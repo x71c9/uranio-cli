@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 
-const [,, ...args] = process.argv;
+import {parser} from './args/';
 
-// console.log(process.argv);
+import {urn_process} from './process';
 
-console.log(`URANIO ${args}`);
+const args = parser(process.argv.slice(2));
+
+urn_process(args);
+
+

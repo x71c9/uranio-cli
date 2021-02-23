@@ -7,7 +7,9 @@
 	"scripts": {
 		"build": "tsc -b",
 		"start": "node -r source-map-support/register dist/urn-cli.js",
-		"dev": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/urn-cli.js\""
+		"init": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/urn-cli.js init\"",
+		"help": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/urn-cli.js -h\"",
+		"version": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/urn-cli.js -v\""
 	},
 	"repository": {
 		"type": "git",
@@ -21,9 +23,12 @@
 	"license": "ISC",
 	"homepage": "https://bitbucket.org/nbl7/urn-cli#readme",
 	"devDependencies": {
+		"@types/minimist": "^1.2.1",
 		"urn-dev": "git+ssh://git@bitbucket.org/nbl7/urn-dev.git"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"minimist": "^1.2.5"
+	},
 	"bin": {
 		"uranio": "dist/urn-cli.js"
 	}
