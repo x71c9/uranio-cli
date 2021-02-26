@@ -21,9 +21,11 @@ if(!fs.existsSync('.urn_log')){
 }
 
 function _spinner_text_color(text:string):string{
-	return chalk.magentaBright(text);
+	// return chalk.yellow(text);
+	return chalk.magenta(text);
 }
 
+// const spinner = ora({text: 'Loading...', color: 'magenta', interval: 40});
 const spinner = ora({text: 'Loading...', color: 'magenta', interval: 40});
 
 export function start_loading(context?:string, text?:string)
@@ -74,7 +76,7 @@ function _format_text(context:string, text:string)
 		:string{
 	const time = dateFormat(new Date(), defaults.time_format);
 	let time_text = '';
-	time_text += `${chalk.blackBright(`[${time}]`)} `;
+	time_text += `${chalk.blue(`[${time}]`)} `;
 	time_text += `${chalk.grey(`[${context}]`)} `;
 	time_text += `${chalk.green(text)}`;
 	time_text += `\n`;
