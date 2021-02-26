@@ -50,6 +50,9 @@ export const init = {
 			}
 		}
 		
+		_create_folder_if_doesnt_exists('init', 'src');
+		_create_folder_if_doesnt_exists('init', 'dist');
+		
 		_remove_folder_if_exists('init', defaults.folder);
 		_create_folder_if_doesnt_exists('init', defaults.folder);
 		
@@ -73,6 +76,7 @@ export const init = {
 			}
 		}
 		
+		output.end_log(`Initialization completed.`);
 		// process.exit(1);
 		
 	}
@@ -118,7 +122,7 @@ async function _uninstall_web_dep(){
 }
 
 async function _install_dep(repo:string, context:string){
-	const action = `installing dependencies for repo [${repo}]`;
+	const action = `installing dependencies [${repo}]`;
 	output.verbose_log(context, `Start ${action}`);
 	output.start_loading(context, action);
 	return new Promise((resolve, reject) => {
@@ -127,7 +131,7 @@ async function _install_dep(repo:string, context:string){
 }
 
 async function _install_dep_dev(repo:string, context:string){
-	const action = `installing dev dependencies for repo [${repo}]`;
+	const action = `installing dev dependencies [${repo}]`;
 	output.verbose_log(context, `Start ${action}`);
 	output.start_loading(context, action);
 	return new Promise((resolve, reject) => {
@@ -136,7 +140,7 @@ async function _install_dep_dev(repo:string, context:string){
 }
 
 async function _uninstall_dep(repo:string, context:string){
-	const action = `uninstalling dependencies for repo [${repo}]`;
+	const action = `uninstalling dependencies [${repo}]`;
 	output.verbose_log(context, `Start ${action}`);
 	output.start_loading(context, action);
 	return new Promise((resolve, reject) => {
@@ -187,15 +191,7 @@ function _spawn_cmd(
 	if(child.stdout){
 		child.stdout.setEncoding('utf8');
 		child.stdout.on('data', (chunk) => {
-			// output.stop_loading();
-			// output.verbose_log(chunk);
-			// output.start_loading(`${action[0].toUpperCase()}${action.slice(1)}...`);
-			// output.start_loading(chunk.replace('/\n/g','').replace('/\r/g',''));
-			// output.spinner_text(chunk.replace('/\n/g','').replace('/\r/g',''));
-			// output.spinner_text(chunk.replace('/\r/g',''));
-			// output.spinner_text(chunk);
 			const plain_text = chunk.replace(/\r?\n|\r/g, ' ');
-			// output.spinner_text(JSON.stringify(chunk).replace('\\n','').slice(1,-1).trim());
 			output.spinner_text(plain_text);
 		});
 	}
@@ -203,14 +199,7 @@ function _spawn_cmd(
 	if(child.stderr){
 		child.stderr.setEncoding('utf8');
 		child.stderr.on('data', (chunk) => {
-			// output.stop_loading();
-			// output.verbose_log(chunk);
-			// output.start_loading(`${action[0].toUpperCase()}${action.slice(1)}...`);
-			// output.start_loading(chunk.replace('/\n/g','').replace('/\r/g',''));
-			// output.spinner_text(chunk.replace('/\n/g','').replace('/\r/g',''));
-			// output.spinner_text(chunk.replace('/\r/g',''));
 			const plain_text = chunk.replace(/\r?\n|\r/g, ' ');
-			// output.spinner_text(JSON.stringify(chunk).replace('\\n','').slice(1,-1).trim());
 			output.spinner_text(plain_text);
 		});
 	}
@@ -219,7 +208,7 @@ function _spawn_cmd(
 		output.stop_loading();
 		switch(code){
 			case 0:{
-				output.log(context, `${defaults.check_char} Done ${action}.`);
+				output.log(context, `${defaults.check_char} Done ${action}`);
 				return resolve(true);
 			}
 			default:{
