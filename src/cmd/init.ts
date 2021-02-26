@@ -104,7 +104,7 @@ async function _uninstall_core_dep(){
 	_remove_folder_if_exists('core', dep_folder);
 	const dep_dev_folder = `./node_modules/${defaults.core_dep_dev_repo}`;
 	_remove_folder_if_exists('core', dep_dev_folder);
-	await _uninstall_dep(`${defaults.core_dep_repo} ${defaults.core_dep_dev_repo}`, 'core');
+	await _uninstall_dep(`${defaults.core_dep_repo.split('/').slice(-1)[0]} ${defaults.core_dep_dev_repo.split('/').slice(-1)[0]}`, 'core');
 	return true;
 }
 
@@ -113,7 +113,7 @@ async function _uninstall_web_dep(){
 	_remove_folder_if_exists('web', dep_folder);
 	const dep_dev_folder = `./node_modules/${defaults.web_dep_dev_repo}`;
 	_remove_folder_if_exists('web', dep_dev_folder);
-	await _uninstall_dep(`${defaults.web_dep_repo} ${defaults.core_dep_dev_repo}`, 'web');
+	await _uninstall_dep(`${defaults.web_dep_repo.split('/').slice(-1)[0]} ${defaults.core_dep_dev_repo.split('/').slice(-1)[0]}`, 'web');
 	return true;
 }
 
@@ -194,7 +194,9 @@ function _spawn_cmd(
 			// output.spinner_text(chunk.replace('/\n/g','').replace('/\r/g',''));
 			// output.spinner_text(chunk.replace('/\r/g',''));
 			// output.spinner_text(chunk);
-			output.spinner_text(JSON.stringify(chunk).replace('\\n','').slice(1,-1).trim());
+			const plain_text = chunk.replace(/\r?\n|\r/g, ' ');
+			// output.spinner_text(JSON.stringify(chunk).replace('\\n','').slice(1,-1).trim());
+			output.spinner_text(plain_text);
 		});
 	}
 	
@@ -207,7 +209,9 @@ function _spawn_cmd(
 			// output.start_loading(chunk.replace('/\n/g','').replace('/\r/g',''));
 			// output.spinner_text(chunk.replace('/\n/g','').replace('/\r/g',''));
 			// output.spinner_text(chunk.replace('/\r/g',''));
-			output.spinner_text(JSON.stringify(chunk).replace('\\n','').slice(1,-1).trim());
+			const plain_text = chunk.replace(/\r?\n|\r/g, ' ');
+			// output.spinner_text(JSON.stringify(chunk).replace('\\n','').slice(1,-1).trim());
+			output.spinner_text(plain_text);
 		});
 	}
 	
