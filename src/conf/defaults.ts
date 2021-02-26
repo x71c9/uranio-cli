@@ -6,11 +6,15 @@
 
 const cloud_address = 'ssh://git@bitbucket.org/nbl7/';
 
-export const conf = {
+export const defaults = {
 	
 	default_repo: 'web',
 	
-	urn_folder: '.urn',
+	folder: '.urn',
+	
+	log_filepath: '.urn_log',
+	
+	time_format: "yy-mm-dd'T'HH:MM:ss:l",
 	
 	web_repo: `${cloud_address}urn-web.git`,
 	
@@ -23,5 +27,13 @@ export const conf = {
 	core_dep_repo: `${cloud_address}urn-core-dep`,
 	
 	core_dep_dev_repo: `${cloud_address}urn-core-dep-dev`,
+	
+	check_char: '✔'
+	
+};
+
+export const conf = {
+	
+	verbose: true
 	
 };

@@ -3,3 +3,4 @@ config/*
 !config/example.env
 dist
 .urn
+.urn_log
