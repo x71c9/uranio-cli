@@ -61,7 +61,12 @@ export function log(context:string, text:string)
 
 export function error_log(context:string, text:string)
 		:void{
-	_log(context, `[ERROR] ${text}`);
+	log(context, `[ERROR] ${text}`);
+}
+
+export function end_log(text:string)
+		:void{
+	log('finished', chalk.yellow(text));
 }
 
 function _log(context:string, text:string, out=false){
