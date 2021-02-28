@@ -15,7 +15,7 @@ import * as cp from 'child_process';
 
 // import chalk from 'chalk';
 
-import {Arguments} from '../types';
+import {Arguments, Repo} from '../types';
 
 import {conf, defaults} from '../conf/defaults';
 
@@ -29,7 +29,7 @@ export const init = {
 		
 		title();
 		
-		let repo = defaults.default_repo;
+		let repo:Repo = defaults.default_repo;
 		
 		const args_repo = args.r || args.repo;
 		
@@ -50,11 +50,20 @@ export const init = {
 			}
 		}
 		
+		_update_aliases(repo);
+		
 		_create_folder_if_doesnt_exists('init', 'src');
 		_create_folder_if_doesnt_exists('init', 'dist');
 		
 		_remove_folder_if_exists('init', defaults.folder);
 		_create_folder_if_doesnt_exists('init', defaults.folder);
+		
+		_copy_book_file();
+		_copy_types_file();
+		
+		// TODO only in production _copy_tsconfig_file();
+		
+		_copy_eslint_files();
 		
 		switch(repo){
 			case 'core':{
@@ -83,12 +92,57 @@ export const init = {
 	
 };
 
-function sync_exec(cause: string, context:string, action:string, done:string, command:string){
-	output.verbose_log(context, `* ${cause}`);
+function _copy_book_file(){
+	_copy_file('./src/files/book.ts', `./${defaults.folder}/book.ts`);
+}
+
+function _copy_types_file(){
+	_copy_file('./src/files/types.ts', `./${defaults.folder}/types.ts`);
+}
+
+function _update_aliases(repo:Repo){
+	const data = fs.readFileSync('./package.json', 'utf8');
+	const package_data = JSON.parse(data);
+	package_data['_moduleAliases'] = {
+		urn_book: './dist/book.js',
+		urn_core: './dist/urn-core/',
+	};
+	if(repo === 'web'){
+		package_data['_moduleAliases']['urn_web'] = './dist/urn-web/';
+	}
+	fs.writeFileSync('./package.json', JSON.stringify(package_data, null, '\t'));
+}
+
+// function _copy_tsconfig_file(){
+//   _copy_file('./src/files/tsconfig.json', './tsconfig.json');
+// }
+
+function _copy_eslint_files(){
+	_copy_files('./src/files/.eslintrc.js ./src/files/.eslintignore', '.');
+}
+
+function _copy_files(source:string, destination:string){
+	_sync_exec(
+		`cp -t ${destination} ${source}`,
+		'init',
+		`copying files ${source} to ${destination}`,
+	);
+}
+
+function _copy_file(source:string, destination:string){
+	_sync_exec(
+		`cp ${source} ${destination}`,
+		'init',
+		`copying file ${source} to ${destination}`,
+	);
+}
+
+// function _sync_exec(cause: string, context:string, action:string, done:string, command:string){
+function _sync_exec(command:string, context:string, action:string){
 	output.start_loading(context, action);
 	cp.execSync(command);
 	output.stop_loading();
-	output.log(context, `${defaults.check_char} ${done}`);
+	output.log(context, `${defaults.check_char} Done ${action}`);
 }
 
 async function _install_core_dep(){
@@ -227,24 +281,20 @@ function _spawn_cmd(
 
 function _remove_folder_if_exists(context:string, folder_path:string){
 	if(fs.existsSync(folder_path)){
-		sync_exec(
-			`Folder ${folder_path} exists`,
+		_sync_exec(
+			`rm -rf ${folder_path}`,
 			context,
-			`Deleting folder ${folder_path}`,
-			`Folder ${folder_path} deleted`,
-			`rm -rf ${folder_path}`
+			`deleting folder ${folder_path}`
 		);
 	}
 }
 
 function _create_folder_if_doesnt_exists(context:string, folder_path:string){
 	if(!fs.existsSync(folder_path)){
-		sync_exec(
-			`Folder ${folder_path} doesn't exists`,
+		_sync_exec(
+			`mkdir ${folder_path}`,
 			context,
-			`Deleting folder ${folder_path}`,
-			`Folder ${folder_path} deleted`,
-			`rm -rf ${folder_path}`
+			`creating folder ${folder_path}`,
 		);
 	}
 }
