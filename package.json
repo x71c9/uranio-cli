@@ -35,6 +35,11 @@
 		"urn-web-dep": "bitbucket:nbl7/urn-web-dep"
 	},
 	"bin": {
-		"uranio": "dist/urn-cli.js"
+		"uranio": "dist/src/urn-cli.js"
+	},
+	"_moduleAliases": {
+		"urn_book": "./dist/book.js",
+		"urn_core": "./dist/urn-core/",
+		"urn_web": "./dist/urn-web/"
 	}
 }

@@ -20,12 +20,12 @@
 		"moduleResolution": "node",
 		"esModuleInterop": true,
 		"experimentalDecorators": true,
-		"sourceMap": true
+		"sourceMap": true,
 	},
 	"include": [
-		"src/**/*"
+		"src/**/*",
 	],
 	"exclude": [
-		"src/__test__/**/*"
+		"src/files/**/*"
 	]
 }

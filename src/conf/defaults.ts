@@ -4,9 +4,11 @@
  * @packageDocumentation
  */
 
+import {Defaults, Conf} from '../types';
+
 const cloud_address = 'ssh://git@bitbucket.org/nbl7/';
 
-export const defaults = {
+export const defaults:Defaults = {
 	
 	default_repo: 'web',
 	
@@ -32,7 +34,7 @@ export const defaults = {
 	
 };
 
-export const conf = {
+export const conf:Conf = {
 	
 	verbose: true
 	

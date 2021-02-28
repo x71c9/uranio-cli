@@ -5,7 +5,7 @@
 		"allowJs": true,
 		"lib": [ "es2015" ],
 		"outDir": "./dist",
-		"rootDir": "./src",
+		"rootDir": "./",
 		"strict": true,
 		"declaration": true,
 		"noImplicitAny": true,
@@ -34,5 +34,7 @@
 		"src/**/*",
 		".urn/**/*"
 	],
-	"exclude": []
+	"exclude": [
+		"dist/**/*"
+	]
 }
