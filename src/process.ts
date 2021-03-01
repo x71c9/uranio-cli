@@ -6,14 +6,18 @@
 
 import {Arguments} from './types';
 
-import {help, init} from './cmd/';
+import {help, init, transpose} from './cmd/';
+
+import {conf} from './conf/defaults';
+
+import * as output from './log/';
 
 export function urn_process(args:Arguments)
 		:void{
 	
-	let cmd = args._[0] || 'help';
+	let cmd = args._[0] || '';
 	
-	if (args.version || args.v) {
+	if (args.version) {
 		cmd = 'version';
 	}
 	
@@ -21,9 +25,26 @@ export function urn_process(args:Arguments)
 		cmd = 'help';
 	}
 	
+	const verbose = args.v || args.verbose;
+	
+	if(verbose === true){
+		conf.verbose = true;
+	}
+	
+	_log_arguments(args);
+		
 	switch(cmd){
+		case '':
+		case 'version':{
+			console.log('v0.0.1');
+			break;
+		}
 		case 'init':{
 			init.run(args);
+			break;
+		}
+		case 'transpose':{
+			transpose.run(args);
 			break;
 		}
 		case 'help':{
@@ -38,3 +59,8 @@ export function urn_process(args:Arguments)
 	// process.exit(1);
 	
 }
+
+function _log_arguments(args:Arguments){
+	output.verbose_log('args', JSON.stringify(args));
+}
+

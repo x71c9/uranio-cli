@@ -8,6 +8,7 @@
 		"build": "tsc -b",
 		"start": "node -r source-map-support/register dist/urn-cli.js",
 		"init": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/urn-cli.js init\"",
+		"transpose": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/urn-cli.js transpose\"",
 		"help": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/urn-cli.js -h\"",
 		"version": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/urn-cli.js -v\""
 	},
@@ -32,6 +33,7 @@
 		"dateformat": "^4.5.1",
 		"minimist": "^1.2.5",
 		"ora": "^5.3.0",
+		"ts-morph": "^10.0.1",
 		"urn-web-dep": "bitbucket:nbl7/urn-web-dep"
 	},
 	"bin": {
