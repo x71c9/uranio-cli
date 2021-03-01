@@ -15,6 +15,8 @@ export type Repo = 'core' | 'web';
 export type Defaults = {
 	default_repo: Repo,
 	folder: string,
+	book_src_path: string,
+	book_dest_path: string,
 	log_filepath: string,
 	time_format: string,
 	core_repo: string,

@@ -14,6 +14,10 @@ export const defaults:Defaults = {
 	
 	folder: '.urn',
 	
+	book_src_path: './src/book.ts',
+	
+	book_dest_path: './.urn/book.ts',
+	
 	log_filepath: '.urn_log',
 	
 	time_format: "yy-mm-dd'T'HH:MM:ss:l",

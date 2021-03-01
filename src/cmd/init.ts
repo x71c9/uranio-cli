@@ -17,7 +17,7 @@ import * as cp from 'child_process';
 
 import {Arguments, Repo} from '../types';
 
-import {conf, defaults} from '../conf/defaults';
+import {defaults} from '../conf/defaults';
 
 import * as output from '../log/';
 
@@ -32,10 +32,6 @@ export const init = {
 		let repo:Repo = defaults.default_repo;
 		
 		const args_repo = args.r || args.repo;
-		
-		if(args.verbose === true){
-			conf.verbose = true;
-		}
 		
 		if(args_repo){
 			switch(args_repo){
@@ -152,8 +148,8 @@ async function _install_core_dep(){
 }
 
 async function _install_web_dep(){
-	await _install_dep(defaults.web_dep_repo, 'web');
-	await _install_dep_dev(defaults.web_dep_dev_repo, 'web');
+	await _install_dep(defaults.web_dep_repo, 'web_');
+	await _install_dep_dev(defaults.web_dep_dev_repo, 'web_');
 	return true;
 }
 
@@ -168,10 +164,10 @@ async function _uninstall_core_dep(){
 
 async function _uninstall_web_dep(){
 	const dep_folder = `./node_modules/${defaults.web_dep_repo}`;
-	_remove_folder_if_exists('web', dep_folder);
+	_remove_folder_if_exists('web_', dep_folder);
 	const dep_dev_folder = `./node_modules/${defaults.web_dep_dev_repo}`;
-	_remove_folder_if_exists('web', dep_dev_folder);
-	await _uninstall_dep(`${defaults.web_dep_repo.split('/').slice(-1)[0]} ${defaults.core_dep_dev_repo.split('/').slice(-1)[0]}`, 'web');
+	_remove_folder_if_exists('web_', dep_dev_folder);
+	await _uninstall_dep(`${defaults.web_dep_repo.split('/').slice(-1)[0]} ${defaults.core_dep_dev_repo.split('/').slice(-1)[0]}`, 'web_');
 	return true;
 }
 
@@ -206,7 +202,7 @@ async function _clone_core(){
 }
 
 async function _clone_web(){
-	return await _clone_repo('web', defaults.web_repo, 'urn-web');
+	return await _clone_repo('web_', defaults.web_repo, 'urn-web');
 }
 
 async function _clone_repo(context: string, address:string, dest_folder:string){

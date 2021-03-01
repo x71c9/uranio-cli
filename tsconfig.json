@@ -26,6 +26,7 @@
 		"src/**/*",
 	],
 	"exclude": [
-		"src/files/**/*"
+		"src/files/**/*",
+		"src/book.ts"
 	]
 }
