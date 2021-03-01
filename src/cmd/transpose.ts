@@ -101,12 +101,9 @@ function _remove_bll_import(prop:PropertyAssignment){
 		if(symbol){
 			const declarations = symbol.getDeclarations();
 			for(const decl of declarations){
-				const decl_parent = decl.getParent();
-				if(decl_parent){
-					const import_decl = decl_parent.getParentIfKind(ts.SyntaxKind.ImportDeclaration);
-					if(import_decl){
-						import_decl.replaceWithText('');
-					}
+				const import_decl = decl.getFirstAncestorByKind(ts.SyntaxKind.ImportDeclaration);
+				if(import_decl){
+					import_decl.replaceWithText('');
 				}
 			}
 		}
