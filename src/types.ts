@@ -10,7 +10,21 @@ export type Arguments = minimist.ParsedArgs;
 
 export type ParseOptions = minimist.Opts;
 
-export type Repo = 'core' | 'web';
+const repos = {
+	core: '',
+	web: ''
+} as const;
+
+export function valid_repos()
+		:string[]{
+	const vals:string[] = [];
+	for(const k in repos){
+		vals.push(k);
+	}
+	return vals;
+}
+
+export type Repo = keyof typeof repos;
 
 export type Defaults = {
 	default_repo: Repo,
