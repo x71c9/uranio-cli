@@ -34,7 +34,7 @@
 		"minimist": "^1.2.5",
 		"ora": "^5.3.0",
 		"ts-morph": "^10.0.1",
-		"urn-web-dep": "bitbucket:nbl7/urn-web-dep"
+		"urn-core-dep": "bitbucket:nbl7/urn-core-dep"
 	},
 	"bin": {
 		"uranio": "dist/src/urn-cli.js"
