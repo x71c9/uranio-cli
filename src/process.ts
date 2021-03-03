@@ -7,7 +7,6 @@
 import {Arguments} from './types';
 
 import {help, init, transpose} from './cmd/';
-// import {help, init} from './cmd/';
 
 import {conf} from './conf/defaults';
 

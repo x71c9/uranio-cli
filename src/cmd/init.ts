@@ -46,8 +46,6 @@ export const init = {
 		
 		output.end_log(`Initialization completed.`);
 		
-		// process.exit(1);
-		
 	}
 	
 };
