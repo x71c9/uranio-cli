@@ -11,8 +11,11 @@ import {
 	Project,
 	Node,
 	VariableDeclaration,
-	PropertyAssignment,
-	SourceFile
+	VariableStatement,
+	// PropertyAssignment,
+	SourceFile,
+	QuoteKind,
+	IndentationText
 } from 'ts-morph';
 
 import {Arguments} from '../types';
@@ -37,11 +40,18 @@ export const transpose = {
 		
 		output.end_log(`Transpose completed.`);
 		
-		// process.exit(1);
-		
 	}
 	
 };
+
+const _project = new Project(
+	{
+		manipulationSettings: {
+			indentationText: IndentationText.Tab,
+			quoteKind: QuoteKind.Single,
+		}
+	}
+);
 
 function _manipulate_file(src_path:string){
 	
@@ -50,10 +60,11 @@ function _manipulate_file(src_path:string){
 	
 	output.verbose_log(`mnpl`, `Started ${action}.`);
 	
-	const project = new Project();
-	let sourceFile = project.addSourceFileAtPath(src_path);
+	let sourceFile = _project.addSourceFileAtPath(src_path);
 	
 	sourceFile = _change_realtive_imports(sourceFile);
+	sourceFile = _create_bll_book(sourceFile);
+	sourceFile = _create_route_book(sourceFile);
 	sourceFile = _manipulate_atom_book(sourceFile);
 
 	output.done_log('mnpl', `Done ${action}`);
@@ -64,18 +75,113 @@ function _manipulate_file(src_path:string){
 function _manipulate_atom_book(sourceFile:SourceFile)
 		:SourceFile{
 	output.start_loading(`Manipulating atom_book...`);
-	const var_states = sourceFile.getChildrenOfKind(ts.SyntaxKind.VariableStatement);
-	for(const var_state of var_states){
-		let book_decl = _find_atom_book_declaration(var_state);
-		if(book_decl){
-			book_decl = _remove_type_reference(book_decl);
-			book_decl = _remove_bll_prop_and_imports(book_decl);
-			book_decl = _add_as_const(book_decl);
-			break;
-		}
+	let book_decl = _find_atom_book_declaration(sourceFile);
+	if(book_decl){
+		book_decl = _remove_type_reference(book_decl);
+		book_decl = _clean_prop('bll', book_decl);
+		book_decl = _clean_prop('api', book_decl);
+		book_decl = _append_requried_atoms(book_decl);
+		book_decl = _add_as_const(book_decl);
 	}
 	output.done_log('mnpl', 'Done manipulating atom_book.');
 	return sourceFile;
+}
+
+function _create_a_book(sourceFile:SourceFile, book_name:string, keep_property:string)
+		:SourceFile{
+	output.start_loading(`Creating ${book_name}_book...`);
+	const book_state = _find_atom_book_statement(sourceFile);
+	if(book_state){
+		const atom_book_state_text = book_state.getText();
+		const cloned_book_source = _project.createSourceFile(`./${defaults.folder}/${book_name}_book.ts`, atom_book_state_text);
+		let cloned_book_decl = cloned_book_source.getFirstDescendantByKind(ts.SyntaxKind.VariableDeclaration);
+		if(cloned_book_decl){
+			cloned_book_decl = _remove_type_reference(cloned_book_decl);
+			cloned_book_decl = _rename_book(book_name, cloned_book_decl);
+			cloned_book_decl = _clean_all_but(keep_property, cloned_book_decl);
+		}
+		const last = sourceFile.getLastChildByKind(ts.SyntaxKind.VariableStatement);
+		if(last){
+			last.replaceWithText(last.getText() + cloned_book_source.getText());
+		}
+	}
+	output.done_log(book_name, `Created ${book_name}_book.`);
+	return sourceFile;
+}
+
+function _create_route_book(sourceFile:SourceFile)
+		:SourceFile{
+	return _create_a_book(sourceFile, 'api', 'api');
+}
+
+function _create_bll_book(sourceFile:SourceFile)
+		:SourceFile{
+	return _create_a_book(sourceFile, 'bll', 'bll');
+}
+
+function _clean_all_but(but:string, var_decl:VariableDeclaration)
+		:VariableDeclaration{
+	output.start_loading(`Cleaning all properties but [${but}]...`);
+	const book_expr = var_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+	if(book_expr){
+		const atom_names = book_expr.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
+		for(const atom_name of atom_names){
+			const atom_def = atom_name.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+			if(atom_def){
+				const atom_def_props = atom_def.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
+				for(const atom_def_prop of atom_def_props){
+					if(atom_def_prop.getName() !== but){
+						atom_def_prop.remove();
+					}
+				}
+			}
+		}
+	}
+	output.done_verbose_log('props', `Removed all properties but [${but}].`);
+	return var_decl;
+}
+
+function _clean_prop(prop:string, var_decl:VariableDeclaration)
+		:VariableDeclaration{
+	output.start_loading(`Cleaning property [${prop}]...`);
+	const book_expr = var_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+	if(book_expr){
+		const atom_names = book_expr.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
+		for(const atom_name of atom_names){
+			const atom_def = atom_name.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+			if(atom_def){
+				const atom_def_props = atom_def.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
+				for(const atom_def_prop of atom_def_props){
+					if(atom_def_prop.getName() === prop){
+						atom_def_prop.remove();
+					}
+				}
+			}
+		}
+	}
+	output.done_verbose_log('prop', `Removed property [${prop}].`);
+	return var_decl;
+}
+
+function _rename_book(book_name:string, var_decl:VariableDeclaration)
+		:VariableDeclaration{
+	const identifier = var_decl.getFirstChildByKind(ts.SyntaxKind.Identifier);
+	if(identifier){
+		identifier.replaceWithText(`${book_name}_book`);
+	}
+	return var_decl;
+}
+
+function _append_requried_atoms(book_decl:VariableDeclaration)
+		:VariableDeclaration{
+	output.start_loading(`Adding required_book...`);
+	const obj_lit = book_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+	if(obj_lit){
+		const text = obj_lit.getText();
+		obj_lit.replaceWithText(`{...uranio.types.required_book,\n` + text.slice(1,text.length));
+	}
+	output.done_log(`requ`, `Added required_book.`);
+	return book_decl;
 }
 
 function _change_realtive_imports(sourceFile:SourceFile)
@@ -115,53 +221,100 @@ function _change_realtive_import(node:Node)
 			output.verbose_log(`impo`, `Changed [${text}] to [${replace}].`);
 		}
 	}
-	output.done_log('impo', `Changed relative import.`);
+	// output.done_log('impo', `Changed relative import.`);
 	return node;
 }
 
-function _remove_bll_import(prop:PropertyAssignment){
-	output.start_loading(`Removing bll import...`);
-	const bll_value = prop.getLastChildByKind(ts.SyntaxKind.Identifier);
-	if(bll_value){
-		const symbol = bll_value.getSymbol();
-		if(symbol){
-			const declarations = symbol.getDeclarations();
-			for(const decl of declarations){
-				const import_decl = decl.getFirstAncestorByKind(ts.SyntaxKind.ImportDeclaration);
-				if(import_decl){
-					const import_text = import_decl.getText();
-					import_decl.replaceWithText('');
-					output.verbose_log('blls', `Removed import declaration [${import_text}].`);
-				}
-			}
-		}
-	}
-	output.done_log('blls', `Removed bll import.`);
-}
+// function _remove_bll_import(prop:PropertyAssignment){
+//   output.start_loading(`Removing bll import...`);
+//   const bll_value = prop.getLastChildByKind(ts.SyntaxKind.Identifier);
+//   if(bll_value){
+//     const symbol = bll_value.getSymbol();
+//     if(symbol){
+//       const declarations = symbol.getDeclarations();
+//       for(const decl of declarations){
+//         const import_decl = decl.getFirstAncestorByKind(ts.SyntaxKind.ImportDeclaration);
+//         if(import_decl){
+//           const import_text = import_decl.getText();
+//           import_decl.replaceWithText('');
+//           output.verbose_log('blls', `Removed import declaration [${import_text}].`);
+//         }
+//       }
+//     }
+//   }
+//   output.done_log('blls', `Removed bll import.`);
+// }
 
-function _remove_bll_prop_and_imports(book_decl:VariableDeclaration){
-	output.start_loading(`Removing bll prop and imports...`);
-	output.verbose_log(`bll_`, `Look for bll property assignments.`);
-	const book_expr = book_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
-	if(book_expr){
-		const atom_names = book_expr.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
-		for(const atom_name of atom_names){
-			const atom_def = atom_name.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
-			if(atom_def){
-				const atom_def_props = atom_def.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
-				for(const atom_def_prop of atom_def_props){
-					if(atom_def_prop.getName() === 'bll'){
-						_remove_bll_import(atom_def_prop);
-						atom_def_prop.remove();
-						output.verbose_log(`bll_`, `Removed bll for [${atom_name.getName()}].`);
-					}
-				}
-			}
-		}
-	}
-	output.done_log('blls', `Removed blls.`);
-	return book_decl;
-}
+// function _remove_api_prop(book_decl:VariableDeclaration){
+//   output.start_loading(`Removing bll props...`);
+//   output.verbose_log(`bll`, `Look for bll property assignments.`);
+//   const book_expr = book_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+//   if(book_expr){
+//     const atom_names = book_expr.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
+//     for(const atom_name of atom_names){
+//       const atom_def = atom_name.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+//       if(atom_def){
+//         const atom_def_props = atom_def.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
+//         for(const atom_def_prop of atom_def_props){
+//           if(atom_def_prop.getName() === 'bll'){
+//             atom_def_prop.remove();
+//             output.verbose_log(`bll_`, `Removed bll for [${atom_name.getName()}].`);
+//           }
+//         }
+//       }
+//     }
+//   }
+//   output.done_log('blls', `Removed blls.`);
+//   return book_decl;
+// }
+
+// function _remove_bll_prop(book_decl:VariableDeclaration){
+//   output.start_loading(`Removing bll props...`);
+//   output.verbose_log(`bll`, `Look for bll property assignments.`);
+//   const book_expr = book_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+//   if(book_expr){
+//     const atom_names = book_expr.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
+//     for(const atom_name of atom_names){
+//       const atom_def = atom_name.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+//       if(atom_def){
+//         const atom_def_props = atom_def.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
+//         for(const atom_def_prop of atom_def_props){
+//           if(atom_def_prop.getName() === 'bll'){
+//             // _remove_bll_import(atom_def_prop);
+//             atom_def_prop.remove();
+//             output.verbose_log(`bll_`, `Removed bll for [${atom_name.getName()}].`);
+//           }
+//         }
+//       }
+//     }
+//   }
+//   output.done_log('blls', `Removed blls.`);
+//   return book_decl;
+// }
+
+// function _remove_bll_prop_and_imports(book_decl:VariableDeclaration){
+//   output.start_loading(`Removing bll prop and imports...`);
+//   output.verbose_log(`bll_`, `Look for bll property assignments.`);
+//   const book_expr = book_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+//   if(book_expr){
+//     const atom_names = book_expr.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
+//     for(const atom_name of atom_names){
+//       const atom_def = atom_name.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+//       if(atom_def){
+//         const atom_def_props = atom_def.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
+//         for(const atom_def_prop of atom_def_props){
+//           if(atom_def_prop.getName() === 'bll'){
+//             _remove_bll_import(atom_def_prop);
+//             atom_def_prop.remove();
+//             output.verbose_log(`bll_`, `Removed bll for [${atom_name.getName()}].`);
+//           }
+//         }
+//       }
+//     }
+//   }
+//   output.done_log('blls', `Removed blls.`);
+//   return book_decl;
+// }
 
 function _remove_type_reference(book_decl:VariableDeclaration){
 	output.start_loading(`Removing type reference...`);
@@ -175,20 +328,68 @@ function _remove_type_reference(book_decl:VariableDeclaration){
 	return book_decl;
 }
 
-function _find_atom_book_declaration(node:Node){
+function _find_atom_book_declaration(sourceFile:SourceFile)
+		:VariableDeclaration | undefined{
 	output.start_loading(`Looking for atom_book declaration...`);
 	output.verbose_log(`book`, `Look for atom_book declaration.`);
-	const var_decl_list = node.getFirstChildByKind(ts.SyntaxKind.VariableDeclarationList);
-	if(var_decl_list){
-		const var_decl = var_decl_list.getFirstChildByKind(ts.SyntaxKind.VariableDeclaration);
-		if(var_decl){
-			const name = var_decl.getName();
-			if(name === 'atom_book'){
-				output.done_log(`book`, `Declaration of atom_book found.`);
-				return var_decl;
+	const var_states = sourceFile.getChildrenOfKind(ts.SyntaxKind.VariableStatement);
+	for(const state of var_states){
+		const var_decl_list = state.getFirstChildByKind(ts.SyntaxKind.VariableDeclarationList);
+		if(var_decl_list){
+			const var_decl = var_decl_list.getFirstChildByKind(ts.SyntaxKind.VariableDeclaration);
+			if(var_decl){
+				const name = var_decl.getName();
+				if(name === 'atom_book'){
+					output.done_log(`book`, `Declaration of atom_book found.`);
+					return var_decl;
+				}
 			}
 		}
 	}
 	output.done_log('book', `Cannot find atom_book`);
 	return undefined;
 }
+
+function _find_atom_book_statement(sourceFile:SourceFile)
+		:VariableStatement | undefined{
+	output.start_loading(`Looking for atom_book statement...`);
+	output.verbose_log(`book`, `Look for atom_book statement.`);
+	const var_states = sourceFile.getChildrenOfKind(ts.SyntaxKind.VariableStatement);
+	for(const state of var_states){
+		const var_decl_list = state.getFirstChildByKind(ts.SyntaxKind.VariableDeclarationList);
+		if(var_decl_list){
+			const var_decl = var_decl_list.getFirstChildByKind(ts.SyntaxKind.VariableDeclaration);
+			if(var_decl){
+				const name = var_decl.getName();
+				if(name === 'atom_book'){
+					output.done_log(`book`, `Statement of atom_book found.`);
+					return state;
+				}
+			}
+		}
+	}
+	output.done_log('book', `Cannot find atom_book`);
+	return undefined;
+}
+// function _get_object_literal(var_decl:VariableDeclaration)
+//     :ObjectLiteralExpression | undefined {
+//   return var_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+// }
+
+// function _find_atom_book_declaration(node:Node){
+//   output.start_loading(`Looking for atom_book declaration...`);
+//   output.verbose_log(`book`, `Look for atom_book declaration.`);
+//   const var_decl_list = node.getFirstChildByKind(ts.SyntaxKind.VariableDeclarationList);
+//   if(var_decl_list){
+//     const var_decl = var_decl_list.getFirstChildByKind(ts.SyntaxKind.VariableDeclaration);
+//     if(var_decl){
+//       const name = var_decl.getName();
+//       if(name === 'atom_book'){
+//         output.done_log(`book`, `Declaration of atom_book found.`);
+//         return var_decl;
+//       }
+//     }
+//   }
+//   output.done_log('book', `Cannot find atom_book`);
+//   return undefined;
+// }
