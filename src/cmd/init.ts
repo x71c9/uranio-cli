@@ -20,6 +20,8 @@ export const init = {
 	
 	run: async (args:Arguments):Promise<void> => {
 		
+		console.clear();
+		
 		title();
 		
 		output.start_loading('Initialization...');
@@ -237,7 +239,7 @@ function _spawn_cmd(command:string, context:string, action:string, resolve:PF, r
 	
 	const child = cp.spawn(first_command, splitted_command);
 	
-	output.log(context, command);
+	output.verbose_log(context, command);
 	
 	if(child.stdout){
 		child.stdout.setEncoding('utf8');
@@ -258,7 +260,7 @@ function _spawn_cmd(command:string, context:string, action:string, resolve:PF, r
 	child.on('close', (code) => {
 		switch(code){
 			case 0:{
-				output.done_log(context, `Done ${action}`);
+				output.done_verbose_log(context, `Done ${action}`);
 				return resolve(true);
 			}
 			default:{
