@@ -7,6 +7,7 @@
 import {Arguments} from './types';
 
 import {help, init, transpose} from './cmd/';
+// import {help, init} from './cmd/';
 
 import {conf} from './conf/defaults';
 
@@ -29,6 +30,12 @@ export function urn_process(args:Arguments)
 	
 	if(verbose === true){
 		conf.verbose = true;
+	}
+	
+	const no_colors = args['no-colors'];
+	
+	if(no_colors === true){
+		conf.colors = false;
 	}
 	
 	_log_arguments(args);

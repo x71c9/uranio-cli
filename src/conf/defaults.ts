@@ -40,6 +40,8 @@ export const defaults:Defaults = {
 
 export const conf:Conf = {
 	
-	verbose: true
+	verbose: true,
+	
+	colors: true
 	
 };

@@ -28,7 +28,7 @@ export const transpose = {
 		output.start_loading('Transposing...');
 		
 		const src_path = args.s || args['src-path'] || defaults.book_src_path;
-
+		
 		const destination = args.d || args.destination || defaults.book_dest_path;
 		
 		const modified = _manipulate_file(src_path);
@@ -112,9 +112,10 @@ function _change_realtive_import(node:Node)
 		if(text.includes('./')){
 			const replace = text.replace('./','../src/');
 			str_lit.replaceWithText(replace);
-			output.done_verbose_log(`impo`, `Changed [${text}] to [${replace}].`);
+			output.verbose_log(`impo`, `Changed [${text}] to [${replace}].`);
 		}
 	}
+	output.done_log('impo', `Changed relative import.`);
 	return node;
 }
 
@@ -128,12 +129,14 @@ function _remove_bll_import(prop:PropertyAssignment){
 			for(const decl of declarations){
 				const import_decl = decl.getFirstAncestorByKind(ts.SyntaxKind.ImportDeclaration);
 				if(import_decl){
+					const import_text = import_decl.getText();
 					import_decl.replaceWithText('');
+					output.verbose_log('blls', `Removed import declaration [${import_text}].`);
 				}
 			}
 		}
 	}
-	output.verbose_log('blls', `Removed bll import.`);
+	output.done_log('blls', `Removed bll import.`);
 }
 
 function _remove_bll_prop_and_imports(book_decl:VariableDeclaration){

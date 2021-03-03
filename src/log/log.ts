@@ -21,15 +21,26 @@ if(!fs.existsSync('.urnlog')){
 }
 
 function _spinner_text_color(text?:string):string{
-	return (text) ? chalk.magenta(text) : '';
+	if(!text){
+		return '';
+	}
+	return (conf.colors === true) ? chalk.magenta(text) : text;
 }
 
 const spinner = ora({text: 'Loading...', color: 'magenta', interval: 40});
 
+const spinner_texts:string[] = [];
+
 export function start_loading(text:string)
 		:void{
+	if(conf.colors === false){
+		spinner.color = 'white';
+	}
+	spinner_texts.push(text);
 	spinner_text(text);
-	spinner.start();
+	if(!spinner.isSpinning){
+		spinner.start();
+	}
 }
 
 export function stop_loading()
@@ -37,50 +48,44 @@ export function stop_loading()
 	spinner.stop();
 }
 
-// export function spinner_text(context?:string, text?:string)
-//     :void{
-//   let t = '';
-//   t += (context) ? `[${context}] ` : '';
-//   t += (text) ? text : '';
-//   if(t != ''){
-//     spinner.text = _spinner_text_color(t);
-//   }
-//   spinner.text = _spinner_text_color(text);
-// }
-
 export function spinner_text(text:string)
 		:void{
-	if(text){
-		spinner.text = _spinner_text_color(text);
-	}
+	spinner.text = _spinner_text_color(text);
+}
+
+function _go_previous(){
+	spinner_texts.pop();
+	spinner_text(spinner_texts[spinner_texts.length - 1]);
 }
 
 export function done_log(context:string, text:string)
 		:void{
-	stop_loading();
+	_go_previous();
 	log(context, `${defaults.check_char} ${text}`);
 }
 
 export function done_verbose_log(context:string, text:string)
 		:void{
-	stop_loading();
+	_go_previous();
 	verbose_log(context, `${defaults.check_char} ${text}`);
 }
 
 export function error_log(context:string, text:string)
 		:void{
+	stop_loading();
 	log(context, `[ERROR] ${text}`);
 }
 
 export function end_log(text:string)
 		:void{
 	stop_loading();
-	log('end', chalk.yellow(text));
+	log('end', (conf.colors) ? chalk.yellow(text) : text);
 }
 
 export function verbose_log(context:string, text:string)
 		:void{
-	_log(context, chalk.hex('#668899')(text), (conf.verbose === true));
+	const color_text = (conf.colors) ? chalk.hex('#668899')(text) : text;
+	_log(context, color_text, (conf.verbose === true));
 }
 
 export function log(context:string, text:string)
@@ -113,9 +118,15 @@ function _format_text(context:string, text:string)
 		context = context.substr(0,4);
 	}
 	let time_text = '';
-	time_text += `${chalk.blue(`[${time}]`)} `;
-	time_text += `${chalk.grey(`[${context}]`)} `;
-	time_text += `${chalk.green(text)}`;
+	if(conf.colors === true){
+		time_text += `${chalk.blue(`[${time}]`)} `;
+		time_text += `${chalk.grey(`[${context}]`)} `;
+		time_text += `${chalk.green(text)}`;
+	}else{
+		time_text += `[${time}] `;
+		time_text += `[${context}] `;
+		time_text += text;
+	}
 	time_text += `\n`;
 	return time_text;
 }

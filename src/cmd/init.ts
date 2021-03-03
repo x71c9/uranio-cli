@@ -36,9 +36,9 @@ export const init = {
 		
 		_create_urn_folder();
 		
-		_copy_book_file();
+		// _copy_book_file();
 		
-		_copy_types_file();
+		// _copy_types_file();
 		
 		_copy_eslint_files();
 		
@@ -66,6 +66,7 @@ function _check_repo(repo:Repo){
 }
 
 async function _clone_and_install_repo(repo:Repo){
+	output.start_loading(`Cloning and intalling [${repo}]...`);
 	switch(repo){
 		case 'core':{
 			await _clone_core();
@@ -89,7 +90,7 @@ async function _clone_and_install_repo(repo:Repo){
 }
 
 function _create_urn_folder(){
-	output.start_loading(`Creating .urn folder...`);
+	output.start_loading(`Creating ${defaults.folder} folder...`);
 	_remove_folder_if_exists('init', defaults.folder);
 	_create_folder_if_doesnt_exists('init', defaults.folder);
 	output.done_log('init', `Created folder ${defaults.folder}.`);
@@ -99,34 +100,36 @@ function _create_src_dist_folders(){
 	output.start_loading(`Creating src and dist folders...`);
 	_create_folder_if_doesnt_exists('init', 'src');
 	_create_folder_if_doesnt_exists('init', 'dist');
-	output.done_log('init', `Created folder src dist.`);
+	output.done_log('init', `Created folders src and dist.`);
 }
 
-function _copy_book_file(){
-	output.start_loading(`Copying book file...`);
-	_copy_file('init', './src/files/book.ts', `./${defaults.folder}/book.ts`);
-	output.done_log('init', `Copied book file.`);
-}
+// function _copy_book_file(){
+//   output.start_loading(`Copying book file...`);
+//   _copy_file('init', './src/files/book.ts', `./${defaults.folder}/book.ts`);
+//   output.done_log('init', `Copied book file.`);
+// }
 
-function _copy_types_file(){
-	output.start_loading(`Copying types file...`);
-	_copy_file('init', './src/files/types.ts', `./${defaults.folder}/types.ts`);
-	output.done_log('init', `Copied types file.`);
-}
+// function _copy_types_file(){
+//   output.start_loading(`Copying types file...`);
+//   _copy_file('init', './src/files/types.ts', `./${defaults.folder}/types.ts`);
+//   output.done_log('init', `Copied types file.`);
+// }
 
 function _update_aliases(repo:Repo){
 	output.start_loading('Updating aliases...');
 	const data = fs.readFileSync('./package.json', 'utf8');
 	const package_data = JSON.parse(data);
 	package_data['_moduleAliases'] = {
-		urn_book: './dist/book.js',
-		urn_core: './dist/urn-core/',
+		urn_book: `./dist/${defaults.folder}/book.js`,
+		urn_core: `./dist/${defaults.folder}/urn-core/`,
+		uranio: `./dist/${defaults.folder}/urn-core/`
 	};
 	if(repo === 'web'){
-		package_data['_moduleAliases']['urn_web'] = './dist/urn-web/';
+		package_data['_moduleAliases']['urn_web'] = `./dist/${defaults.folder}/urn-web/`;
+		package_data['_moduleAliases']['uranio'] = `./dist/${defaults.folder}/urn-web/`;
 	}
 	fs.writeFileSync('./package.json', JSON.stringify(package_data, null, '\t'));
-	output.done_log('alia', `Aliases updated.`);
+	output.done_log('alas', `Aliases updated.`);
 }
 
 // function _copy_tsconfig_file(){
@@ -282,7 +285,7 @@ function _remove_folder_if_exists(context:string, folder_path:string){
 	if(fs.existsSync(folder_path)){
 		output.start_loading(`Removing folder [${folder_path}]`);
 		_sync_exec(`rm -rf ${folder_path}`);
-		output.verbose_log(context, `Folder [${folder_path}] removed.`);
+		output.done_verbose_log(context, `Folder [${folder_path}] removed.`);
 	}
 }
 
@@ -300,9 +303,9 @@ function _copy_files(context:string, source:string, destination:string){
 	output.done_verbose_log(context, `Copied files [${source}] to [${destination}]`);
 }
 
-function _copy_file(context:string, source:string, destination:string){
-	output.start_loading(`Copying file [${source}] to [${destination}]...`);
-	_sync_exec(`cp ${source} ${destination}`);
-	output.done_verbose_log(context, `Copied file [${source}] to [${destination}]`);
-}
+// function _copy_file(context:string, source:string, destination:string){
+//   output.start_loading(`Copying file [${source}] to [${destination}]...`);
+//   _sync_exec(`cp ${source} ${destination}`);
+//   output.done_verbose_log(context, `Copied file [${source}] to [${destination}]`);
+// }
 

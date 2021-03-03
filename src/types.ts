@@ -43,5 +43,6 @@ export type Defaults = {
 }
 
 export type Conf = {
-	verbose: boolean;
+	verbose: boolean,
+	colors: boolean
 }
