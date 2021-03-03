@@ -56,6 +56,7 @@ const _project = new Project(
 function _manipulate_file(src_path:string){
 	
 	const action = `manipulating [${src_path}]`;
+	
 	output.start_loading(`${action[0].toUpperCase()}${action.substr(1)}...`);
 	
 	output.verbose_log(`mnpl`, `Started ${action}.`);
@@ -66,8 +67,6 @@ function _manipulate_file(src_path:string){
 	sourceFile = _create_bll_book(sourceFile);
 	sourceFile = _create_route_book(sourceFile);
 	sourceFile = _manipulate_atom_book(sourceFile);
-
-	output.done_log('mnpl', `Done ${action}`);
 	
 	return sourceFile.print();
 }
@@ -182,7 +181,7 @@ function _append_requried_book(book_decl:VariableDeclaration, book_string:string
 		const text = obj_lit.getText();
 		obj_lit.replaceWithText(`{...${book_string},\n` + text.slice(1,text.length));
 	}
-	output.done_log(`requ`, `Added required_book.`);
+	output.done_verbose_log(`requ`, `Added required_book.`);
 	return book_decl;
 }
 
@@ -213,13 +212,13 @@ function _change_realtive_imports(sourceFile:SourceFile)
 function _copy_modified_file_to_dest(dest:string, text:string){
 	output.start_loading(`Copying manipulated book...`);
 	fs.writeFileSync(dest, text);
-	output.done_log(`trns`, `Book manipulated and moved to [${dest}].`);
+	output.done_log(`trns`, `Manipulated books copied to [${dest}].`);
 }
 
 function _add_as_const(book_decl:VariableDeclaration){
 	output.start_loading(`Adding as const...`);
 	book_decl.replaceWithText(book_decl.getText() + ' as const');
-	output.done_log(`asco`, `Added as const.`);
+	output.done_verbose_log(`asco`, `Added as const.`);
 	return book_decl;
 }
 
@@ -332,20 +331,19 @@ function _change_realtive_import(node:Node)
 
 function _remove_type_reference(book_decl:VariableDeclaration){
 	output.start_loading(`Removing type reference...`);
-	output.verbose_log(`type`, `Look for type reference.`);
+	// output.verbose_log(`type`, `Look for type reference.`);
 	const type_ref = book_decl.getFirstChildByKind(ts.SyntaxKind.TypeReference);
 	if(type_ref){
 		book_decl.removeType();
-		output.verbose_log(`type`, `Type reference removed.`);
 	}
-	output.done_log('type', `Type reference removed.`);
+	output.done_verbose_log('type', `Type reference removed.`);
 	return book_decl;
 }
 
 function _find_atom_book_declaration(sourceFile:SourceFile)
 		:VariableDeclaration | undefined{
 	output.start_loading(`Looking for atom_book declaration...`);
-	output.verbose_log(`book`, `Look for atom_book declaration.`);
+	// output.verbose_log(`book`, `Look for atom_book declaration.`);
 	const var_states = sourceFile.getChildrenOfKind(ts.SyntaxKind.VariableStatement);
 	for(const state of var_states){
 		const var_decl_list = state.getFirstChildByKind(ts.SyntaxKind.VariableDeclarationList);
@@ -354,20 +352,20 @@ function _find_atom_book_declaration(sourceFile:SourceFile)
 			if(var_decl){
 				const name = var_decl.getName();
 				if(name === 'atom_book'){
-					output.done_log(`book`, `Declaration of atom_book found.`);
+					output.verbose_log(`book`, `Declaration of atom_book found.`);
 					return var_decl;
 				}
 			}
 		}
 	}
-	output.done_log('book', `Cannot find atom_book`);
+	output.verbose_log('book', `Cannot find atom_book`);
 	return undefined;
 }
 
 function _find_atom_book_statement(sourceFile:SourceFile)
 		:VariableStatement | undefined{
 	output.start_loading(`Looking for atom_book statement...`);
-	output.verbose_log(`book`, `Look for atom_book statement.`);
+	// output.verbose_log(`book`, `Look for atom_book statement.`);
 	const var_states = sourceFile.getChildrenOfKind(ts.SyntaxKind.VariableStatement);
 	for(const state of var_states){
 		const var_decl_list = state.getFirstChildByKind(ts.SyntaxKind.VariableDeclarationList);
@@ -376,13 +374,13 @@ function _find_atom_book_statement(sourceFile:SourceFile)
 			if(var_decl){
 				const name = var_decl.getName();
 				if(name === 'atom_book'){
-					output.done_log(`book`, `Statement of atom_book found.`);
+					output.verbose_log(`book`, `Statement of atom_book found.`);
 					return state;
 				}
 			}
 		}
 	}
-	output.done_log('book', `Cannot find atom_book`);
+	output.verbose_log('book', `Cannot find atom_book`);
 	return undefined;
 }
 // function _get_object_literal(var_decl:VariableDeclaration)

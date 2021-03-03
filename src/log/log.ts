@@ -67,7 +67,8 @@ export function done_log(context:string, text:string)
 export function done_verbose_log(context:string, text:string)
 		:void{
 	_go_previous();
-	verbose_log(context, `${defaults.check_char} ${text}`);
+	// verbose_log(context, `${defaults.check_char} ${text}`);
+	verbose_log(context, `${text}`);
 }
 
 export function error_log(context:string, text:string)
@@ -79,7 +80,8 @@ export function error_log(context:string, text:string)
 export function end_log(text:string)
 		:void{
 	stop_loading();
-	log('end', (conf.colors) ? chalk.yellow(text) : text);
+	const end_text = `${defaults.check_char} ${text}`;
+	log('end', (conf.colors) ? chalk.yellow(end_text) : end_text);
 }
 
 export function verbose_log(context:string, text:string)
