@@ -38,7 +38,7 @@ export function urn_process(args:Arguments)
 	}
 	
 	_log_arguments(args);
-		
+	
 	switch(cmd){
 		case '':
 		case 'version':{
