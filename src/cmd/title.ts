@@ -4,20 +4,18 @@
  * @packageDocumentation
  */
 
-/*eslint-disable */
-
-import fs from 'fs';
+// import fs from 'fs';
 
 export function title()
 		:void{
 	
-	// console.log(``);
+	console.log(``);
 
-	// console.log(`                                           _/           `);
-	// console.log(`  _/    _/  _/  _/_/    _/_/_/  _/_/_/          _/_/    `);
-	// console.log(` _/    _/  _/_/      _/    _/  _/    _/  _/  _/    _/   `);
-	// console.log(`_/    _/  _/        _/    _/  _/    _/  _/  _/    _/    `);
-	// console.log(` _/_/_/  _/          _/_/_/  _/    _/  _/    _/_/       `);
+	console.log(`                                           _/           `);
+	console.log(`  _/    _/  _/  _/_/    _/_/_/  _/_/_/          _/_/    `);
+	console.log(` _/    _/  _/_/      _/    _/  _/    _/  _/  _/    _/   `);
+	console.log(`_/    _/  _/        _/    _/  _/    _/  _/  _/    _/    `);
+	console.log(` _/_/_/  _/          _/_/_/  _/    _/  _/    _/_/       `);
 
 	// console.log('   _/    _/  _/_/_/      _/_/    _/      _/  _/_/_/    _/_/    ');
 	// console.log('  _/    _/  _/    _/  _/    _/  _/_/    _/    _/    _/    _/   ');
@@ -25,10 +23,10 @@ export function title()
 	// console.log('_/    _/  _/    _/  _/    _/  _/    _/_/    _/    _/    _/     ');
 	// console.log(' _/_/    _/    _/  _/    _/  _/      _/  _/_/_/    _/_/        ');
 	
-	// console.log(``);
-	// console.log(``);
+	console.log(``);
+	console.log(``);
 
-	const content = fs.readFileSync('./src/ascii/1.txt', {encoding: 'utf8'});
-	console.log(content);
+	// const content = fs.readFileSync('./src/ascii/1.txt', {encoding: 'utf8'});
+	// console.log(content);
 	
 }
