@@ -14,6 +14,8 @@ import {defaults} from '../conf/defaults';
 
 import * as output from '../log/';
 
+import * as util from '../util/';
+
 import {title} from './title';
 
 export const init = {
@@ -38,6 +40,8 @@ export const init = {
 		
 		_create_urn_folder();
 		
+		_create_rc_file(repo);
+		
 		// _copy_book_file();
 		
 		// _copy_types_file();
@@ -51,6 +55,17 @@ export const init = {
 	}
 	
 };
+
+function _create_rc_file(repo:Repo){
+	output.start_loading('Creating rc file...');
+	let content = ``;
+	content += `module.exports = {\n`;
+	content += `repo: '${repo}'\n`;
+	content += `};`;
+	fs.writeFileSync(defaults.rcfile_path, content);
+	util.prettier(defaults.rcfile_path);
+	output.done_log('rcfl', `${defaults.rcfile_path} created.`);
+}
 
 function _check_repo(repo:Repo){
 	switch(repo){

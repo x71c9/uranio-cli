@@ -39,7 +39,8 @@ export type Defaults = {
 	core_dep_dev_repo: string,
 	web_dep_repo: string,
 	web_dep_dev_repo: string,
-	check_char: string
+	check_char: string,
+	rcfile_path: string
 }
 
 export type Conf = {
