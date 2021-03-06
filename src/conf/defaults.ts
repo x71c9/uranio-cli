@@ -16,9 +16,9 @@ export const defaults:Defaults = {
 	
 	book_src_path: './src/book.ts',
 	
-	book_dest_path: './.urn/book.ts',
+	book_dest_path: './.urn/books.ts',
 	
-	log_filepath: '.urn_log',
+	log_filepath: '.urnlog',
 	
 	time_format: "yy-mm-dd'T'HH:MM:ss:l",
 	
@@ -34,7 +34,9 @@ export const defaults:Defaults = {
 	
 	core_dep_dev_repo: `${cloud_address}urn-core-dep-dev`,
 	
-	check_char: '✔'
+	check_char: '✔',
+	
+	rcfile_path: `./.urnrc.js`
 	
 };
 

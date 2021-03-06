@@ -24,6 +24,8 @@ import {defaults} from '../conf/defaults';
 
 import * as output from '../log/';
 
+import * as util from '../util/';
+
 export const transpose = {
 	
 	run: async (args:Arguments):Promise<void> => {
@@ -37,6 +39,8 @@ export const transpose = {
 		const modified = _manipulate_file(src_path);
 		
 		_copy_modified_file_to_dest(destination, modified);
+		
+		_prettier_books();
 		
 		output.end_log(`Transpose completed.`);
 		
@@ -52,6 +56,10 @@ const _project = new Project(
 		}
 	}
 );
+
+function _prettier_books(){
+	util.prettier(defaults.book_dest_path);
+}
 
 function _manipulate_file(src_path:string){
 	
@@ -210,7 +218,7 @@ function _change_realtive_imports(sourceFile:SourceFile)
 
 
 function _copy_modified_file_to_dest(dest:string, text:string){
-	output.start_loading(`Copying manipulated book...`);
+	output.start_loading(`Writing manipulated book...`);
 	fs.writeFileSync(dest, text);
 	output.done_log(`trns`, `Manipulated books copied to [${dest}].`);
 }

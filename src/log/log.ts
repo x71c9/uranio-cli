@@ -16,8 +16,8 @@ import * as cp from 'child_process';
 
 import {conf, defaults} from '../conf/defaults';
 
-if(!fs.existsSync('.urnlog')){
-	cp.execSync('touch .urnlog');
+if(!fs.existsSync(defaults.log_filepath)){
+	cp.execSync(`touch ${defaults.log_filepath}`);
 }
 
 function _spinner_text_color(text?:string):string{
