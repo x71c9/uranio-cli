@@ -33,6 +33,7 @@ export type Defaults = {
 	book_dest_path: string,
 	log_filepath: string,
 	time_format: string,
+	dot_repo: string,
 	core_repo: string,
 	web_repo: string,
 	core_dep_repo: string,

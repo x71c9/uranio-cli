@@ -6,11 +6,13 @@
 
 import fs from 'fs';
 
+import * as cp from 'child_process';
+
 import {Arguments} from './types';
 
 import {help, init, transpose} from './cmd/';
 
-import {conf} from './conf/defaults';
+import {conf, defaults} from './conf/defaults';
 
 import * as output from './log/';
 
@@ -21,12 +23,20 @@ export function urn_process(args:Arguments)
 	
 	_get_project_root();
 	
+	_init_log();
+	
 	_log_arguments(args);
 	
 	_switch_command(args);
 	
 	// process.exit(1);
 	
+}
+
+function _init_log(){
+	if(!fs.existsSync(`${global.uranio.root}/${defaults.log_filepath}`)){
+		cp.execSync(`touch ${global.uranio.root}/${defaults.log_filepath}`);
+	}
 }
 
 function _init_global(){
@@ -38,6 +48,18 @@ function _check_folder(folder_path:string)
 	const data = fs.readdirSync(folder_path);
 	for(const file of data){
 		if(file === 'package.json'){
+			const content = fs.readFileSync(`${folder_path}/${file}`,'utf8');
+			const pack = JSON.parse(content);
+			if(pack.name === 'urn-cli'){
+				return false;
+			}else if(pack.name === 'uranio'){
+				const bld_path = `${folder_path}/urn-bld`;
+				if(!fs.existsSync(bld_path)){
+					return false;
+				}
+				global.uranio.root = bld_path;
+				return true;
+			}
 			global.uranio.root = folder_path;
 			return true;
 		}

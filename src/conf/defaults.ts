@@ -14,13 +14,15 @@ export const defaults:Defaults = {
 	
 	folder: '.urn',
 	
-	book_src_path: './src/book.ts',
+	book_src_path: 'src/book.ts',
 	
-	book_dest_path: './.urn/books.ts',
+	book_dest_path: '.urn/books.ts',
 	
 	log_filepath: '.urnlog',
 	
 	time_format: "yy-mm-dd'T'HH:MM:ss:l",
+	
+	dot_repo: `${cloud_address}urn-dot.git`,
 	
 	web_repo: `${cloud_address}urn-web.git`,
 	
@@ -36,7 +38,7 @@ export const defaults:Defaults = {
 	
 	check_char: '✔',
 	
-	rcfile_path: `./.urnrc.js`
+	rcfile_path: `.urnrc.json`
 	
 };
 
