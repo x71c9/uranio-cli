@@ -17,7 +17,7 @@ import * as cp from 'child_process';
 import {conf, defaults} from '../conf/defaults';
 
 if(!fs.existsSync(defaults.log_filepath)){
-	cp.execSync(`touch ${defaults.log_filepath}`);
+	cp.execSync(`touch ${global.uranio.root}/${defaults.log_filepath}`);
 }
 
 function _spinner_text_color(text?:string):string{
@@ -104,7 +104,7 @@ function _log(context:string, text:string, out=false){
 			was_spinning = true;
 			stop_loading();
 		}
-		process.stdout.write(time_text);
+		process.stdout.write(_replace_root_string(time_text));
 		if(was_spinning){
 			spinner.start();
 		}
@@ -135,6 +135,15 @@ function _format_text(context:string, text:string)
 
 function _log_to_file(text:string)
 		:void{
-	fs.appendFileSync(defaults.log_filepath, text);
+	fs.appendFileSync(`${global.uranio.root}/${defaults.log_filepath}`, text);
+}
+
+function _replace_root_string(str:string)
+		:string{
+	if(str.indexOf('$URNROOT$') !== -1){
+		return str.replace('$URNROOT$','');
+	}
+	const regex2 = new RegExp(`${global.uranio.root}`, 'g');
+	return str.replace(regex2, 'ROOT');
 }
 

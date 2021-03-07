@@ -32,13 +32,27 @@ export const transpose = {
 		
 		output.start_loading('Transposing...');
 		
-		const src_path = args.s || args['src-path'] || defaults.book_src_path;
+		let src_path = args.s || args['src-path'] || defaults.book_src_path;
 		
-		const destination = args.d || args.destination || defaults.book_dest_path;
+		if(src_path[0] !== '/'){
+			if(src_path.substr(0,2) === './'){
+				src_path = src_path.substr(2);
+			}
+			src_path = `${global.uranio.root}/${src_path}`;
+		}
+		
+		let dest_path = args.d || args['dest-path'] || defaults.book_dest_path;
+		
+		if(dest_path[0] !== '/'){
+			if(dest_path.substr(0,2) === './'){
+				dest_path = dest_path.substr(2);
+			}
+			dest_path = `${global.uranio.root}/${dest_path}`;
+		}
 		
 		const modified = _manipulate_file(src_path);
 		
-		_copy_modified_file_to_dest(destination, modified);
+		_copy_modified_file_to_dest(dest_path, modified);
 		
 		_prettier_books();
 		
@@ -217,12 +231,6 @@ function _change_realtive_imports(sourceFile:SourceFile)
 }
 
 
-function _copy_modified_file_to_dest(dest:string, text:string){
-	output.start_loading(`Writing manipulated book...`);
-	fs.writeFileSync(dest, text);
-	output.done_log(`trns`, `Manipulated books copied to [${dest}].`);
-}
-
 function _add_as_const(book_decl:VariableDeclaration){
 	output.start_loading(`Adding as const...`);
 	book_decl.replaceWithText(book_decl.getText() + ' as const');
@@ -246,48 +254,11 @@ function _change_realtive_import(node:Node)
 	return node;
 }
 
-// function _remove_bll_import(prop:PropertyAssignment){
-//   output.start_loading(`Removing bll import...`);
-//   const bll_value = prop.getLastChildByKind(ts.SyntaxKind.Identifier);
-//   if(bll_value){
-//     const symbol = bll_value.getSymbol();
-//     if(symbol){
-//       const declarations = symbol.getDeclarations();
-//       for(const decl of declarations){
-//         const import_decl = decl.getFirstAncestorByKind(ts.SyntaxKind.ImportDeclaration);
-//         if(import_decl){
-//           const import_text = import_decl.getText();
-//           import_decl.replaceWithText('');
-//           output.verbose_log('blls', `Removed import declaration [${import_text}].`);
-//         }
-//       }
-//     }
-//   }
-//   output.done_log('blls', `Removed bll import.`);
-// }
-
-// function _remove_api_prop(book_decl:VariableDeclaration){
-//   output.start_loading(`Removing bll props...`);
-//   output.verbose_log(`bll`, `Look for bll property assignments.`);
-//   const book_expr = book_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
-//   if(book_expr){
-//     const atom_names = book_expr.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
-//     for(const atom_name of atom_names){
-//       const atom_def = atom_name.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
-//       if(atom_def){
-//         const atom_def_props = atom_def.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
-//         for(const atom_def_prop of atom_def_props){
-//           if(atom_def_prop.getName() === 'bll'){
-//             atom_def_prop.remove();
-//             output.verbose_log(`bll_`, `Removed bll for [${atom_name.getName()}].`);
-//           }
-//         }
-//       }
-//     }
-//   }
-//   output.done_log('blls', `Removed blls.`);
-//   return book_decl;
-// }
+function _copy_modified_file_to_dest(dest:string, text:string){
+	output.start_loading(`Writing manipulated book...`);
+	fs.writeFileSync(dest, text);
+	output.done_log(`trns`, `Manipulated books copied to [${dest}].`);
+}
 
 // function _remove_bll_prop(book_decl:VariableDeclaration){
 //   output.start_loading(`Removing bll props...`);
