@@ -32,16 +32,13 @@
 		"minimist": "^1.2.5",
 		"ora": "^5.3.0",
 		"prettier": "^2.2.1",
-		"ts-morph": "^10.0.1",
-		"urn-web-dep": "bitbucket:nbl7/urn-web-dep"
+		"ts-morph": "^10.0.1"
 	},
 	"bin": {
 		"uranio": "dist/src/index.js"
 	},
 	"_moduleAliases": {
 		"urn_book": "./dist/.urn/book.js",
-		"urn_core": "./dist/.urn/urn-core/",
-		"uranio": "./dist/.urn/urn-web/",
-		"urn_web": "./dist/.urn/urn-web/"
+		"uranio": "./dist/.urn/urn-web/"
 	}
 }
