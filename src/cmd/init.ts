@@ -32,27 +32,86 @@ export const init = {
 		
 		_update_aliases(repo);
 		
-		_create_src_dist_folders();
+		// _create_src_folder();
 		
 		_create_urn_folder();
 		
 		_create_rc_file(repo);
 		
-		await _clone_and_install_repo(repo);
+		await _clone_dot();
 		
-		// TODO only in production _copy_tsconfig_file();
+		_copy_dot_files();
 		
-		// _copy_book_file();
+		_copy_uranio_repo(repo);
 		
-		// _copy_types_file();
+		_remove_tmp();
 		
-		// _copy_eslint_files();
+		await _install_dep(repo);
+		
+		// await _clone_and_install_repo(repo);
 		
 		output.end_log(`Initialization completed.`);
 		
 	}
 	
 };
+
+function _remove_tmp(){
+	output.start_loading(`Removing tmp folder [${defaults.tmp_folder}]...`);
+	util.remove_folder_if_exists('dot', `${global.uranio.root}/${defaults.tmp_folder}`);
+	// util.sync_exec(`rm -rf ${global.uranio.root}/${defaults.tmp_folder}`);
+	output.done_verbose_log('tmp', `Removed tmp folder [${defaults.tmp_folder}].`);
+}
+
+async function _install_dep(repo:Repo){
+	switch(repo){
+		case 'core':{
+			await _uninstall_core_dep();
+			await _uninstall_web_dep();
+			await _install_core_dep();
+			break;
+		}
+		case 'web':{
+			await _uninstall_core_dep();
+			await _uninstall_web_dep();
+			await _install_web_dep();
+			break;
+		}
+		default:{
+			output.log('init', `Selected repo is not valid. [${repo}]`);
+			process.exit(1);
+		}
+	}
+}
+
+function _copy_uranio_repo(repo:Repo){
+	const dot_folder = `${global.uranio.root}/${defaults.tmp_folder}/urn-dot`;
+	let srcs = '';
+	switch(repo){
+		case 'core':{
+			srcs = `${dot_folder}/${defaults.folder}/web/core`;
+			break;
+		}
+		case 'web':{
+			srcs = `${dot_folder}/${defaults.folder}/web`;
+			break;
+		}
+	}
+	if(srcs !== ''){
+		util.copy_files('dot', srcs, `${global.uranio.root}/${defaults.folder}`);
+	}
+
+}
+
+function _copy_dot_files(){
+	const dot_folder = `${global.uranio.root}/${defaults.tmp_folder}/urn-dot`;
+	let srcs = ``;
+	srcs += `${dot_folder}/src `;
+	srcs += `${dot_folder}/tsconfig.json `;
+	srcs += `${dot_folder}/.eslintignore ${dot_folder}/.eslintrc.js`;
+	const dest = `${global.uranio.root}/`;
+	util.copy_files('dot', srcs, dest);
+}
 
 function _create_rc_file(repo:Repo){
 	output.start_loading('Creating rc file...');
@@ -82,11 +141,17 @@ function _check_repo(repo:Repo){
 	}
 }
 
-async function _clone_and_install_repo(repo:Repo){
-	output.start_loading(`Cloning and intalling [${repo}]...`);
-	await _clone_dot();
-	output.done_log('repo', `Cloned and installed repo [${repo}].`);
-}
+// async function _clone_dot_in_temp(){
+//   output.start_loading(`Cloning and intalling [${defaults.dot_repo}]...`);
+//   await _clone_dot();
+//   output.done_log('repo', `Cloned and installed repo [${defaults.dot_repo}].`);
+// }
+
+// async function _clone_and_install_repo(repo:Repo){
+//   output.start_loading(`Cloning and intalling [${repo}]...`);
+//   // await _clone_dot();
+//   output.done_log('repo', `Cloned and installed repo [${repo}].`);
+// }
 
 // async function _clone_and_install_repo(repo:Repo){
 //   output.start_loading(`Cloning and intalling [${repo}]...`);
@@ -119,12 +184,12 @@ function _create_urn_folder(){
 	output.done_log('init', `Created folder ${defaults.folder}.`);
 }
 
-function _create_src_dist_folders(){
-	output.start_loading(`Creating src and dist folders...`);
-	util.create_folder_if_doesnt_exists('init', `${global.uranio.root}/src`);
-	util.create_folder_if_doesnt_exists('init', `${global.uranio.root}/dist`);
-	output.done_log('init', `Created folders src and dist.`);
-}
+// function _create_src_folder(){
+//   output.start_loading(`Creating src folder...`);
+//   util.create_folder_if_doesnt_exists('init', `${global.uranio.root}/src`);
+//   // util.create_folder_if_doesnt_exists('init', `${global.uranio.root}/dist`);
+//   output.done_log('init', `Created src folder.`);
+// }
 
 // function _copy_book_file(){
 //   output.start_loading(`Copying book file...`);
@@ -143,13 +208,11 @@ function _update_aliases(repo:Repo){
 	const data = fs.readFileSync(`${global.uranio.root}/package.json`, 'utf8');
 	const package_data = JSON.parse(data);
 	package_data['_moduleAliases'] = {
-		urn_book: `./dist/${defaults.folder}/book.js`,
-		urn_core: `./dist/${defaults.folder}/urn-core/`,
-		uranio: `./dist/${defaults.folder}/urn-core/`
+		urn_books: `./dist/${defaults.folder}/books.js`,
+		uranio: `./dist/${defaults.folder}/core/`
 	};
 	if(repo === 'web'){
-		package_data['_moduleAliases']['urn_web'] = `./dist/${defaults.folder}/urn-web/`;
-		package_data['_moduleAliases']['uranio'] = `./dist/${defaults.folder}/urn-web/`;
+		package_data['_moduleAliases']['uranio'] = `./dist/${defaults.folder}/web/`;
 	}
 	fs.writeFileSync(`${global.uranio.root}/package.json`, JSON.stringify(package_data, null, '\t'));
 	output.done_log('alas', `Aliases updated.`);
@@ -206,21 +269,24 @@ async function _uninstall_web_dep(){
 
 async function _clone_dot(){
 	output.start_loading(`Cloning dot...`);
-	await util.clone_repo('dot', defaults.dot_repo, 'urn-dot');
+	const tmp = `${global.uranio.root}/${defaults.tmp_folder}`;
+	util.remove_folder_if_exists('dot', tmp);
+	util.create_folder_if_doesnt_exists('dot', tmp);
+	await util.clone_repo('dot', defaults.dot_repo, `${defaults.tmp_folder}/urn-dot`);
 	output.done_log('dot', `Cloned dot repo.`);
 }
 
-async function _clone_core(){
-	output.start_loading(`Cloning core...`);
-	await util.clone_repo('core', defaults.core_repo, 'urn-core');
-	output.done_log('core', `Cloned core repo.`);
-}
+// async function _clone_core(){
+//   output.start_loading(`Cloning core...`);
+//   await util.clone_repo('core', defaults.core_repo, 'urn-core');
+//   output.done_log('core', `Cloned core repo.`);
+// }
 
-async function _clone_web(){
-	output.start_loading(`Cloning web...`);
-	await util.clone_repo('web_', defaults.web_repo, 'urn-web');
-	output.done_log('web', `Cloned web repo.`);
-}
+// async function _clone_web(){
+//   output.start_loading(`Cloning web...`);
+//   await util.clone_repo('web_', defaults.web_repo, 'urn-web');
+//   output.done_log('web', `Cloned web repo.`);
+// }
 
 
 

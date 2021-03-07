@@ -29,6 +29,7 @@ export type Repo = keyof typeof repos;
 export type Defaults = {
 	default_repo: Repo,
 	folder: string,
+	tmp_folder: string,
 	book_src_path: string,
 	book_dest_path: string,
 	log_filepath: string,
