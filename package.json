@@ -35,7 +35,7 @@
 		"ts-morph": "^10.0.1"
 	},
 	"bin": {
-		"uranio": "dist/src/index.js"
+		"uranio": "dist/index.js"
 	},
 	"_moduleAliases": {
 		"urn_book": "./dist/.urn/book.js",
