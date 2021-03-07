@@ -62,8 +62,8 @@ function _create_rc_file(repo:Repo){
 	content += `module.exports = {\n`;
 	content += `repo: '${repo}'\n`;
 	content += `};`;
-	fs.writeFileSync(defaults.rcfile_path, content);
-	util.prettier(defaults.rcfile_path);
+	fs.writeFileSync(`${global.uranio.root}/${defaults.rcfile_path}`, content);
+	util.prettier(`${global.uranio.root}/${defaults.rcfile_path}`);
 	output.done_log('rcfl', `${defaults.rcfile_path} created.`);
 }
 
@@ -106,15 +106,15 @@ async function _clone_and_install_repo(repo:Repo){
 
 function _create_urn_folder(){
 	output.start_loading(`Creating ${defaults.folder} folder...`);
-	_remove_folder_if_exists('init', defaults.folder);
-	_create_folder_if_doesnt_exists('init', defaults.folder);
+	_remove_folder_if_exists('init', `${global.uranio.root}/${defaults.folder}`);
+	_create_folder_if_doesnt_exists('init', `${global.uranio.root}/${defaults.folder}`);
 	output.done_log('init', `Created folder ${defaults.folder}.`);
 }
 
 function _create_src_dist_folders(){
 	output.start_loading(`Creating src and dist folders...`);
-	_create_folder_if_doesnt_exists('init', 'src');
-	_create_folder_if_doesnt_exists('init', 'dist');
+	_create_folder_if_doesnt_exists('init', `${global.uranio.root}/src`);
+	_create_folder_if_doesnt_exists('init', `${global.uranio.root}/dist`);
 	output.done_log('init', `Created folders src and dist.`);
 }
 
@@ -132,7 +132,7 @@ function _create_src_dist_folders(){
 
 function _update_aliases(repo:Repo){
 	output.start_loading('Updating aliases...');
-	const data = fs.readFileSync('./package.json', 'utf8');
+	const data = fs.readFileSync(`${global.uranio.root}/package.json`, 'utf8');
 	const package_data = JSON.parse(data);
 	package_data['_moduleAliases'] = {
 		urn_book: `./dist/${defaults.folder}/book.js`,
@@ -143,7 +143,7 @@ function _update_aliases(repo:Repo){
 		package_data['_moduleAliases']['urn_web'] = `./dist/${defaults.folder}/urn-web/`;
 		package_data['_moduleAliases']['uranio'] = `./dist/${defaults.folder}/urn-web/`;
 	}
-	fs.writeFileSync('./package.json', JSON.stringify(package_data, null, '\t'));
+	fs.writeFileSync(`${global.uranio.root}/package.json`, JSON.stringify(package_data, null, '\t'));
 	output.done_log('alas', `Aliases updated.`);
 }
 
@@ -154,7 +154,7 @@ function _update_aliases(repo:Repo){
 
 function _copy_eslint_files(){
 	output.start_loading(`Copying eslint files...`);
-	_copy_files('init', './src/files/.eslintrc.js ./src/files/.eslintignore', '.');
+	_copy_files('init', `${global.uranio.root}/src/files/.eslintrc.js ${global.uranio.root}/src/files/.eslintignore`, global.uranio.root);
 	output.done_log('esln', `Copied eslint files.`);
 }
 
@@ -176,9 +176,9 @@ async function _install_web_dep(){
 
 async function _uninstall_core_dep(){
 	output.start_loading(`Uninstalling core dep...`);
-	const dep_folder = `./node_modules/${defaults.core_dep_repo}`;
+	const dep_folder = `${global.uranio.root}/node_modules/${defaults.core_dep_repo}`;
 	_remove_folder_if_exists('core', dep_folder);
-	const dep_dev_folder = `./node_modules/${defaults.core_dep_dev_repo}`;
+	const dep_dev_folder = `${global.uranio.root}/node_modules/${defaults.core_dep_dev_repo}`;
 	_remove_folder_if_exists('core', dep_dev_folder);
 	await _uninstall_dep(`${defaults.core_dep_repo.split('/').slice(-1)[0]} ${defaults.core_dep_dev_repo.split('/').slice(-1)[0]}`, 'core');
 	output.done_log('core', `Uninstalled core dependencies.`);
@@ -187,9 +187,9 @@ async function _uninstall_core_dep(){
 
 async function _uninstall_web_dep(){
 	output.start_loading(`Uninstalling web dep...`);
-	const dep_folder = `./node_modules/${defaults.web_dep_repo}`;
+	const dep_folder = `${global.uranio.root}/node_modules/${defaults.web_dep_repo}`;
 	_remove_folder_if_exists('web_', dep_folder);
-	const dep_dev_folder = `./node_modules/${defaults.web_dep_dev_repo}`;
+	const dep_dev_folder = `${global.uranio.root}/node_modules/${defaults.web_dep_dev_repo}`;
 	_remove_folder_if_exists('web_', dep_dev_folder);
 	await _uninstall_dep(`${defaults.web_dep_repo.split('/').slice(-1)[0]} ${defaults.core_dep_dev_repo.split('/').slice(-1)[0]}`, 'web_');
 	output.done_log('web', `Uninstalled web dependencies.`);
@@ -238,7 +238,13 @@ async function _clone_repo(context: string, address:string, dest_folder:string){
 	const action = `cloning repo [${address}]`;
 	output.verbose_log(context, `Started ${action}`);
 	return new Promise((resolve, reject) => {
-		_spawn_cmd(`git clone ${address} ${defaults.folder}/${dest_folder} --progress`, context, action, resolve, reject);
+		_spawn_cmd(
+			`git clone ${address} ${global.uranio.root}/${defaults.folder}/${dest_folder} --progress`,
+			context,
+			action,
+			resolve,
+			reject
+		);
 	});
 }
 

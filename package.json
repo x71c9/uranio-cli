@@ -2,15 +2,14 @@
 	"name": "urn-cli",
 	"version": "0.0.0",
 	"description": "Uranio Command Line Interface",
-	"main": "dist/urn-cli.js",
-	"types": "dist/urn-cli.d.ts",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"scripts": {
 		"build": "tsc -b",
-		"start": "node -r source-map-support/register dist/urn-cli.js",
-		"init": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/urn-cli.js init\"",
-		"transpose": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/urn-cli.js transpose\"",
-		"help": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/urn-cli.js -h\"",
-		"version": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/urn-cli.js -v\""
+		"init": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js init\"",
+		"transpose": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js transpose\"",
+		"help": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js -h\"",
+		"version": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js -v\""
 	},
 	"repository": {
 		"type": "git",
@@ -38,7 +37,7 @@
 		"urn-web-dep": "bitbucket:nbl7/urn-web-dep"
 	},
 	"bin": {
-		"uranio": "dist/src/urn-cli.js"
+		"uranio": "dist/src/index.js"
 	},
 	"_moduleAliases": {
 		"urn_book": "./dist/.urn/book.js",
