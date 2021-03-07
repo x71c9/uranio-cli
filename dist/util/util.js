@@ -158,7 +158,7 @@ function clone_repo(context, address, dest_folder) {
         const action = `cloning repo [${address}]`;
         output.verbose_log(context, `Started ${action}`);
         return new Promise((resolve, reject) => {
-            spawn_cmd(`git clone ${address} ${global.uranio.root}/${dest_folder} --progress`, context, action, resolve, reject);
+            spawn_cmd(`git clone ${address} ${global.uranio.root}/${dest_folder} --progress --recurse-submodules -j8`, context, action, resolve, reject);
         });
     });
 }

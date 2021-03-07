@@ -145,7 +145,7 @@ export async function clone_repo(context: string, address:string, dest_folder:st
 	output.verbose_log(context, `Started ${action}`);
 	return new Promise((resolve, reject) => {
 		spawn_cmd(
-			`git clone ${address} ${global.uranio.root}/${dest_folder} --progress`,
+			`git clone ${address} ${global.uranio.root}/${dest_folder} --progress --recurse-submodules -j8`,
 			context,
 			action,
 			resolve,
