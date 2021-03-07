@@ -14,6 +14,8 @@ export const defaults:Defaults = {
 	
 	folder: '.urn',
 	
+	tmp_folder: '.tmp',
+	
 	book_src_path: 'src/book.ts',
 	
 	book_dest_path: '.urn/books.ts',

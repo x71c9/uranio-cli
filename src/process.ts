@@ -79,6 +79,7 @@ function _get_project_root(){
 		}
 		_check_folder(folder_path);
 	}
+	process.chdir(global.uranio.root);
 	output.done_verbose_log('root', `$URNROOT$Project root found [${global.uranio.root}]`);
 }
 
@@ -113,6 +114,7 @@ function _switch_command(args:Arguments){
 	switch(cmd){
 		case '':
 		case 'version':{
+			output.end_log('version');
 			console.log('v0.0.1');
 			break;
 		}

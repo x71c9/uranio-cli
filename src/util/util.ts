@@ -8,8 +8,6 @@ import fs from 'fs';
 
 import * as cp from 'child_process';
 
-import {defaults} from '../conf/defaults';
-
 import * as output from '../log/';
 
 export function prettier(path:string)
@@ -19,7 +17,8 @@ export function prettier(path:string)
 	output.done_verbose_log('prtt', `Prettier [${path}] done.`);
 }
 
-export function remove_folder_if_exists(context:string, folder_path:string){
+export function remove_folder_if_exists(context:string, folder_path:string)
+		:void{
 	if(fs.existsSync(folder_path)){
 		output.start_loading(`Removing folder [${folder_path}]`);
 		sync_exec(`rm -rf ${folder_path}`);
@@ -27,7 +26,8 @@ export function remove_folder_if_exists(context:string, folder_path:string){
 	}
 }
 
-export function create_folder_if_doesnt_exists(context:string, folder_path:string){
+export function create_folder_if_doesnt_exists(context:string, folder_path:string)
+		:void{
 	if(!fs.existsSync(folder_path)){
 		output.start_loading(`Creating folder [${folder_path}]`);
 		sync_exec(`mkdir ${folder_path}`);
@@ -35,25 +35,36 @@ export function create_folder_if_doesnt_exists(context:string, folder_path:strin
 	}
 }
 
-export function copy_files(context:string, source:string, destination:string){
+export function copy_files(context:string, source:string, destination:string)
+		:void{
 	output.start_loading(`Copying files [${source}] to [${destination}]...`);
-	sync_exec(`cp -t ${destination} ${source}`,);
+	sync_exec(`cp -rf -t ${destination} ${source}`,);
 	output.done_verbose_log(context, `Copied files [${source}] to [${destination}]`);
 }
 
-export function copy_file(context:string, source:string, destination:string){
+export function copy_file(context:string, source:string, destination:string)
+		:void{
 	output.start_loading(`Copying file [${source}] to [${destination}]...`);
 	sync_exec(`cp ${source} ${destination}`);
 	output.done_verbose_log(context, `Copied file [${source}] to [${destination}]`);
 }
 
-export function sync_exec(command:string){
+export function copy_folder(context:string, source:string, destination:string)
+		:void{
+	output.start_loading(`Copying folder [${source}] to [${destination}]...`);
+	sync_exec(`cp -rf ${source} ${destination}`);
+	output.done_verbose_log(context, `Copied folder [${source}] to [${destination}]`);
+}
+
+export function sync_exec(command:string)
+		:void{
 	cp.execSync(command);
 }
 
 type PF = (v?:unknown) => void;
 
-export function spawn_cmd(command:string, context:string, action:string, resolve:PF, reject:PF){
+export function spawn_cmd(command:string, context:string, action:string, resolve:PF, reject:PF)
+		:void{
 	
 	output.start_loading(`${action}...`);
 	
@@ -101,7 +112,8 @@ export function spawn_cmd(command:string, context:string, action:string, resolve
 	
 }
 
-export async function install_dep(repo:string, context:string){
+export async function install_dep(repo:string, context:string)
+		:Promise<any>{
 	const action = `installing dependencies [${repo}]`;
 	output.verbose_log(context, `Started ${action}`);
 	return new Promise((resolve, reject) => {
@@ -109,7 +121,8 @@ export async function install_dep(repo:string, context:string){
 	});
 }
 
-export async function install_dep_dev(repo:string, context:string){
+export async function install_dep_dev(repo:string, context:string)
+		:Promise<any>{
 	const action = `installing dev dependencies [${repo}]`;
 	output.verbose_log(context, `Started ${action}`);
 	return new Promise((resolve, reject) => {
@@ -117,7 +130,8 @@ export async function install_dep_dev(repo:string, context:string){
 	});
 }
 
-export async function uninstall_dep(repo:string, context:string){
+export async function uninstall_dep(repo:string, context:string)
+		:Promise<any>{
 	const action = `uninstalling dependencies [${repo}]`;
 	output.verbose_log(context, `Started ${action}`);
 	return new Promise((resolve, reject) => {
@@ -125,12 +139,13 @@ export async function uninstall_dep(repo:string, context:string){
 	});
 }
 
-export async function clone_repo(context: string, address:string, dest_folder:string){
+export async function clone_repo(context: string, address:string, dest_folder:string)
+		:Promise<any>{
 	const action = `cloning repo [${address}]`;
 	output.verbose_log(context, `Started ${action}`);
 	return new Promise((resolve, reject) => {
 		spawn_cmd(
-			`git clone ${address} ${global.uranio.root}/${defaults.folder}/${dest_folder} --progress`,
+			`git clone ${address} ${global.uranio.root}/${dest_folder} --progress`,
 			context,
 			action,
 			resolve,
