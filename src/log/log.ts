@@ -12,13 +12,7 @@ import chalk from 'chalk';
 
 import fs from 'fs';
 
-import * as cp from 'child_process';
-
 import {conf, defaults} from '../conf/defaults';
-
-if(!fs.existsSync(defaults.log_filepath)){
-	cp.execSync(`touch ${global.uranio.root}/${defaults.log_filepath}`);
-}
 
 function _spinner_text_color(text?:string):string{
 	if(!text){
