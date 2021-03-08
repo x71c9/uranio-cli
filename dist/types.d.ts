@@ -33,5 +33,6 @@ export declare type Defaults = {
 export declare type Conf = {
     verbose: boolean;
     colors: boolean;
+    output: boolean;
 };
 export {};

@@ -27,6 +27,7 @@ exports.defaults = {
 };
 exports.conf = {
     verbose: true,
-    colors: true
+    colors: true,
+    output: true
 };
 //# sourceMappingURL=defaults.js.map

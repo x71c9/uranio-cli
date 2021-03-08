@@ -110,6 +110,10 @@ function _switch_command(args) {
     if (no_colors === true) {
         defaults_1.conf.colors = false;
     }
+    const no_log = args['no-log'];
+    if (no_log === true) {
+        defaults_1.conf.output = false;
+    }
     switch (cmd) {
         case '':
         case 'version': {

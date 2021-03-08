@@ -3,6 +3,7 @@
  *
  * @packageDocumentation
  */
+import { Arguments } from '../types';
 export declare const init: {
-    run: (args: any) => any;
+    run: (args: Arguments) => Promise<void>;
 };
