@@ -12,6 +12,24 @@ import * as output from '../log/';
 
 import {valid_repos} from '../types';
 
+import {defaults} from '../conf/defaults';
+
+export function check_if_initialized()
+		:void{
+	const rc_file_path = `${global.uranio.root}/${defaults.rcfile_path}`;
+	if(!fs.existsSync(rc_file_path)){
+		let err =  `URANIO was not initialized yet.`;
+		err += ` Please run "uranio init" in order to initialize the repo.`;
+		output.error_log('init', err);
+		process.exit(1);
+	}else{
+		const rc_content = fs.readFileSync(rc_file_path, 'utf8');
+		const rc_obj = JSON.parse(rc_content);
+		check_repo(rc_obj.repo);
+		global.uranio.repo = rc_obj.repo;
+	}
+}
+
 export function check_repo(repo:unknown)
 		:void{
 	switch(repo){

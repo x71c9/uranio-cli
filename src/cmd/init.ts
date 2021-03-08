@@ -34,6 +34,8 @@ export const init = {
 		
 		_create_urn_folder();
 		
+		_ignore_urn_folder();
+		
 		_create_rc_file(repo);
 		
 		await _clone_dot();
@@ -53,6 +55,23 @@ export const init = {
 	}
 	
 };
+
+function _ignore_urn_folder(){
+	output.start_loading(`Adding urn to .gitignore...`);
+	const gitignore = `${global.uranio.root}/.gitignore`;
+	if(!fs.existsSync(gitignore)){
+		util.sync_exec(`touch .gitignore`);
+	}
+	let content = fs.readFileSync(gitignore, 'utf8');
+	if(content.indexOf(defaults.folder+'/') === -1){
+		content += `\n${defaults.folder}/`;
+	}
+	if(content.indexOf(defaults.log_filepath) === -1){
+		content += `\n${defaults.log_filepath}`;
+	}
+	fs.writeFileSync(gitignore, content);
+	output.done_verbose_log('.git',`Added .urn to .gitignore.`);
+}
 
 function _remove_tmp(){
 	output.start_loading(`Removing tmp folder [${defaults.tmp_folder}]...`);
@@ -104,7 +123,7 @@ async function _install_dep(repo:Repo){
 function _copy_dot_src_folder(){
 	const dot_folder = `${global.uranio.root}/${defaults.tmp_folder}/urn-dot`;
 	let srcs = ``;
-	srcs += `${dot_folder}/src `;
+	srcs += `${dot_folder}/src`;
 	const dest = `${global.uranio.root}/`;
 	util.copy_folder('dot', srcs, dest);
 }
@@ -112,7 +131,7 @@ function _copy_dot_src_folder(){
 function _copy_dot_tsconfig(){
 	const dot_folder = `${global.uranio.root}/${defaults.tmp_folder}/urn-dot`;
 	let srcs = ``;
-	srcs += `${dot_folder}/tsconfig.json `;
+	srcs += `${dot_folder}/tsconfig.json`;
 	const dest = `${global.uranio.root}/`;
 	util.copy_file('dot', srcs, dest);
 }

@@ -10,7 +10,7 @@ import * as cp from 'child_process';
 
 import {Arguments} from './types';
 
-import {help, init, transpose} from './cmd/';
+import {help, init, transpose, dev} from './cmd/';
 
 import {conf, defaults} from './conf/defaults';
 
@@ -127,6 +127,10 @@ function _switch_command(args:Arguments){
 		}
 		case 'transpose':{
 			transpose.run(args);
+			break;
+		}
+		case 'dev':{
+			dev.run(args);
 			break;
 		}
 		case 'help':{

@@ -32,7 +32,7 @@ export const transpose = {
 		
 		output.start_loading('Transposing...');
 		
-		_check_if_initialized();
+		util.check_if_initialized();
 		
 		let src_path = args.s || args['src-path'] || defaults.book_src_path;
 		
@@ -64,19 +64,6 @@ const _project = new Project(
 		}
 	}
 );
-
-function _check_if_initialized(){
-	const rc_file_path = `${global.uranio.root}/${defaults.rcfile_path}`;
-	if(!fs.existsSync(rc_file_path)){
-		output.error_log('init', `URANIO was not initialized yet. Please run "uranio init" before transposing.`);
-		process.exit(1);
-	}else{
-		const rc_content = fs.readFileSync(rc_file_path, 'utf8');
-		const rc_obj = JSON.parse(rc_content);
-		util.check_repo(rc_obj.repo);
-		global.uranio.repo = rc_obj.repo;
-	}
-}
 
 function _relative_to_absolute_path(path:string)
 		:string{
