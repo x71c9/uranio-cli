@@ -68,7 +68,8 @@ export function done_verbose_log(context:string, text:string)
 export function error_log(context:string, text:string)
 		:void{
 	stop_loading();
-	log(context, `[ERROR] ${text}`);
+	const error_text = `${chalk.red(`[ERROR] ${text}`)}`;
+	log(context, error_text);
 }
 
 export function end_log(text:string)

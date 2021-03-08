@@ -40,7 +40,10 @@ function _init_log(){
 }
 
 function _init_global(){
-	global.uranio = {root: '.'};
+	global.uranio = {
+		root: '.',
+		repo: 'web'
+	};
 }
 
 function _check_folder(folder_path:string)
