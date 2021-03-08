@@ -3,6 +3,7 @@
  *
  * @packageDocumentation
  */
+import { Arguments } from '../types';
 export declare const transpose: {
-    run: (args: any) => any;
+    run: (args: Arguments) => Promise<void>;
 };

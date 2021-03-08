@@ -48,6 +48,8 @@ export const conf:Conf = {
 	
 	verbose: true,
 	
-	colors: true
+	colors: true,
+	
+	output: true
 	
 };

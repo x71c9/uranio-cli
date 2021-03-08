@@ -114,6 +114,12 @@ function _switch_command(args:Arguments){
 		conf.colors = false;
 	}
 	
+	const no_log = args['no-log'];
+	
+	if(no_log === true){
+		conf.output = false;
+	}
+	
 	switch(cmd){
 		case '':
 		case 'version':{
