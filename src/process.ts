@@ -108,15 +108,15 @@ function _switch_command(args:Arguments){
 		conf.verbose = true;
 	}
 	
-	const no_colors = args['no-colors'];
+	const colors = args['colors'];
 	
-	if(no_colors === true){
+	if(colors === false){
 		conf.colors = false;
 	}
 	
-	const no_log = args['no-log'];
+	const log = args['log'];
 	
-	if(no_log === true){
+	if(log === false){
 		conf.output = false;
 	}
 	
