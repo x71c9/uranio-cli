@@ -106,12 +106,12 @@ function _switch_command(args) {
     if (verbose === true) {
         defaults_1.conf.verbose = true;
     }
-    const no_colors = args['no-colors'];
-    if (no_colors === true) {
+    const colors = args['colors'];
+    if (colors === false) {
         defaults_1.conf.colors = false;
     }
-    const no_log = args['no-log'];
-    if (no_log === true) {
+    const log = args['log'];
+    if (log === false) {
         defaults_1.conf.output = false;
     }
     switch (cmd) {

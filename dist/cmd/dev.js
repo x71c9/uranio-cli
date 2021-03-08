@@ -34,6 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.dev = void 0;
+const cp = __importStar(require("child_process"));
 const output = __importStar(require("../log/"));
 const util = __importStar(require("../util/"));
 exports.dev = {
@@ -46,13 +47,13 @@ exports.dev = {
 function _start_dev(args) {
     return __awaiter(this, void 0, void 0, function* () {
         args;
-        return new Promise((resolve, reject) => {
-            const register = `-r source-map-support/register -r module-alias/register`;
-            const node_run = `node ${register} ./dist/src/index.js`;
-            const on_success = `uranio transpose && ${node_run}`;
-            const cmd = `npx tsc-watch --onSuccess "${on_success}"`;
-            util.spawn_cmd(cmd, 'dev', 'Developing', resolve, reject);
-        });
+        const register = `-r source-map-support/register -r module-alias/register`;
+        const node_run = `node ${register} ./dist/src/index.js`;
+        // const on_success = `uranio transpose && ${node_run}`;
+        // const cmd = `tsc-watch --onSuccess "${on_success}"`;
+        // const cmd = `nodemon --watch 'src/**/*.ts' --ignore '.urn/**/*' --exec 'npx uranio transpose && tsc -b && ${node_run}'`;
+        // cp.spawn('npx', ['tsc-watch', '--onSuccess', `"${on_success}"`], {stdio: 'inherit'});
+        cp.spawn('nodemon', ['--watch', "'src/**/*.ts'", `--ignore`, "'.urn/**/*'", '--exec', `'npx uranio transpose && tsc -b && ${node_run}'`], { stdio: 'inherit' });
     });
 }
 //# sourceMappingURL=dev.js.map

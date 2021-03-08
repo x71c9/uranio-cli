@@ -33,9 +33,10 @@ async function _start_dev(args:Arguments)
 	
 	const register = `-r source-map-support/register -r module-alias/register`;
 	const node_run = `node ${register} ./dist/src/index.js`;
-	const on_success = `uranio transpose && ${node_run}`;
+	// const on_success = `uranio transpose && ${node_run}`;
 	// const cmd = `tsc-watch --onSuccess "${on_success}"`;
-	
-	cp.spawn('npx', ['tsc-watch', '--onSuccess', `"${on_success}"`], {stdio: 'inherit'});
+	// const cmd = `nodemon --watch 'src/**/*.ts' --ignore '.urn/**/*' --exec 'npx uranio transpose && tsc -b && ${node_run}'`;
+	// cp.spawn('npx', ['tsc-watch', '--onSuccess', `"${on_success}"`], {stdio: 'inherit'});
+	cp.spawn('nodemon', ['--watch', "'src/**/*.ts'", `--ignore`, "'.urn/**/*'", '--exec', `'npx uranio transpose && tsc -b && ${node_run}'`], {stdio: 'inherit'});
 	
 }

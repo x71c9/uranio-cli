@@ -86,7 +86,7 @@ function _log(context, text, out = false) {
             was_spinning = true;
             stop_loading();
         }
-        if (defaults_1.conf.output == true) {
+        if (defaults_1.conf.output === true) {
             process.stdout.write(_replace_root_string(time_text));
         }
         if (was_spinning) {
