@@ -1,1 +1,41 @@
-{}
+{
+	"name": "urn-cli",
+	"version": "0.0.0",
+	"description": "Uranio Command Line Interface",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "tsc -b",
+		"init": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js init\"",
+		"transpose": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js transpose\"",
+		"help": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js -h\"",
+		"version": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js -v\""
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@bitbucket.org/nbl7/urn-cli.git"
+	},
+	"keywords": [
+		"uranio",
+		"urn"
+	],
+	"author": "Andrea Reni <mail@nbl7.net>",
+	"license": "ISC",
+	"homepage": "https://bitbucket.org/nbl7/urn-cli#readme",
+	"devDependencies": {
+		"@types/minimist": "^1.2.1",
+		"urn-dev": "git+ssh://git@bitbucket.org/nbl7/urn-dev.git"
+	},
+	"dependencies": {
+		"chalk": "^4.1.0",
+		"dateformat": "^4.5.1",
+		"minimist": "^1.2.5",
+		"ora": "^5.3.0",
+		"prettier": "^2.2.1",
+		"ts-morph": "^10.0.1"
+	},
+	"bin": {
+		"uranio": "dist/index.js"
+	}
+}
+
