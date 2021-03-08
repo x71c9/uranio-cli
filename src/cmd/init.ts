@@ -6,7 +6,7 @@
 
 import fs from 'fs';
 
-import {Arguments, Repo, valid_repos} from '../types';
+import {Arguments, Repo} from '../types';
 
 import {defaults} from '../conf/defaults';
 
@@ -28,11 +28,9 @@ export const init = {
 		
 		const repo = args.r || args.repo || defaults.default_repo;
 		
-		_check_repo(repo);
+		util.check_repo(repo);
 		
 		_update_aliases(repo);
-		
-		// _create_src_folder();
 		
 		_create_urn_folder();
 		
@@ -42,13 +40,13 @@ export const init = {
 		
 		_copy_dot_files();
 		
-		_copy_uranio_repo(repo);
+		// _copy_uranio_repo(repo);
+		
+		await _clone_and_install_repo(repo);
 		
 		_remove_tmp();
 		
-		await _install_dep(repo);
-		
-		// await _clone_and_install_repo(repo);
+		// await _install_dep(repo);
 		
 		output.end_log(`Initialization completed.`);
 		
@@ -84,33 +82,53 @@ async function _install_dep(repo:Repo){
 	}
 }
 
-function _copy_uranio_repo(repo:Repo){
-	const dot_folder = `${global.uranio.root}/${defaults.tmp_folder}/urn-dot`;
-	let srcs = '';
-	switch(repo){
-		case 'core':{
-			srcs = `${dot_folder}/${defaults.folder}/web/core`;
-			break;
-		}
-		case 'web':{
-			srcs = `${dot_folder}/${defaults.folder}/web`;
-			break;
-		}
-	}
-	if(srcs !== ''){
-		util.copy_files('dot', srcs, `${global.uranio.root}/${defaults.folder}`);
-	}
+// function _copy_uranio_repo(repo:Repo){
+//   const dot_folder = `${global.uranio.root}/${defaults.tmp_folder}/urn-dot`;
+//   let srcs = '';
+//   switch(repo){
+//     case 'core':{
+//       srcs = `${dot_folder}/${defaults.folder}/web/core`;
+//       break;
+//     }
+//     case 'web':{
+//       srcs = `${dot_folder}/${defaults.folder}/web`;
+//       break;
+//     }
+//   }
+//   if(srcs !== ''){
+//     util.copy_folder('dot', srcs, `${global.uranio.root}/${defaults.folder}`);
+//   }
 
-}
+// }
 
-function _copy_dot_files(){
+function _copy_dot_src_folder(){
 	const dot_folder = `${global.uranio.root}/${defaults.tmp_folder}/urn-dot`;
 	let srcs = ``;
 	srcs += `${dot_folder}/src `;
+	const dest = `${global.uranio.root}/`;
+	util.copy_folder('dot', srcs, dest);
+}
+
+function _copy_dot_tsconfig(){
+	const dot_folder = `${global.uranio.root}/${defaults.tmp_folder}/urn-dot`;
+	let srcs = ``;
 	srcs += `${dot_folder}/tsconfig.json `;
+	const dest = `${global.uranio.root}/`;
+	util.copy_file('dot', srcs, dest);
+}
+
+function _copy_dot_eslint_files(){
+	const dot_folder = `${global.uranio.root}/${defaults.tmp_folder}/urn-dot`;
+	let srcs = ``;
 	srcs += `${dot_folder}/.eslintignore ${dot_folder}/.eslintrc.js`;
 	const dest = `${global.uranio.root}/`;
 	util.copy_files('dot', srcs, dest);
+}
+
+function _copy_dot_files(){
+	_copy_dot_src_folder();
+	_copy_dot_tsconfig();
+	_copy_dot_eslint_files();
 }
 
 function _create_rc_file(repo:Repo){
@@ -124,22 +142,23 @@ function _create_rc_file(repo:Repo){
 	output.done_log('rcfl', `${defaults.rcfile_path} created.`);
 }
 
-function _check_repo(repo:Repo){
-	switch(repo){
-		case 'core':
-		case 'web':{
-			break;
-		}
-		default:{
-			const valid_repos_str = valid_repos().join(', ');
-			let end_log = '';
-			end_log += `Wrong repo. `;
-			end_log += `Repo must be one of the following [${valid_repos_str}]`;
-			output.end_log(end_log);
-			process.exit(1);
-		}
-	}
-}
+// function _check_repo(repo:Repo){
+//   switch(repo){
+//     case 'core':
+//     case 'web':{
+//       global.uranio.repo = repo;
+//       break;
+//     }
+//     default:{
+//       const valid_repos_str = valid_repos().join(', ');
+//       let end_log = '';
+//       end_log += `Wrong repo. `;
+//       end_log += `Repo must be one of the following [${valid_repos_str}]`;
+//       output.end_log(end_log);
+//       process.exit(1);
+//     }
+//   }
+// }
 
 // async function _clone_dot_in_temp(){
 //   output.start_loading(`Cloning and intalling [${defaults.dot_repo}]...`);
@@ -153,29 +172,25 @@ function _check_repo(repo:Repo){
 //   output.done_log('repo', `Cloned and installed repo [${repo}].`);
 // }
 
-// async function _clone_and_install_repo(repo:Repo){
-//   output.start_loading(`Cloning and intalling [${repo}]...`);
-//   switch(repo){
-//     case 'core':{
-//       await _clone_core();
-//       await _uninstall_core_dep();
-//       await _install_core_dep();
-//       break;
-//     }
-//     case 'web':{
-//       await _clone_core();
-//       await _clone_web();
-//       await _uninstall_web_dep();
-//       await _install_web_dep();
-//       break;
-//     }
-//     default:{
-//       output.log('init', `Selected repo is not valid. [${repo}]`);
-//       process.exit(1);
-//     }
-//   }
-//   output.done_log('repo', `Cloned and installed repo [${repo}].`);
-// }
+async function _clone_and_install_repo(repo:Repo){
+	output.start_loading(`Cloning and intalling [${repo}]...`);
+	switch(repo){
+		case 'core':{
+			await _clone_core();
+			break;
+		}
+		case 'web':{
+			await _clone_web();
+			break;
+		}
+		default:{
+			output.log('init', `Selected repo is not valid. [${repo}]`);
+			process.exit(1);
+		}
+	}
+	await _install_dep(repo);
+	output.done_log('repo', `Cloned and installed repo [${repo}].`);
+}
 
 function _create_urn_folder(){
 	output.start_loading(`Creating ${defaults.folder} folder...`);
@@ -276,21 +291,14 @@ async function _clone_dot(){
 	output.done_log('dot', `Cloned dot repo.`);
 }
 
-// async function _clone_core(){
-//   output.start_loading(`Cloning core...`);
-//   await util.clone_repo('core', defaults.core_repo, 'urn-core');
-//   output.done_log('core', `Cloned core repo.`);
-// }
+async function _clone_core(){
+	output.start_loading(`Cloning core...`);
+	await util.clone_repo('core', defaults.core_repo, `${defaults.folder}/core`);
+	output.done_log('core', `Cloned core repo.`);
+}
 
-// async function _clone_web(){
-//   output.start_loading(`Cloning web...`);
-//   await util.clone_repo('web_', defaults.web_repo, 'urn-web');
-//   output.done_log('web', `Cloned web repo.`);
-// }
-
-
-
-
-
-
-
+async function _clone_web(){
+	output.start_loading(`Cloning web...`);
+	await util.clone_repo_recursive('web_', defaults.web_repo, `${defaults.folder}/web`);
+	output.done_log('web', `Cloned web repo.`);
+}

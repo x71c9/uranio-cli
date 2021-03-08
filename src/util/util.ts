@@ -10,6 +10,27 @@ import * as cp from 'child_process';
 
 import * as output from '../log/';
 
+import {valid_repos} from '../types';
+
+export function check_repo(repo:unknown)
+		:void{
+	switch(repo){
+		case 'core':
+		case 'web':{
+			global.uranio.repo = repo;
+			break;
+		}
+		default:{
+			const valid_repos_str = valid_repos().join(', ');
+			let end_log = '';
+			end_log += `Wrong repo. `;
+			end_log += `Repo must be one of the following [${valid_repos_str}]`;
+			output.end_log(end_log);
+			process.exit(1);
+		}
+	}
+}
+
 export function prettier(path:string)
 	:void{
 	output.start_loading(`Prettier [${path}]...`);
@@ -141,15 +162,21 @@ export async function uninstall_dep(repo:string, context:string)
 
 export async function clone_repo(context: string, address:string, dest_folder:string)
 		:Promise<any>{
+	return await _clone_repo(context, address, dest_folder);
+}
+
+export async function clone_repo_recursive(context: string, address:string, dest_folder:string)
+		:Promise<any>{
+	return await _clone_repo(context, address, dest_folder, true);
+}
+
+async function _clone_repo(context: string, address:string, dest_folder:string, recursive=false)
+		:Promise<any>{
 	const action = `cloning repo [${address}]`;
 	output.verbose_log(context, `Started ${action}`);
 	return new Promise((resolve, reject) => {
-		spawn_cmd(
-			`git clone ${address} ${global.uranio.root}/${dest_folder} --progress --recurse-submodules -j8`,
-			context,
-			action,
-			resolve,
-			reject
-		);
+		let cmd = `git clone ${address} ${global.uranio.root}/${dest_folder} --progress`;
+		cmd += (recursive === true) ? ` --recurse-submodules` : '';
+		spawn_cmd(cmd, context, action, resolve, reject);
 	});
 }

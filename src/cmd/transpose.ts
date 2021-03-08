@@ -32,6 +32,8 @@ export const transpose = {
 		
 		output.start_loading('Transposing...');
 		
+		_check_if_initialized();
+		
 		let src_path = args.s || args['src-path'] || defaults.book_src_path;
 		
 		src_path = _relative_to_absolute_path(src_path);
@@ -63,6 +65,19 @@ const _project = new Project(
 	}
 );
 
+function _check_if_initialized(){
+	const rc_file_path = `${global.uranio.root}/${defaults.rcfile_path}`;
+	if(!fs.existsSync(rc_file_path)){
+		output.error_log('init', `URANIO was not initialized yet. Please run "uranio init" before transposing.`);
+		process.exit(1);
+	}else{
+		const rc_content = fs.readFileSync(rc_file_path, 'utf8');
+		const rc_obj = JSON.parse(rc_content);
+		util.check_repo(rc_obj.repo);
+		global.uranio.repo = rc_obj.repo;
+	}
+}
+
 function _relative_to_absolute_path(path:string)
 		:string{
 	if(path[0] !== '/'){
@@ -90,8 +105,10 @@ function _manipulate_file(src_path:string){
 	
 	sourceFile = _replace_comments(sourceFile);
 	sourceFile = _change_realtive_imports(sourceFile);
+	
 	sourceFile = _create_bll_book(sourceFile);
-	sourceFile = _create_route_book(sourceFile);
+	sourceFile = _create_api_book(sourceFile);
+	
 	sourceFile = _manipulate_atom_book(sourceFile);
 	
 	return sourceFile.print();
@@ -126,7 +143,8 @@ function _manipulate_atom_book(sourceFile:SourceFile)
 		book_decl = _remove_type_reference(book_decl);
 		book_decl = _clean_prop('bll', book_decl);
 		book_decl = _clean_prop('api', book_decl);
-		book_decl = _append_requried_book(book_decl, 'uranio.types.required_books.atom');
+		// book_decl = _append_requried_book(book_decl, 'uranio.types.required_books.atom');
+		book_decl = _append_requried_book(book_decl, 'atom');
 		book_decl = _add_as_const(book_decl);
 	}
 	output.done_log('mnpl', 'Done manipulating atom_book.');
@@ -139,13 +157,18 @@ function _create_a_book(sourceFile:SourceFile, book_name:string, keep_property:s
 	const book_state = _find_atom_book_statement(sourceFile);
 	if(book_state){
 		const atom_book_state_text = book_state.getText();
-		const cloned_book_source = _project.createSourceFile(`./${defaults.folder}/${book_name}_book.ts`, atom_book_state_text);
+		const cloned_book_source = _project.createSourceFile(
+			`${global.uranio.root}/${defaults.folder}/${book_name}_book.ts`,
+			atom_book_state_text,
+			{ overwrite: true }
+		);
 		let cloned_book_decl = cloned_book_source.getFirstDescendantByKind(ts.SyntaxKind.VariableDeclaration);
 		if(cloned_book_decl){
 			cloned_book_decl = _remove_type_reference(cloned_book_decl);
 			cloned_book_decl = _rename_book(book_name, cloned_book_decl);
 			cloned_book_decl = _clean_all_but(keep_property, cloned_book_decl);
-			cloned_book_decl = _append_requried_book(cloned_book_decl, `uranio.types.required_books.${required_book_name}`);
+			// cloned_book_decl = _append_requried_book(cloned_book_decl, `uranio.types.required_books.${required_book_name}`);
+			cloned_book_decl = _append_requried_book(cloned_book_decl, required_book_name);
 			cloned_book_decl = _add_as_const(cloned_book_decl);
 		}
 		const last = sourceFile.getLastChildByKind(ts.SyntaxKind.VariableStatement);
@@ -157,7 +180,7 @@ function _create_a_book(sourceFile:SourceFile, book_name:string, keep_property:s
 	return sourceFile;
 }
 
-function _create_route_book(sourceFile:SourceFile)
+function _create_api_book(sourceFile:SourceFile)
 		:SourceFile{
 	return _create_a_book(sourceFile, 'api', 'api', 'api');
 }
@@ -220,17 +243,91 @@ function _rename_book(book_name:string, var_decl:VariableDeclaration)
 	return var_decl;
 }
 
-function _append_requried_book(book_decl:VariableDeclaration, book_string:string)
-		:VariableDeclaration{
-	output.start_loading(`Adding required_book...`);
-	const obj_lit = book_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
-	if(obj_lit){
-		const text = obj_lit.getText();
-		obj_lit.replaceWithText(`{...${book_string},\n` + text.slice(1,text.length));
+function _get_variable_content(source:SourceFile, variable_name:string)
+		:string{
+	const states = source.getChildrenOfKind(ts.SyntaxKind.VariableStatement);
+	for(const state of states){
+		const var_decl = state.getFirstDescendantByKind(ts.SyntaxKind.VariableDeclaration);
+		if(var_decl){
+			if(var_decl.getName() === variable_name){
+				const syntax_list = var_decl.getFirstDescendantByKind(ts.SyntaxKind.SyntaxList);
+				if(syntax_list){
+					return syntax_list.getText();
+				}
+			}
+		}
 	}
-	output.done_verbose_log(`requ`, `Added required_book.`);
+	return '';
+}
+
+function _add_book_from_file(book_decl:VariableDeclaration, required_book_name:string, books_file_path:string){
+
+	const book_content = fs.readFileSync(books_file_path, 'utf8');
+	
+	const core_books_source = _project.createSourceFile(
+		`${global.uranio.root}/${defaults.folder}/cloned_${required_book_name}.ts`,
+		book_content,
+		{ overwrite: true }
+	);
+	
+	const core_var_content = _get_variable_content(core_books_source, required_book_name);
+	
+	const syntax_list = book_decl.getFirstDescendantByKind(ts.SyntaxKind.SyntaxList);
+	
+	if(syntax_list){
+		syntax_list.replaceWithText(core_var_content + syntax_list.getText());
+	}
+}
+
+function _add_core_books(book_decl:VariableDeclaration, required_book_name:string){
+	
+	let core_repo_path = `${global.uranio.root}/${defaults.folder}/core/`;
+	if(global.uranio.repo === 'web'){
+		core_repo_path = `${global.uranio.root}/${defaults.folder}/web/core`;
+	}
+	
+	const books_path = `${core_repo_path}/books.ts`;
+	
+	_add_book_from_file(book_decl, required_book_name, books_path);
+	
+}
+
+function _add_web_books(book_decl:VariableDeclaration, required_book_name:string){
+	
+	const web_repo_path = `${global.uranio.root}/${defaults.folder}/web/`;
+	const books_path = `${web_repo_path}/books.ts`;
+	
+	_add_book_from_file(book_decl, required_book_name, books_path);
+	
+}
+
+function _append_requried_book(book_decl:VariableDeclaration, required_book_name:string)
+		:VariableDeclaration{
+	output.start_loading(`Adding required books...`);
+	
+	_add_core_books(book_decl, required_book_name);
+	
+	if(global.uranio.repo === 'web'){
+		
+		_add_web_books(book_decl, required_book_name);
+		
+	}
+	
+	output.done_verbose_log(`requ`, `Added required books.`);
 	return book_decl;
 }
+
+// function _append_requried_book(book_decl:VariableDeclaration, book_string:string)
+//     :VariableDeclaration{
+//   output.start_loading(`Adding required_book...`);
+//   const obj_lit = book_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+//   if(obj_lit){
+//     const text = obj_lit.getText();
+//     obj_lit.replaceWithText(`{...${book_string},\n` + text.slice(1,text.length));
+//   }
+//   output.done_verbose_log(`requ`, `Added required_book.`);
+//   return book_decl;
+// }
 
 // function _append_requried_atoms(book_decl:VariableDeclaration)
 //     :VariableDeclaration{
