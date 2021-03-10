@@ -5,7 +5,7 @@
  */
 export declare function check_if_initialized(): void;
 export declare function check_repo(repo: unknown): void;
-export declare function prettier(path: string): void;
+export declare function prety(path: string): void;
 export declare function remove_folder_if_exists(context: string, folder_path: string): void;
 export declare function create_folder_if_doesnt_exists(context: string, folder_path: string): void;
 export declare function copy_files(context: string, source: string, destination: string): void;

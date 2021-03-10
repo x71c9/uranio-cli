@@ -8,6 +8,8 @@ import fs from 'fs';
 
 import * as cp from 'child_process';
 
+import prettier from 'prettier';
+
 import * as output from '../log/';
 
 import {valid_repos} from '../types';
@@ -49,10 +51,13 @@ export function check_repo(repo:unknown)
 	}
 }
 
-export function prettier(path:string)
+export function prety(path:string)
 	:void{
 	output.start_loading(`Prettier [${path}]...`);
-	cp.execSync(`npx prettier --write ${path} --use-tabs --tab-width 2`);
+	const content = fs.readFileSync(path, 'utf8');
+	const pretty_string = prettier.format(content, { useTabs: true, tabWidth: 2});
+	fs.writeFileSync(path, pretty_string);
+	// cp.execSync(`npx prettier --write ${path} --use-tabs --tab-width 2`);
 	output.done_verbose_log('prtt', `Prettier [${path}] done.`);
 }
 

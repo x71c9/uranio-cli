@@ -7,7 +7,7 @@
 	"scripts": {
 		"build": "tsc -b",
 		"init": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js init\"",
-		"transpose": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js transpose --no-log\"",
+		"transpose": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js transpose\"",
 		"help": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js -h\"",
 		"version": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js -v\""
 	},
@@ -24,6 +24,7 @@
 	"homepage": "https://bitbucket.org/nbl7/urn-cli#readme",
 	"devDependencies": {
 		"@types/minimist": "^1.2.1",
+		"@types/prettier": "^2.2.2",
 		"urn-dev": "git+ssh://git@bitbucket.org/nbl7/urn-dev.git"
 	},
 	"dependencies": {

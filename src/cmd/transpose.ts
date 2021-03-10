@@ -12,7 +12,6 @@ import {
 	Node,
 	VariableDeclaration,
 	VariableStatement,
-	// PropertyAssignment,
 	SourceFile,
 	QuoteKind,
 	IndentationText
@@ -77,7 +76,8 @@ function _relative_to_absolute_path(path:string)
 }
 
 function _prettier_books(dest_path:string){
-	util.prettier(dest_path);
+	// util.prettier(dest_path);
+	util.prety(dest_path);
 }
 
 function _manipulate_file(src_path:string){
