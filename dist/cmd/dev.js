@@ -19,7 +19,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -39,7 +39,8 @@ const output = __importStar(require("../log/"));
 const util = __importStar(require("../util/"));
 exports.dev = {
     run: (args) => __awaiter(void 0, void 0, void 0, function* () {
-        output.start_loading('Developing...');
+        // output.start_loading('Developing...');
+        output.stop_loading();
         util.check_if_initialized();
         _start_dev(args);
     })
@@ -53,7 +54,12 @@ function _start_dev(args) {
         // const cmd = `tsc-watch --onSuccess "${on_success}"`;
         // const cmd = `nodemon --watch 'src/**/*.ts' --ignore '.urn/**/*' --exec 'npx uranio transpose && tsc -b && ${node_run}'`;
         // cp.spawn('npx', ['tsc-watch', '--onSuccess', `"${on_success}"`], {stdio: 'inherit'});
-        cp.spawn('nodemon', ['--watch', "'src/**/*.ts'", `--ignore`, "'.urn/**/*'", '--exec', `'npx uranio transpose && tsc -b && ${node_run}'`], { stdio: 'inherit' });
+        // const ts_node = `npx ts-node-dev -r module-alias/register --clear --respawn --watch src/* -- src/index.ts`;
+        // const nodemon = `nodemon --watch 'src/**/*' -e ts --ignore '.urn/**/*' --exec 'npx uranio transpose && tsc -b && ${node_run}'`;
+        // const nodemon_urntranspose = `npx nodemon --watch 'src/**/*' -e ts  --exec 'npx uranio transpose'`;
+        // cp.spawn('nodemon', ['--watch', "'src/**/*'", '-e', 'ts',  `--ignore`, "'.urn/**/*'", '--exec', `'npx uranio transpose && tsc -b && ${node_run}'`], {stdio: 'inherit'});
+        cp.spawn('npx', ['nodemon', '--watch', "src/book.ts", '-e', 'ts', '--exec', `npx uranio transpose`], { stdio: 'inherit' });
+        cp.spawn('npx', ['tsc-watch', '--onSuccess', node_run], { stdio: 'inherit' });
     });
 }
 //# sourceMappingURL=dev.js.map
