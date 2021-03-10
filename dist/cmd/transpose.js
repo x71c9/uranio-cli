@@ -72,7 +72,8 @@ function _relative_to_absolute_path(path) {
     return path;
 }
 function _prettier_books(dest_path) {
-    util.prettier(dest_path);
+    // util.prettier(dest_path);
+    util.prety(dest_path);
 }
 function _manipulate_file(src_path) {
     const action = `manipulating [${src_path}]`;

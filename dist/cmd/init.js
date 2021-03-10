@@ -156,7 +156,8 @@ function _create_rc_file(repo) {
     content += `"repo": "${repo}"\n`;
     content += `}`;
     fs_1.default.writeFileSync(`${global.uranio.root}/${defaults_1.defaults.rcfile_path}`, content);
-    util.prettier(`${global.uranio.root}/${defaults_1.defaults.rcfile_path}`);
+    // util.prettier(`${global.uranio.root}/${defaults.rcfile_path}`);
+    // util.prety(`${global.uranio.root}/${defaults.rcfile_path}`);
     output.done_log('rcfl', `${defaults_1.defaults.rcfile_path} created.`);
 }
 // function _check_repo(repo:Repo){

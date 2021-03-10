@@ -36,9 +36,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.prettier = exports.check_repo = exports.check_if_initialized = void 0;
+exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.prety = exports.check_repo = exports.check_if_initialized = void 0;
 const fs_1 = __importDefault(require("fs"));
 const cp = __importStar(require("child_process"));
+const prettier_1 = __importDefault(require("prettier"));
 const output = __importStar(require("../log/"));
 const types_1 = require("../types");
 const defaults_1 = require("../conf/defaults");
@@ -76,12 +77,15 @@ function check_repo(repo) {
     }
 }
 exports.check_repo = check_repo;
-function prettier(path) {
+function prety(path) {
     output.start_loading(`Prettier [${path}]...`);
-    cp.execSync(`npx prettier --write ${path} --use-tabs --tab-width 2`);
+    const content = fs_1.default.readFileSync(path, 'utf8');
+    const pretty_string = prettier_1.default.format(content, { useTabs: true, tabWidth: 2 });
+    fs_1.default.writeFileSync(path, pretty_string);
+    // cp.execSync(`npx prettier --write ${path} --use-tabs --tab-width 2`);
     output.done_verbose_log('prtt', `Prettier [${path}] done.`);
 }
-exports.prettier = prettier;
+exports.prety = prety;
 function remove_folder_if_exists(context, folder_path) {
     if (fs_1.default.existsSync(folder_path)) {
         output.start_loading(`Removing folder [${folder_path}]`);
