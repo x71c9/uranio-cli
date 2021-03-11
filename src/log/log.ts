@@ -61,7 +61,6 @@ export function done_log(context:string, text:string)
 export function done_verbose_log(context:string, text:string)
 		:void{
 	_go_previous();
-	// verbose_log(context, `${defaults.check_char} ${text}`);
 	verbose_log(context, `${text}`);
 }
 
@@ -132,7 +131,7 @@ function _format_text(context:string, text:string)
 
 function _log_to_file(text:string)
 		:void{
-	fs.appendFileSync(`${global.uranio.root}/${defaults.log_filepath}`, text);
+	fs.appendFileSync(defaults.log_filepath, text);
 }
 
 function _replace_root_string(str:string)
@@ -140,7 +139,7 @@ function _replace_root_string(str:string)
 	if(str.indexOf('$URNROOT$') !== -1){
 		return str.replace('$URNROOT$','');
 	}
-	const regex2 = new RegExp(`${global.uranio.root}`, 'g');
-	return str.replace(regex2, 'ROOT');
+	const regex = new RegExp(`${global.uranio.root}`, 'g');
+	return str.replace(regex, 'ROOT');
 }
 

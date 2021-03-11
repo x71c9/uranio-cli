@@ -38,16 +38,14 @@ const cp = __importStar(require("child_process"));
 const output = __importStar(require("../log/"));
 const util = __importStar(require("../util/"));
 exports.dev = {
-    run: (args) => __awaiter(void 0, void 0, void 0, function* () {
-        // output.start_loading('Developing...');
+    run: () => __awaiter(void 0, void 0, void 0, function* () {
         output.stop_loading();
-        util.check_if_initialized();
-        _start_dev(args);
+        util.read_rc_file();
+        _start_dev();
     })
 };
-function _start_dev(args) {
+function _start_dev() {
     return __awaiter(this, void 0, void 0, function* () {
-        args;
         const register = `-r source-map-support/register -r module-alias/register`;
         const node_run = `node ${register} ./dist/src/index.js`;
         cp.spawn('npx', [

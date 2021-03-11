@@ -33,18 +33,20 @@ const cp = __importStar(require("child_process"));
 const cmd_1 = require("./cmd/");
 const defaults_1 = require("./conf/defaults");
 const output = __importStar(require("./log/"));
+// import * as util from './util/';
 function urn_process(args) {
     _init_global();
-    _get_project_root();
+    _read_options(args);
     _init_log();
+    _get_project_root();
     _log_arguments(args);
     _switch_command(args);
     // process.exit(1);
 }
 exports.urn_process = urn_process;
 function _init_log() {
-    if (!fs_1.default.existsSync(`${global.uranio.root}/${defaults_1.defaults.log_filepath}`)) {
-        cp.execSync(`touch ${global.uranio.root}/${defaults_1.defaults.log_filepath}`);
+    if (!fs_1.default.existsSync(defaults_1.defaults.log_filepath)) {
+        cp.execSync(`touch ${defaults_1.defaults.log_filepath}`);
     }
 }
 function _init_global() {
@@ -86,7 +88,7 @@ function _get_project_root() {
         if (folder_path === '/') {
             throw new Error('Cannot find project root.');
         }
-        _check_folder(folder_path);
+        // _check_folder(folder_path);
     }
     process.chdir(global.uranio.root);
     output.done_verbose_log('root', `$URNROOT$Project root found [${global.uranio.root}]`);
@@ -94,14 +96,7 @@ function _get_project_root() {
 function _log_arguments(args) {
     output.verbose_log('args', JSON.stringify(args));
 }
-function _switch_command(args) {
-    let cmd = args._[0] || '';
-    if (args.version) {
-        cmd = 'version';
-    }
-    if (args.help || args.h) {
-        cmd = 'help';
-    }
+function _read_options(args) {
     const verbose = args.v || args.verbose;
     if (verbose === true) {
         defaults_1.conf.verbose = true;
@@ -114,10 +109,19 @@ function _switch_command(args) {
     if (log === false) {
         defaults_1.conf.output = false;
     }
+}
+function _switch_command(args) {
+    let cmd = args._[0] || '';
+    if (args.version) {
+        cmd = 'version';
+    }
+    if (args.help || args.h) {
+        cmd = 'help';
+    }
     switch (cmd) {
         case '':
         case 'version': {
-            output.end_log('version');
+            output.stop_loading();
             console.log('v0.0.1');
             break;
         }
@@ -126,11 +130,11 @@ function _switch_command(args) {
             break;
         }
         case 'transpose': {
-            cmd_1.transpose.run(args);
+            cmd_1.transpose.run();
             break;
         }
         case 'dev': {
-            cmd_1.dev.run(args);
+            cmd_1.dev.run();
             break;
         }
         case 'help': {

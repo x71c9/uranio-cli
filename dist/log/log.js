@@ -52,7 +52,6 @@ function done_log(context, text) {
 exports.done_log = done_log;
 function done_verbose_log(context, text) {
     _go_previous();
-    // verbose_log(context, `${defaults.check_char} ${text}`);
     verbose_log(context, `${text}`);
 }
 exports.done_verbose_log = done_verbose_log;
@@ -117,13 +116,13 @@ function _format_text(context, text) {
     return time_text;
 }
 function _log_to_file(text) {
-    fs_1.default.appendFileSync(`${global.uranio.root}/${defaults_1.defaults.log_filepath}`, text);
+    fs_1.default.appendFileSync(defaults_1.defaults.log_filepath, text);
 }
 function _replace_root_string(str) {
     if (str.indexOf('$URNROOT$') !== -1) {
         return str.replace('$URNROOT$', '');
     }
-    const regex2 = new RegExp(`${global.uranio.root}`, 'g');
-    return str.replace(regex2, 'ROOT');
+    const regex = new RegExp(`${global.uranio.root}`, 'g');
+    return str.replace(regex, 'ROOT');
 }
 //# sourceMappingURL=log.js.map
