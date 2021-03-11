@@ -19,7 +19,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -157,7 +157,7 @@ function _create_rc_file(repo) {
     content += `}`;
     fs_1.default.writeFileSync(`${global.uranio.root}/${defaults_1.defaults.rcfile_path}`, content);
     // util.prettier(`${global.uranio.root}/${defaults.rcfile_path}`);
-    // util.prety(`${global.uranio.root}/${defaults.rcfile_path}`);
+    util.prety(`${global.uranio.root}/${defaults_1.defaults.rcfile_path}`, 'json');
     output.done_log('rcfl', `${defaults_1.defaults.rcfile_path} created.`);
 }
 // function _check_repo(repo:Repo){
