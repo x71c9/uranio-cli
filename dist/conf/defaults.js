@@ -14,6 +14,7 @@ exports.defaults = {
     book_src_path: 'src/book.ts',
     book_dest_path: '.urn/books.ts',
     log_filepath: '.urnlog',
+    rcfile_path: `.urn/.urnrc.json`,
     time_format: "yy-mm-dd'T'HH:MM:ss:l",
     dot_repo: `${cloud_address}urn-dot.git`,
     web_repo: `${cloud_address}urn-web.git`,
@@ -23,10 +24,9 @@ exports.defaults = {
     core_dep_repo: `${cloud_address}urn-core-dep`,
     core_dep_dev_repo: `${cloud_address}urn-core-dep-dev`,
     check_char: '✔',
-    rcfile_path: `.urnrc.json`
 };
 exports.conf = {
-    verbose: true,
+    verbose: false,
     colors: true,
     output: true
 };

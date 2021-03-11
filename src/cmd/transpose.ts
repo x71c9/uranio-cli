@@ -17,8 +17,6 @@ import {
 	IndentationText
 } from 'ts-morph';
 
-import {Arguments} from '../types';
-
 import {defaults} from '../conf/defaults';
 
 import * as output from '../log/';
@@ -27,27 +25,17 @@ import * as util from '../util/';
 
 export const transpose = {
 	
-	run: async (args:Arguments):Promise<void> => {
+	run: async ():Promise<void> => {
 		
 		output.start_loading('Transposing...');
 		
-		util.check_if_initialized();
+		util.read_rc_file();
 		
-		let src_path = args.s || args['src-path'] || defaults.book_src_path;
+		const modified = _manipulate_file();
 		
-		src_path = _relative_to_absolute_path(src_path);
+		_copy_manipulated_file(modified);
 		
-		let dest_path = args.d || args['dest-path'] || defaults.book_dest_path;
-		
-		dest_path = _relative_to_absolute_path(dest_path);
-		
-		
-		const modified = _manipulate_file(src_path);
-		
-		
-		_copy_modified_file_to_dest(dest_path, modified);
-		
-		_prettier_books(dest_path);
+		_pretty_books();
 		
 		output.end_log(`Transpose completed.`);
 		
@@ -64,31 +52,19 @@ const _project = new Project(
 	}
 );
 
-function _relative_to_absolute_path(path:string)
-		:string{
-	if(path[0] !== '/'){
-		if(path.substr(0,2) === './'){
-			path = path.substr(2);
-		}
-		path = `${global.uranio.root}/${path}`;
-	}
-	return path;
+function _pretty_books(){
+	util.pretty(defaults.book_dest_path);
 }
 
-function _prettier_books(dest_path:string){
-	// util.prettier(dest_path);
-	util.pretty(dest_path);
-}
-
-function _manipulate_file(src_path:string){
+function _manipulate_file(){
 	
-	const action = `manipulating [${src_path}]`;
+	const action = `manipulating [${defaults.book_src_path}]`;
 	
 	output.start_loading(`${action[0].toUpperCase()}${action.substr(1)}...`);
 	
 	output.verbose_log(`mnpl`, `Started ${action}.`);
 	
-	let sourceFile = _project.addSourceFileAtPath(src_path);
+	let sourceFile = _project.addSourceFileAtPath(defaults.book_src_path);
 	
 	sourceFile = _replace_comments(sourceFile);
 	sourceFile = _change_realtive_imports(sourceFile);
@@ -130,7 +106,6 @@ function _manipulate_atom_book(sourceFile:SourceFile)
 		book_decl = _remove_type_reference(book_decl);
 		book_decl = _clean_prop('bll', book_decl);
 		book_decl = _clean_prop('api', book_decl);
-		// book_decl = _append_requried_book(book_decl, 'uranio.types.required_books.atom');
 		book_decl = _append_requried_book(book_decl, 'atom');
 		book_decl = _add_as_const(book_decl);
 	}
@@ -138,8 +113,12 @@ function _manipulate_atom_book(sourceFile:SourceFile)
 	return sourceFile;
 }
 
-function _create_a_book(sourceFile:SourceFile, book_name:string, keep_property:string, required_book_name:string)
-		:SourceFile{
+function _create_a_book(
+	sourceFile:SourceFile,
+	book_name:string,
+	keep_property:string,
+	required_book_name:string
+):SourceFile{
 	output.start_loading(`Creating ${book_name}_book...`);
 	const book_state = _find_atom_book_statement(sourceFile);
 	if(book_state){
@@ -149,12 +128,12 @@ function _create_a_book(sourceFile:SourceFile, book_name:string, keep_property:s
 			atom_book_state_text,
 			{ overwrite: true }
 		);
-		let cloned_book_decl = cloned_book_source.getFirstDescendantByKind(ts.SyntaxKind.VariableDeclaration);
+		let cloned_book_decl = cloned_book_source
+			.getFirstDescendantByKind(ts.SyntaxKind.VariableDeclaration);
 		if(cloned_book_decl){
 			cloned_book_decl = _remove_type_reference(cloned_book_decl);
 			cloned_book_decl = _rename_book(book_name, cloned_book_decl);
 			cloned_book_decl = _clean_all_but(keep_property, cloned_book_decl);
-			// cloned_book_decl = _append_requried_book(cloned_book_decl, `uranio.types.required_books.${required_book_name}`);
 			cloned_book_decl = _append_requried_book(cloned_book_decl, required_book_name);
 			cloned_book_decl = _add_as_const(cloned_book_decl);
 		}
@@ -247,86 +226,50 @@ function _get_variable_content(source:SourceFile, variable_name:string)
 	return '';
 }
 
-function _add_book_from_file(book_decl:VariableDeclaration, required_book_name:string, books_file_path:string){
-
+function _add_book_from_file(
+	book_decl:VariableDeclaration,
+	required_book_name:string,
+	books_file_path:string
+){
 	const book_content = fs.readFileSync(books_file_path, 'utf8');
-	
 	const core_books_source = _project.createSourceFile(
-		`${global.uranio.root}/${defaults.folder}/cloned_${required_book_name}.ts`,
+		`./${defaults.folder}/cloned_${required_book_name}.ts`,
 		book_content,
 		{ overwrite: true }
 	);
-	
 	const core_var_content = _get_variable_content(core_books_source, required_book_name);
-	
 	const syntax_list = book_decl.getFirstDescendantByKind(ts.SyntaxKind.SyntaxList);
-	
 	if(syntax_list){
 		syntax_list.replaceWithText(core_var_content + syntax_list.getText());
 	}
 }
 
 function _add_core_books(book_decl:VariableDeclaration, required_book_name:string){
-	
-	let core_repo_path = `${global.uranio.root}/${defaults.folder}/core/`;
+	let core_repo_path = `./${defaults.folder}/core/`;
 	if(global.uranio.repo === 'web'){
-		core_repo_path = `${global.uranio.root}/${defaults.folder}/web/core`;
+		core_repo_path = `./${defaults.folder}/web/core`;
 	}
-	
-	const books_path = `${core_repo_path}/books.ts`;
-	
-	_add_book_from_file(book_decl, required_book_name, books_path);
+	const required_books_path = `${core_repo_path}/books.ts`;
+	_add_book_from_file(book_decl, required_book_name, required_books_path);
 	
 }
 
 function _add_web_books(book_decl:VariableDeclaration, required_book_name:string){
-	
 	const web_repo_path = `${global.uranio.root}/${defaults.folder}/web/`;
-	const books_path = `${web_repo_path}/books.ts`;
-	
-	_add_book_from_file(book_decl, required_book_name, books_path);
-	
+	const required_books_path = `${web_repo_path}/books.ts`;
+	_add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 
 function _append_requried_book(book_decl:VariableDeclaration, required_book_name:string)
 		:VariableDeclaration{
 	output.start_loading(`Adding required books...`);
-	
 	_add_core_books(book_decl, required_book_name);
-	
 	if(global.uranio.repo === 'web'){
-		
 		_add_web_books(book_decl, required_book_name);
-		
 	}
-	
 	output.done_verbose_log(`requ`, `Added required books.`);
 	return book_decl;
 }
-
-// function _append_requried_book(book_decl:VariableDeclaration, book_string:string)
-//     :VariableDeclaration{
-//   output.start_loading(`Adding required_book...`);
-//   const obj_lit = book_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
-//   if(obj_lit){
-//     const text = obj_lit.getText();
-//     obj_lit.replaceWithText(`{...${book_string},\n` + text.slice(1,text.length));
-//   }
-//   output.done_verbose_log(`requ`, `Added required_book.`);
-//   return book_decl;
-// }
-
-// function _append_requried_atoms(book_decl:VariableDeclaration)
-//     :VariableDeclaration{
-//   output.start_loading(`Adding required_book...`);
-//   const obj_lit = book_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
-//   if(obj_lit){
-//     const text = obj_lit.getText();
-//     obj_lit.replaceWithText(`{...uranio.types.required_book,\n` + text.slice(1,text.length));
-//   }
-//   output.done_log(`requ`, `Added required_book.`);
-//   return book_decl;
-// }
 
 function _change_realtive_imports(sourceFile:SourceFile)
 		:SourceFile{
@@ -338,7 +281,6 @@ function _change_realtive_imports(sourceFile:SourceFile)
 	output.done_log('impr', 'Changed relative imports.');
 	return sourceFile;
 }
-
 
 function _add_as_const(book_decl:VariableDeclaration){
 	output.start_loading(`Adding as const...`);
@@ -359,67 +301,17 @@ function _change_realtive_import(node:Node)
 			output.verbose_log(`impo`, `Changed [${text}] to [${replace}].`);
 		}
 	}
-	// output.done_log('impo', `Changed relative import.`);
 	return node;
 }
 
-function _copy_modified_file_to_dest(dest:string, text:string){
+function _copy_manipulated_file(text:string){
 	output.start_loading(`Writing manipulated book...`);
-	fs.writeFileSync(dest, text);
-	output.done_log(`trns`, `Manipulated books copied to [${dest}].`);
+	fs.writeFileSync(`./${defaults.book_dest_path}`, text);
+	output.done_log(`trns`, `Manipulated books copied to [./${defaults.book_dest_path}].`);
 }
-
-// function _remove_bll_prop(book_decl:VariableDeclaration){
-//   output.start_loading(`Removing bll props...`);
-//   output.verbose_log(`bll`, `Look for bll property assignments.`);
-//   const book_expr = book_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
-//   if(book_expr){
-//     const atom_names = book_expr.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
-//     for(const atom_name of atom_names){
-//       const atom_def = atom_name.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
-//       if(atom_def){
-//         const atom_def_props = atom_def.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
-//         for(const atom_def_prop of atom_def_props){
-//           if(atom_def_prop.getName() === 'bll'){
-//             // _remove_bll_import(atom_def_prop);
-//             atom_def_prop.remove();
-//             output.verbose_log(`bll_`, `Removed bll for [${atom_name.getName()}].`);
-//           }
-//         }
-//       }
-//     }
-//   }
-//   output.done_log('blls', `Removed blls.`);
-//   return book_decl;
-// }
-
-// function _remove_bll_prop_and_imports(book_decl:VariableDeclaration){
-//   output.start_loading(`Removing bll prop and imports...`);
-//   output.verbose_log(`bll_`, `Look for bll property assignments.`);
-//   const book_expr = book_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
-//   if(book_expr){
-//     const atom_names = book_expr.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
-//     for(const atom_name of atom_names){
-//       const atom_def = atom_name.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
-//       if(atom_def){
-//         const atom_def_props = atom_def.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
-//         for(const atom_def_prop of atom_def_props){
-//           if(atom_def_prop.getName() === 'bll'){
-//             _remove_bll_import(atom_def_prop);
-//             atom_def_prop.remove();
-//             output.verbose_log(`bll_`, `Removed bll for [${atom_name.getName()}].`);
-//           }
-//         }
-//       }
-//     }
-//   }
-//   output.done_log('blls', `Removed blls.`);
-//   return book_decl;
-// }
 
 function _remove_type_reference(book_decl:VariableDeclaration){
 	output.start_loading(`Removing type reference...`);
-	// output.verbose_log(`type`, `Look for type reference.`);
 	const type_ref = book_decl.getFirstChildByKind(ts.SyntaxKind.TypeReference);
 	if(type_ref){
 		book_decl.removeType();
@@ -431,7 +323,6 @@ function _remove_type_reference(book_decl:VariableDeclaration){
 function _find_atom_book_declaration(sourceFile:SourceFile)
 		:VariableDeclaration | undefined{
 	output.start_loading(`Looking for atom_book declaration...`);
-	// output.verbose_log(`book`, `Look for atom_book declaration.`);
 	const var_states = sourceFile.getChildrenOfKind(ts.SyntaxKind.VariableStatement);
 	for(const state of var_states){
 		const var_decl_list = state.getFirstChildByKind(ts.SyntaxKind.VariableDeclarationList);
@@ -453,7 +344,6 @@ function _find_atom_book_declaration(sourceFile:SourceFile)
 function _find_atom_book_statement(sourceFile:SourceFile)
 		:VariableStatement | undefined{
 	output.start_loading(`Looking for atom_book statement...`);
-	// output.verbose_log(`book`, `Look for atom_book statement.`);
 	const var_states = sourceFile.getChildrenOfKind(ts.SyntaxKind.VariableStatement);
 	for(const state of var_states){
 		const var_decl_list = state.getFirstChildByKind(ts.SyntaxKind.VariableDeclarationList);
@@ -471,25 +361,3 @@ function _find_atom_book_statement(sourceFile:SourceFile)
 	output.verbose_log('book', `Cannot find atom_book`);
 	return undefined;
 }
-// function _get_object_literal(var_decl:VariableDeclaration)
-//     :ObjectLiteralExpression | undefined {
-//   return var_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
-// }
-
-// function _find_atom_book_declaration(node:Node){
-//   output.start_loading(`Looking for atom_book declaration...`);
-//   output.verbose_log(`book`, `Look for atom_book declaration.`);
-//   const var_decl_list = node.getFirstChildByKind(ts.SyntaxKind.VariableDeclarationList);
-//   if(var_decl_list){
-//     const var_decl = var_decl_list.getFirstChildByKind(ts.SyntaxKind.VariableDeclaration);
-//     if(var_decl){
-//       const name = var_decl.getName();
-//       if(name === 'atom_book'){
-//         output.done_log(`book`, `Declaration of atom_book found.`);
-//         return var_decl;
-//       }
-//     }
-//   }
-//   output.done_log('book', `Cannot find atom_book`);
-//   return undefined;
-// }

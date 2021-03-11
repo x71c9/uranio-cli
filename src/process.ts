@@ -16,14 +16,18 @@ import {conf, defaults} from './conf/defaults';
 
 import * as output from './log/';
 
+// import * as util from './util/';
+
 export function urn_process(args:Arguments)
 		:void{
 	
 	_init_global();
 	
-	_get_project_root();
+	_read_options(args);
 	
 	_init_log();
+	
+	_get_project_root();
 	
 	_log_arguments(args);
 	
@@ -34,8 +38,8 @@ export function urn_process(args:Arguments)
 }
 
 function _init_log(){
-	if(!fs.existsSync(`${global.uranio.root}/${defaults.log_filepath}`)){
-		cp.execSync(`touch ${global.uranio.root}/${defaults.log_filepath}`);
+	if(!fs.existsSync(defaults.log_filepath)){
+		cp.execSync(`touch ${defaults.log_filepath}`);
 	}
 }
 
@@ -80,7 +84,7 @@ function _get_project_root(){
 		if(folder_path === '/'){
 			throw new Error('Cannot find project root.');
 		}
-		_check_folder(folder_path);
+		// _check_folder(folder_path);
 	}
 	process.chdir(global.uranio.root);
 	output.done_verbose_log('root', `$URNROOT$Project root found [${global.uranio.root}]`);
@@ -90,17 +94,7 @@ function _log_arguments(args:Arguments){
 	output.verbose_log('args', JSON.stringify(args));
 }
 
-function _switch_command(args:Arguments){
-	
-	let cmd = args._[0] || '';
-	
-	if (args.version) {
-		cmd = 'version';
-	}
-	
-	if (args.help || args.h) {
-		cmd = 'help';
-	}
+function _read_options(args:Arguments){
 	
 	const verbose = args.v || args.verbose;
 	
@@ -120,10 +114,24 @@ function _switch_command(args:Arguments){
 		conf.output = false;
 	}
 	
+}
+
+function _switch_command(args:Arguments){
+	
+	let cmd = args._[0] || '';
+	
+	if (args.version) {
+		cmd = 'version';
+	}
+	
+	if (args.help || args.h) {
+		cmd = 'help';
+	}
+	
 	switch(cmd){
 		case '':
 		case 'version':{
-			output.end_log('version');
+			output.stop_loading();
 			console.log('v0.0.1');
 			break;
 		}
@@ -132,11 +140,11 @@ function _switch_command(args:Arguments){
 			break;
 		}
 		case 'transpose':{
-			transpose.run(args);
+			transpose.run();
 			break;
 		}
 		case 'dev':{
-			dev.run(args);
+			dev.run();
 			break;
 		}
 		case 'help':{

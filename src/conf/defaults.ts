@@ -22,6 +22,8 @@ export const defaults:Defaults = {
 	
 	log_filepath: '.urnlog',
 	
+	rcfile_path: `.urn/.urnrc.json`,
+	
 	time_format: "yy-mm-dd'T'HH:MM:ss:l",
 	
 	dot_repo: `${cloud_address}urn-dot.git`,
@@ -40,13 +42,11 @@ export const defaults:Defaults = {
 	
 	check_char: '✔',
 	
-	rcfile_path: `.urnrc.json`
-	
 };
 
 export const conf:Conf = {
 	
-	verbose: true,
+	verbose: false,
 	
 	colors: true,
 	

@@ -6,8 +6,8 @@
 	"types": "dist/index.d.ts",
 	"scripts": {
 		"build": "tsc -b",
-		"init": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js init\"",
-		"transpose": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js transpose\"",
+		"init": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js init -v\"",
+		"transpose": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js transpose -v\"",
 		"help": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js -h\"",
 		"version": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js -v\""
 	},

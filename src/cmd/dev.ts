@@ -6,33 +6,26 @@
 
 import * as cp from 'child_process';
 
-import {Arguments} from '../types';
-
 import * as output from '../log/';
 
 import * as util from '../util/';
 
 export const dev = {
 	
-	run: async (args:Arguments):Promise<void> => {
-		
-		// output.start_loading('Developing...');
+	run: async ():Promise<void> => {
 		
 		output.stop_loading();
 		
-		util.check_if_initialized();
+		util.read_rc_file();
 		
-		_start_dev(args);
+		_start_dev();
 		
 	}
 	
 };
 
-async function _start_dev(args:Arguments)
+async function _start_dev()
 		:Promise<any>{
-	
-	args;
-	
 	const register = `-r source-map-support/register -r module-alias/register`;
 	const node_run = `node ${register} ./dist/src/index.js`;
 	cp.spawn(

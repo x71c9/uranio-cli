@@ -36,30 +36,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.prety = exports.check_repo = exports.check_if_initialized = void 0;
+exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.pretty = exports.set_repo = exports.is_initialized = exports.read_rc_file = void 0;
 const fs_1 = __importDefault(require("fs"));
 const cp = __importStar(require("child_process"));
 const prettier_1 = __importDefault(require("prettier"));
 const output = __importStar(require("../log/"));
 const types_1 = require("../types");
 const defaults_1 = require("../conf/defaults");
-function check_if_initialized() {
-    const rc_file_path = `${global.uranio.root}/${defaults_1.defaults.rcfile_path}`;
-    if (!fs_1.default.existsSync(rc_file_path)) {
+function read_rc_file() {
+    if (!is_initialized()) {
         let err = `URANIO was not initialized yet.`;
         err += ` Please run "uranio init" in order to initialize the repo.`;
         output.error_log('init', err);
         process.exit(1);
     }
     else {
-        const rc_content = fs_1.default.readFileSync(rc_file_path, 'utf8');
+        const rc_content = fs_1.default.readFileSync(defaults_1.defaults.rcfile_path, 'utf8');
         const rc_obj = JSON.parse(rc_content);
-        check_repo(rc_obj.repo);
+        set_repo(rc_obj.repo);
         global.uranio.repo = rc_obj.repo;
     }
 }
-exports.check_if_initialized = check_if_initialized;
-function check_repo(repo) {
+exports.read_rc_file = read_rc_file;
+function is_initialized() {
+    return (fs_1.default.existsSync('./' + defaults_1.defaults.rcfile_path));
+}
+exports.is_initialized = is_initialized;
+function set_repo(repo) {
     switch (repo) {
         case 'core':
         case 'web': {
@@ -76,8 +79,8 @@ function check_repo(repo) {
         }
     }
 }
-exports.check_repo = check_repo;
-function prety(path, parser = 'typescript') {
+exports.set_repo = set_repo;
+function pretty(path, parser = 'typescript') {
     output.start_loading(`Prettier [${path}]...`);
     const content = fs_1.default.readFileSync(path, 'utf8');
     const pretty_string = prettier_1.default.format(content, { useTabs: true, tabWidth: 2, parser: parser });
@@ -85,7 +88,7 @@ function prety(path, parser = 'typescript') {
     // cp.execSync(`npx prettier --write ${path} --use-tabs --tab-width 2`);
     output.done_verbose_log('prtt', `Prettier [${path}] done.`);
 }
-exports.prety = prety;
+exports.pretty = pretty;
 function remove_folder_if_exists(context, folder_path) {
     if (fs_1.default.existsSync(folder_path)) {
         output.start_loading(`Removing folder [${folder_path}]`);
@@ -120,6 +123,16 @@ function copy_folder(context, source, destination) {
     output.done_verbose_log(context, `Copied folder [${source}] to [${destination}]`);
 }
 exports.copy_folder = copy_folder;
+function relative_to_absolute_path(path) {
+    if (path[0] !== '/') {
+        if (path.substr(0, 2) === './') {
+            path = path.substr(2);
+        }
+        path = `${global.uranio.root}/${path}`;
+    }
+    return path;
+}
+exports.relative_to_absolute_path = relative_to_absolute_path;
 function sync_exec(command) {
     cp.execSync(command);
 }
@@ -210,7 +223,7 @@ function _clone_repo(context, address, dest_folder, recursive = false) {
         const action = `cloning repo [${address}]`;
         output.verbose_log(context, `Started ${action}`);
         return new Promise((resolve, reject) => {
-            let cmd = `git clone ${address} ${global.uranio.root}/${dest_folder} --progress`;
+            let cmd = `git clone ${address} ${dest_folder} --progress`;
             cmd += (recursive === true) ? ` --recurse-submodules` : '';
             spawn_cmd(cmd, context, action, resolve, reject);
         });

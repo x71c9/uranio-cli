@@ -16,23 +16,27 @@ import {valid_repos} from '../types';
 
 import {defaults} from '../conf/defaults';
 
-export function check_if_initialized()
+export function read_rc_file()
 		:void{
-	const rc_file_path = `${global.uranio.root}/${defaults.rcfile_path}`;
-	if(!fs.existsSync(rc_file_path)){
+	if(!is_initialized()){
 		let err =  `URANIO was not initialized yet.`;
 		err += ` Please run "uranio init" in order to initialize the repo.`;
 		output.error_log('init', err);
 		process.exit(1);
 	}else{
-		const rc_content = fs.readFileSync(rc_file_path, 'utf8');
+		const rc_content = fs.readFileSync(defaults.rcfile_path, 'utf8');
 		const rc_obj = JSON.parse(rc_content);
-		check_repo(rc_obj.repo);
+		set_repo(rc_obj.repo);
 		global.uranio.repo = rc_obj.repo;
 	}
 }
 
-export function check_repo(repo:unknown)
+export function is_initialized()
+		:boolean{
+	return (fs.existsSync('./'+defaults.rcfile_path));
+}
+
+export function set_repo(repo:unknown)
 		:void{
 	switch(repo){
 		case 'core':
@@ -101,6 +105,17 @@ export function copy_folder(context:string, source:string, destination:string)
 	output.start_loading(`Copying folder [${source}] to [${destination}]...`);
 	sync_exec(`cp -rf ${source} ${destination}`);
 	output.done_verbose_log(context, `Copied folder [${source}] to [${destination}]`);
+}
+
+export function relative_to_absolute_path(path:string)
+		:string{
+	if(path[0] !== '/'){
+		if(path.substr(0,2) === './'){
+			path = path.substr(2);
+		}
+		path = `${global.uranio.root}/${path}`;
+	}
+	return path;
 }
 
 export function sync_exec(command:string)
@@ -201,7 +216,7 @@ async function _clone_repo(context: string, address:string, dest_folder:string, 
 	const action = `cloning repo [${address}]`;
 	output.verbose_log(context, `Started ${action}`);
 	return new Promise((resolve, reject) => {
-		let cmd = `git clone ${address} ${global.uranio.root}/${dest_folder} --progress`;
+		let cmd = `git clone ${address} ${dest_folder} --progress`;
 		cmd += (recursive === true) ? ` --recurse-submodules` : '';
 		spawn_cmd(cmd, context, action, resolve, reject);
 	});
