@@ -19,7 +19,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -57,18 +57,9 @@ function _start_dev(args) {
             '-e',
             'ts',
             '--exec',
-            `npx uranio transpose --no-log`,
-            '&',
-            'npx',
-            'tsc-watch',
-            '--onSuccess',
-            node_run
-        ], { stdio: 'inherit' });
-        // cp.spawn(
-        //   'npx',
-        //   ['tsc-watch', '--onSuccess', node_run],
-        //   {stdio: 'inherit'}
-        // );
+            `npx uranio transpose`,
+        ]);
+        cp.spawn('npx', ['tsc-watch', '--onSuccess', node_run], { stdio: 'inherit' });
     });
 }
 //# sourceMappingURL=dev.js.map
