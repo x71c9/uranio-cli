@@ -44,20 +44,13 @@ async function _start_dev(args:Arguments)
 			'-e',
 			'ts',
 			'--exec',
-			`npx uranio transpose --no-log`,
-			'&',
-			'npx',
-			'tsc-watch',
-			'--onSuccess',
-			node_run
-		],
+			`npx uranio transpose`,
+		]
+	);
+	cp.spawn(
+		'npx',
+		['tsc-watch', '--onSuccess', node_run],
 		{stdio: 'inherit'}
 	);
-	
-	// cp.spawn(
-	//   'npx',
-	//   ['tsc-watch', '--onSuccess', node_run],
-	//   {stdio: 'inherit'}
-	// );
 	
 }

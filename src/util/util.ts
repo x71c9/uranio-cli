@@ -51,11 +51,14 @@ export function check_repo(repo:unknown)
 	}
 }
 
-export function prety(path:string)
+export function pretty(path:string, parser='typescript')
 	:void{
 	output.start_loading(`Prettier [${path}]...`);
 	const content = fs.readFileSync(path, 'utf8');
-	const pretty_string = prettier.format(content, { useTabs: true, tabWidth: 2});
+	const pretty_string = prettier.format(
+		content,
+		{ useTabs: true, tabWidth: 2, parser: parser }
+	);
 	fs.writeFileSync(path, pretty_string);
 	// cp.execSync(`npx prettier --write ${path} --use-tabs --tab-width 2`);
 	output.done_verbose_log('prtt', `Prettier [${path}] done.`);
