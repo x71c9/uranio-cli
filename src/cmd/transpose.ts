@@ -263,10 +263,10 @@ function _add_web_books(book_decl:VariableDeclaration, required_book_name:string
 function _append_requried_book(book_decl:VariableDeclaration, required_book_name:string)
 		:VariableDeclaration{
 	output.start_loading(`Adding required books...`);
-	_add_core_books(book_decl, required_book_name);
 	if(global.uranio.repo === 'web'){
 		_add_web_books(book_decl, required_book_name);
 	}
+	_add_core_books(book_decl, required_book_name);
 	output.done_verbose_log(`requ`, `Added required books.`);
 	return book_decl;
 }
