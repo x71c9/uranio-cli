@@ -70,8 +70,12 @@ function _ignore_urn_folder() {
     if (content.indexOf(defaults_1.defaults.folder + '/') === -1) {
         content += `\n${defaults_1.defaults.folder}/`;
     }
+    if (content.indexOf(defaults_1.defaults.log_filepath + '/') === -1) {
+        content += `\n${defaults_1.defaults.log_filepath}/`;
+    }
     fs_1.default.writeFileSync(gitignore, content);
-    output.done_verbose_log('.git', `Added ${defaults_1.defaults.folder} to .gitignore.`);
+    const log_msg = `Added ${defaults_1.defaults.folder} and ${defaults_1.defaults.log_filepath} to .gitignore.`;
+    output.done_verbose_log('.git', log_msg);
 }
 function _remove_tmp() {
     output.start_loading(`Removing tmp folder [${defaults_1.defaults.tmp_folder}]...`);
