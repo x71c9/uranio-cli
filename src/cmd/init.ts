@@ -6,6 +6,8 @@
 
 import fs from 'fs';
 
+import inquirer from 'inquirer';
+
 import {Arguments, Repo} from '../types';
 
 import {defaults} from '../conf/defaults';
@@ -24,33 +26,69 @@ export const init = {
 		
 		title();
 		
-		output.start_loading('Initialization...');
+		const repo = args.r || args.repo;
 		
-		const repo = args.r || args.repo || defaults.default_repo;
-		
-		util.set_repo(repo);
-		
-		_update_aliases();
-		
-		_create_urn_folder();
-		
-		_ignore_urn_folder();
-		
-		_create_rc_file();
-		
-		await _clone_dot();
-		
-		_copy_dot_files();
-		
-		await _clone_and_install_repo();
-		
-		_remove_tmp();
-		
-		output.end_log(`Initialization completed.`);
+		if(!repo){
+				
+			output.stop_loading();
+			
+			inquirer.
+				prompt([
+					{
+						type: 'list',
+						name: 'repo',
+						message: 'Which repo do you want to clone?',
+						choices: [
+							'core',
+							'web',
+							'adm',
+							'srvl'
+						]
+					}
+				]).then(async (answers) => {
+					await _proceed_with_repo(answers.repo);
+				});
+		}else{
+			
+			await _proceed_with_repo(repo);
+			
+		}
 		
 	}
 	
 };
+
+async function _proceed_with_repo(repo:Repo){
+	
+	console.clear();
+	
+	title();
+	
+	output.log('repo', `Selected repo: [${repo}]`);
+	
+	output.start_loading('Initialization...');
+		
+	util.set_repo(repo);
+	
+	_update_aliases();
+	
+	_create_urn_folder();
+	
+	_ignore_urn_folder();
+	
+	_create_rc_file();
+	
+	await _clone_dot();
+	
+	_copy_dot_files();
+	
+	await _clone_and_install_repo();
+	
+	_remove_tmp();
+		
+	output.end_log(`Initialization completed.`);
+	
+}
 
 function _ignore_urn_folder(){
 	output.start_loading(`Adding ${defaults.folder} to .gitignore...`);
