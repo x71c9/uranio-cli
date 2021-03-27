@@ -19,7 +19,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -38,6 +38,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.init = void 0;
 const fs_1 = __importDefault(require("fs"));
+const inquirer_1 = __importDefault(require("inquirer"));
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../log/"));
 const util = __importStar(require("../util/"));
@@ -46,8 +47,37 @@ exports.init = {
     run: (args) => __awaiter(void 0, void 0, void 0, function* () {
         console.clear();
         title_1.title();
+        const repo = args.r || args.repo;
+        if (!repo) {
+            output.stop_loading();
+            inquirer_1.default.
+                prompt([
+                {
+                    type: 'list',
+                    name: 'repo',
+                    message: 'Which repo do you want to clone?',
+                    choices: [
+                        'core',
+                        'web',
+                        'adm',
+                        'srvl'
+                    ]
+                }
+            ]).then((answers) => __awaiter(void 0, void 0, void 0, function* () {
+                yield _proceed_with_repo(answers.repo);
+            }));
+        }
+        else {
+            yield _proceed_with_repo(repo);
+        }
+    })
+};
+function _proceed_with_repo(repo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.clear();
+        title_1.title();
+        output.log('repo', `Selected repo: [${repo}]`);
         output.start_loading('Initialization...');
-        const repo = args.r || args.repo || defaults_1.defaults.default_repo;
         util.set_repo(repo);
         _update_aliases();
         _create_urn_folder();
@@ -58,8 +88,8 @@ exports.init = {
         yield _clone_and_install_repo();
         _remove_tmp();
         output.end_log(`Initialization completed.`);
-    })
-};
+    });
+}
 function _ignore_urn_folder() {
     output.start_loading(`Adding ${defaults_1.defaults.folder} to .gitignore...`);
     const gitignore = `.gitignore`;
