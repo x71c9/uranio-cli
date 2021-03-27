@@ -28,7 +28,7 @@ async function _start_dev()
 		:Promise<any>{
 	const register = `-r source-map-support/register -r module-alias/register`;
 	const node_run = `node ${register} ./dist/src/index.js`;
-	cp.spawn(
+	const nodemon = cp.spawn(
 		'npx',
 		[
 			'nodemon',
@@ -38,12 +38,18 @@ async function _start_dev()
 			'ts',
 			'--exec',
 			`npx uranio transpose`,
-		]
+		],
 	);
-	cp.spawn(
+	const tscwatch = cp.spawn(
 		'npx',
 		['tsc-watch', '--onSuccess', node_run],
-		{stdio: 'inherit'}
+		{stdio: [null, 'inherit', 'inherit']}
 	);
+	
+	process.on('SIGINT', function() {
+		console.log("--- Caught interrupt signal ---");
+		process.kill(nodemon.pid);
+		process.kill(tscwatch.pid);
+	});
 	
 }
