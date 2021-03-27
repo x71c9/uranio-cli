@@ -19,7 +19,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -48,7 +48,9 @@ function _start_dev() {
     return __awaiter(this, void 0, void 0, function* () {
         const register = `-r source-map-support/register -r module-alias/register`;
         const node_run = `node ${register} ./dist/src/index.js`;
-        cp.spawn('npx', [
+        const nodemon = cp.spawn(
+        // cp.spawn(
+        'npx', [
             'nodemon',
             '--watch',
             'src/book.ts',
@@ -57,7 +59,24 @@ function _start_dev() {
             '--exec',
             `npx uranio transpose`,
         ]);
-        cp.spawn('npx', ['tsc-watch', '--onSuccess', node_run], { stdio: 'inherit' });
+        const tscwatch = cp.spawn(
+        // cp.spawn(
+        'npx', ['tsc-watch', '--onSuccess', node_run], { stdio: [null, 'inherit', 'inherit'] });
+        process.on('SIGINT', function () {
+            console.log("--- Caught interrupt signal ---");
+            // tscwatch.stdin.write("\x03");
+            // if(nodemon.stdin){
+            //   nodemon.stdin.end();
+            // }
+            // if(tscwatch.stdin){
+            //   tscwatch.stdin.end();
+            // }
+            process.kill(nodemon.pid);
+            process.kill(tscwatch.pid);
+            // nodemon.kill('SIGINT');
+            // tscwatch.kill('SIGINT');
+            // process.exit(0);
+        });
     });
 }
 //# sourceMappingURL=dev.js.map
