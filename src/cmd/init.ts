@@ -26,43 +26,81 @@ export const init = {
 		
 		title();
 		
-		const repo = args.r || args.repo;
-		
-		if(!repo){
-				
+		if(_is_already_initialized()){
+			
 			output.stop_loading();
+			
+			let confirm_msg = '';
+			confirm_msg += `It appears the repo is already initialized.\n`;
+			confirm_msg += `? Are you sure you want to proceed?\n`;
+			
+			const suffix = `? All data will be lost and replaced.`;
 			
 			inquirer.
 				prompt([
 					{
-						type: 'list',
-						name: 'repo',
-						message: 'Which repo do you want to clone?',
-						choices: [
-							'core',
-							'web',
-							'adm',
-							'srvl'
-						]
+						type: 'confirm',
+						name: 'proceed',
+						message: confirm_msg,
+						suffix: suffix
 					}
-				]).then(async (answers) => {
-					await _proceed_with_repo(answers.repo);
+				]).then(async (answer) => {
+					if(answer.proceed && answer.proceed === true){
+						_initialize(args);
+					}else{
+						process.exit(0);
+					}
 				});
 		}else{
-			
-			await _proceed_with_repo(repo);
-			
+			await _initialize(args);
 		}
 		
 	}
 	
 };
 
+function _is_already_initialized(){
+	return (fs.existsSync(defaults.rcfile_path));
+}
+
+async function _initialize(args:Arguments){
+	
+	const repo = args.r || args.repo;
+	
+	if(!repo){
+			
+		output.stop_loading();
+		
+		inquirer.
+			prompt([
+				{
+					type: 'list',
+					name: 'repo',
+					message: 'Which repo do you want to clone?',
+					choices: [
+						'core',
+						'web',
+						'adm',
+						'srvl'
+					]
+				}
+			]).then(async (answers) => {
+				await _proceed_with_repo(answers.repo);
+			});
+	}else{
+		
+		await _proceed_with_repo(repo);
+		
+	}
+}
+
 async function _proceed_with_repo(repo:Repo){
 	
 	console.clear();
 	
 	title();
+	
+	output.log('root', `$URNROOT$Project root: [${global.uranio.root}]`);
 	
 	output.log('repo', `Selected repo: [${repo}]`);
 	

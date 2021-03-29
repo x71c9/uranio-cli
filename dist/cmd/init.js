@@ -47,6 +47,39 @@ exports.init = {
     run: (args) => __awaiter(void 0, void 0, void 0, function* () {
         console.clear();
         title_1.title();
+        if (_is_already_initialized()) {
+            output.stop_loading();
+            let confirm_msg = '';
+            confirm_msg += `It appears the repo is already initialized.\n`;
+            confirm_msg += `? Are you sure you want to proceed?\n`;
+            const suffix = `? All data will be lost and replaced.`;
+            inquirer_1.default.
+                prompt([
+                {
+                    type: 'confirm',
+                    name: 'proceed',
+                    message: confirm_msg,
+                    suffix: suffix
+                }
+            ]).then((answer) => __awaiter(void 0, void 0, void 0, function* () {
+                if (answer.proceed && answer.proceed === true) {
+                    _initialize(args);
+                }
+                else {
+                    process.exit(0);
+                }
+            }));
+        }
+        else {
+            yield _initialize(args);
+        }
+    })
+};
+function _is_already_initialized() {
+    return (fs_1.default.existsSync(defaults_1.defaults.rcfile_path));
+}
+function _initialize(args) {
+    return __awaiter(this, void 0, void 0, function* () {
         const repo = args.r || args.repo;
         if (!repo) {
             output.stop_loading();
@@ -63,19 +96,20 @@ exports.init = {
                         'srvl'
                     ]
                 }
-            ]).then((answers) => __awaiter(void 0, void 0, void 0, function* () {
+            ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
                 yield _proceed_with_repo(answers.repo);
             }));
         }
         else {
             yield _proceed_with_repo(repo);
         }
-    })
-};
+    });
+}
 function _proceed_with_repo(repo) {
     return __awaiter(this, void 0, void 0, function* () {
         console.clear();
         title_1.title();
+        output.log('root', `$URNROOT$Project root: [${global.uranio.root}]`);
         output.log('repo', `Selected repo: [${repo}]`);
         output.start_loading('Initialization...');
         util.set_repo(repo);
