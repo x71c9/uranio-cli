@@ -124,7 +124,7 @@ function _create_a_book(
 	if(book_state){
 		const atom_book_state_text = book_state.getText();
 		const cloned_book_source = _project.createSourceFile(
-			`${global.uranio.root}/${defaults.folder}/${book_name}_book.ts`,
+			`./${defaults.folder}/${book_name}_book.ts`,
 			atom_book_state_text,
 			{ overwrite: true }
 		);
@@ -245,7 +245,7 @@ function _add_book_from_file(
 }
 
 function _add_core_books(book_decl:VariableDeclaration, required_book_name:string){
-	let core_repo_path = `./${defaults.folder}/core/`;
+	let core_repo_path = `./${defaults.folder}/core`;
 	if(global.uranio.repo === 'web'){
 		core_repo_path = `./${defaults.folder}/web/core`;
 	}
@@ -255,7 +255,7 @@ function _add_core_books(book_decl:VariableDeclaration, required_book_name:strin
 }
 
 function _add_web_books(book_decl:VariableDeclaration, required_book_name:string){
-	const web_repo_path = `${global.uranio.root}/${defaults.folder}/web/`;
+	const web_repo_path = `./${defaults.folder}/web`;
 	const required_books_path = `${web_repo_path}/books.ts`;
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
 }

@@ -47,7 +47,7 @@ async function _start_dev()
 	);
 	
 	process.on('SIGINT', function() {
-		console.log("--- Caught interrupt signal ---");
+		process.stdout.write("\r--- Caught interrupt signal ---\n");
 		process.kill(nodemon.pid);
 		process.kill(tscwatch.pid);
 	});
