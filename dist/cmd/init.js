@@ -109,8 +109,8 @@ function _proceed_with_repo(repo) {
     return __awaiter(this, void 0, void 0, function* () {
         console.clear();
         title_1.title();
-        output.log('root', `$URNROOT$Project root: [${global.uranio.root}]`);
-        output.log('repo', `Selected repo: [${repo}]`);
+        output.verbose_log('root', `$URNROOT$Project root: [${global.uranio.root}]`);
+        output.verbose_log('repo', `Selected repo: [${repo}]`);
         output.start_loading('Initialization...');
         util.set_repo(repo);
         _update_aliases();
