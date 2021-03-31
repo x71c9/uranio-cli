@@ -100,9 +100,9 @@ async function _proceed_with_repo(repo:Repo){
 	
 	title();
 	
-	output.log('root', `$URNROOT$Project root: [${global.uranio.root}]`);
+	output.verbose_log('root', `$URNROOT$Project root: [${global.uranio.root}]`);
 	
-	output.log('repo', `Selected repo: [${repo}]`);
+	output.verbose_log('repo', `Selected repo: [${repo}]`);
 	
 	output.start_loading('Initialization...');
 		
