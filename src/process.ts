@@ -46,7 +46,7 @@ function _init_log(){
 function _init_global(){
 	global.uranio = {
 		root: '.',
-		repo: 'web'
+		repo: defaults.default_repo
 	};
 }
 
@@ -84,7 +84,6 @@ function _get_project_root(){
 		if(folder_path === '/'){
 			throw new Error('Cannot find project root.');
 		}
-		// _check_folder(folder_path);
 	}
 	process.chdir(global.uranio.root);
 	output.done_verbose_log('root', `$URNROOT$Project root found [${global.uranio.root}]`);
