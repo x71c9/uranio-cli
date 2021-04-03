@@ -5,14 +5,15 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.valid_repos = void 0;
-const repos = {
+exports.valid_repos = exports.abstract_repos = void 0;
+exports.abstract_repos = {
     core: '',
-    web: ''
+    web: '',
+    fnc: ''
 };
 function valid_repos() {
     const vals = [];
-    for (const k in repos) {
+    for (const k in exports.abstract_repos) {
         vals.push(k);
     }
     return vals;

@@ -8,7 +8,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.log = exports.verbose_log = exports.end_log = exports.error_log = exports.done_verbose_log = exports.done_log = exports.spinner_text = exports.stop_loading = exports.start_loading = void 0;
+exports.log = exports.verbose_log = exports.wrong_end_log = exports.end_log = exports.error_log = exports.done_verbose_log = exports.done_log = exports.spinner_text = exports.stop_loading = exports.start_loading = void 0;
 const dateformat_1 = __importDefault(require("dateformat"));
 const ora_1 = __importDefault(require("ora"));
 const chalk_1 = __importDefault(require("chalk"));
@@ -67,6 +67,12 @@ function end_log(text) {
     log('end', (defaults_1.conf.colors) ? chalk_1.default.yellow(end_text) : end_text);
 }
 exports.end_log = end_log;
+function wrong_end_log(text) {
+    stop_loading();
+    const end_text = `${defaults_1.defaults.wrong_char} ${text}`;
+    log('end', (defaults_1.conf.colors) ? chalk_1.default.red(end_text) : end_text);
+}
+exports.wrong_end_log = wrong_end_log;
 function verbose_log(context, text) {
     const color_text = (defaults_1.conf.colors) ? chalk_1.default.hex('#668899')(text) : text;
     _log(context, color_text, (defaults_1.conf.verbose === true));

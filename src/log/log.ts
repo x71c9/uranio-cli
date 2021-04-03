@@ -78,6 +78,13 @@ export function end_log(text:string)
 	log('end', (conf.colors) ? chalk.yellow(end_text) : end_text);
 }
 
+export function wrong_end_log(text:string)
+		:void{
+	stop_loading();
+	const end_text = `${defaults.wrong_char} ${text}`;
+	log('end', (conf.colors) ? chalk.red(end_text) : end_text);
+}
+
 export function verbose_log(context:string, text:string)
 		:void{
 	const color_text = (conf.colors) ? chalk.hex('#668899')(text) : text;

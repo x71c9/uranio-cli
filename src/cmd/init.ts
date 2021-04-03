@@ -46,13 +46,17 @@ export const init = {
 					}
 				]).then(async (answer) => {
 					if(answer.proceed && answer.proceed === true){
-						_initialize(args);
+						
+						await _initialize(args);
+					
 					}else{
 						process.exit(0);
 					}
 				});
 		}else{
+			
 			await _initialize(args);
+			
 		}
 		
 	}
@@ -80,12 +84,13 @@ async function _initialize(args:Arguments){
 					choices: [
 						'core',
 						'web',
-						'adm',
-						'srvl'
+						'fnc',
 					]
 				}
 			]).then(async (answers) => {
+				
 				await _proceed_with_repo(answers.repo);
+				
 			});
 	}else{
 		
@@ -152,24 +157,28 @@ function _remove_tmp(){
 	output.done_verbose_log('tmp', `Removed tmp folder [${defaults.tmp_folder}].`);
 }
 
-async function _install_dep(repo:Repo){
+async function _install_dep(repo:Repo)
+		:Promise<true>{
+	await _uninstall_core_dep();
+	await _uninstall_web_dep();
+	await _uninstall_fnc_dep();
 	switch(repo){
 		case 'core':{
-			await _uninstall_core_dep();
-			await _uninstall_web_dep();
 			await _install_core_dep();
-			break;
+			return true;
 		}
 		case 'web':{
-			await _uninstall_core_dep();
-			await _uninstall_web_dep();
 			await _install_web_dep();
-			break;
+			return true;
 		}
-		default:{
-			output.log('init', `Selected repo is not valid. [${repo}]`);
-			process.exit(1);
+		case 'fnc':{
+			await _install_fnc_dep();
+			return true;
 		}
+		// default:{
+		//   output.log('init', `Selected repo is not valid. [${repo}]`);
+		//   process.exit(1);
+		// }
 	}
 }
 
@@ -219,6 +228,10 @@ async function _clone_and_install_repo(){
 			await _clone_web();
 			break;
 		}
+		case 'fnc':{
+			await _clone_fnc();
+			break;
+		}
 		default:{
 			output.log('init', `Selected repo is not valid. [${global.uranio.repo}]`);
 			process.exit(1);
@@ -263,6 +276,14 @@ async function _install_web_dep(){
 	return true;
 }
 
+async function _install_fnc_dep(){
+	output.start_loading(`Installing fnc dep...`);
+	await util.install_dep(defaults.fnc_dep_repo, 'fnc_');
+	await util.install_dep_dev(defaults.fnc_dep_dev_repo, 'fnc_');
+	output.done_log('fnc', `Installed fnc dependencies.`);
+	return true;
+}
+
 async function _uninstall_core_dep(){
 	output.start_loading(`Uninstalling core dep...`);
 	const dep_folder = `./node_modules/${defaults.core_dep_repo}`;
@@ -280,8 +301,19 @@ async function _uninstall_web_dep(){
 	util.remove_folder_if_exists('web_', dep_folder);
 	const dep_dev_folder = `./node_modules/${defaults.web_dep_dev_repo}`;
 	util.remove_folder_if_exists('web_', dep_dev_folder);
-	await util.uninstall_dep(`${defaults.web_dep_repo.split('/').slice(-1)[0]} ${defaults.core_dep_dev_repo.split('/').slice(-1)[0]}`, 'web_');
+	await util.uninstall_dep(`${defaults.web_dep_repo.split('/').slice(-1)[0]} ${defaults.web_dep_dev_repo.split('/').slice(-1)[0]}`, 'web_');
 	output.done_log('web', `Uninstalled web dependencies.`);
+	return true;
+}
+
+async function _uninstall_fnc_dep(){
+	output.start_loading(`Uninstalling fnc dep...`);
+	const dep_folder = `./node_modules/${defaults.fnc_dep_repo}`;
+	util.remove_folder_if_exists('fnc_', dep_folder);
+	const dep_dev_folder = `./node_modules/${defaults.fnc_dep_dev_repo}`;
+	util.remove_folder_if_exists('fnc_', dep_dev_folder);
+	await util.uninstall_dep(`${defaults.fnc_dep_repo.split('/').slice(-1)[0]} ${defaults.fnc_dep_dev_repo.split('/').slice(-1)[0]}`, 'fnc_');
+	output.done_log('fnc', `Uninstalled fnc dependencies.`);
 	return true;
 }
 
@@ -303,4 +335,10 @@ async function _clone_web(){
 	output.start_loading(`Cloning web...`);
 	await util.clone_repo_recursive('web_', defaults.web_repo, `${defaults.folder}/web`);
 	output.done_log('web', `Cloned web repo.`);
+}
+
+async function _clone_fnc(){
+	output.start_loading(`Cloning fnc...`);
+	await util.clone_repo_recursive('fnc_', defaults.fnc_repo, `${defaults.folder}/fnc`);
+	output.done_log('fnc', `Cloned fnc repo.`);
 }

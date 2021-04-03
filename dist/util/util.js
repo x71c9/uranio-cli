@@ -40,6 +40,7 @@ exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = expo
 const fs_1 = __importDefault(require("fs"));
 const cp = __importStar(require("child_process"));
 const prettier_1 = __importDefault(require("prettier"));
+const urn_lib_1 = require("urn-lib");
 const output = __importStar(require("../log/"));
 const types_1 = require("../types");
 const defaults_1 = require("../conf/defaults");
@@ -63,20 +64,16 @@ function is_initialized() {
 }
 exports.is_initialized = is_initialized;
 function set_repo(repo) {
-    switch (repo) {
-        case 'core':
-        case 'web': {
-            global.uranio.repo = repo;
-            break;
-        }
-        default: {
-            const valid_repos_str = types_1.valid_repos().join(', ');
-            let end_log = '';
-            end_log += `Wrong repo. `;
-            end_log += `Repo must be one of the following [${valid_repos_str}]`;
-            output.end_log(end_log);
-            process.exit(1);
-        }
+    if (urn_lib_1.urn_util.object.has_key(types_1.abstract_repos, repo)) {
+        global.uranio.repo = repo;
+    }
+    else {
+        const valid_repos_str = types_1.valid_repos().join(', ');
+        let end_log = '';
+        end_log += `Wrong repo. `;
+        end_log += `Repo must be one of the following [${valid_repos_str}]`;
+        output.wrong_end_log(end_log);
+        process.exit(1);
     }
 }
 exports.set_repo = set_repo;

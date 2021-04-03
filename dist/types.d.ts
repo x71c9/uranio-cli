@@ -6,12 +6,13 @@
 import minimist from 'minimist';
 export declare type Arguments = minimist.ParsedArgs;
 export declare type ParseOptions = minimist.Opts;
-declare const repos: {
+export declare const abstract_repos: {
     readonly core: "";
     readonly web: "";
+    readonly fnc: "";
 };
 export declare function valid_repos(): string[];
-export declare type Repo = keyof typeof repos;
+export declare type Repo = keyof typeof abstract_repos;
 export declare type Defaults = {
     default_repo: Repo;
     folder: string;
@@ -23,11 +24,15 @@ export declare type Defaults = {
     dot_repo: string;
     core_repo: string;
     web_repo: string;
+    fnc_repo: string;
     core_dep_repo: string;
     core_dep_dev_repo: string;
     web_dep_repo: string;
     web_dep_dev_repo: string;
+    fnc_dep_repo: string;
+    fnc_dep_dev_repo: string;
     check_char: string;
+    wrong_char: string;
     rcfile_path: string;
 };
 export declare type Conf = {
@@ -35,4 +40,3 @@ export declare type Conf = {
     colors: boolean;
     output: boolean;
 };
-export {};
