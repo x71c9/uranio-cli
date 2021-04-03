@@ -10,7 +10,7 @@ const cloud_address = 'ssh://git@bitbucket.org/nbl7/';
 
 export const defaults:Defaults = {
 	
-	default_repo: 'web',
+	default_repo: 'fnc',
 	
 	folder: '.urn',
 	
@@ -28,9 +28,15 @@ export const defaults:Defaults = {
 	
 	dot_repo: `${cloud_address}urn-dot.git`,
 	
+	fnc_repo: `${cloud_address}urn-fnc.git`,
+	
 	web_repo: `${cloud_address}urn-web.git`,
 	
 	core_repo: `${cloud_address}urn-core.git`,
+	
+	fnc_dep_repo: `${cloud_address}urn-fnc-dep`,
+	
+	fnc_dep_dev_repo: `${cloud_address}urn-fnc-dep-dev`,
 	
 	web_dep_repo: `${cloud_address}urn-web-dep`,
 	
@@ -41,6 +47,8 @@ export const defaults:Defaults = {
 	core_dep_dev_repo: `${cloud_address}urn-core-dep-dev`,
 	
 	check_char: '✔',
+	
+	wrong_char: '✗',
 	
 };
 

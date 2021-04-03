@@ -10,9 +10,11 @@ import * as cp from 'child_process';
 
 import prettier from 'prettier';
 
+import {urn_util} from 'urn-lib';
+
 import * as output from '../log/';
 
-import {valid_repos} from '../types';
+import {abstract_repos, valid_repos, Repo} from '../types';
 
 import {defaults} from '../conf/defaults';
 
@@ -38,20 +40,15 @@ export function is_initialized()
 
 export function set_repo(repo:unknown)
 		:void{
-	switch(repo){
-		case 'core':
-		case 'web':{
-			global.uranio.repo = repo;
-			break;
-		}
-		default:{
-			const valid_repos_str = valid_repos().join(', ');
-			let end_log = '';
-			end_log += `Wrong repo. `;
-			end_log += `Repo must be one of the following [${valid_repos_str}]`;
-			output.end_log(end_log);
-			process.exit(1);
-		}
+	if(urn_util.object.has_key(abstract_repos, repo as string)){
+		global.uranio.repo = repo as unknown as Repo;
+	}else{
+		const valid_repos_str = valid_repos().join(', ');
+		let end_log = '';
+		end_log += `Wrong repo. `;
+		end_log += `Repo must be one of the following [${valid_repos_str}]`;
+		output.wrong_end_log(end_log);
+		process.exit(1);
 	}
 }
 

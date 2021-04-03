@@ -63,7 +63,7 @@ exports.init = {
                 }
             ]).then((answer) => __awaiter(void 0, void 0, void 0, function* () {
                 if (answer.proceed && answer.proceed === true) {
-                    _initialize(args);
+                    yield _initialize(args);
                 }
                 else {
                     process.exit(0);
@@ -92,8 +92,7 @@ function _initialize(args) {
                     choices: [
                         'core',
                         'web',
-                        'adm',
-                        'srvl'
+                        'fnc',
                     ]
                 }
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
@@ -148,23 +147,26 @@ function _remove_tmp() {
 }
 function _install_dep(repo) {
     return __awaiter(this, void 0, void 0, function* () {
+        yield _uninstall_core_dep();
+        yield _uninstall_web_dep();
+        yield _uninstall_fnc_dep();
         switch (repo) {
             case 'core': {
-                yield _uninstall_core_dep();
-                yield _uninstall_web_dep();
                 yield _install_core_dep();
-                break;
+                return true;
             }
             case 'web': {
-                yield _uninstall_core_dep();
-                yield _uninstall_web_dep();
                 yield _install_web_dep();
-                break;
+                return true;
             }
-            default: {
-                output.log('init', `Selected repo is not valid. [${repo}]`);
-                process.exit(1);
+            case 'fnc': {
+                yield _install_fnc_dep();
+                return true;
             }
+            // default:{
+            //   output.log('init', `Selected repo is not valid. [${repo}]`);
+            //   process.exit(1);
+            // }
         }
     });
 }
@@ -208,6 +210,10 @@ function _clone_and_install_repo() {
             }
             case 'web': {
                 yield _clone_web();
+                break;
+            }
+            case 'fnc': {
+                yield _clone_fnc();
                 break;
             }
             default: {
@@ -254,6 +260,15 @@ function _install_web_dep() {
         return true;
     });
 }
+function _install_fnc_dep() {
+    return __awaiter(this, void 0, void 0, function* () {
+        output.start_loading(`Installing fnc dep...`);
+        yield util.install_dep(defaults_1.defaults.fnc_dep_repo, 'fnc_');
+        yield util.install_dep_dev(defaults_1.defaults.fnc_dep_dev_repo, 'fnc_');
+        output.done_log('fnc', `Installed fnc dependencies.`);
+        return true;
+    });
+}
 function _uninstall_core_dep() {
     return __awaiter(this, void 0, void 0, function* () {
         output.start_loading(`Uninstalling core dep...`);
@@ -273,8 +288,20 @@ function _uninstall_web_dep() {
         util.remove_folder_if_exists('web_', dep_folder);
         const dep_dev_folder = `./node_modules/${defaults_1.defaults.web_dep_dev_repo}`;
         util.remove_folder_if_exists('web_', dep_dev_folder);
-        yield util.uninstall_dep(`${defaults_1.defaults.web_dep_repo.split('/').slice(-1)[0]} ${defaults_1.defaults.core_dep_dev_repo.split('/').slice(-1)[0]}`, 'web_');
+        yield util.uninstall_dep(`${defaults_1.defaults.web_dep_repo.split('/').slice(-1)[0]} ${defaults_1.defaults.web_dep_dev_repo.split('/').slice(-1)[0]}`, 'web_');
         output.done_log('web', `Uninstalled web dependencies.`);
+        return true;
+    });
+}
+function _uninstall_fnc_dep() {
+    return __awaiter(this, void 0, void 0, function* () {
+        output.start_loading(`Uninstalling fnc dep...`);
+        const dep_folder = `./node_modules/${defaults_1.defaults.fnc_dep_repo}`;
+        util.remove_folder_if_exists('fnc_', dep_folder);
+        const dep_dev_folder = `./node_modules/${defaults_1.defaults.fnc_dep_dev_repo}`;
+        util.remove_folder_if_exists('fnc_', dep_dev_folder);
+        yield util.uninstall_dep(`${defaults_1.defaults.fnc_dep_repo.split('/').slice(-1)[0]} ${defaults_1.defaults.fnc_dep_dev_repo.split('/').slice(-1)[0]}`, 'fnc_');
+        output.done_log('fnc', `Uninstalled fnc dependencies.`);
         return true;
     });
 }
@@ -299,6 +326,13 @@ function _clone_web() {
         output.start_loading(`Cloning web...`);
         yield util.clone_repo_recursive('web_', defaults_1.defaults.web_repo, `${defaults_1.defaults.folder}/web`);
         output.done_log('web', `Cloned web repo.`);
+    });
+}
+function _clone_fnc() {
+    return __awaiter(this, void 0, void 0, function* () {
+        output.start_loading(`Cloning fnc...`);
+        yield util.clone_repo_recursive('fnc_', defaults_1.defaults.fnc_repo, `${defaults_1.defaults.folder}/fnc`);
+        output.done_log('fnc', `Cloned fnc repo.`);
     });
 }
 //# sourceMappingURL=init.js.map
