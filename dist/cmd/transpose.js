@@ -59,13 +59,13 @@ const _project = new ts_morph_1.Project({
     }
 });
 function _pretty_books() {
-    util.pretty(defaults_1.defaults.book_dest_path);
+    util.pretty(`${defaults_1.defaults.folder}/books.ts`);
 }
 function _manipulate_file() {
-    const action = `manipulating [${defaults_1.defaults.book_src_path}]`;
+    const action = `manipulating [src/book.ts]`;
     output.start_loading(`${action[0].toUpperCase()}${action.substr(1)}...`);
     output.verbose_log(`mnpl`, `Started ${action}.`);
-    let sourceFile = _project.addSourceFileAtPath(defaults_1.defaults.book_src_path);
+    let sourceFile = _project.addSourceFileAtPath(`src/book.ts`);
     sourceFile = _replace_comments(sourceFile);
     sourceFile = _change_realtive_imports(sourceFile);
     sourceFile = _create_bll_book(sourceFile);
@@ -206,22 +206,40 @@ function _add_book_from_file(book_decl, required_book_name, books_file_path) {
     }
 }
 function _add_core_books(book_decl, required_book_name) {
-    let core_repo_path = `./${defaults_1.defaults.folder}/core`;
-    if (global.uranio.repo === 'web') {
-        core_repo_path = `./${defaults_1.defaults.folder}/web/core`;
+    let core_repo_path = `./${defaults_1.defaults.folder}/repo`;
+    switch (global.uranio.repo) {
+        case 'core': {
+            break;
+        }
+        case 'fnc':
+        case 'web': {
+            core_repo_path = `./${defaults_1.defaults.folder}/repo/core`;
+            break;
+        }
     }
     const required_books_path = `${core_repo_path}/books.ts`;
     _add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 function _add_web_books(book_decl, required_book_name) {
-    const web_repo_path = `./${defaults_1.defaults.folder}/web`;
+    const web_repo_path = `./${defaults_1.defaults.folder}/repo`;
     const required_books_path = `${web_repo_path}/books.ts`;
+    _add_book_from_file(book_decl, required_book_name, required_books_path);
+}
+function _add_fnc_books(book_decl, required_book_name) {
+    const fnc_repo_path = `./${defaults_1.defaults.folder}/repo`;
+    const required_books_path = `${fnc_repo_path}/books.ts`;
     _add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 function _append_requried_book(book_decl, required_book_name) {
     output.start_loading(`Adding required books...`);
-    if (global.uranio.repo === 'web') {
-        _add_web_books(book_decl, required_book_name);
+    switch (global.uranio.repo) {
+        case 'web': {
+            _add_web_books(book_decl, required_book_name);
+            break;
+        }
+        case 'fnc': {
+            _add_fnc_books(book_decl, required_book_name);
+        }
     }
     _add_core_books(book_decl, required_book_name);
     output.done_verbose_log(`requ`, `Added required books.`);
@@ -257,8 +275,8 @@ function _change_realtive_import(node) {
 }
 function _copy_manipulated_file(text) {
     output.start_loading(`Writing manipulated book...`);
-    fs_1.default.writeFileSync(`./${defaults_1.defaults.book_dest_path}`, text);
-    output.done_log(`trns`, `Manipulated books copied to [./${defaults_1.defaults.book_dest_path}].`);
+    fs_1.default.writeFileSync(`${defaults_1.defaults.folder}/books.ts`, text);
+    output.done_log(`trns`, `Manipulated books copied to [${defaults_1.defaults.folder}/books.ts].`);
 }
 function _remove_type_reference(book_decl) {
     output.start_loading(`Removing type reference...`);

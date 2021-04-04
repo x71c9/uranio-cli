@@ -76,7 +76,7 @@ exports.init = {
     })
 };
 function _is_already_initialized() {
-    return (fs_1.default.existsSync(defaults_1.defaults.rcfile_path));
+    return (fs_1.default.existsSync(defaults_1.jsonfile_path));
 }
 function _initialize(args) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -115,7 +115,7 @@ function _proceed_with_repo(repo) {
         _update_aliases();
         _create_urn_folder();
         _ignore_urn_folder();
-        _create_rc_file();
+        _create_json_file();
         yield _clone_dot();
         _copy_dot_files();
         yield _clone_and_install_repo();
@@ -138,7 +138,7 @@ function _ignore_urn_folder() {
     }
     fs_1.default.writeFileSync(gitignore, content);
     const log_msg = `Added ${defaults_1.defaults.folder} and ${defaults_1.defaults.log_filepath} to .gitignore.`;
-    output.done_verbose_log('.git', log_msg);
+    output.done_log('.git', log_msg);
 }
 function _remove_tmp() {
     output.start_loading(`Removing tmp folder [${defaults_1.defaults.tmp_folder}]...`);
@@ -190,15 +190,15 @@ function _copy_dot_files() {
     _copy_dot_tsconfig();
     _copy_dot_eslint_files();
 }
-function _create_rc_file() {
+function _create_json_file() {
     output.start_loading('Creating rc file...');
     let content = ``;
     content += `{\n`;
     content += `"repo": "${global.uranio.repo}"\n`;
     content += `}`;
-    fs_1.default.writeFileSync(defaults_1.defaults.rcfile_path, content);
-    util.pretty(defaults_1.defaults.rcfile_path, 'json');
-    output.done_log('rcfl', `[${defaults_1.defaults.rcfile_path}] created.`);
+    fs_1.default.writeFileSync(defaults_1.jsonfile_path, content);
+    util.pretty(defaults_1.jsonfile_path, 'json');
+    output.done_log('rcfl', `Created file ${defaults_1.jsonfile_path}.`);
 }
 function _clone_and_install_repo() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -237,10 +237,10 @@ function _update_aliases() {
     const package_data = JSON.parse(data);
     package_data['_moduleAliases'] = {
         urn_books: `./dist/${defaults_1.defaults.folder}/books.js`,
-        uranio: `./dist/${defaults_1.defaults.folder}/${global.uranio.repo}/`
+        uranio: `./dist/${defaults_1.defaults.folder}/repo/`
     };
     fs_1.default.writeFileSync(`./package.json`, JSON.stringify(package_data, null, '\t'));
-    output.done_log('alas', `Aliases updated.`);
+    output.done_log('alas', `Updated aliases.`);
 }
 function _install_core_dep() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -254,8 +254,8 @@ function _install_core_dep() {
 function _install_web_dep() {
     return __awaiter(this, void 0, void 0, function* () {
         output.start_loading(`Installing web dep...`);
-        yield util.install_dep(defaults_1.defaults.web_dep_repo, 'web_');
-        yield util.install_dep_dev(defaults_1.defaults.web_dep_dev_repo, 'web_');
+        yield util.install_dep(defaults_1.defaults.web_dep_repo, 'web');
+        yield util.install_dep_dev(defaults_1.defaults.web_dep_dev_repo, 'web');
         output.done_log('web', `Installed web dependencies.`);
         return true;
     });
@@ -263,8 +263,8 @@ function _install_web_dep() {
 function _install_fnc_dep() {
     return __awaiter(this, void 0, void 0, function* () {
         output.start_loading(`Installing fnc dep...`);
-        yield util.install_dep(defaults_1.defaults.fnc_dep_repo, 'fnc_');
-        yield util.install_dep_dev(defaults_1.defaults.fnc_dep_dev_repo, 'fnc_');
+        yield util.install_dep(defaults_1.defaults.fnc_dep_repo, 'fnc');
+        yield util.install_dep_dev(defaults_1.defaults.fnc_dep_dev_repo, 'fnc');
         output.done_log('fnc', `Installed fnc dependencies.`);
         return true;
     });
@@ -317,21 +317,21 @@ function _clone_dot() {
 function _clone_core() {
     return __awaiter(this, void 0, void 0, function* () {
         output.start_loading(`Cloning core...`);
-        yield util.clone_repo('core', defaults_1.defaults.core_repo, `${defaults_1.defaults.folder}/core`);
+        yield util.clone_repo('core', defaults_1.defaults.core_repo, `${defaults_1.defaults.folder}/repo`);
         output.done_log('core', `Cloned core repo.`);
     });
 }
 function _clone_web() {
     return __awaiter(this, void 0, void 0, function* () {
         output.start_loading(`Cloning web...`);
-        yield util.clone_repo_recursive('web_', defaults_1.defaults.web_repo, `${defaults_1.defaults.folder}/web`);
+        yield util.clone_repo_recursive('web_', defaults_1.defaults.web_repo, `${defaults_1.defaults.folder}/repo`);
         output.done_log('web', `Cloned web repo.`);
     });
 }
 function _clone_fnc() {
     return __awaiter(this, void 0, void 0, function* () {
         output.start_loading(`Cloning fnc...`);
-        yield util.clone_repo_recursive('fnc_', defaults_1.defaults.fnc_repo, `${defaults_1.defaults.folder}/fnc`);
+        yield util.clone_repo_recursive('fnc_', defaults_1.defaults.fnc_repo, `${defaults_1.defaults.folder}/repo`);
         output.done_log('fnc', `Cloned fnc repo.`);
     });
 }
