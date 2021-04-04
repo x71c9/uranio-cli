@@ -16,7 +16,7 @@ import * as output from '../log/';
 
 import {abstract_repos, valid_repos, Repo} from '../types';
 
-import {defaults} from '../conf/defaults';
+import {jsonfile_path} from '../conf/defaults';
 
 export function read_rc_file()
 		:void{
@@ -26,7 +26,7 @@ export function read_rc_file()
 		output.error_log('init', err);
 		process.exit(1);
 	}else{
-		const rc_content = fs.readFileSync(defaults.rcfile_path, 'utf8');
+		const rc_content = fs.readFileSync(jsonfile_path, 'utf8');
 		const rc_obj = JSON.parse(rc_content);
 		set_repo(rc_obj.repo);
 		global.uranio.repo = rc_obj.repo;
@@ -35,7 +35,7 @@ export function read_rc_file()
 
 export function is_initialized()
 		:boolean{
-	return (fs.existsSync('./'+defaults.rcfile_path));
+	return (fs.existsSync(jsonfile_path));
 }
 
 export function set_repo(repo:unknown)

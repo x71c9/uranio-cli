@@ -5,16 +5,15 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.conf = exports.defaults = void 0;
+exports.conf = exports.jsonfile_path = exports.defaults = void 0;
 const cloud_address = 'ssh://git@bitbucket.org/nbl7/';
 exports.defaults = {
-    default_repo: 'fnc',
-    folder: '.urn',
+    default_repo: 'web',
+    folder: '.uranio',
+    repo_folder: 'repo',
     tmp_folder: '.tmp',
-    book_src_path: 'src/book.ts',
-    book_dest_path: '.urn/books.ts',
     log_filepath: '.urnlog',
-    rcfile_path: `.urn/.urnrc.json`,
+    json_filename: `uranio.json`,
     time_format: "yy-mm-dd'T'HH:MM:ss:l",
     dot_repo: `${cloud_address}urn-dot.git`,
     fnc_repo: `${cloud_address}urn-fnc.git`,
@@ -29,6 +28,7 @@ exports.defaults = {
     check_char: '✔',
     wrong_char: '✗',
 };
+exports.jsonfile_path = `${exports.defaults.folder}/${exports.defaults.json_filename}`;
 exports.conf = {
     verbose: false,
     colors: true,

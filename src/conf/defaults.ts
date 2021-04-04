@@ -4,25 +4,23 @@
  * @packageDocumentation
  */
 
-import {Defaults, Conf} from '../types';
+import {Conf} from '../types';
 
 const cloud_address = 'ssh://git@bitbucket.org/nbl7/';
 
-export const defaults:Defaults = {
+export const defaults = {
 	
-	default_repo: 'fnc',
+	default_repo: 'web',
 	
-	folder: '.urn',
+	folder: '.uranio',
+	
+	repo_folder: 'repo',
 	
 	tmp_folder: '.tmp',
 	
-	book_src_path: 'src/book.ts',
-	
-	book_dest_path: '.urn/books.ts',
-	
 	log_filepath: '.urnlog',
 	
-	rcfile_path: `.urn/.urnrc.json`,
+	json_filename: `uranio.json`,
 	
 	time_format: "yy-mm-dd'T'HH:MM:ss:l",
 	
@@ -50,7 +48,9 @@ export const defaults:Defaults = {
 	
 	wrong_char: '✗',
 	
-};
+} as const;
+
+export const jsonfile_path = `${defaults.folder}/${defaults.json_filename}`;
 
 export const conf:Conf = {
 	

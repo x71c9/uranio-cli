@@ -52,7 +52,7 @@ function read_rc_file() {
         process.exit(1);
     }
     else {
-        const rc_content = fs_1.default.readFileSync(defaults_1.defaults.rcfile_path, 'utf8');
+        const rc_content = fs_1.default.readFileSync(defaults_1.jsonfile_path, 'utf8');
         const rc_obj = JSON.parse(rc_content);
         set_repo(rc_obj.repo);
         global.uranio.repo = rc_obj.repo;
@@ -60,7 +60,7 @@ function read_rc_file() {
 }
 exports.read_rc_file = read_rc_file;
 function is_initialized() {
-    return (fs_1.default.existsSync('./' + defaults_1.defaults.rcfile_path));
+    return (fs_1.default.existsSync(defaults_1.jsonfile_path));
 }
 exports.is_initialized = is_initialized;
 function set_repo(repo) {
