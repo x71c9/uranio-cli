@@ -9,7 +9,7 @@ exports.valid_repos = exports.abstract_repos = void 0;
 exports.abstract_repos = {
     core: '',
     web: '',
-    fnc: ''
+    ntl: ''
 };
 function valid_repos() {
     const vals = [];

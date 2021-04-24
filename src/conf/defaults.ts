@@ -26,15 +26,15 @@ export const defaults = {
 	
 	dot_repo: `${cloud_address}urn-dot.git`,
 	
-	fnc_repo: `${cloud_address}urn-fnc.git`,
+	ntl_repo: `${cloud_address}urn-ntl.git`,
 	
 	web_repo: `${cloud_address}urn-web.git`,
 	
 	core_repo: `${cloud_address}urn-core.git`,
 	
-	fnc_dep_repo: `${cloud_address}urn-fnc-dep`,
+	ntl_dep_repo: `${cloud_address}urn-ntl-dep`,
 	
-	fnc_dep_dev_repo: `${cloud_address}urn-fnc-dep-dev`,
+	ntl_dep_dev_repo: `${cloud_address}urn-ntl-dep-dev`,
 	
 	web_dep_repo: `${cloud_address}urn-web-dep`,
 	

@@ -146,7 +146,7 @@ function _install_dep(repo) {
     return __awaiter(this, void 0, void 0, function* () {
         yield _uninstall_core_dep();
         yield _uninstall_web_dep();
-        yield _uninstall_fnc_dep();
+        yield _uninstall_ntl_dep();
         switch (repo) {
             case 'core': {
                 yield _install_core_dep();
@@ -156,8 +156,8 @@ function _install_dep(repo) {
                 yield _install_web_dep();
                 return true;
             }
-            case 'fnc': {
-                yield _install_fnc_dep();
+            case 'ntl': {
+                yield _install_ntl_dep();
                 return true;
             }
             // default:{
@@ -209,8 +209,8 @@ function _clone_and_install_repo() {
                 yield _clone_web();
                 break;
             }
-            case 'fnc': {
-                yield _clone_fnc();
+            case 'ntl': {
+                yield _clone_ntl();
                 break;
             }
             default: {
@@ -260,12 +260,12 @@ function _install_web_dep() {
         return true;
     });
 }
-function _install_fnc_dep() {
+function _install_ntl_dep() {
     return __awaiter(this, void 0, void 0, function* () {
-        output.start_loading(`Installing fnc dep...`);
-        yield util.install_dep(defaults_1.defaults.fnc_dep_repo, 'fnc');
-        yield util.install_dep_dev(defaults_1.defaults.fnc_dep_dev_repo, 'fnc');
-        output.done_log('fnc', `Installed fnc dependencies.`);
+        output.start_loading(`Installing ntl dep...`);
+        yield util.install_dep(defaults_1.defaults.ntl_dep_repo, 'ntl');
+        yield util.install_dep_dev(defaults_1.defaults.ntl_dep_dev_repo, 'ntl');
+        output.done_log('ntl', `Installed ntl dependencies.`);
         return true;
     });
 }
@@ -293,15 +293,15 @@ function _uninstall_web_dep() {
         return true;
     });
 }
-function _uninstall_fnc_dep() {
+function _uninstall_ntl_dep() {
     return __awaiter(this, void 0, void 0, function* () {
-        output.start_loading(`Uninstalling fnc dep...`);
-        const dep_folder = `./node_modules/${defaults_1.defaults.fnc_dep_repo}`;
-        util.remove_folder_if_exists('fnc_', dep_folder);
-        const dep_dev_folder = `./node_modules/${defaults_1.defaults.fnc_dep_dev_repo}`;
-        util.remove_folder_if_exists('fnc_', dep_dev_folder);
-        yield util.uninstall_dep(`${defaults_1.defaults.fnc_dep_repo.split('/').slice(-1)[0]} ${defaults_1.defaults.fnc_dep_dev_repo.split('/').slice(-1)[0]}`, 'fnc_');
-        output.done_log('fnc', `Uninstalled fnc dependencies.`);
+        output.start_loading(`Uninstalling ntl dep...`);
+        const dep_folder = `./node_modules/${defaults_1.defaults.ntl_dep_repo}`;
+        util.remove_folder_if_exists('ntl_', dep_folder);
+        const dep_dev_folder = `./node_modules/${defaults_1.defaults.ntl_dep_dev_repo}`;
+        util.remove_folder_if_exists('ntl_', dep_dev_folder);
+        yield util.uninstall_dep(`${defaults_1.defaults.ntl_dep_repo.split('/').slice(-1)[0]} ${defaults_1.defaults.ntl_dep_dev_repo.split('/').slice(-1)[0]}`, 'ntl_');
+        output.done_log('ntl', `Uninstalled ntl dependencies.`);
         return true;
     });
 }
@@ -328,11 +328,11 @@ function _clone_web() {
         output.done_log('web', `Cloned web repo.`);
     });
 }
-function _clone_fnc() {
+function _clone_ntl() {
     return __awaiter(this, void 0, void 0, function* () {
-        output.start_loading(`Cloning fnc...`);
-        yield util.clone_repo_recursive('fnc_', defaults_1.defaults.fnc_repo, `${defaults_1.defaults.folder}/repo`);
-        output.done_log('fnc', `Cloned fnc repo.`);
+        output.start_loading(`Cloning ntl...`);
+        yield util.clone_repo_recursive('ntl_', defaults_1.defaults.ntl_repo, `${defaults_1.defaults.folder}/repo`);
+        output.done_log('ntl', `Cloned ntl repo.`);
     });
 }
 //# sourceMappingURL=init.js.map

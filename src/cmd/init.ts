@@ -157,7 +157,7 @@ async function _install_dep(repo:Repo)
 		:Promise<true>{
 	await _uninstall_core_dep();
 	await _uninstall_web_dep();
-	await _uninstall_fnc_dep();
+	await _uninstall_ntl_dep();
 	switch(repo){
 		case 'core':{
 			await _install_core_dep();
@@ -167,8 +167,8 @@ async function _install_dep(repo:Repo)
 			await _install_web_dep();
 			return true;
 		}
-		case 'fnc':{
-			await _install_fnc_dep();
+		case 'ntl':{
+			await _install_ntl_dep();
 			return true;
 		}
 		// default:{
@@ -224,8 +224,8 @@ async function _clone_and_install_repo(){
 			await _clone_web();
 			break;
 		}
-		case 'fnc':{
-			await _clone_fnc();
+		case 'ntl':{
+			await _clone_ntl();
 			break;
 		}
 		default:{
@@ -275,11 +275,11 @@ async function _install_web_dep(){
 	return true;
 }
 
-async function _install_fnc_dep(){
-	output.start_loading(`Installing fnc dep...`);
-	await util.install_dep(defaults.fnc_dep_repo, 'fnc');
-	await util.install_dep_dev(defaults.fnc_dep_dev_repo, 'fnc');
-	output.done_log('fnc', `Installed fnc dependencies.`);
+async function _install_ntl_dep(){
+	output.start_loading(`Installing ntl dep...`);
+	await util.install_dep(defaults.ntl_dep_repo, 'ntl');
+	await util.install_dep_dev(defaults.ntl_dep_dev_repo, 'ntl');
+	output.done_log('ntl', `Installed ntl dependencies.`);
 	return true;
 }
 
@@ -305,14 +305,14 @@ async function _uninstall_web_dep(){
 	return true;
 }
 
-async function _uninstall_fnc_dep(){
-	output.start_loading(`Uninstalling fnc dep...`);
-	const dep_folder = `./node_modules/${defaults.fnc_dep_repo}`;
-	util.remove_folder_if_exists('fnc_', dep_folder);
-	const dep_dev_folder = `./node_modules/${defaults.fnc_dep_dev_repo}`;
-	util.remove_folder_if_exists('fnc_', dep_dev_folder);
-	await util.uninstall_dep(`${defaults.fnc_dep_repo.split('/').slice(-1)[0]} ${defaults.fnc_dep_dev_repo.split('/').slice(-1)[0]}`, 'fnc_');
-	output.done_log('fnc', `Uninstalled fnc dependencies.`);
+async function _uninstall_ntl_dep(){
+	output.start_loading(`Uninstalling ntl dep...`);
+	const dep_folder = `./node_modules/${defaults.ntl_dep_repo}`;
+	util.remove_folder_if_exists('ntl_', dep_folder);
+	const dep_dev_folder = `./node_modules/${defaults.ntl_dep_dev_repo}`;
+	util.remove_folder_if_exists('ntl_', dep_dev_folder);
+	await util.uninstall_dep(`${defaults.ntl_dep_repo.split('/').slice(-1)[0]} ${defaults.ntl_dep_dev_repo.split('/').slice(-1)[0]}`, 'ntl_');
+	output.done_log('ntl', `Uninstalled ntl dependencies.`);
 	return true;
 }
 
@@ -336,8 +336,8 @@ async function _clone_web(){
 	output.done_log('web', `Cloned web repo.`);
 }
 
-async function _clone_fnc(){
-	output.start_loading(`Cloning fnc...`);
-	await util.clone_repo_recursive('fnc_', defaults.fnc_repo, `${defaults.folder}/repo`);
-	output.done_log('fnc', `Cloned fnc repo.`);
+async function _clone_ntl(){
+	output.start_loading(`Cloning ntl...`);
+	await util.clone_repo_recursive('ntl_', defaults.ntl_repo, `${defaults.folder}/repo`);
+	output.done_log('ntl', `Cloned ntl repo.`);
 }
