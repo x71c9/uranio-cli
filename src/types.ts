@@ -13,7 +13,7 @@ export type ParseOptions = minimist.Opts;
 export const abstract_repos = {
 	core: '',
 	web: '',
-	fnc: ''
+	ntl: ''
 } as const;
 
 export function valid_repos()

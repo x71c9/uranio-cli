@@ -250,7 +250,7 @@ function _add_core_books(book_decl:VariableDeclaration, required_book_name:strin
 		case 'core':{
 			break;
 		}
-		case 'fnc':
+		case 'ntl':
 		case 'web':{
 			core_repo_path = `./${defaults.folder}/repo/core`;
 			break;
@@ -267,9 +267,9 @@ function _add_web_books(book_decl:VariableDeclaration, required_book_name:string
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 
-function _add_fnc_books(book_decl:VariableDeclaration, required_book_name:string){
-	const fnc_repo_path = `./${defaults.folder}/repo`;
-	const required_books_path = `${fnc_repo_path}/books.ts`;
+function _add_ntl_books(book_decl:VariableDeclaration, required_book_name:string){
+	const ntl_repo_path = `./${defaults.folder}/repo`;
+	const required_books_path = `${ntl_repo_path}/books.ts`;
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 
@@ -281,8 +281,8 @@ function _append_requried_book(book_decl:VariableDeclaration, required_book_name
 			_add_web_books(book_decl, required_book_name);
 			break;
 		}
-		case 'fnc':{
-			_add_fnc_books(book_decl, required_book_name);
+		case 'ntl':{
+			_add_ntl_books(book_decl, required_book_name);
 		}
 	}
 	_add_core_books(book_decl, required_book_name);
