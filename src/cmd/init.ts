@@ -8,7 +8,7 @@ import fs from 'fs';
 
 import inquirer from 'inquirer';
 
-import {Arguments, Repo} from '../types';
+import {Arguments, Repo, abstract_repos} from '../types';
 
 import {defaults, jsonfile_path} from '../conf/defaults';
 
@@ -81,11 +81,7 @@ async function _initialize(args:Arguments){
 					type: 'list',
 					name: 'repo',
 					message: 'Which repo do you want to clone?',
-					choices: [
-						'core',
-						'web',
-						'fnc',
-					]
+					choices: Object.keys(abstract_repos)
 				}
 			]).then(async (answers) => {
 				
@@ -256,6 +252,9 @@ function _update_aliases(){
 		urn_books: `./dist/${defaults.folder}/books.js`,
 		uranio: `./dist/${defaults.folder}/repo/`
 	};
+	if(global.uranio.repo !== 'core'){
+		package_data['_moduleAliases']['urn_core'] = `./dist/${defaults.folder}/repo/core/`;
+	}
 	fs.writeFileSync(`./package.json`, JSON.stringify(package_data, null, '\t'));
 	output.done_log('alas', `Updated aliases.`);
 }
