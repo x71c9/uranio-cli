@@ -39,6 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.init = void 0;
 const fs_1 = __importDefault(require("fs"));
 const inquirer_1 = __importDefault(require("inquirer"));
+const types_1 = require("../types");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../log/"));
 const util = __importStar(require("../util/"));
@@ -89,11 +90,7 @@ function _initialize(args) {
                     type: 'list',
                     name: 'repo',
                     message: 'Which repo do you want to clone?',
-                    choices: [
-                        'core',
-                        'web',
-                        'fnc',
-                    ]
+                    choices: Object.keys(types_1.abstract_repos)
                 }
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
                 yield _proceed_with_repo(answers.repo);
@@ -239,6 +236,9 @@ function _update_aliases() {
         urn_books: `./dist/${defaults_1.defaults.folder}/books.js`,
         uranio: `./dist/${defaults_1.defaults.folder}/repo/`
     };
+    if (global.uranio.repo !== 'core') {
+        package_data['_moduleAliases']['urn_core'] = `./dist/${defaults_1.defaults.folder}/repo/core/`;
+    }
     fs_1.default.writeFileSync(`./package.json`, JSON.stringify(package_data, null, '\t'));
     output.done_log('alas', `Updated aliases.`);
 }
