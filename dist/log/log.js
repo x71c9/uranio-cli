@@ -83,8 +83,8 @@ function log(context, text) {
 }
 exports.log = log;
 function _log(context, text, out = false) {
-    const time_text = _format_text(context, text);
-    _log_to_file(time_text);
+    const output_text = _format_text(context, text);
+    _log_to_file(output_text);
     if (out) {
         let was_spinning = false;
         if (spinner.isSpinning) {
@@ -92,7 +92,7 @@ function _log(context, text, out = false) {
             stop_loading();
         }
         if (defaults_1.conf.output === true) {
-            process.stdout.write(_replace_root_string(time_text));
+            process.stdout.write(output_text);
         }
         if (was_spinning) {
             spinner.start();
@@ -100,26 +100,47 @@ function _log(context, text, out = false) {
     }
 }
 function _format_text(context, text) {
-    const time = dateformat_1.default(new Date(), defaults_1.defaults.time_format);
+    let time = dateformat_1.default(new Date(), defaults_1.defaults.time_format);
     if (context.length < 4) {
         context = context.padEnd(4, '_');
     }
     else if (context.length > 4) {
         context = context.substr(0, 4);
     }
-    let time_text = '';
+    text = _replace_root_string(text);
+    let text_lenght = 0;
+    text_lenght += context.length;
+    text_lenght += text.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '').length; // eslint-disable-line no-control-regex
+    text_lenght += time.length;
+    text_lenght += 8;
+    let output_text = '';
+    let dot = '.';
     if (defaults_1.conf.colors === true) {
-        time_text += `${chalk_1.default.blue(`[${time}]`)} `;
-        time_text += `${chalk_1.default.grey(`[${context}]`)} `;
-        time_text += `${chalk_1.default.green(text)}`;
+        context = `${chalk_1.default.grey(`[${context}]`)}`;
+        text = `${chalk_1.default.green(text)}`;
+        dot = `${chalk_1.default.gray('.')}`;
+        time = `${chalk_1.default.blue(`[${time}]`)}`;
     }
     else {
-        time_text += `[${time}] `;
-        time_text += `[${context}] `;
-        time_text += text;
+        context = `[${context}]`;
+        time = `[${time}]`;
     }
-    time_text += `\n`;
-    return time_text;
+    if (defaults_1.conf.full_width === true) {
+        output_text += context + ' ';
+        output_text += text + ' ';
+        for (let i = 0; i < process.stdout.columns - text_lenght; i++) {
+            output_text += dot;
+        }
+        output_text += ' ';
+        output_text += time;
+    }
+    else {
+        output_text += time + ' ';
+        output_text += context + ' ';
+        output_text += text + ' ';
+    }
+    output_text += `\n`;
+    return output_text;
 }
 function _log_to_file(text) {
     fs_1.default.appendFileSync(defaults_1.defaults.log_filepath, text);

@@ -80,7 +80,7 @@ async function _initialize(args:Arguments){
 				{
 					type: 'list',
 					name: 'repo',
-					message: 'Which repo do you want to clone?',
+					message: 'Select URANIO repo you want to use:',
 					choices: Object.keys(abstract_repos)
 				}
 			]).then(async (answers) => {

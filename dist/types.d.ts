@@ -17,4 +17,5 @@ export declare type Conf = {
     verbose: boolean;
     colors: boolean;
     output: boolean;
+    full_width: boolean;
 };

@@ -89,7 +89,7 @@ function _initialize(args) {
                 {
                     type: 'list',
                     name: 'repo',
-                    message: 'Which repo do you want to clone?',
+                    message: 'Select URANIO repo you want to use:',
                     choices: Object.keys(types_1.abstract_repos)
                 }
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {

@@ -97,8 +97,8 @@ export function log(context:string, text:string)
 }
 
 function _log(context:string, text:string, out=false){
-	const time_text = _format_text(context, text);
-	_log_to_file(time_text);
+	const output_text = _format_text(context, text);
+	_log_to_file(output_text);
 	if(out){
 		let was_spinning = false;
 		if(spinner.isSpinning){
@@ -106,7 +106,7 @@ function _log(context:string, text:string, out=false){
 			stop_loading();
 		}
 		if(conf.output === true){
-			process.stdout.write(_replace_root_string(time_text));
+			process.stdout.write(output_text);
 		}
 		if(was_spinning){
 			spinner.start();
@@ -116,24 +116,53 @@ function _log(context:string, text:string, out=false){
 
 function _format_text(context:string, text:string)
 		:string{
-	const time = dateFormat(new Date(), defaults.time_format);
+	
+	let time = dateFormat(new Date(), defaults.time_format);
+	
 	if(context.length < 4){
 		context = context.padEnd(4,'_');
 	}else if(context.length > 4){
 		context = context.substr(0,4);
 	}
-	let time_text = '';
+	
+	text = _replace_root_string(text);
+	
+	let text_lenght = 0;
+	text_lenght += context.length;
+	text_lenght += text.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '').length; // eslint-disable-line no-control-regex
+	text_lenght += time.length;
+	text_lenght += 8;
+	
+	let output_text = '';
+	let dot = '.';
+	
 	if(conf.colors === true){
-		time_text += `${chalk.blue(`[${time}]`)} `;
-		time_text += `${chalk.grey(`[${context}]`)} `;
-		time_text += `${chalk.green(text)}`;
+		context = `${chalk.grey(`[${context}]`)}`;
+		text = `${chalk.green(text)}`;
+		dot = `${chalk.gray('.')}`;
+		time = `${chalk.blue(`[${time}]`)}`;
 	}else{
-		time_text += `[${time}] `;
-		time_text += `[${context}] `;
-		time_text += text;
+		context = `[${context}]`;
+		time = `[${time}]`;
 	}
-	time_text += `\n`;
-	return time_text;
+	
+	if(conf.full_width === true){
+		output_text += context + ' ';
+		output_text += text + ' ';
+		for(let i = 0; i < process.stdout.columns - text_lenght; i++){
+			output_text += dot;
+		}
+		output_text += ' ';
+		output_text += time;
+	}else{
+		output_text += time + ' ';
+		output_text += context + ' ';
+		output_text += text + ' ';
+	}
+	
+	output_text += `\n`;
+	
+	return output_text;
 }
 
 function _log_to_file(text:string)

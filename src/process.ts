@@ -10,13 +10,11 @@ import * as cp from 'child_process';
 
 import {Arguments} from './types';
 
-import {help, init, transpose, dev} from './cmd/';
+import {help, init, transpose, dev, test} from './cmd/';
 
 import {conf, defaults} from './conf/defaults';
 
 import * as output from './log/';
-
-// import * as util from './util/';
 
 export function urn_process(args:Arguments)
 		:void{
@@ -148,6 +146,10 @@ function _switch_command(args:Arguments){
 		}
 		case 'help':{
 			help.run();
+			break;
+		}
+		case 'test':{
+			test.run();
 			break;
 		}
 		default:{
