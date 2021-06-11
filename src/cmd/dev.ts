@@ -46,10 +46,17 @@ async function _start_dev()
 		{stdio: [null, 'inherit', 'inherit']}
 	);
 	
+	// const netlifydev = cp.spawn(
+	//   'ntl',
+	//   ['dev'],
+	//   {stdio: [null, 'inherit', 'inherit']}
+	// );
+
 	process.on('SIGINT', function() {
 		process.stdout.write("\r--- Caught interrupt signal ---\n");
 		process.kill(nodemon.pid);
 		process.kill(tscwatch.pid);
+		// process.kill(netlifydev.pid);
 	});
 	
 }
