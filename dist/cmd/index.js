@@ -19,4 +19,5 @@ __exportStar(require("./help"), exports);
 __exportStar(require("./init"), exports);
 __exportStar(require("./transpose"), exports);
 __exportStar(require("./dev"), exports);
+__exportStar(require("./test"), exports);
 //# sourceMappingURL=index.js.map

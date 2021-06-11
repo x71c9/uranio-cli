@@ -58,6 +58,8 @@ export const conf:Conf = {
 	
 	colors: true,
 	
-	output: true
+	output: true,
+	
+	full_width: false
 	
 };

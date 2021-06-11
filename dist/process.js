@@ -33,7 +33,6 @@ const cp = __importStar(require("child_process"));
 const cmd_1 = require("./cmd/");
 const defaults_1 = require("./conf/defaults");
 const output = __importStar(require("./log/"));
-// import * as util from './util/';
 function urn_process(args) {
     _init_global();
     _read_options(args);
@@ -138,6 +137,10 @@ function _switch_command(args) {
         }
         case 'help': {
             cmd_1.help.run();
+            break;
+        }
+        case 'test': {
+            cmd_1.test.run();
             break;
         }
         default: {
