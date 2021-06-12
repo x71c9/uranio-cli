@@ -96,16 +96,32 @@ function _log_arguments(args) {
 }
 function _read_options(args) {
     const verbose = args.v || args.verbose;
-    if (verbose === true) {
+    if (verbose == true) {
         defaults_1.conf.verbose = true;
     }
-    const colors = args['colors'];
-    if (colors === false) {
-        defaults_1.conf.colors = false;
+    if (typeof args.noverbose !== 'undefined' && !!args.noverbose !== !defaults_1.conf.verbose) {
+        defaults_1.conf.verbose = !args.noverbose;
     }
-    const log = args['log'];
-    if (log === false) {
-        defaults_1.conf.output = false;
+    const hide = args.n || args.hide;
+    if (hide == true) {
+        defaults_1.conf.hide = true;
+    }
+    if (typeof args.nohide !== 'undefined' && !!args.nohide !== !defaults_1.conf.hide) {
+        defaults_1.conf.hide = !args.nohide;
+    }
+    const blank = args.b || args.blank;
+    if (blank == true) {
+        defaults_1.conf.blank = true;
+    }
+    if (typeof args.noblank !== 'undefined' && !!args.noblank !== !defaults_1.conf.blank) {
+        defaults_1.conf.blank = !args.noblank;
+    }
+    const fullwidth = args.f || args.fullwidth;
+    if (fullwidth == true) {
+        defaults_1.conf.fullwidth = true;
+    }
+    if (typeof args.nofullwidth !== 'undefined' && !!args.nofullwidth !== !defaults_1.conf.fullwidth) {
+        defaults_1.conf.fullwidth = !args.nofullwidth;
     }
 }
 function _switch_command(args) {

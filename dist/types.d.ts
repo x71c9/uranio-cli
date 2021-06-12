@@ -15,7 +15,7 @@ export declare function valid_repos(): string[];
 export declare type Repo = keyof typeof abstract_repos;
 export declare type Conf = {
     verbose: boolean;
-    colors: boolean;
-    output: boolean;
-    full_width: boolean;
+    blank: boolean;
+    hide: boolean;
+    fullwidth: boolean;
 };
