@@ -18,12 +18,12 @@ function _spinner_text_color(text) {
     if (!text) {
         return '';
     }
-    return (defaults_1.conf.colors === true) ? chalk_1.default.magenta(text) : text;
+    return (defaults_1.conf.blank === false) ? chalk_1.default.magenta(text) : text;
 }
 const spinner = ora_1.default({ text: 'Loading...', color: 'magenta', interval: 40 });
 const spinner_texts = [];
 function start_loading(text) {
-    if (defaults_1.conf.colors === false) {
+    if (defaults_1.conf.blank === true) {
         spinner.color = 'white';
     }
     spinner_texts.push(text);
@@ -64,17 +64,17 @@ exports.error_log = error_log;
 function end_log(text) {
     stop_loading();
     const end_text = `${defaults_1.defaults.check_char} ${text}`;
-    log('end', (defaults_1.conf.colors) ? chalk_1.default.yellow(end_text) : end_text);
+    log('end', (!defaults_1.conf.blank) ? chalk_1.default.yellow(end_text) : end_text);
 }
 exports.end_log = end_log;
 function wrong_end_log(text) {
     stop_loading();
     const end_text = `${defaults_1.defaults.wrong_char} ${text}`;
-    log('end', (defaults_1.conf.colors) ? chalk_1.default.red(end_text) : end_text);
+    log('end', (!defaults_1.conf.blank) ? chalk_1.default.red(end_text) : end_text);
 }
 exports.wrong_end_log = wrong_end_log;
 function verbose_log(context, text) {
-    const color_text = (defaults_1.conf.colors) ? chalk_1.default.hex('#668899')(text) : text;
+    const color_text = (!defaults_1.conf.blank) ? chalk_1.default.hex('#668899')(text) : text;
     _log(context, color_text, (defaults_1.conf.verbose === true));
 }
 exports.verbose_log = verbose_log;
@@ -91,7 +91,7 @@ function _log(context, text, out = false) {
             was_spinning = true;
             stop_loading();
         }
-        if (defaults_1.conf.output === true) {
+        if (defaults_1.conf.hide === false) {
             process.stdout.write(output_text);
         }
         if (was_spinning) {
@@ -108,24 +108,22 @@ function _format_text(context, text) {
         context = context.substr(0, 4);
     }
     text = _replace_root_string(text);
+    context = `[${context}]`;
+    time = `[${time}]`;
     let text_lenght = 0;
     text_lenght += context.length;
     text_lenght += text.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '').length; // eslint-disable-line no-control-regex
     text_lenght += time.length;
-    text_lenght += 8;
+    text_lenght += 4;
     let output_text = '';
     let dot = '.';
-    if (defaults_1.conf.colors === true) {
-        context = `${chalk_1.default.grey(`[${context}]`)}`;
-        text = `${chalk_1.default.green(text)}`;
-        dot = `${chalk_1.default.gray('.')}`;
-        time = `${chalk_1.default.blue(`[${time}]`)}`;
+    if (defaults_1.conf.blank === false) {
+        context = chalk_1.default.grey(context);
+        text = chalk_1.default.green(text);
+        dot = chalk_1.default.gray('.');
+        time = chalk_1.default.blue(time);
     }
-    else {
-        context = `[${context}]`;
-        time = `[${time}]`;
-    }
-    if (defaults_1.conf.full_width === true) {
+    if (defaults_1.conf.fullwidth === true) {
         output_text += context + ' ';
         output_text += text + ' ';
         for (let i = 0; i < process.stdout.columns - text_lenght; i++) {

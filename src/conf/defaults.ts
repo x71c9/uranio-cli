@@ -56,10 +56,10 @@ export const conf:Conf = {
 	
 	verbose: false,
 	
-	colors: true,
+	blank: false,
 	
-	output: true,
+	hide: false,
 	
-	full_width: false
+	fullwidth: false
 	
 };

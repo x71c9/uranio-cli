@@ -29,7 +29,7 @@ export type Repo = keyof typeof abstract_repos;
 
 export type Conf = {
 	verbose: boolean,
-	colors: boolean,
-	output: boolean,
-	full_width: boolean
+	blank: boolean,
+	hide: boolean,
+	fullwidth: boolean
 }

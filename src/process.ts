@@ -95,20 +95,38 @@ function _read_options(args:Arguments){
 	
 	const verbose = args.v || args.verbose;
 	
-	if(verbose === true){
+	if(verbose == true){
 		conf.verbose = true;
 	}
-	
-	const colors = args['colors'];
-	
-	if(colors === false){
-		conf.colors = false;
+	if(typeof args.noverbose !== 'undefined' && !!args.noverbose !== !conf.verbose){
+		conf.verbose = !args.noverbose;
 	}
 	
-	const log = args['log'];
+	const hide = args.n || args.hide;
 	
-	if(log === false){
-		conf.output = false;
+	if(hide == true){
+		conf.hide = true;
+	}
+	if(typeof args.nohide !== 'undefined' && !!args.nohide !== !conf.hide){
+		conf.hide = !args.nohide;
+	}
+	
+	const blank = args.b || args.blank;
+	
+	if(blank == true){
+		conf.blank = true;
+	}
+	if(typeof args.noblank !== 'undefined' && !!args.noblank !== !conf.blank){
+		conf.blank = !args.noblank;
+	}
+	
+	const fullwidth = args.f || args.fullwidth;
+	
+	if(fullwidth == true){
+		conf.fullwidth = true;
+	}
+	if(typeof args.nofullwidth !== 'undefined' && !!args.nofullwidth !== !conf.fullwidth){
+		conf.fullwidth = !args.nofullwidth;
 	}
 	
 }

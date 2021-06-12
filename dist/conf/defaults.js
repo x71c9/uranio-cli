@@ -31,8 +31,8 @@ exports.defaults = {
 exports.jsonfile_path = `${exports.defaults.folder}/${exports.defaults.json_filename}`;
 exports.conf = {
     verbose: false,
-    colors: true,
-    output: true,
-    full_width: false
+    blank: false,
+    hide: false,
+    fullwidth: false
 };
 //# sourceMappingURL=defaults.js.map

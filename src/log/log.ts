@@ -18,7 +18,7 @@ function _spinner_text_color(text?:string):string{
 	if(!text){
 		return '';
 	}
-	return (conf.colors === true) ? chalk.magenta(text) : text;
+	return (conf.blank === false) ? chalk.magenta(text) : text;
 }
 
 const spinner = ora({text: 'Loading...', color: 'magenta', interval: 40});
@@ -27,7 +27,7 @@ const spinner_texts:string[] = [];
 
 export function start_loading(text:string)
 		:void{
-	if(conf.colors === false){
+	if(conf.blank === true){
 		spinner.color = 'white';
 	}
 	spinner_texts.push(text);
@@ -75,19 +75,19 @@ export function end_log(text:string)
 		:void{
 	stop_loading();
 	const end_text = `${defaults.check_char} ${text}`;
-	log('end', (conf.colors) ? chalk.yellow(end_text) : end_text);
+	log('end', (!conf.blank) ? chalk.yellow(end_text) : end_text);
 }
 
 export function wrong_end_log(text:string)
 		:void{
 	stop_loading();
 	const end_text = `${defaults.wrong_char} ${text}`;
-	log('end', (conf.colors) ? chalk.red(end_text) : end_text);
+	log('end', (!conf.blank) ? chalk.red(end_text) : end_text);
 }
 
 export function verbose_log(context:string, text:string)
 		:void{
-	const color_text = (conf.colors) ? chalk.hex('#668899')(text) : text;
+	const color_text = (!conf.blank) ? chalk.hex('#668899')(text) : text;
 	_log(context, color_text, (conf.verbose === true));
 }
 
@@ -105,7 +105,7 @@ function _log(context:string, text:string, out=false){
 			was_spinning = true;
 			stop_loading();
 		}
-		if(conf.output === true){
+		if(conf.hide === false){
 			process.stdout.write(output_text);
 		}
 		if(was_spinning){
@@ -127,26 +127,26 @@ function _format_text(context:string, text:string)
 	
 	text = _replace_root_string(text);
 	
+	context = `[${context}]`;
+	time = `[${time}]`;
+	
 	let text_lenght = 0;
 	text_lenght += context.length;
 	text_lenght += text.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '').length; // eslint-disable-line no-control-regex
 	text_lenght += time.length;
-	text_lenght += 8;
+	text_lenght += 4;
 	
 	let output_text = '';
 	let dot = '.';
 	
-	if(conf.colors === true){
-		context = `${chalk.grey(`[${context}]`)}`;
-		text = `${chalk.green(text)}`;
-		dot = `${chalk.gray('.')}`;
-		time = `${chalk.blue(`[${time}]`)}`;
-	}else{
-		context = `[${context}]`;
-		time = `[${time}]`;
+	if(conf.blank === false){
+		context = chalk.grey(context);
+		text = chalk.green(text);
+		dot = chalk.gray('.');
+		time = chalk.blue(time);
 	}
 	
-	if(conf.full_width === true){
+	if(conf.fullwidth === true){
 		output_text += context + ' ';
 		output_text += text + ' ';
 		for(let i = 0; i < process.stdout.columns - text_lenght; i++){
