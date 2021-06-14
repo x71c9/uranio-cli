@@ -10,7 +10,7 @@ const cloud_address = 'ssh://git@bitbucket.org/nbl7/';
 exports.defaults = {
     default_repo: 'web',
     folder: '.uranio',
-    repo_folder: 'repo',
+    repo_folder: 'lib',
     tmp_folder: '.tmp',
     log_filepath: '.urnlog',
     json_filename: `uranio.json`,

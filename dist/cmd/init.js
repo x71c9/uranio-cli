@@ -234,10 +234,10 @@ function _update_aliases() {
     const package_data = JSON.parse(data);
     package_data['_moduleAliases'] = {
         urn_books: `./dist/${defaults_1.defaults.folder}/books.js`,
-        uranio: `./dist/${defaults_1.defaults.folder}/repo/`
+        uranio: `./dist/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/`
     };
     if (global.uranio.repo !== 'core') {
-        package_data['_moduleAliases']['urn_core'] = `./dist/${defaults_1.defaults.folder}/repo/core/`;
+        package_data['_moduleAliases']['urn_core'] = `./dist/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/core/`;
     }
     fs_1.default.writeFileSync(`./package.json`, JSON.stringify(package_data, null, '\t'));
     output.done_log('alas', `Updated aliases.`);
@@ -317,21 +317,21 @@ function _clone_dot() {
 function _clone_core() {
     return __awaiter(this, void 0, void 0, function* () {
         output.start_loading(`Cloning core...`);
-        yield util.clone_repo('core', defaults_1.defaults.core_repo, `${defaults_1.defaults.folder}/repo`);
+        yield util.clone_repo('core', defaults_1.defaults.core_repo, `${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`);
         output.done_log('core', `Cloned core repo.`);
     });
 }
 function _clone_web() {
     return __awaiter(this, void 0, void 0, function* () {
         output.start_loading(`Cloning web...`);
-        yield util.clone_repo_recursive('web_', defaults_1.defaults.web_repo, `${defaults_1.defaults.folder}/repo`);
+        yield util.clone_repo_recursive('web_', defaults_1.defaults.web_repo, `${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`);
         output.done_log('web', `Cloned web repo.`);
     });
 }
 function _clone_ntl() {
     return __awaiter(this, void 0, void 0, function* () {
         output.start_loading(`Cloning ntl...`);
-        yield util.clone_repo_recursive('ntl_', defaults_1.defaults.ntl_repo, `${defaults_1.defaults.folder}/repo`);
+        yield util.clone_repo_recursive('ntl_', defaults_1.defaults.ntl_repo, `${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`);
         output.done_log('ntl', `Cloned ntl repo.`);
     });
 }
