@@ -245,14 +245,14 @@ function _add_book_from_file(
 }
 
 function _add_core_books(book_decl:VariableDeclaration, required_book_name:string){
-	let core_repo_path = `./${defaults.folder}/repo`;
+	let core_repo_path = `./${defaults.folder}/${defaults.repo_folder}`;
 	switch(global.uranio.repo){
 		case 'core':{
 			break;
 		}
 		case 'ntl':
 		case 'web':{
-			core_repo_path = `./${defaults.folder}/repo/core`;
+			core_repo_path = `./${defaults.folder}/${defaults.repo_folder}/core`;
 			break;
 		}
 	}
@@ -262,13 +262,13 @@ function _add_core_books(book_decl:VariableDeclaration, required_book_name:strin
 }
 
 function _add_web_books(book_decl:VariableDeclaration, required_book_name:string){
-	const web_repo_path = `./${defaults.folder}/repo`;
+	const web_repo_path = `./${defaults.folder}/${defaults.repo_folder}`;
 	const required_books_path = `${web_repo_path}/books.ts`;
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 
 function _add_ntl_books(book_decl:VariableDeclaration, required_book_name:string){
-	const ntl_repo_path = `./${defaults.folder}/repo`;
+	const ntl_repo_path = `./${defaults.folder}/${defaults.repo_folder}`;
 	const required_books_path = `${ntl_repo_path}/books.ts`;
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
 }

@@ -14,7 +14,7 @@ export const defaults = {
 	
 	folder: '.uranio',
 	
-	repo_folder: 'repo',
+	repo_folder: 'lib',
 	
 	tmp_folder: '.tmp',
 	

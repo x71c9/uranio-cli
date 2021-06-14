@@ -250,10 +250,10 @@ function _update_aliases(){
 	const package_data = JSON.parse(data);
 	package_data['_moduleAliases'] = {
 		urn_books: `./dist/${defaults.folder}/books.js`,
-		uranio: `./dist/${defaults.folder}/repo/`
+		uranio: `./dist/${defaults.folder}/${defaults.repo_folder}/`
 	};
 	if(global.uranio.repo !== 'core'){
-		package_data['_moduleAliases']['urn_core'] = `./dist/${defaults.folder}/repo/core/`;
+		package_data['_moduleAliases']['urn_core'] = `./dist/${defaults.folder}/${defaults.repo_folder}/core/`;
 	}
 	fs.writeFileSync(`./package.json`, JSON.stringify(package_data, null, '\t'));
 	output.done_log('alas', `Updated aliases.`);
@@ -326,18 +326,18 @@ async function _clone_dot(){
 
 async function _clone_core(){
 	output.start_loading(`Cloning core...`);
-	await util.clone_repo('core', defaults.core_repo, `${defaults.folder}/repo`);
+	await util.clone_repo('core', defaults.core_repo, `${defaults.folder}/${defaults.repo_folder}`);
 	output.done_log('core', `Cloned core repo.`);
 }
 
 async function _clone_web(){
 	output.start_loading(`Cloning web...`);
-	await util.clone_repo_recursive('web_', defaults.web_repo, `${defaults.folder}/repo`);
+	await util.clone_repo_recursive('web_', defaults.web_repo, `${defaults.folder}/${defaults.repo_folder}`);
 	output.done_log('web', `Cloned web repo.`);
 }
 
 async function _clone_ntl(){
 	output.start_loading(`Cloning ntl...`);
-	await util.clone_repo_recursive('ntl_', defaults.ntl_repo, `${defaults.folder}/repo`);
+	await util.clone_repo_recursive('ntl_', defaults.ntl_repo, `${defaults.folder}/${defaults.repo_folder}`);
 	output.done_log('ntl', `Cloned ntl repo.`);
 }
