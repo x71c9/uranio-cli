@@ -7,7 +7,7 @@ import { Conf } from '../types';
 export declare const defaults: {
     readonly default_repo: "web";
     readonly folder: ".uranio";
-    readonly repo_folder: "repo";
+    readonly repo_folder: "lib";
     readonly tmp_folder: ".tmp";
     readonly log_filepath: ".urnlog";
     readonly json_filename: "uranio.json";
