@@ -41,6 +41,6 @@
 		"urn-lib": "bitbucket:nbl7/urn-lib"
 	},
 	"bin": {
-		"uranio": "dist/index.js"
+		"uranio": "dist/sh.js"
 	}
 }
