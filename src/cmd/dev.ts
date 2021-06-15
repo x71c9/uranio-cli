@@ -12,7 +12,7 @@ import * as util from '../util/';
 
 export const dev = {
 	
-	run: async ():Promise<void> => {
+	command: async ():Promise<void> => {
 		
 		output.stop_loading();
 		

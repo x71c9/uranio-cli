@@ -3,7 +3,8 @@
  *
  * @packageDocumentation
  */
-import { Arguments } from '../types';
+import { Arguments, Repo, Options } from '../types';
 export declare const init: {
-    run: (args: Arguments) => Promise<void>;
+    run: (root: string, repo: Repo, options: Partial<Options>) => Promise<void>;
+    command: (args: Arguments) => Promise<void>;
 };

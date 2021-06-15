@@ -43,7 +43,17 @@ const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../log/"));
 const util = __importStar(require("../util/"));
 exports.transpose = {
-    run: () => __awaiter(void 0, void 0, void 0, function* () {
+    run: (root, options) => __awaiter(void 0, void 0, void 0, function* () {
+        if (!util.check_folder(root)) {
+            throw new Error(`Invalid root path [${root}].`);
+        }
+        defaults_1.conf.hide = true;
+        if (options) {
+            util.merge_options(options);
+        }
+        yield exports.transpose.command();
+    }),
+    command: () => __awaiter(void 0, void 0, void 0, function* () {
         output.start_loading('Transposing...');
         util.read_rc_file();
         const modified = _manipulate_file();
@@ -59,13 +69,13 @@ const _project = new ts_morph_1.Project({
     }
 });
 function _pretty_books() {
-    util.pretty(`${defaults_1.defaults.folder}/books.ts`);
+    util.pretty(`${defaults_1.conf.root}/${defaults_1.defaults.folder}/books.ts`);
 }
 function _manipulate_file() {
     const action = `manipulating [src/book.ts]`;
     output.start_loading(`${action[0].toUpperCase()}${action.substr(1)}...`);
     output.verbose_log(`mnpl`, `Started ${action}.`);
-    let sourceFile = _project.addSourceFileAtPath(`src/book.ts`);
+    let sourceFile = _project.addSourceFileAtPath(`${defaults_1.conf.root}/src/book.ts`);
     sourceFile = _replace_comments(sourceFile);
     sourceFile = _change_realtive_imports(sourceFile);
     sourceFile = _create_bll_book(sourceFile);
@@ -110,7 +120,7 @@ function _create_a_book(sourceFile, book_name, keep_property, required_book_name
     const book_state = _find_atom_book_statement(sourceFile);
     if (book_state) {
         const atom_book_state_text = book_state.getText();
-        const cloned_book_source = _project.createSourceFile(`./${defaults_1.defaults.folder}/${book_name}_book.ts`, atom_book_state_text, { overwrite: true });
+        const cloned_book_source = _project.createSourceFile(`${defaults_1.conf.root}/${defaults_1.defaults.folder}/${book_name}_book.ts`, atom_book_state_text, { overwrite: true });
         let cloned_book_decl = cloned_book_source
             .getFirstDescendantByKind(ts_morph_1.ts.SyntaxKind.VariableDeclaration);
         if (cloned_book_decl) {
@@ -198,7 +208,7 @@ function _get_variable_content(source, variable_name) {
 }
 function _add_book_from_file(book_decl, required_book_name, books_file_path) {
     const book_content = fs_1.default.readFileSync(books_file_path, 'utf8');
-    const core_books_source = _project.createSourceFile(`./${defaults_1.defaults.folder}/cloned_${required_book_name}.ts`, book_content, { overwrite: true });
+    const core_books_source = _project.createSourceFile(`${defaults_1.conf.root}/${defaults_1.defaults.folder}/cloned_${required_book_name}.ts`, book_content, { overwrite: true });
     const core_var_content = _get_variable_content(core_books_source, required_book_name);
     const syntax_list = book_decl.getFirstDescendantByKind(ts_morph_1.ts.SyntaxKind.SyntaxList);
     if (syntax_list) {
@@ -206,33 +216,33 @@ function _add_book_from_file(book_decl, required_book_name, books_file_path) {
     }
 }
 function _add_core_books(book_decl, required_book_name) {
-    let core_repo_path = `./${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`;
-    switch (global.uranio.repo) {
+    let core_repo_path = `${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`;
+    switch (defaults_1.conf.repo) {
         case 'core': {
             break;
         }
         case 'ntl':
         case 'web': {
-            core_repo_path = `./${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/core`;
+            core_repo_path = `${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/core`;
             break;
         }
     }
-    const required_books_path = `${core_repo_path}/books.ts`;
+    const required_books_path = `${defaults_1.conf.root}/${core_repo_path}/books.ts`;
     _add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 function _add_web_books(book_decl, required_book_name) {
-    const web_repo_path = `./${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`;
-    const required_books_path = `${web_repo_path}/books.ts`;
+    const web_repo_path = `${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`;
+    const required_books_path = `${defaults_1.conf.root}/${web_repo_path}/books.ts`;
     _add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 function _add_ntl_books(book_decl, required_book_name) {
-    const ntl_repo_path = `./${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`;
-    const required_books_path = `${ntl_repo_path}/books.ts`;
+    const ntl_repo_path = `${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`;
+    const required_books_path = `${defaults_1.conf.root}/${ntl_repo_path}/books.ts`;
     _add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 function _append_requried_book(book_decl, required_book_name) {
     output.start_loading(`Adding required books...`);
-    switch (global.uranio.repo) {
+    switch (defaults_1.conf.repo) {
         case 'web': {
             _add_web_books(book_decl, required_book_name);
             break;
@@ -275,7 +285,7 @@ function _change_realtive_import(node) {
 }
 function _copy_manipulated_file(text) {
     output.start_loading(`Writing manipulated book...`);
-    fs_1.default.writeFileSync(`${defaults_1.defaults.folder}/books.ts`, text);
+    fs_1.default.writeFileSync(`${defaults_1.conf.root}/${defaults_1.defaults.folder}/books.ts`, text);
     output.done_log(`trns`, `Manipulated books copied to [${defaults_1.defaults.folder}/books.ts].`);
 }
 function _remove_type_reference(book_decl) {

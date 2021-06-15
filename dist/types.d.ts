@@ -13,9 +13,13 @@ export declare const abstract_repos: {
 };
 export declare function valid_repos(): string[];
 export declare type Repo = keyof typeof abstract_repos;
-export declare type Conf = {
+export declare type Options = {
     verbose: boolean;
     blank: boolean;
     hide: boolean;
     fullwidth: boolean;
+};
+export declare type Conf = Options & {
+    root: string;
+    repo: Repo;
 };

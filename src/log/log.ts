@@ -175,7 +175,10 @@ function _replace_root_string(str:string)
 	if(str.indexOf('$URNROOT$') !== -1){
 		return str.replace('$URNROOT$','');
 	}
-	const regex = new RegExp(`${global.uranio.root}`, 'g');
+	if(conf.root == '.'){
+		return str;
+	}
+	const regex = new RegExp(`${conf.root}`, 'g');
 	return str.replace(regex, 'ROOT');
 }
 
