@@ -38,7 +38,7 @@ const cp = __importStar(require("child_process"));
 const output = __importStar(require("../log/"));
 const util = __importStar(require("../util/"));
 exports.dev = {
-    run: () => __awaiter(void 0, void 0, void 0, function* () {
+    command: () => __awaiter(void 0, void 0, void 0, function* () {
         output.stop_loading();
         util.read_rc_file();
         _start_dev();

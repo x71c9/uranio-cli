@@ -37,7 +37,7 @@ exports.test = void 0;
 const output = __importStar(require("../log/"));
 const util = __importStar(require("../util/"));
 exports.test = {
-    run: () => __awaiter(void 0, void 0, void 0, function* () {
+    command: () => __awaiter(void 0, void 0, void 0, function* () {
         output.stop_loading();
         util.read_rc_file();
         output.verbose_log('TTTT', 'TEST URANIO LOG');

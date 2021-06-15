@@ -8,9 +8,9 @@ import fs from 'fs';
 
 import inquirer from 'inquirer';
 
-import {Arguments, Repo, abstract_repos} from '../types';
+import {Arguments, Repo, Options, abstract_repos} from '../types';
 
-import {defaults, jsonfile_path} from '../conf/defaults';
+import {conf, defaults, jsonfile_path} from '../conf/defaults';
 
 import * as output from '../log/';
 
@@ -20,7 +20,19 @@ import {title} from './title';
 
 export const init = {
 	
-	run: async (args:Arguments):Promise<void> => {
+	run: async (root:string, repo:Repo, options:Partial<Options>):Promise<void> => {
+		
+		conf.hide = true;
+		
+		if(options){
+			util.merge_options(options);
+		}
+		
+		await _initialize(root, repo, options);
+		
+	},
+	
+	command: async (args:Arguments):Promise<void> => {
 		
 		console.clear();
 		
@@ -47,7 +59,7 @@ export const init = {
 				]).then(async (answer) => {
 					if(answer.proceed && answer.proceed === true){
 						
-						await _initialize(args);
+						await _select_repo(args);
 					
 					}else{
 						process.exit(0);
@@ -55,7 +67,7 @@ export const init = {
 				});
 		}else{
 			
-			await _initialize(args);
+			await _select_repo(args);
 			
 		}
 		
@@ -63,11 +75,47 @@ export const init = {
 	
 };
 
-function _is_already_initialized(){
-	return (fs.existsSync(jsonfile_path));
+async function _initialize(root:string, repo:Repo, options?:Partial<Options>)
+		:Promise<void>{
+	
+	if(!util.check_folder(root)){
+		throw new Error(`Invalid root path [${root}].`);
+	}
+	
+	if(!util.check_repo(repo)){
+		throw new Error(`Invalid repo [${repo}].`);
+	}
+	
+	conf.root = root;
+	conf.repo = repo;
+	
+	if(options){
+		util.merge_options(options);
+	}
+	
+	output.verbose_log('root', `$URNROOT$Project root: [${conf.root}]`);
+	output.verbose_log('repo', `Selected repo: [${repo}]`);
+	output.start_loading('Initialization...');
+	
+	_update_aliases();
+	_create_urn_folder();
+	_ignore_urn_folder();
+	_create_json_file();
+	await _clone_dot();
+	_copy_dot_files();
+	await _clone_and_install_repo();
+	_remove_tmp();
+		
+	output.end_log(`Initialization completed.`);
+	
 }
 
-async function _initialize(args:Arguments){
+
+function _is_already_initialized(){
+	return (fs.existsSync(`${conf.root}/${jsonfile_path}`));
+}
+
+async function _select_repo(args:Arguments){
 	
 	const repo = args.r || args.repo;
 	
@@ -88,6 +136,7 @@ async function _initialize(args:Arguments){
 				await _proceed_with_repo(answers.repo);
 				
 			});
+		
 	}else{
 		
 		await _proceed_with_repo(repo);
@@ -97,43 +146,36 @@ async function _initialize(args:Arguments){
 
 async function _proceed_with_repo(repo:Repo){
 	
+	util.set_repo(repo);
+	
 	console.clear();
 	
 	title();
 	
-	output.verbose_log('root', `$URNROOT$Project root: [${global.uranio.root}]`);
+	await _initialize(conf.root, conf.repo);
 	
-	output.verbose_log('repo', `Selected repo: [${repo}]`);
+	// output.verbose_log('root', `$URNROOT$Project root: [${conf.root}]`);
+	// output.verbose_log('repo', `Selected repo: [${conf.repo}]`);
+	// output.start_loading('Initialization...');
 	
-	output.start_loading('Initialization...');
+	// _update_aliases();
+	// _create_urn_folder();
+	// _ignore_urn_folder();
+	// _create_json_file();
+	// await _clone_dot();
+	// _copy_dot_files();
+	// await _clone_and_install_repo();
+	// _remove_tmp();
 		
-	util.set_repo(repo);
-	
-	_update_aliases();
-	
-	_create_urn_folder();
-	
-	_ignore_urn_folder();
-	
-	_create_json_file();
-	
-	await _clone_dot();
-	
-	_copy_dot_files();
-	
-	await _clone_and_install_repo();
-	
-	_remove_tmp();
-		
-	output.end_log(`Initialization completed.`);
+	// output.end_log(`Initialization completed.`);
 	
 }
 
 function _ignore_urn_folder(){
 	output.start_loading(`Adding ${defaults.folder} to .gitignore...`);
-	const gitignore = `.gitignore`;
+	const gitignore = `${conf.root}/.gitignore`;
 	if(!fs.existsSync(gitignore)){
-		util.sync_exec(`touch .gitignore`);
+		util.sync_exec(`touch ${gitignore}`);
 	}
 	let content = fs.readFileSync(gitignore, 'utf8');
 	if(content.indexOf(defaults.folder+'/') === -1){
@@ -179,20 +221,20 @@ async function _install_dep(repo:Repo)
 }
 
 function _copy_dot_src_folder(){
-	const dot_src_folder = `${defaults.tmp_folder}/urn-dot/src`;
-	const dest = `./`;
+	const dot_src_folder = `${conf.root}/${defaults.tmp_folder}/urn-dot/src`;
+	const dest = `${conf.root}/`;
 	util.copy_folder('dot', dot_src_folder, dest);
 }
 
 function _copy_dot_tsconfig(){
-	const dot_tsc_file = `${defaults.tmp_folder}/urn-dot/tsconfig.json`;
-	const dest = `./`;
+	const dot_tsc_file = `${conf.root}/${defaults.tmp_folder}/urn-dot/tsconfig.json`;
+	const dest = `${conf.root}/`;
 	util.copy_file('dot', dot_tsc_file, dest);
 }
 
 function _copy_dot_eslint_files(){
-	const dot_eslint_files = `${defaults.tmp_folder}/urn-dot/.eslint*`;
-	const dest = `./`;
+	const dot_eslint_files = `${conf.root}/${defaults.tmp_folder}/urn-dot/.eslint*`;
+	const dest = `${conf.root}/`;
 	util.copy_files('dot', dot_eslint_files, dest);
 }
 
@@ -206,16 +248,16 @@ function _create_json_file(){
 	output.start_loading('Creating rc file...');
 	let content = ``;
 	content += `{\n`;
-	content += `"repo": "${global.uranio.repo}"\n`;
+	content += `"repo": "${conf.repo}"\n`;
 	content += `}`;
-	fs.writeFileSync(jsonfile_path, content);
-	util.pretty(jsonfile_path, 'json');
+	fs.writeFileSync(`${conf.root}/${jsonfile_path}`, content);
+	util.pretty(`${conf.root}/${jsonfile_path}`, 'json');
 	output.done_log('rcfl', `Created file ${jsonfile_path}.`);
 }
 
 async function _clone_and_install_repo(){
-	output.start_loading(`Cloning and intalling [${global.uranio.repo}]...`);
-	switch(global.uranio.repo){
+	output.start_loading(`Cloning and intalling [${conf.repo}]...`);
+	switch(conf.repo){
 		case 'core':{
 			await _clone_core();
 			break;
@@ -229,33 +271,33 @@ async function _clone_and_install_repo(){
 			break;
 		}
 		default:{
-			output.log('init', `Selected repo is not valid. [${global.uranio.repo}]`);
+			output.log('init', `Selected repo is not valid. [${conf.repo}]`);
 			process.exit(1);
 		}
 	}
-	await _install_dep(global.uranio.repo);
-	output.done_log('repo', `Cloned and installed repo [${global.uranio.repo}].`);
+	await _install_dep(conf.repo);
+	output.done_log('repo', `Cloned and installed repo [${conf.repo}].`);
 }
 
 function _create_urn_folder(){
 	output.start_loading(`Creating ${defaults.folder} folder...`);
-	util.remove_folder_if_exists('init', defaults.folder);
-	util.create_folder_if_doesnt_exists('init', defaults.folder);
+	util.remove_folder_if_exists('init', `${conf.root}/${defaults.folder}`);
+	util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}`);
 	output.done_log('init', `Created folder ${defaults.folder}.`);
 }
 
 function _update_aliases(){
 	output.start_loading('Updating aliases...');
-	const data = fs.readFileSync(`./package.json`, 'utf8');
+	const data = fs.readFileSync(`${conf.root}/package.json`, 'utf8');
 	const package_data = JSON.parse(data);
 	package_data['_moduleAliases'] = {
 		urn_books: `./dist/${defaults.folder}/books.js`,
 		uranio: `./dist/${defaults.folder}/${defaults.repo_folder}/`
 	};
-	if(global.uranio.repo !== 'core'){
+	if(conf.repo !== 'core'){
 		package_data['_moduleAliases']['urn_core'] = `./dist/${defaults.folder}/${defaults.repo_folder}/core/`;
 	}
-	fs.writeFileSync(`./package.json`, JSON.stringify(package_data, null, '\t'));
+	fs.writeFileSync(`${conf.root}/package.json`, JSON.stringify(package_data, null, '\t'));
 	output.done_log('alas', `Updated aliases.`);
 }
 
@@ -285,9 +327,9 @@ async function _install_ntl_dep(){
 
 async function _uninstall_core_dep(){
 	output.start_loading(`Uninstalling core dep...`);
-	const dep_folder = `./node_modules/${defaults.core_dep_repo}`;
+	const dep_folder = `${conf.root}/node_modules/${defaults.core_dep_repo}`;
 	util.remove_folder_if_exists('core', dep_folder);
-	const dep_dev_folder = `./node_modules/${defaults.core_dep_dev_repo}`;
+	const dep_dev_folder = `${conf.root}/node_modules/${defaults.core_dep_dev_repo}`;
 	util.remove_folder_if_exists('core', dep_dev_folder);
 	await util.uninstall_dep(`${defaults.core_dep_repo.split('/').slice(-1)[0]} ${defaults.core_dep_dev_repo.split('/').slice(-1)[0]}`, 'core');
 	output.done_log('core', `Uninstalled core dependencies.`);
@@ -296,9 +338,9 @@ async function _uninstall_core_dep(){
 
 async function _uninstall_web_dep(){
 	output.start_loading(`Uninstalling web dep...`);
-	const dep_folder = `./node_modules/${defaults.web_dep_repo}`;
+	const dep_folder = `${conf.root}/node_modules/${defaults.web_dep_repo}`;
 	util.remove_folder_if_exists('web_', dep_folder);
-	const dep_dev_folder = `./node_modules/${defaults.web_dep_dev_repo}`;
+	const dep_dev_folder = `${conf.root}/node_modules/${defaults.web_dep_dev_repo}`;
 	util.remove_folder_if_exists('web_', dep_dev_folder);
 	await util.uninstall_dep(`${defaults.web_dep_repo.split('/').slice(-1)[0]} ${defaults.web_dep_dev_repo.split('/').slice(-1)[0]}`, 'web_');
 	output.done_log('web', `Uninstalled web dependencies.`);
@@ -307,9 +349,9 @@ async function _uninstall_web_dep(){
 
 async function _uninstall_ntl_dep(){
 	output.start_loading(`Uninstalling ntl dep...`);
-	const dep_folder = `./node_modules/${defaults.ntl_dep_repo}`;
+	const dep_folder = `${conf.root}/node_modules/${defaults.ntl_dep_repo}`;
 	util.remove_folder_if_exists('ntl_', dep_folder);
-	const dep_dev_folder = `./node_modules/${defaults.ntl_dep_dev_repo}`;
+	const dep_dev_folder = `${conf.root}/node_modules/${defaults.ntl_dep_dev_repo}`;
 	util.remove_folder_if_exists('ntl_', dep_dev_folder);
 	await util.uninstall_dep(`${defaults.ntl_dep_repo.split('/').slice(-1)[0]} ${defaults.ntl_dep_dev_repo.split('/').slice(-1)[0]}`, 'ntl_');
 	output.done_log('ntl', `Uninstalled ntl dependencies.`);
@@ -320,24 +362,24 @@ async function _clone_dot(){
 	output.start_loading(`Cloning dot...`);
 	util.remove_folder_if_exists('dot', defaults.tmp_folder);
 	util.create_folder_if_doesnt_exists('dot', defaults.tmp_folder);
-	await util.clone_repo('dot', defaults.dot_repo, `${defaults.tmp_folder}/urn-dot`);
+	await util.clone_repo('dot', defaults.dot_repo, `${conf.root}/${defaults.tmp_folder}/urn-dot`);
 	output.done_log('dot', `Cloned dot repo.`);
 }
 
 async function _clone_core(){
 	output.start_loading(`Cloning core...`);
-	await util.clone_repo('core', defaults.core_repo, `${defaults.folder}/${defaults.repo_folder}`);
+	await util.clone_repo('core', defaults.core_repo, `${conf.root}/${defaults.folder}/${defaults.repo_folder}`);
 	output.done_log('core', `Cloned core repo.`);
 }
 
 async function _clone_web(){
 	output.start_loading(`Cloning web...`);
-	await util.clone_repo_recursive('web_', defaults.web_repo, `${defaults.folder}/${defaults.repo_folder}`);
+	await util.clone_repo_recursive('web_', defaults.web_repo, `${conf.root}/${defaults.folder}/${defaults.repo_folder}`);
 	output.done_log('web', `Cloned web repo.`);
 }
 
 async function _clone_ntl(){
 	output.start_loading(`Cloning ntl...`);
-	await util.clone_repo_recursive('ntl_', defaults.ntl_repo, `${defaults.folder}/${defaults.repo_folder}`);
+	await util.clone_repo_recursive('ntl_', defaults.ntl_repo, `${conf.root}/${defaults.folder}/${defaults.repo_folder}`);
 	output.done_log('ntl', `Cloned ntl repo.`);
 }

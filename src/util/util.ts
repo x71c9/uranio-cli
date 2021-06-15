@@ -14,9 +14,18 @@ import {urn_util} from 'urn-lib';
 
 import * as output from '../log/';
 
-import {abstract_repos, valid_repos, Repo} from '../types';
+import {abstract_repos, valid_repos, Repo, Options, Conf} from '../types';
 
-import {jsonfile_path} from '../conf/defaults';
+import {conf, jsonfile_path} from '../conf/defaults';
+
+export function merge_options(options:Partial<Options>):void{
+	let k:keyof Conf;
+	for(k in conf){
+		if(urn_util.object.has_key(options,k)){
+			conf[k] = options[k] as typeof conf[typeof k];
+		}
+	}
+}
 
 export function read_rc_file()
 		:void{
@@ -26,22 +35,61 @@ export function read_rc_file()
 		output.error_log('init', err);
 		process.exit(1);
 	}else{
-		const rc_content = fs.readFileSync(jsonfile_path, 'utf8');
+		const rc_content = fs.readFileSync(`${conf.root}/${jsonfile_path}`, 'utf8');
 		const rc_obj = JSON.parse(rc_content);
 		set_repo(rc_obj.repo);
-		global.uranio.repo = rc_obj.repo;
+		conf.repo = rc_obj.repo;
 	}
 }
 
 export function is_initialized()
 		:boolean{
-	return (fs.existsSync(jsonfile_path));
+	return (fs.existsSync(`${conf.root}/${jsonfile_path}`));
 }
 
-export function set_repo(repo:unknown)
+export function check_folder(folder_path:string)
+		:boolean{
+	const data = fs.readdirSync(folder_path);
+	for(const file of data){
+		if(file === 'package.json'){
+			const content = fs.readFileSync(`${folder_path}/${file}`,'utf8');
+			const pack = JSON.parse(content);
+			if(pack.name === 'urn-cli'){
+				return false;
+			}else if(pack.name === 'uranio'){
+				const bld_path = `${folder_path}/urn-bld`;
+				if(!fs.existsSync(bld_path)){
+					return false;
+				}
+				conf.root = bld_path;
+				return true;
+			}
+			conf.root = folder_path;
+			return true;
+		}
+	}
+	return false;
+}
+
+export function auto_set_project_root()
 		:void{
-	if(urn_util.object.has_key(abstract_repos, repo as string)){
-		global.uranio.repo = repo as unknown as Repo;
+	output.start_loading('Getting project root...');
+	let folder_path = process.cwd();
+	while(!check_folder(folder_path)){
+		const arr_folder = folder_path.split('/');
+		arr_folder.pop();
+		folder_path = arr_folder.join('/');
+		if(folder_path === '/'){
+			throw new Error('Cannot find project root.');
+		}
+	}
+	output.done_verbose_log('root', `$URNROOT$Project root found [${conf.root}]`);
+}
+
+export function set_repo(repo:string)
+		:void{
+	if(check_repo(repo)){
+		conf.repo = repo as Repo;
 	}else{
 		const valid_repos_str = valid_repos().join(', ');
 		let end_log = '';
@@ -50,6 +98,11 @@ export function set_repo(repo:unknown)
 		output.wrong_end_log(end_log);
 		process.exit(1);
 	}
+}
+
+export function check_repo(repo:string)
+		:boolean{
+	return urn_util.object.has_key(abstract_repos, repo);
 }
 
 export function pretty(path:string, parser='typescript')
@@ -106,11 +159,14 @@ export function copy_folder(context:string, source:string, destination:string)
 
 export function relative_to_absolute_path(path:string)
 		:string{
+	if(path[path.length-1] === '/'){
+		path = path.substr(0,path.length-1);
+	}
 	if(path[0] !== '/'){
 		if(path.substr(0,2) === './'){
 			path = path.substr(2);
 		}
-		path = `${global.uranio.root}/${path}`;
+		path = `${conf.root}/${path}`;
 	}
 	return path;
 }

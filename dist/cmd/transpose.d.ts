@@ -3,6 +3,8 @@
  *
  * @packageDocumentation
  */
+import { Options } from '../types';
 export declare const transpose: {
-    run: () => Promise<void>;
+    run: (root: string, options: Partial<Options>) => Promise<void>;
+    command: () => Promise<void>;
 };

@@ -6,12 +6,13 @@
 	"types": "dist/index.d.ts",
 	"scripts": {
 		"build": "tsc -b",
-		"init": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js init -v\"",
-		"transpose": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js transpose -v\"",
-		"help": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js -h\"",
-		"test": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js test -vbf --noblank\"",
-		"version": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js -v\"",
-		"dev": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/index.js dev\""
+		"init": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js init -v\"",
+		"transpose": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js transpose -v\"",
+		"help": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -h\"",
+		"test": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js test -vbf --noblank\"",
+		"version": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v\"",
+		"dev": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js dev\"",
+		"run": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/test.js\""
 	},
 	"repository": {
 		"type": "git",

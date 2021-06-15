@@ -10,6 +10,8 @@ import * as cp from 'child_process';
 
 import {Arguments} from './types';
 
+import * as util from './util/';
+
 import {help, init, transpose, dev, test} from './cmd/';
 
 import {conf, defaults} from './conf/defaults';
@@ -19,13 +21,11 @@ import * as output from './log/';
 export function urn_process(args:Arguments)
 		:void{
 	
-	_init_global();
+	_set_conf(args);
 	
-	_read_options(args);
+	process.chdir(conf.root);
 	
 	_init_log();
-	
-	_get_project_root();
 	
 	_log_arguments(args);
 	
@@ -36,62 +36,42 @@ export function urn_process(args:Arguments)
 }
 
 function _init_log(){
-	if(!fs.existsSync(defaults.log_filepath)){
-		cp.execSync(`touch ${defaults.log_filepath}`);
+	if(!fs.existsSync(`${conf.root}/${defaults.log_filepath}`)){
+		cp.execSync(`touch ${conf.root}/${defaults.log_filepath}`);
 	}
-}
-
-function _init_global(){
-	global.uranio = {
-		root: '.',
-		repo: defaults.default_repo
-	};
-}
-
-function _check_folder(folder_path:string)
-		:boolean{
-	const data = fs.readdirSync(folder_path);
-	for(const file of data){
-		if(file === 'package.json'){
-			const content = fs.readFileSync(`${folder_path}/${file}`,'utf8');
-			const pack = JSON.parse(content);
-			if(pack.name === 'urn-cli'){
-				return false;
-			}else if(pack.name === 'uranio'){
-				const bld_path = `${folder_path}/urn-bld`;
-				if(!fs.existsSync(bld_path)){
-					return false;
-				}
-				global.uranio.root = bld_path;
-				return true;
-			}
-			global.uranio.root = folder_path;
-			return true;
-		}
-	}
-	return false;
-}
-
-function _get_project_root(){
-	output.start_loading('Getting project root...');
-	let folder_path = process.cwd();
-	while(!_check_folder(folder_path)){
-		const arr_folder = folder_path.split('/');
-		arr_folder.pop();
-		folder_path = arr_folder.join('/');
-		if(folder_path === '/'){
-			throw new Error('Cannot find project root.');
-		}
-	}
-	process.chdir(global.uranio.root);
-	output.done_verbose_log('root', `$URNROOT$Project root found [${global.uranio.root}]`);
 }
 
 function _log_arguments(args:Arguments){
 	output.verbose_log('args', JSON.stringify(args));
 }
 
-function _read_options(args:Arguments){
+function _set_conf(args:Arguments){
+	
+	const repo = args.r || args.repo;
+	
+	if(typeof undefined !== typeof repo){
+		util.set_repo(repo);
+	}
+	
+	let root = args.s || args.root;
+	
+	if(typeof undefined !== typeof root){
+		root = util.relative_to_absolute_path(root);
+		if(!util.check_folder(root)){
+			let end_log = '';
+			end_log += `Invalid project root.`;
+			output.wrong_end_log(end_log);
+			process.exit(1);
+		}else{
+			conf.root = root;
+		}
+	}else{
+		util.auto_set_project_root();
+	}
+	
+	if(typeof args.noverbose !== 'undefined' && !!args.noverbose !== !conf.verbose){
+		conf.verbose = !args.noverbose;
+	}
 	
 	const verbose = args.v || args.verbose;
 	
@@ -135,7 +115,7 @@ function _switch_command(args:Arguments){
 	
 	let cmd = args._[0] || '';
 	
-	if (args.version) {
+	if (args.version || args.V) {
 		cmd = 'version';
 	}
 	
@@ -151,23 +131,23 @@ function _switch_command(args:Arguments){
 			break;
 		}
 		case 'init':{
-			init.run(args);
+			init.command(args);
 			break;
 		}
 		case 'transpose':{
-			transpose.run();
+			transpose.command();
 			break;
 		}
 		case 'dev':{
-			dev.run();
+			dev.command();
 			break;
 		}
 		case 'help':{
-			help.run();
+			help.command();
 			break;
 		}
 		case 'test':{
-			test.run();
+			test.command();
 			break;
 		}
 		default:{

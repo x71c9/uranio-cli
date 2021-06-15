@@ -3,9 +3,14 @@
  *
  * @packageDocumentation
  */
+import { Options } from '../types';
+export declare function merge_options(options: Partial<Options>): void;
 export declare function read_rc_file(): void;
 export declare function is_initialized(): boolean;
-export declare function set_repo(repo: unknown): void;
+export declare function check_folder(folder_path: string): boolean;
+export declare function auto_set_project_root(): void;
+export declare function set_repo(repo: string): void;
+export declare function check_repo(repo: string): boolean;
 export declare function pretty(path: string, parser?: string): void;
 export declare function remove_folder_if_exists(context: string, folder_path: string): void;
 export declare function create_folder_if_doesnt_exists(context: string, folder_path: string): void;

@@ -147,7 +147,10 @@ function _replace_root_string(str) {
     if (str.indexOf('$URNROOT$') !== -1) {
         return str.replace('$URNROOT$', '');
     }
-    const regex = new RegExp(`${global.uranio.root}`, 'g');
+    if (defaults_1.conf.root == '.') {
+        return str;
+    }
+    const regex = new RegExp(`${defaults_1.conf.root}`, 'g');
     return str.replace(regex, 'ROOT');
 }
 //# sourceMappingURL=log.js.map

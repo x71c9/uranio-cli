@@ -4,5 +4,5 @@
  * @packageDocumentation
  */
 export declare const help: {
-    run: () => void;
+    command: () => void;
 };

@@ -4,5 +4,5 @@
  * @packageDocumentation
  */
 export declare const test: {
-    run: () => Promise<void>;
+    command: () => Promise<void>;
 };

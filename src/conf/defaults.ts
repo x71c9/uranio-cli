@@ -60,6 +60,10 @@ export const conf:Conf = {
 	
 	hide: false,
 	
-	fullwidth: false
+	fullwidth: false,
+	
+	root: '.',
+	
+	repo: defaults.default_repo
 	
 };

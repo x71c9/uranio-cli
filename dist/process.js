@@ -30,71 +30,51 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.urn_process = void 0;
 const fs_1 = __importDefault(require("fs"));
 const cp = __importStar(require("child_process"));
+const util = __importStar(require("./util/"));
 const cmd_1 = require("./cmd/");
 const defaults_1 = require("./conf/defaults");
 const output = __importStar(require("./log/"));
 function urn_process(args) {
-    _init_global();
-    _read_options(args);
+    _set_conf(args);
+    process.chdir(defaults_1.conf.root);
     _init_log();
-    _get_project_root();
     _log_arguments(args);
     _switch_command(args);
     // process.exit(1);
 }
 exports.urn_process = urn_process;
 function _init_log() {
-    if (!fs_1.default.existsSync(defaults_1.defaults.log_filepath)) {
-        cp.execSync(`touch ${defaults_1.defaults.log_filepath}`);
+    if (!fs_1.default.existsSync(`${defaults_1.conf.root}/${defaults_1.defaults.log_filepath}`)) {
+        cp.execSync(`touch ${defaults_1.conf.root}/${defaults_1.defaults.log_filepath}`);
     }
-}
-function _init_global() {
-    global.uranio = {
-        root: '.',
-        repo: defaults_1.defaults.default_repo
-    };
-}
-function _check_folder(folder_path) {
-    const data = fs_1.default.readdirSync(folder_path);
-    for (const file of data) {
-        if (file === 'package.json') {
-            const content = fs_1.default.readFileSync(`${folder_path}/${file}`, 'utf8');
-            const pack = JSON.parse(content);
-            if (pack.name === 'urn-cli') {
-                return false;
-            }
-            else if (pack.name === 'uranio') {
-                const bld_path = `${folder_path}/urn-bld`;
-                if (!fs_1.default.existsSync(bld_path)) {
-                    return false;
-                }
-                global.uranio.root = bld_path;
-                return true;
-            }
-            global.uranio.root = folder_path;
-            return true;
-        }
-    }
-    return false;
-}
-function _get_project_root() {
-    output.start_loading('Getting project root...');
-    let folder_path = process.cwd();
-    while (!_check_folder(folder_path)) {
-        const arr_folder = folder_path.split('/');
-        arr_folder.pop();
-        folder_path = arr_folder.join('/');
-        if (folder_path === '/') {
-            throw new Error('Cannot find project root.');
-        }
-    }
-    process.chdir(global.uranio.root);
-    output.done_verbose_log('root', `$URNROOT$Project root found [${global.uranio.root}]`);
 }
 function _log_arguments(args) {
     output.verbose_log('args', JSON.stringify(args));
 }
-function _read_options(args) {
+function _set_conf(args) {
+    const repo = args.r || args.repo;
+    if (typeof undefined !== typeof repo) {
+        util.set_repo(repo);
+    }
+    let root = args.s || args.root;
+    if (typeof undefined !== typeof root) {
+        root = util.relative_to_absolute_path(root);
+        if (!util.check_folder(root)) {
+            let end_log = '';
+            end_log += `Invalid project root.`;
+            output.wrong_end_log(end_log);
+            process.exit(1);
+        }
+        else {
+            defaults_1.conf.root = root;
+        }
+    }
+    else {
+        util.auto_set_project_root();
+    }
+    if (typeof args.noverbose !== 'undefined' && !!args.noverbose !== !defaults_1.conf.verbose) {
+        defaults_1.conf.verbose = !args.noverbose;
+    }
     const verbose = args.v || args.verbose;
     if (verbose == true) {
         defaults_1.conf.verbose = true;
@@ -126,7 +106,7 @@ function _read_options(args) {
 }
 function _switch_command(args) {
     let cmd = args._[0] || '';
-    if (args.version) {
+    if (args.version || args.V) {
         cmd = 'version';
     }
     if (args.help || args.h) {
@@ -140,23 +120,23 @@ function _switch_command(args) {
             break;
         }
         case 'init': {
-            cmd_1.init.run(args);
+            cmd_1.init.command(args);
             break;
         }
         case 'transpose': {
-            cmd_1.transpose.run();
+            cmd_1.transpose.command();
             break;
         }
         case 'dev': {
-            cmd_1.dev.run();
+            cmd_1.dev.command();
             break;
         }
         case 'help': {
-            cmd_1.help.run();
+            cmd_1.help.command();
             break;
         }
         case 'test': {
-            cmd_1.test.run();
+            cmd_1.test.command();
             break;
         }
         default: {

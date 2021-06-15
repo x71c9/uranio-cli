@@ -33,6 +33,8 @@ exports.conf = {
     verbose: false,
     blank: false,
     hide: false,
-    fullwidth: false
+    fullwidth: false,
+    root: '.',
+    repo: exports.defaults.default_repo
 };
 //# sourceMappingURL=defaults.js.map

@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.pretty = exports.set_repo = exports.is_initialized = exports.read_rc_file = void 0;
+exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.pretty = exports.check_repo = exports.set_repo = exports.auto_set_project_root = exports.check_folder = exports.is_initialized = exports.read_rc_file = exports.merge_options = void 0;
 const fs_1 = __importDefault(require("fs"));
 const cp = __importStar(require("child_process"));
 const prettier_1 = __importDefault(require("prettier"));
@@ -44,6 +44,15 @@ const urn_lib_1 = require("urn-lib");
 const output = __importStar(require("../log/"));
 const types_1 = require("../types");
 const defaults_1 = require("../conf/defaults");
+function merge_options(options) {
+    let k;
+    for (k in defaults_1.conf) {
+        if (urn_lib_1.urn_util.object.has_key(options, k)) {
+            defaults_1.conf[k] = options[k];
+        }
+    }
+}
+exports.merge_options = merge_options;
 function read_rc_file() {
     if (!is_initialized()) {
         let err = `URANIO was not initialized yet.`;
@@ -52,20 +61,58 @@ function read_rc_file() {
         process.exit(1);
     }
     else {
-        const rc_content = fs_1.default.readFileSync(defaults_1.jsonfile_path, 'utf8');
+        const rc_content = fs_1.default.readFileSync(`${defaults_1.conf.root}/${defaults_1.jsonfile_path}`, 'utf8');
         const rc_obj = JSON.parse(rc_content);
         set_repo(rc_obj.repo);
-        global.uranio.repo = rc_obj.repo;
+        defaults_1.conf.repo = rc_obj.repo;
     }
 }
 exports.read_rc_file = read_rc_file;
 function is_initialized() {
-    return (fs_1.default.existsSync(defaults_1.jsonfile_path));
+    return (fs_1.default.existsSync(`${defaults_1.conf.root}/${defaults_1.jsonfile_path}`));
 }
 exports.is_initialized = is_initialized;
+function check_folder(folder_path) {
+    const data = fs_1.default.readdirSync(folder_path);
+    for (const file of data) {
+        if (file === 'package.json') {
+            const content = fs_1.default.readFileSync(`${folder_path}/${file}`, 'utf8');
+            const pack = JSON.parse(content);
+            if (pack.name === 'urn-cli') {
+                return false;
+            }
+            else if (pack.name === 'uranio') {
+                const bld_path = `${folder_path}/urn-bld`;
+                if (!fs_1.default.existsSync(bld_path)) {
+                    return false;
+                }
+                defaults_1.conf.root = bld_path;
+                return true;
+            }
+            defaults_1.conf.root = folder_path;
+            return true;
+        }
+    }
+    return false;
+}
+exports.check_folder = check_folder;
+function auto_set_project_root() {
+    output.start_loading('Getting project root...');
+    let folder_path = process.cwd();
+    while (!check_folder(folder_path)) {
+        const arr_folder = folder_path.split('/');
+        arr_folder.pop();
+        folder_path = arr_folder.join('/');
+        if (folder_path === '/') {
+            throw new Error('Cannot find project root.');
+        }
+    }
+    output.done_verbose_log('root', `$URNROOT$Project root found [${defaults_1.conf.root}]`);
+}
+exports.auto_set_project_root = auto_set_project_root;
 function set_repo(repo) {
-    if (urn_lib_1.urn_util.object.has_key(types_1.abstract_repos, repo)) {
-        global.uranio.repo = repo;
+    if (check_repo(repo)) {
+        defaults_1.conf.repo = repo;
     }
     else {
         const valid_repos_str = types_1.valid_repos().join(', ');
@@ -77,6 +124,10 @@ function set_repo(repo) {
     }
 }
 exports.set_repo = set_repo;
+function check_repo(repo) {
+    return urn_lib_1.urn_util.object.has_key(types_1.abstract_repos, repo);
+}
+exports.check_repo = check_repo;
 function pretty(path, parser = 'typescript') {
     output.start_loading(`Prettier [${path}]...`);
     const content = fs_1.default.readFileSync(path, 'utf8');
@@ -121,11 +172,14 @@ function copy_folder(context, source, destination) {
 }
 exports.copy_folder = copy_folder;
 function relative_to_absolute_path(path) {
+    if (path[path.length - 1] === '/') {
+        path = path.substr(0, path.length - 1);
+    }
     if (path[0] !== '/') {
         if (path.substr(0, 2) === './') {
             path = path.substr(2);
         }
-        path = `${global.uranio.root}/${path}`;
+        path = `${defaults_1.conf.root}/${path}`;
     }
     return path;
 }

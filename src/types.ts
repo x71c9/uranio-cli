@@ -27,9 +27,14 @@ export function valid_repos()
 
 export type Repo = keyof typeof abstract_repos;
 
-export type Conf = {
+export type Options = {
 	verbose: boolean,
 	blank: boolean,
 	hide: boolean,
 	fullwidth: boolean
+}
+
+export type Conf = Options & {
+	root: string,
+	repo: Repo
 }
