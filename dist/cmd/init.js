@@ -141,18 +141,6 @@ function _proceed_with_repo(repo) {
         console.clear();
         title_1.title();
         yield _initialize(defaults_1.conf.root, defaults_1.conf.repo);
-        // output.verbose_log('root', `$URNROOT$Project root: [${conf.root}]`);
-        // output.verbose_log('repo', `Selected repo: [${conf.repo}]`);
-        // output.start_loading('Initialization...');
-        // _update_aliases();
-        // _create_urn_folder();
-        // _ignore_urn_folder();
-        // _create_json_file();
-        // await _clone_dot();
-        // _copy_dot_files();
-        // await _clone_and_install_repo();
-        // _remove_tmp();
-        // output.end_log(`Initialization completed.`);
     });
 }
 function _ignore_urn_folder() {
