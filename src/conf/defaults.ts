@@ -60,6 +60,8 @@ export const conf:Conf = {
 	
 	hide: false,
 	
+	spinner: true,
+	
 	fullwidth: false,
 	
 	root: '.',

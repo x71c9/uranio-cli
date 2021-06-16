@@ -33,6 +33,7 @@ exports.conf = {
     verbose: false,
     blank: false,
     hide: false,
+    spinner: true,
     fullwidth: false,
     root: '.',
     repo: exports.defaults.default_repo

@@ -48,6 +48,7 @@ exports.transpose = {
             throw new Error(`Invalid root path [${root}].`);
         }
         defaults_1.conf.hide = true;
+        defaults_1.conf.spinner = false;
         if (options) {
             util.merge_options(options);
         }
@@ -56,26 +57,40 @@ exports.transpose = {
     command: () => __awaiter(void 0, void 0, void 0, function* () {
         output.start_loading('Transposing...');
         util.read_rc_file();
-        const modified = _manipulate_file();
+        const tmp_book_folder = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/.tmp`;
+        util.create_folder_if_doesnt_exists('tmp', tmp_book_folder);
+        util.copy_file('bkp', `${defaults_1.conf.root}/src/book.ts`, `${tmp_book_folder}/book.ts`);
+        const modified = _manipulate_file(`${tmp_book_folder}/book.ts`);
         _copy_manipulated_file(modified);
         _pretty_books();
+        util.remove_folder_if_exists('tmp', tmp_book_folder);
         output.end_log(`Transpose completed.`);
     })
 };
-const _project = new ts_morph_1.Project({
+const _project_option = {
     manipulationSettings: {
         indentationText: ts_morph_1.IndentationText.Tab,
         quoteKind: ts_morph_1.QuoteKind.Single,
     }
-});
+};
+// const _project = new Project(
+//   {
+//     manipulationSettings: {
+//       indentationText: IndentationText.Tab,
+//       quoteKind: QuoteKind.Single,
+//     }
+//   }
+// );
 function _pretty_books() {
     util.pretty(`${defaults_1.conf.root}/${defaults_1.defaults.folder}/books.ts`);
 }
-function _manipulate_file() {
+function _manipulate_file(filepath) {
     const action = `manipulating [src/book.ts]`;
     output.start_loading(`${action[0].toUpperCase()}${action.substr(1)}...`);
     output.verbose_log(`mnpl`, `Started ${action}.`);
-    let sourceFile = _project.addSourceFileAtPath(`${defaults_1.conf.root}/src/book.ts`);
+    // let sourceFile = _project.addSourceFileAtPath(`${conf.root}/src/book.ts`);
+    const _project = new ts_morph_1.Project(_project_option);
+    let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
     sourceFile = _replace_comments(sourceFile);
     sourceFile = _change_realtive_imports(sourceFile);
     sourceFile = _create_bll_book(sourceFile);
@@ -120,6 +135,7 @@ function _create_a_book(sourceFile, book_name, keep_property, required_book_name
     const book_state = _find_atom_book_statement(sourceFile);
     if (book_state) {
         const atom_book_state_text = book_state.getText();
+        const _project = new ts_morph_1.Project(_project_option);
         const cloned_book_source = _project.createSourceFile(`${defaults_1.conf.root}/${defaults_1.defaults.folder}/${book_name}_book.ts`, atom_book_state_text, { overwrite: true });
         let cloned_book_decl = cloned_book_source
             .getFirstDescendantByKind(ts_morph_1.ts.SyntaxKind.VariableDeclaration);
@@ -208,6 +224,7 @@ function _get_variable_content(source, variable_name) {
 }
 function _add_book_from_file(book_decl, required_book_name, books_file_path) {
     const book_content = fs_1.default.readFileSync(books_file_path, 'utf8');
+    const _project = new ts_morph_1.Project(_project_option);
     const core_books_source = _project.createSourceFile(`${defaults_1.conf.root}/${defaults_1.defaults.folder}/cloned_${required_book_name}.ts`, book_content, { overwrite: true });
     const core_var_content = _get_variable_content(core_books_source, required_book_name);
     const syntax_list = book_decl.getFirstDescendantByKind(ts_morph_1.ts.SyntaxKind.SyntaxList);

@@ -31,6 +31,7 @@ export type Options = {
 	verbose: boolean,
 	blank: boolean,
 	hide: boolean,
+	spinner: boolean,
 	fullwidth: boolean
 }
 

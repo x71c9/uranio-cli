@@ -35,7 +35,7 @@ export function start_loading(text:string)
 	}
 	spinner_texts.push(text);
 	spinner_text(text);
-	if(!spinner.isSpinning){
+	if(conf.spinner === true && !spinner.isSpinning){
 		spinner.start();
 	}
 }
@@ -111,7 +111,7 @@ function _log(context:string, text:string, out=false){
 		if(conf.hide === false){
 			process.stdout.write(output_text);
 		}
-		if(was_spinning){
+		if(conf.spinner === true && was_spinning){
 			spinner.start();
 		}
 	}
@@ -127,7 +127,6 @@ function _format_text(context:string, text:string)
 	}else if(context.length > 4){
 		context = context.substr(0,4);
 	}
-	
 	text = _replace_root_string(text);
 	
 	context = `[${context}]`;
