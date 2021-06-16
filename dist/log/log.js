@@ -23,6 +23,9 @@ function _spinner_text_color(text) {
 const spinner = ora_1.default({ text: 'Loading...', color: 'magenta', interval: 40 });
 const spinner_texts = [];
 function start_loading(text) {
+    if (defaults_1.conf.hide === true) {
+        return;
+    }
     if (defaults_1.conf.blank === true) {
         spinner.color = 'white';
     }
