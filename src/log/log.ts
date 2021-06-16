@@ -27,6 +27,9 @@ const spinner_texts:string[] = [];
 
 export function start_loading(text:string)
 		:void{
+	if(conf.hide === true){
+		return;
+	}
 	if(conf.blank === true){
 		spinner.color = 'white';
 	}

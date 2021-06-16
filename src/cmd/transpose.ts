@@ -27,7 +27,7 @@ import * as util from '../util/';
 
 export const transpose = {
 	
-	run: async (root:string, options:Partial<Options>):Promise<void> => {
+	run: async (root:string, options?:Partial<Options>):Promise<void> => {
 		
 		if(!util.check_folder(root)){
 			throw new Error(`Invalid root path [${root}].`);
