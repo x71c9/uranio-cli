@@ -31,7 +31,7 @@ function start_loading(text) {
     }
     spinner_texts.push(text);
     spinner_text(text);
-    if (!spinner.isSpinning) {
+    if (defaults_1.conf.spinner === true && !spinner.isSpinning) {
         spinner.start();
     }
 }
@@ -97,7 +97,7 @@ function _log(context, text, out = false) {
         if (defaults_1.conf.hide === false) {
             process.stdout.write(output_text);
         }
-        if (was_spinning) {
+        if (defaults_1.conf.spinner === true && was_spinning) {
             spinner.start();
         }
     }

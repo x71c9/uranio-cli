@@ -17,6 +17,7 @@ export declare type Options = {
     verbose: boolean;
     blank: boolean;
     hide: boolean;
+    spinner: boolean;
     fullwidth: boolean;
 };
 export declare type Conf = Options & {

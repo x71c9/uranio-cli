@@ -23,6 +23,7 @@ export const init = {
 	run: async (root:string, repo:Repo, options:Partial<Options>):Promise<void> => {
 		
 		conf.hide = true;
+		conf.spinner = false;
 		
 		if(options){
 			util.merge_options(options);

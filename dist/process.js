@@ -52,26 +52,6 @@ function _log_arguments(args) {
     output.verbose_log('args', JSON.stringify(args));
 }
 function _set_conf(args) {
-    const repo = args.r || args.repo;
-    if (typeof undefined !== typeof repo) {
-        util.set_repo(repo);
-    }
-    let root = args.s || args.root;
-    if (typeof undefined !== typeof root) {
-        root = util.relative_to_absolute_path(root);
-        if (!util.check_folder(root)) {
-            let end_log = '';
-            end_log += `Invalid project root.`;
-            output.wrong_end_log(end_log);
-            process.exit(1);
-        }
-        else {
-            defaults_1.conf.root = root;
-        }
-    }
-    else {
-        util.auto_set_project_root();
-    }
     if (typeof args.noverbose !== 'undefined' && !!args.noverbose !== !defaults_1.conf.verbose) {
         defaults_1.conf.verbose = !args.noverbose;
     }
@@ -102,6 +82,27 @@ function _set_conf(args) {
     }
     if (typeof args.nofullwidth !== 'undefined' && !!args.nofullwidth !== !defaults_1.conf.fullwidth) {
         defaults_1.conf.fullwidth = !args.nofullwidth;
+    }
+    const repo = args.r || args.repo;
+    if (typeof undefined !== typeof repo) {
+        util.set_repo(repo);
+    }
+    let root = args.s || args.root;
+    if (typeof undefined !== typeof root) {
+        root = util.relative_to_absolute_path(root);
+        if (!util.check_folder(root)) {
+            let end_log = '';
+            end_log += `Invalid project root.`;
+            output.wrong_end_log(end_log);
+            process.exit(1);
+        }
+        else {
+            defaults_1.conf.root = root;
+            output.done_verbose_log('root', `$URNROOT$Project root set to [${defaults_1.conf.root}]`);
+        }
+    }
+    else {
+        util.auto_set_project_root();
     }
 }
 function _switch_command(args) {

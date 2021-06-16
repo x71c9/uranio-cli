@@ -47,6 +47,7 @@ const title_1 = require("./title");
 exports.init = {
     run: (root, repo, options) => __awaiter(void 0, void 0, void 0, function* () {
         defaults_1.conf.hide = true;
+        defaults_1.conf.spinner = false;
         if (options) {
             util.merge_options(options);
         }

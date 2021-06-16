@@ -34,6 +34,7 @@ export const transpose = {
 		}
 		
 		conf.hide = true;
+		conf.spinner = false;
 		
 		if(options){
 			util.merge_options(options);
@@ -49,11 +50,23 @@ export const transpose = {
 		
 		util.read_rc_file();
 		
-		const modified = _manipulate_file();
+		const tmp_book_folder = `${conf.root}/${defaults.folder}/.tmp`;
+		
+		util.create_folder_if_doesnt_exists('tmp', tmp_book_folder);
+		
+		util.copy_file(
+			'bkp',
+			`${conf.root}/src/book.ts`,
+			`${tmp_book_folder}/book.ts`
+		);
+		
+		const modified = _manipulate_file(`${tmp_book_folder}/book.ts`);
 		
 		_copy_manipulated_file(modified);
 		
 		_pretty_books();
+		
+		util.remove_folder_if_exists('tmp', tmp_book_folder);
 		
 		output.end_log(`Transpose completed.`);
 		
@@ -61,20 +74,27 @@ export const transpose = {
 	
 };
 
-const _project = new Project(
-	{
-		manipulationSettings: {
-			indentationText: IndentationText.Tab,
-			quoteKind: QuoteKind.Single,
-		}
+const _project_option = {
+	manipulationSettings: {
+		indentationText: IndentationText.Tab,
+		quoteKind: QuoteKind.Single,
 	}
-);
+};
+
+// const _project = new Project(
+//   {
+//     manipulationSettings: {
+//       indentationText: IndentationText.Tab,
+//       quoteKind: QuoteKind.Single,
+//     }
+//   }
+// );
 
 function _pretty_books(){
 	util.pretty(`${conf.root}/${defaults.folder}/books.ts`);
 }
 
-function _manipulate_file(){
+function _manipulate_file(filepath:string){
 	
 	const action = `manipulating [src/book.ts]`;
 	
@@ -82,7 +102,11 @@ function _manipulate_file(){
 	
 	output.verbose_log(`mnpl`, `Started ${action}.`);
 	
-	let sourceFile = _project.addSourceFileAtPath(`${conf.root}/src/book.ts`);
+	// let sourceFile = _project.addSourceFileAtPath(`${conf.root}/src/book.ts`);
+	
+	const _project = new Project(_project_option);
+	
+	let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
 	
 	sourceFile = _replace_comments(sourceFile);
 	sourceFile = _change_realtive_imports(sourceFile);
@@ -142,6 +166,9 @@ function _create_a_book(
 	const book_state = _find_atom_book_statement(sourceFile);
 	if(book_state){
 		const atom_book_state_text = book_state.getText();
+		
+		const _project = new Project(_project_option);
+		
 		const cloned_book_source = _project.createSourceFile(
 			`${conf.root}/${defaults.folder}/${book_name}_book.ts`,
 			atom_book_state_text,
@@ -251,6 +278,9 @@ function _add_book_from_file(
 	books_file_path:string
 ){
 	const book_content = fs.readFileSync(books_file_path, 'utf8');
+	
+	const _project = new Project(_project_option);
+	
 	const core_books_source = _project.createSourceFile(
 		`${conf.root}/${defaults.folder}/cloned_${required_book_name}.ts`,
 		book_content,
