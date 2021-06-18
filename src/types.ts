@@ -32,10 +32,13 @@ export type Options = {
 	blank: boolean,
 	hide: boolean,
 	spinner: boolean,
-	fullwidth: boolean
-}
-
-export type Conf = Options & {
+	fullwidth: boolean,
+	prefix: string
 	root: string,
 	repo: Repo
 }
+
+// export type Conf = Options & {
+// root: string,
+// repo: Repo
+// }

@@ -33,6 +33,7 @@ export const help = {
 		console.log(`  -n --hide .......... do not output log.`);
 		console.log(`  -b --blank ......... log with no colors.`);
 		console.log(`  -f --fullwidth ..... log in full width.`);
+		console.log(`  -p --prefix ........ set a log prefix.`);
 		
 		console.log(``);
 		console.log(``);

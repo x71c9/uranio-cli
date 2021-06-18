@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import {Conf} from '../types';
+import {Options} from '../types';
 
 const cloud_address = 'ssh://git@bitbucket.org/nbl7/';
 
@@ -52,7 +52,7 @@ export const defaults = {
 
 export const jsonfile_path = `${defaults.folder}/${defaults.json_filename}`;
 
-export const conf:Conf = {
+export const conf:Options = {
 	
 	verbose: false,
 	
@@ -66,6 +66,8 @@ export const conf:Conf = {
 	
 	root: '.',
 	
-	repo: defaults.default_repo
+	repo: defaults.default_repo,
+	
+	prefix: ''
 	
 };

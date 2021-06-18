@@ -14,15 +14,15 @@ import {urn_util} from 'urn-lib';
 
 import * as output from '../log/';
 
-import {abstract_repos, valid_repos, Repo, Options, Conf} from '../types';
+import {abstract_repos, valid_repos, Repo, Options} from '../types';
 
 import {conf, jsonfile_path} from '../conf/defaults';
 
 export function merge_options(options:Partial<Options>):void{
-	let k:keyof Conf;
+	let k:keyof Options;
 	for(k in conf){
-		if(urn_util.object.has_key(options,k)){
-			conf[k] = options[k] as typeof conf[typeof k];
+		if(typeof k !== typeof undefined && urn_util.object.has_key(options,k)){
+			(conf as any)[k] = options[k]; // TODO FIX THIS
 		}
 	}
 }
