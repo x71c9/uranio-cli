@@ -36,6 +36,7 @@ exports.conf = {
     spinner: true,
     fullwidth: false,
     root: '.',
-    repo: exports.defaults.default_repo
+    repo: exports.defaults.default_repo,
+    prefix: ''
 };
 //# sourceMappingURL=defaults.js.map

@@ -111,14 +111,16 @@ function _format_text(context, text) {
         context = context.substr(0, 4);
     }
     text = _replace_root_string(text);
+    const prefix = defaults_1.conf.prefix;
     context = `[${context}]`;
     time = `[${time}]`;
     let text_lenght = 0;
     text_lenght += context.length;
     text_lenght += text.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '').length; // eslint-disable-line no-control-regex
     text_lenght += time.length;
+    text_lenght += prefix.length;
     text_lenght += 4;
-    let output_text = '';
+    let output_text = prefix;
     let dot = '.';
     if (defaults_1.conf.blank === false) {
         context = chalk_1.default.grey(context);
