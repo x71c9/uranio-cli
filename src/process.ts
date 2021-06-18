@@ -47,7 +47,7 @@ function _log_arguments(args:Arguments){
 
 function _set_conf(args:Arguments){
 	
-	if(typeof args.noverbose !== 'undefined' && !!args.noverbose !== !conf.verbose){
+	if(typeof args.noverbose === 'boolean' && !!args.noverbose !== !conf.verbose){
 		conf.verbose = !args.noverbose;
 	}
 	
@@ -56,7 +56,7 @@ function _set_conf(args:Arguments){
 	if(verbose == true){
 		conf.verbose = true;
 	}
-	if(typeof args.noverbose !== 'undefined' && !!args.noverbose !== !conf.verbose){
+	if(typeof args.noverbose === 'boolean' && !!args.noverbose !== !conf.verbose){
 		conf.verbose = !args.noverbose;
 	}
 	
@@ -65,7 +65,7 @@ function _set_conf(args:Arguments){
 	if(hide == true){
 		conf.hide = true;
 	}
-	if(typeof args.nohide !== 'undefined' && !!args.nohide !== !conf.hide){
+	if(typeof args.nohide === 'boolean' && !!args.nohide !== !conf.hide){
 		conf.hide = !args.nohide;
 	}
 	
@@ -74,7 +74,7 @@ function _set_conf(args:Arguments){
 	if(blank == true){
 		conf.blank = true;
 	}
-	if(typeof args.noblank !== 'undefined' && !!args.noblank !== !conf.blank){
+	if(typeof args.noblank === 'boolean' && !!args.noblank !== !conf.blank){
 		conf.blank = !args.noblank;
 	}
 	
@@ -83,19 +83,25 @@ function _set_conf(args:Arguments){
 	if(fullwidth == true){
 		conf.fullwidth = true;
 	}
-	if(typeof args.nofullwidth !== 'undefined' && !!args.nofullwidth !== !conf.fullwidth){
+	if(typeof args.nofullwidth === 'boolean' && !!args.nofullwidth !== !conf.fullwidth){
 		conf.fullwidth = !args.nofullwidth;
+	}
+	
+	const prefix = args.p || args.prefix;
+	
+	if(typeof prefix === 'string' && prefix !== ''){
+		conf.prefix = prefix;
 	}
 	
 	const repo = args.r || args.repo;
 	
-	if(typeof undefined !== typeof repo){
+	if(typeof repo === 'string' && repo != ''){
 		util.set_repo(repo);
 	}
 	
 	let root = args.s || args.root;
 	
-	if(typeof undefined !== typeof root){
+	if(typeof root === 'string' && root !== ''){
 		root = util.relative_to_absolute_path(root);
 		if(!util.check_folder(root)){
 			let end_log = '';
