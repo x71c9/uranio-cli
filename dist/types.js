@@ -19,4 +19,8 @@ function valid_repos() {
     return vals;
 }
 exports.valid_repos = valid_repos;
+// export type Conf = Options & {
+// root: string,
+// repo: Repo
+// }
 //# sourceMappingURL=types.js.map

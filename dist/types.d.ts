@@ -19,8 +19,7 @@ export declare type Options = {
     hide: boolean;
     spinner: boolean;
     fullwidth: boolean;
-};
-export declare type Conf = Options & {
+    prefix: string;
     root: string;
     repo: Repo;
 };

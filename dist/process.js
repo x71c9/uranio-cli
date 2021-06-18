@@ -52,43 +52,47 @@ function _log_arguments(args) {
     output.verbose_log('args', JSON.stringify(args));
 }
 function _set_conf(args) {
-    if (typeof args.noverbose !== 'undefined' && !!args.noverbose !== !defaults_1.conf.verbose) {
+    if (typeof args.noverbose === 'boolean' && !!args.noverbose !== !defaults_1.conf.verbose) {
         defaults_1.conf.verbose = !args.noverbose;
     }
     const verbose = args.v || args.verbose;
     if (verbose == true) {
         defaults_1.conf.verbose = true;
     }
-    if (typeof args.noverbose !== 'undefined' && !!args.noverbose !== !defaults_1.conf.verbose) {
+    if (typeof args.noverbose === 'boolean' && !!args.noverbose !== !defaults_1.conf.verbose) {
         defaults_1.conf.verbose = !args.noverbose;
     }
     const hide = args.n || args.hide;
     if (hide == true) {
         defaults_1.conf.hide = true;
     }
-    if (typeof args.nohide !== 'undefined' && !!args.nohide !== !defaults_1.conf.hide) {
+    if (typeof args.nohide === 'boolean' && !!args.nohide !== !defaults_1.conf.hide) {
         defaults_1.conf.hide = !args.nohide;
     }
     const blank = args.b || args.blank;
     if (blank == true) {
         defaults_1.conf.blank = true;
     }
-    if (typeof args.noblank !== 'undefined' && !!args.noblank !== !defaults_1.conf.blank) {
+    if (typeof args.noblank === 'boolean' && !!args.noblank !== !defaults_1.conf.blank) {
         defaults_1.conf.blank = !args.noblank;
     }
     const fullwidth = args.f || args.fullwidth;
     if (fullwidth == true) {
         defaults_1.conf.fullwidth = true;
     }
-    if (typeof args.nofullwidth !== 'undefined' && !!args.nofullwidth !== !defaults_1.conf.fullwidth) {
+    if (typeof args.nofullwidth === 'boolean' && !!args.nofullwidth !== !defaults_1.conf.fullwidth) {
         defaults_1.conf.fullwidth = !args.nofullwidth;
     }
+    const prefix = args.p || args.prefix;
+    if (typeof prefix === 'string' && prefix !== '') {
+        defaults_1.conf.prefix = prefix;
+    }
     const repo = args.r || args.repo;
-    if (typeof undefined !== typeof repo) {
+    if (typeof repo === 'string' && repo != '') {
         util.set_repo(repo);
     }
     let root = args.s || args.root;
-    if (typeof undefined !== typeof root) {
+    if (typeof root === 'string' && root !== '') {
         root = util.relative_to_absolute_path(root);
         if (!util.check_folder(root)) {
             let end_log = '';

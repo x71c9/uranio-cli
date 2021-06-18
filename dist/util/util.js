@@ -47,8 +47,8 @@ const defaults_1 = require("../conf/defaults");
 function merge_options(options) {
     let k;
     for (k in defaults_1.conf) {
-        if (urn_lib_1.urn_util.object.has_key(options, k)) {
-            defaults_1.conf[k] = options[k];
+        if (typeof k !== typeof undefined && urn_lib_1.urn_util.object.has_key(options, k)) {
+            defaults_1.conf[k] = options[k]; // TODO FIX THIS
         }
     }
 }
