@@ -14,7 +14,14 @@ import {urn_util} from 'urn-lib';
 
 import * as output from '../log/';
 
-import {abstract_repos, valid_repos, Repo, Options} from '../types';
+import {
+	abstract_repos,
+	valid_repos,
+	Repo,
+	abstract_pacman,
+	valid_pacman,
+	PacMan,
+	Options} from '../types';
 
 import {conf, jsonfile_path} from '../conf/defaults';
 
@@ -100,9 +107,28 @@ export function set_repo(repo:string)
 	}
 }
 
+export function set_pacman(pacman:string)
+		:void{
+	if(check_pacman(pacman)){
+		conf.pacman = pacman as PacMan;
+	}else{
+		const valid_pacman_str = valid_pacman().join(', ');
+		let end_log = '';
+		end_log += `Wrong package manager. `;
+		end_log += `Package manager must be one of the following [${valid_pacman_str}]`;
+		output.wrong_end_log(end_log);
+		process.exit(1);
+	}
+}
+
 export function check_repo(repo:string)
 		:boolean{
 	return urn_util.object.has_key(abstract_repos, repo);
+}
+
+export function check_pacman(pacman:string)
+		:boolean{
+	return urn_util.object.has_key(abstract_pacman, pacman);
 }
 
 export function pretty(path:string, parser='typescript')
@@ -232,7 +258,7 @@ export async function install_dep(repo:string, context:string)
 	const action = `installing dependencies [${repo}]`;
 	output.verbose_log(context, `Started ${action}`);
 	return new Promise((resolve, reject) => {
-		spawn_cmd(`npm i ${repo} --verbose`, context, action, resolve, reject);
+		spawn_cmd(_pacman_commands.install[conf.pacman](repo), context, action, resolve, reject);
 	});
 }
 
@@ -241,7 +267,7 @@ export async function install_dep_dev(repo:string, context:string)
 	const action = `installing dev dependencies [${repo}]`;
 	output.verbose_log(context, `Started ${action}`);
 	return new Promise((resolve, reject) => {
-		spawn_cmd(`npm i ${repo} --save-dev --verbose`, context, action, resolve, reject);
+		spawn_cmd(_pacman_commands.install_dev[conf.pacman](repo), context, action, resolve, reject);
 	});
 }
 
@@ -250,7 +276,7 @@ export async function uninstall_dep(repo:string, context:string)
 	const action = `uninstalling dependencies [${repo}]`;
 	output.verbose_log(context, `Started ${action}`);
 	return new Promise((resolve, reject) => {
-		spawn_cmd(`npm uninstall ${repo} --verbose`, context, action, resolve, reject);
+		spawn_cmd(_pacman_commands.uninstall[conf.pacman](repo), context, action, resolve, reject);
 	});
 }
 
@@ -274,3 +300,42 @@ async function _clone_repo(context: string, address:string, dest_folder:string, 
 		spawn_cmd(cmd, context, action, resolve, reject);
 	});
 }
+
+export function dependency_exists(repo:string)
+		:boolean{
+	const data = fs.readFileSync(`${conf.root}/package.json`, 'utf8');
+	const package_data = JSON.parse(data);
+	return (
+		typeof package_data['dependencies'][repo] === 'string' ||
+		typeof package_data['devDependencies'][repo] === 'string'
+	);
+}
+
+const _pacman_commands = {
+	install: {
+		npm(repo:string){
+			return `npm i ${repo} --verbose`;
+		},
+		yarn(repo:string){
+			return `yarn add ${repo} --verbose`;
+		}
+	},
+	install_dev: {
+		npm(repo:string){
+			return `npm i --save-dev ${repo} --verbose`;
+		},
+		yarn(repo:string){
+			return `yarn add --dev ${repo} --verbose`;
+		}
+	},
+	uninstall: {
+		npm(repo:string){
+			return `npm uninstall ${repo} --verbose`;
+		},
+		yarn(repo:string){
+			return `yarn remove ${repo} --verbose`;
+		}
+	}
+};
+
+

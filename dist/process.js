@@ -87,6 +87,10 @@ function _set_conf(args) {
     if (typeof prefix === 'string' && prefix !== '') {
         defaults_1.conf.prefix = prefix;
     }
+    const pacman = args.pacman;
+    if (typeof pacman === 'string' && pacman != '') {
+        util.set_pacman(pacman);
+    }
     const repo = args.r || args.repo;
     if (typeof repo === 'string' && repo != '') {
         util.set_repo(repo);

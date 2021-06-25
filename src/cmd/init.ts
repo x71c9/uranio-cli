@@ -8,7 +8,13 @@ import fs from 'fs';
 
 import inquirer from 'inquirer';
 
-import {Arguments, Repo, Options, abstract_repos} from '../types';
+import {
+	Arguments,
+	Repo,
+	Options,
+	abstract_repos,
+	abstract_pacman
+} from '../types';
 
 import {conf, defaults, jsonfile_path} from '../conf/defaults';
 
@@ -60,7 +66,7 @@ export const init = {
 				]).then(async (answer) => {
 					if(answer.proceed && answer.proceed === true){
 						
-						await _select_repo(args);
+						await _select_pacman(args);
 					
 					}else{
 						process.exit(0);
@@ -68,7 +74,7 @@ export const init = {
 				});
 		}else{
 			
-			await _select_repo(args);
+			await _select_pacman(args);
 			
 		}
 		
@@ -94,6 +100,12 @@ async function _initialize(root:string, repo:Repo, options?:Partial<Options>)
 		util.merge_options(options);
 	}
 	
+	if(conf.pacman === 'yarn' && !fs.existsSync(`!${conf.root}/yarn.lock`)){
+		await new Promise((resolve, reject) => {
+			util.spawn_cmd(`yarn install`, 'yarn', 'Yarn install', resolve, reject);
+		});
+	}
+	
 	output.verbose_log('root', `$URNROOT$Project root: [${conf.root}]`);
 	output.verbose_log('repo', `Selected repo: [${repo}]`);
 	output.start_loading('Initialization...');
@@ -116,6 +128,37 @@ function _is_already_initialized(){
 	return (fs.existsSync(`${conf.root}/${jsonfile_path}`));
 }
 
+async function _select_pacman(args:Arguments){
+	
+	const pacman = args.pacman;
+	
+	if(!pacman){
+			
+		output.stop_loading();
+		
+		inquirer.
+			prompt([
+				{
+					type: 'list',
+					name: 'pacman',
+					message: 'Select which package manager you want to use:',
+					choices: Object.keys(abstract_pacman)
+				}
+			]).then(async (answers) => {
+				
+				util.set_pacman(answers.pacman);
+				
+				await _select_repo(args);
+				
+			});
+		
+	}else{
+		
+		await _select_repo(args);
+		
+	}
+}
+
 async function _select_repo(args:Arguments){
 	
 	const repo = args.r || args.repo;
@@ -129,7 +172,7 @@ async function _select_repo(args:Arguments){
 				{
 					type: 'list',
 					name: 'repo',
-					message: 'Select URANIO repo you want to use:',
+					message: 'Select which URANIO repo you want to use:',
 					choices: Object.keys(abstract_repos)
 				}
 			]).then(async (answers) => {
@@ -225,8 +268,12 @@ function _copy_dot_eslint_files(){
 }
 
 function _copy_dot_files(){
+	// if(fs.existsSync(`${conf.root}/src`) === false){
 	_copy_dot_src_folder();
+	// }
+	// if(fs.existsSync(`${conf.root}/tsconfig.json`) === false){
 	_copy_dot_tsconfig();
+	// }
 	_copy_dot_eslint_files();
 }
 
@@ -311,36 +358,58 @@ async function _install_ntl_dep(){
 	return true;
 }
 
+async function _uninstall_dep(repo:string, context:string){
+	if(util.dependency_exists(repo)){
+		output.start_loading(`Uninstalling ${repo} dep...`);
+		const dep_folder = `${conf.root}/node_modules/${repo}`;
+		util.remove_folder_if_exists(context, dep_folder);
+		const dep_dev_folder = `${conf.root}/node_modules/${repo}`;
+		util.remove_folder_if_exists(context, dep_dev_folder);
+		await util.uninstall_dep(`${repo.split('/').slice(-1)[0]}`, context);
+		output.done_log(context, `Uninstalled ${repo} dependencies.`);
+		return true;
+	}
+}
+
 async function _uninstall_core_dep(){
-	output.start_loading(`Uninstalling core dep...`);
-	const dep_folder = `${conf.root}/node_modules/${defaults.core_dep_repo}`;
-	util.remove_folder_if_exists('core', dep_folder);
-	const dep_dev_folder = `${conf.root}/node_modules/${defaults.core_dep_dev_repo}`;
-	util.remove_folder_if_exists('core', dep_dev_folder);
-	await util.uninstall_dep(`${defaults.core_dep_repo.split('/').slice(-1)[0]} ${defaults.core_dep_dev_repo.split('/').slice(-1)[0]}`, 'core');
-	output.done_log('core', `Uninstalled core dependencies.`);
+	// output.start_loading(`Uninstalling core dep...`);
+	// const dep_folder = `${conf.root}/node_modules/${defaults.core_dep_repo}`;
+	// util.remove_folder_if_exists('core', dep_folder);
+	// const dep_dev_folder = `${conf.root}/node_modules/${defaults.core_dep_dev_repo}`;
+	// util.remove_folder_if_exists('core', dep_dev_folder);
+	// await util.uninstall_dep(`${defaults.core_dep_repo.split('/').slice(-1)[0]} ${defaults.core_dep_dev_repo.split('/').slice(-1)[0]}`, 'core');
+	// output.done_log('core', `Uninstalled core dependencies.`);
+	// return true;
+	await _uninstall_dep(defaults.core_dep_repo, 'core');
+	await _uninstall_dep(defaults.core_dep_dev_repo, 'core');
 	return true;
 }
 
 async function _uninstall_web_dep(){
-	output.start_loading(`Uninstalling web dep...`);
-	const dep_folder = `${conf.root}/node_modules/${defaults.web_dep_repo}`;
-	util.remove_folder_if_exists('web_', dep_folder);
-	const dep_dev_folder = `${conf.root}/node_modules/${defaults.web_dep_dev_repo}`;
-	util.remove_folder_if_exists('web_', dep_dev_folder);
-	await util.uninstall_dep(`${defaults.web_dep_repo.split('/').slice(-1)[0]} ${defaults.web_dep_dev_repo.split('/').slice(-1)[0]}`, 'web_');
-	output.done_log('web', `Uninstalled web dependencies.`);
+	// output.start_loading(`Uninstalling web dep...`);
+	// const dep_folder = `${conf.root}/node_modules/${defaults.web_dep_repo}`;
+	// util.remove_folder_if_exists('web_', dep_folder);
+	// const dep_dev_folder = `${conf.root}/node_modules/${defaults.web_dep_dev_repo}`;
+	// util.remove_folder_if_exists('web_', dep_dev_folder);
+	// await util.uninstall_dep(`${defaults.web_dep_repo.split('/').slice(-1)[0]} ${defaults.web_dep_dev_repo.split('/').slice(-1)[0]}`, 'web_');
+	// output.done_log('web', `Uninstalled web dependencies.`);
+	// return true;
+	await _uninstall_dep(defaults.web_dep_repo, 'web');
+	await _uninstall_dep(defaults.web_dep_dev_repo, 'web');
 	return true;
 }
 
 async function _uninstall_ntl_dep(){
-	output.start_loading(`Uninstalling ntl dep...`);
-	const dep_folder = `${conf.root}/node_modules/${defaults.ntl_dep_repo}`;
-	util.remove_folder_if_exists('ntl_', dep_folder);
-	const dep_dev_folder = `${conf.root}/node_modules/${defaults.ntl_dep_dev_repo}`;
-	util.remove_folder_if_exists('ntl_', dep_dev_folder);
-	await util.uninstall_dep(`${defaults.ntl_dep_repo.split('/').slice(-1)[0]} ${defaults.ntl_dep_dev_repo.split('/').slice(-1)[0]}`, 'ntl_');
-	output.done_log('ntl', `Uninstalled ntl dependencies.`);
+	// output.start_loading(`Uninstalling ntl dep...`);
+	// const dep_folder = `${conf.root}/node_modules/${defaults.ntl_dep_repo}`;
+	// util.remove_folder_if_exists('ntl_', dep_folder);
+	// const dep_dev_folder = `${conf.root}/node_modules/${defaults.ntl_dep_dev_repo}`;
+	// util.remove_folder_if_exists('ntl_', dep_dev_folder);
+	// await util.uninstall_dep(`${defaults.ntl_dep_repo.split('/').slice(-1)[0]} ${defaults.ntl_dep_dev_repo.split('/').slice(-1)[0]}`, 'ntl_');
+	// output.done_log('ntl', `Uninstalled ntl dependencies.`);
+	// return true;
+	await _uninstall_dep(defaults.ntl_dep_repo, 'ntl');
+	await _uninstall_dep(defaults.ntl_dep_dev_repo, 'ntl');
 	return true;
 }
 

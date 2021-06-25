@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.pretty = exports.check_repo = exports.set_repo = exports.auto_set_project_root = exports.check_folder = exports.is_initialized = exports.read_rc_file = exports.merge_options = void 0;
+exports.dependency_exists = exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.pretty = exports.check_pacman = exports.check_repo = exports.set_pacman = exports.set_repo = exports.auto_set_project_root = exports.check_folder = exports.is_initialized = exports.read_rc_file = exports.merge_options = void 0;
 const fs_1 = __importDefault(require("fs"));
 const cp = __importStar(require("child_process"));
 const prettier_1 = __importDefault(require("prettier"));
@@ -124,10 +124,28 @@ function set_repo(repo) {
     }
 }
 exports.set_repo = set_repo;
+function set_pacman(pacman) {
+    if (check_pacman(pacman)) {
+        defaults_1.conf.pacman = pacman;
+    }
+    else {
+        const valid_pacman_str = types_1.valid_pacman().join(', ');
+        let end_log = '';
+        end_log += `Wrong package manager. `;
+        end_log += `Package manager must be one of the following [${valid_pacman_str}]`;
+        output.wrong_end_log(end_log);
+        process.exit(1);
+    }
+}
+exports.set_pacman = set_pacman;
 function check_repo(repo) {
     return urn_lib_1.urn_util.object.has_key(types_1.abstract_repos, repo);
 }
 exports.check_repo = check_repo;
+function check_pacman(pacman) {
+    return urn_lib_1.urn_util.object.has_key(types_1.abstract_pacman, pacman);
+}
+exports.check_pacman = check_pacman;
 function pretty(path, parser = 'typescript') {
     output.start_loading(`Prettier [${path}]...`);
     const content = fs_1.default.readFileSync(path, 'utf8');
@@ -232,7 +250,7 @@ function install_dep(repo, context) {
         const action = `installing dependencies [${repo}]`;
         output.verbose_log(context, `Started ${action}`);
         return new Promise((resolve, reject) => {
-            spawn_cmd(`npm i ${repo} --verbose`, context, action, resolve, reject);
+            spawn_cmd(_pacman_commands.install[defaults_1.conf.pacman](repo), context, action, resolve, reject);
         });
     });
 }
@@ -242,7 +260,7 @@ function install_dep_dev(repo, context) {
         const action = `installing dev dependencies [${repo}]`;
         output.verbose_log(context, `Started ${action}`);
         return new Promise((resolve, reject) => {
-            spawn_cmd(`npm i ${repo} --save-dev --verbose`, context, action, resolve, reject);
+            spawn_cmd(_pacman_commands.install_dev[defaults_1.conf.pacman](repo), context, action, resolve, reject);
         });
     });
 }
@@ -252,7 +270,7 @@ function uninstall_dep(repo, context) {
         const action = `uninstalling dependencies [${repo}]`;
         output.verbose_log(context, `Started ${action}`);
         return new Promise((resolve, reject) => {
-            spawn_cmd(`npm uninstall ${repo} --verbose`, context, action, resolve, reject);
+            spawn_cmd(_pacman_commands.uninstall[defaults_1.conf.pacman](repo), context, action, resolve, reject);
         });
     });
 }
@@ -280,4 +298,37 @@ function _clone_repo(context, address, dest_folder, recursive = false) {
         });
     });
 }
+function dependency_exists(repo) {
+    const data = fs_1.default.readFileSync(`${defaults_1.conf.root}/package.json`, 'utf8');
+    const package_data = JSON.parse(data);
+    return (typeof package_data['dependencies'][repo] === 'string' ||
+        typeof package_data['devDependencies'][repo] === 'string');
+}
+exports.dependency_exists = dependency_exists;
+const _pacman_commands = {
+    install: {
+        npm(repo) {
+            return `npm i ${repo} --verbose`;
+        },
+        yarn(repo) {
+            return `yarn add ${repo} --verbose`;
+        }
+    },
+    install_dev: {
+        npm(repo) {
+            return `npm i --save-dev ${repo} --verbose`;
+        },
+        yarn(repo) {
+            return `yarn add --dev ${repo} --verbose`;
+        }
+    },
+    uninstall: {
+        npm(repo) {
+            return `npm uninstall ${repo} --verbose`;
+        },
+        yarn(repo) {
+            return `yarn remove ${repo} --verbose`;
+        }
+    }
+};
 //# sourceMappingURL=util.js.map

@@ -37,6 +37,7 @@ exports.conf = {
     fullwidth: false,
     root: '.',
     repo: exports.defaults.default_repo,
-    prefix: ''
+    prefix: '',
+    pacman: 'yarn'
 };
 //# sourceMappingURL=defaults.js.map

@@ -16,6 +16,11 @@ export const abstract_repos = {
 	ntl: ''
 } as const;
 
+export const abstract_pacman = {
+	yarn: '',
+	npm: '',
+} as const;
+
 export function valid_repos()
 		:string[]{
 	const vals:string[] = [];
@@ -25,7 +30,17 @@ export function valid_repos()
 	return vals;
 }
 
+export function valid_pacman()
+		:string[]{
+	const vals:string[] = [];
+	for(const k in abstract_pacman){
+		vals.push(k);
+	}
+	return vals;
+}
+
 export type Repo = keyof typeof abstract_repos;
+export type PacMan = keyof typeof abstract_pacman;
 
 export type Options = {
 	verbose: boolean,
@@ -35,7 +50,8 @@ export type Options = {
 	fullwidth: boolean,
 	prefix: string
 	root: string,
-	repo: Repo
+	repo: Repo,
+	pacman: PacMan
 }
 
 // export type Conf = Options & {

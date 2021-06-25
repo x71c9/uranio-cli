@@ -72,7 +72,7 @@ exports.init = {
                 }
             ]).then((answer) => __awaiter(void 0, void 0, void 0, function* () {
                 if (answer.proceed && answer.proceed === true) {
-                    yield _select_repo(args);
+                    yield _select_pacman(args);
                 }
                 else {
                     process.exit(0);
@@ -80,7 +80,7 @@ exports.init = {
             }));
         }
         else {
-            yield _select_repo(args);
+            yield _select_pacman(args);
         }
     })
 };
@@ -96,6 +96,11 @@ function _initialize(root, repo, options) {
         defaults_1.conf.repo = repo;
         if (options) {
             util.merge_options(options);
+        }
+        if (defaults_1.conf.pacman === 'yarn' && !fs_1.default.existsSync(`!${defaults_1.conf.root}/yarn.lock`)) {
+            yield new Promise((resolve, reject) => {
+                util.spawn_cmd(`yarn install`, 'yarn', 'Yarn install', resolve, reject);
+            });
         }
         output.verbose_log('root', `$URNROOT$Project root: [${defaults_1.conf.root}]`);
         output.verbose_log('repo', `Selected repo: [${repo}]`);
@@ -114,6 +119,29 @@ function _initialize(root, repo, options) {
 function _is_already_initialized() {
     return (fs_1.default.existsSync(`${defaults_1.conf.root}/${defaults_1.jsonfile_path}`));
 }
+function _select_pacman(args) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pacman = args.pacman;
+        if (!pacman) {
+            output.stop_loading();
+            inquirer_1.default.
+                prompt([
+                {
+                    type: 'list',
+                    name: 'pacman',
+                    message: 'Select which package manager you want to use:',
+                    choices: Object.keys(types_1.abstract_pacman)
+                }
+            ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
+                util.set_pacman(answers.pacman);
+                yield _select_repo(args);
+            }));
+        }
+        else {
+            yield _select_repo(args);
+        }
+    });
+}
 function _select_repo(args) {
     return __awaiter(this, void 0, void 0, function* () {
         const repo = args.r || args.repo;
@@ -124,7 +152,7 @@ function _select_repo(args) {
                 {
                     type: 'list',
                     name: 'repo',
-                    message: 'Select URANIO repo you want to use:',
+                    message: 'Select which URANIO repo you want to use:',
                     choices: Object.keys(types_1.abstract_repos)
                 }
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
@@ -207,8 +235,12 @@ function _copy_dot_eslint_files() {
     util.copy_files('dot', dot_eslint_files, dest);
 }
 function _copy_dot_files() {
+    // if(fs.existsSync(`${conf.root}/src`) === false){
     _copy_dot_src_folder();
+    // }
+    // if(fs.existsSync(`${conf.root}/tsconfig.json`) === false){
     _copy_dot_tsconfig();
+    // }
     _copy_dot_eslint_files();
 }
 function _create_json_file() {
@@ -293,39 +325,62 @@ function _install_ntl_dep() {
         return true;
     });
 }
+function _uninstall_dep(repo, context) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (util.dependency_exists(repo)) {
+            output.start_loading(`Uninstalling ${repo} dep...`);
+            const dep_folder = `${defaults_1.conf.root}/node_modules/${repo}`;
+            util.remove_folder_if_exists(context, dep_folder);
+            const dep_dev_folder = `${defaults_1.conf.root}/node_modules/${repo}`;
+            util.remove_folder_if_exists(context, dep_dev_folder);
+            yield util.uninstall_dep(`${repo.split('/').slice(-1)[0]}`, context);
+            output.done_log(context, `Uninstalled ${repo} dependencies.`);
+            return true;
+        }
+    });
+}
 function _uninstall_core_dep() {
     return __awaiter(this, void 0, void 0, function* () {
-        output.start_loading(`Uninstalling core dep...`);
-        const dep_folder = `${defaults_1.conf.root}/node_modules/${defaults_1.defaults.core_dep_repo}`;
-        util.remove_folder_if_exists('core', dep_folder);
-        const dep_dev_folder = `${defaults_1.conf.root}/node_modules/${defaults_1.defaults.core_dep_dev_repo}`;
-        util.remove_folder_if_exists('core', dep_dev_folder);
-        yield util.uninstall_dep(`${defaults_1.defaults.core_dep_repo.split('/').slice(-1)[0]} ${defaults_1.defaults.core_dep_dev_repo.split('/').slice(-1)[0]}`, 'core');
-        output.done_log('core', `Uninstalled core dependencies.`);
+        // output.start_loading(`Uninstalling core dep...`);
+        // const dep_folder = `${conf.root}/node_modules/${defaults.core_dep_repo}`;
+        // util.remove_folder_if_exists('core', dep_folder);
+        // const dep_dev_folder = `${conf.root}/node_modules/${defaults.core_dep_dev_repo}`;
+        // util.remove_folder_if_exists('core', dep_dev_folder);
+        // await util.uninstall_dep(`${defaults.core_dep_repo.split('/').slice(-1)[0]} ${defaults.core_dep_dev_repo.split('/').slice(-1)[0]}`, 'core');
+        // output.done_log('core', `Uninstalled core dependencies.`);
+        // return true;
+        yield _uninstall_dep(defaults_1.defaults.core_dep_repo, 'core');
+        yield _uninstall_dep(defaults_1.defaults.core_dep_dev_repo, 'core');
         return true;
     });
 }
 function _uninstall_web_dep() {
     return __awaiter(this, void 0, void 0, function* () {
-        output.start_loading(`Uninstalling web dep...`);
-        const dep_folder = `${defaults_1.conf.root}/node_modules/${defaults_1.defaults.web_dep_repo}`;
-        util.remove_folder_if_exists('web_', dep_folder);
-        const dep_dev_folder = `${defaults_1.conf.root}/node_modules/${defaults_1.defaults.web_dep_dev_repo}`;
-        util.remove_folder_if_exists('web_', dep_dev_folder);
-        yield util.uninstall_dep(`${defaults_1.defaults.web_dep_repo.split('/').slice(-1)[0]} ${defaults_1.defaults.web_dep_dev_repo.split('/').slice(-1)[0]}`, 'web_');
-        output.done_log('web', `Uninstalled web dependencies.`);
+        // output.start_loading(`Uninstalling web dep...`);
+        // const dep_folder = `${conf.root}/node_modules/${defaults.web_dep_repo}`;
+        // util.remove_folder_if_exists('web_', dep_folder);
+        // const dep_dev_folder = `${conf.root}/node_modules/${defaults.web_dep_dev_repo}`;
+        // util.remove_folder_if_exists('web_', dep_dev_folder);
+        // await util.uninstall_dep(`${defaults.web_dep_repo.split('/').slice(-1)[0]} ${defaults.web_dep_dev_repo.split('/').slice(-1)[0]}`, 'web_');
+        // output.done_log('web', `Uninstalled web dependencies.`);
+        // return true;
+        yield _uninstall_dep(defaults_1.defaults.web_dep_repo, 'web');
+        yield _uninstall_dep(defaults_1.defaults.web_dep_dev_repo, 'web');
         return true;
     });
 }
 function _uninstall_ntl_dep() {
     return __awaiter(this, void 0, void 0, function* () {
-        output.start_loading(`Uninstalling ntl dep...`);
-        const dep_folder = `${defaults_1.conf.root}/node_modules/${defaults_1.defaults.ntl_dep_repo}`;
-        util.remove_folder_if_exists('ntl_', dep_folder);
-        const dep_dev_folder = `${defaults_1.conf.root}/node_modules/${defaults_1.defaults.ntl_dep_dev_repo}`;
-        util.remove_folder_if_exists('ntl_', dep_dev_folder);
-        yield util.uninstall_dep(`${defaults_1.defaults.ntl_dep_repo.split('/').slice(-1)[0]} ${defaults_1.defaults.ntl_dep_dev_repo.split('/').slice(-1)[0]}`, 'ntl_');
-        output.done_log('ntl', `Uninstalled ntl dependencies.`);
+        // output.start_loading(`Uninstalling ntl dep...`);
+        // const dep_folder = `${conf.root}/node_modules/${defaults.ntl_dep_repo}`;
+        // util.remove_folder_if_exists('ntl_', dep_folder);
+        // const dep_dev_folder = `${conf.root}/node_modules/${defaults.ntl_dep_dev_repo}`;
+        // util.remove_folder_if_exists('ntl_', dep_dev_folder);
+        // await util.uninstall_dep(`${defaults.ntl_dep_repo.split('/').slice(-1)[0]} ${defaults.ntl_dep_dev_repo.split('/').slice(-1)[0]}`, 'ntl_');
+        // output.done_log('ntl', `Uninstalled ntl dependencies.`);
+        // return true;
+        yield _uninstall_dep(defaults_1.defaults.ntl_dep_repo, 'ntl');
+        yield _uninstall_dep(defaults_1.defaults.ntl_dep_dev_repo, 'ntl');
         return true;
     });
 }

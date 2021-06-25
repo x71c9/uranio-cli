@@ -54,8 +54,12 @@ async function _start_dev()
 
 	process.on('SIGINT', function() {
 		process.stdout.write("\r--- Caught interrupt signal ---\n");
-		process.kill(nodemon.pid);
-		process.kill(tscwatch.pid);
+		if(nodemon.pid){
+			process.kill(nodemon.pid);
+		}
+		if(tscwatch.pid){
+			process.kill(tscwatch.pid);
+		}
 		// process.kill(netlifydev.pid);
 	});
 	
