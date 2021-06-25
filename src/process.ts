@@ -22,7 +22,7 @@ export function urn_process(args:Arguments)
 		:void{
 	
 	_set_conf(args);
-
+	
 	process.chdir(conf.root);
 	
 	_init_log();
@@ -91,6 +91,12 @@ function _set_conf(args:Arguments){
 	
 	if(typeof prefix === 'string' && prefix !== ''){
 		conf.prefix = prefix;
+	}
+	
+	const pacman = args.pacman;
+	
+	if(typeof pacman === 'string' && pacman != ''){
+		util.set_pacman(pacman);
 	}
 	
 	const repo = args.r || args.repo;

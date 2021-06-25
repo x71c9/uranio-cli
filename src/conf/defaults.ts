@@ -68,6 +68,8 @@ export const conf:Options = {
 	
 	repo: defaults.default_repo,
 	
-	prefix: ''
+	prefix: '',
+	
+	pacman: 'yarn'
 	
 };

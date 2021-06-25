@@ -11,8 +11,14 @@ export declare const abstract_repos: {
     readonly web: "";
     readonly ntl: "";
 };
+export declare const abstract_pacman: {
+    readonly yarn: "";
+    readonly npm: "";
+};
 export declare function valid_repos(): string[];
+export declare function valid_pacman(): string[];
 export declare type Repo = keyof typeof abstract_repos;
+export declare type PacMan = keyof typeof abstract_pacman;
 export declare type Options = {
     verbose: boolean;
     blank: boolean;
@@ -22,4 +28,5 @@ export declare type Options = {
     prefix: string;
     root: string;
     repo: Repo;
+    pacman: PacMan;
 };

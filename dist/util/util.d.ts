@@ -10,7 +10,9 @@ export declare function is_initialized(): boolean;
 export declare function check_folder(folder_path: string): boolean;
 export declare function auto_set_project_root(): void;
 export declare function set_repo(repo: string): void;
+export declare function set_pacman(pacman: string): void;
 export declare function check_repo(repo: string): boolean;
+export declare function check_pacman(pacman: string): boolean;
 export declare function pretty(path: string, parser?: string): void;
 export declare function remove_folder_if_exists(context: string, folder_path: string): void;
 export declare function create_folder_if_doesnt_exists(context: string, folder_path: string): void;
@@ -26,4 +28,5 @@ export declare function install_dep_dev(repo: string, context: string): Promise<
 export declare function uninstall_dep(repo: string, context: string): Promise<any>;
 export declare function clone_repo(context: string, address: string, dest_folder: string): Promise<any>;
 export declare function clone_repo_recursive(context: string, address: string, dest_folder: string): Promise<any>;
+export declare function dependency_exists(repo: string): boolean;
 export {};
