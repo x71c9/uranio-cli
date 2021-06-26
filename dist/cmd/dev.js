@@ -35,7 +35,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.dev = void 0;
 const cp = __importStar(require("child_process"));
-const output = __importStar(require("../log/"));
+const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 exports.dev = {
     command: () => __awaiter(void 0, void 0, void 0, function* () {

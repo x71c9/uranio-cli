@@ -26,7 +26,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.help = void 0;
 const title_1 = require("./title");
-const output = __importStar(require("../log/"));
+const output = __importStar(require("../output/"));
 exports.help = {
     command: () => {
         output.stop_loading();

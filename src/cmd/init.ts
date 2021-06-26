@@ -18,9 +18,11 @@ import {
 
 import {conf, defaults, jsonfile_path} from '../conf/defaults';
 
-import * as output from '../log/';
+import * as output from '../output/';
 
 import * as util from '../util/';
+
+import * as common from './common';
 
 import {title} from './title';
 
@@ -28,12 +30,7 @@ export const init = {
 	
 	run: async (root:string, repo:Repo, options:Partial<Options>):Promise<void> => {
 		
-		conf.hide = true;
-		conf.spinner = false;
-		
-		if(options){
-			util.merge_options(options);
-		}
+		common.init_run(options);
 		
 		await _initialize(root, repo, options);
 		

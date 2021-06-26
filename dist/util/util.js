@@ -41,7 +41,7 @@ const fs_1 = __importDefault(require("fs"));
 const cp = __importStar(require("child_process"));
 const prettier_1 = __importDefault(require("prettier"));
 const urn_lib_1 = require("urn-lib");
-const output = __importStar(require("../log/"));
+const output = __importStar(require("../output/"));
 const types_1 = require("../types");
 const defaults_1 = require("../conf/defaults");
 function merge_options(options) {

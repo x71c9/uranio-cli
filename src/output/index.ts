@@ -4,4 +4,4 @@
  * @packageDocumentation
  */
 
-export * from './log';
+export * from './output';

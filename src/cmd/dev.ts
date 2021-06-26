@@ -6,7 +6,7 @@
 
 import * as cp from 'child_process';
 
-import * as output from '../log/';
+import * as output from '../output/';
 
 import * as util from '../util/';
 

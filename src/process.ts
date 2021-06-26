@@ -4,9 +4,9 @@
  * @packageDocumentation
  */
 
-import fs from 'fs';
+// import fs from 'fs';
 
-import * as cp from 'child_process';
+// import * as cp from 'child_process';
 
 import {Arguments} from './types';
 
@@ -14,9 +14,11 @@ import * as util from './util/';
 
 import {help, init, transpose, dev, test} from './cmd/';
 
-import {conf, defaults} from './conf/defaults';
+import {conf} from './conf/defaults';
 
-import * as output from './log/';
+import * as output from './output/';
+
+import * as common from './cmd/common';
 
 export function urn_process(args:Arguments)
 		:void{
@@ -25,7 +27,7 @@ export function urn_process(args:Arguments)
 	
 	process.chdir(conf.root);
 	
-	_init_log();
+	common.init_log();
 	
 	_log_arguments(args);
 	
@@ -35,21 +37,11 @@ export function urn_process(args:Arguments)
 	
 }
 
-function _init_log(){
-	if(!fs.existsSync(`${conf.root}/${defaults.log_filepath}`)){
-		cp.execSync(`touch ${conf.root}/${defaults.log_filepath}`);
-	}
-}
-
 function _log_arguments(args:Arguments){
 	output.verbose_log('args', JSON.stringify(args));
 }
 
 function _set_conf(args:Arguments){
-	
-	if(typeof args.noverbose === 'boolean' && !!args.noverbose !== !conf.verbose){
-		conf.verbose = !args.noverbose;
-	}
 	
 	const verbose = args.v || args.verbose;
 	
