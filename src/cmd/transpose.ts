@@ -21,24 +21,19 @@ import {Options} from '../types';
 
 import {conf, defaults} from '../conf/defaults';
 
-import * as output from '../log/';
+import * as output from '../output/';
 
 import * as util from '../util/';
+
+import * as common from './common';
 
 export const transpose = {
 	
 	run: async (root:string, options?:Partial<Options>):Promise<void> => {
 		
-		if(!util.check_folder(root)){
-			throw new Error(`Invalid root path [${root}].`);
-		}
+		conf.root = root;
 		
-		conf.hide = true;
-		conf.spinner = false;
-		
-		if(options){
-			util.merge_options(options);
-		}
+		common.init_run(options);
 		
 		await transpose.command();
 		

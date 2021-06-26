@@ -41,16 +41,13 @@ const fs_1 = __importDefault(require("fs"));
 const inquirer_1 = __importDefault(require("inquirer"));
 const types_1 = require("../types");
 const defaults_1 = require("../conf/defaults");
-const output = __importStar(require("../log/"));
+const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
+const common = __importStar(require("./common"));
 const title_1 = require("./title");
 exports.init = {
     run: (root, repo, options) => __awaiter(void 0, void 0, void 0, function* () {
-        defaults_1.conf.hide = true;
-        defaults_1.conf.spinner = false;
-        if (options) {
-            util.merge_options(options);
-        }
+        common.init_run(options);
         yield _initialize(root, repo, options);
     }),
     command: (args) => __awaiter(void 0, void 0, void 0, function* () {

@@ -40,18 +40,13 @@ exports.transpose = void 0;
 const fs_1 = __importDefault(require("fs"));
 const ts_morph_1 = require("ts-morph");
 const defaults_1 = require("../conf/defaults");
-const output = __importStar(require("../log/"));
+const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
+const common = __importStar(require("./common"));
 exports.transpose = {
     run: (root, options) => __awaiter(void 0, void 0, void 0, function* () {
-        if (!util.check_folder(root)) {
-            throw new Error(`Invalid root path [${root}].`);
-        }
-        defaults_1.conf.hide = true;
-        defaults_1.conf.spinner = false;
-        if (options) {
-            util.merge_options(options);
-        }
+        defaults_1.conf.root = root;
+        common.init_run(options);
         yield exports.transpose.command();
     }),
     command: () => __awaiter(void 0, void 0, void 0, function* () {

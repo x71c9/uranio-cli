@@ -6,7 +6,7 @@
 
 import {title} from './title';
 
-import * as output from '../log/';
+import * as output from '../output/';
 
 export const help = {
 	

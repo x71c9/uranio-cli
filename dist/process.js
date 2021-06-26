@@ -23,38 +23,26 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.urn_process = void 0;
-const fs_1 = __importDefault(require("fs"));
-const cp = __importStar(require("child_process"));
 const util = __importStar(require("./util/"));
 const cmd_1 = require("./cmd/");
 const defaults_1 = require("./conf/defaults");
-const output = __importStar(require("./log/"));
+const output = __importStar(require("./output/"));
+const common = __importStar(require("./cmd/common"));
 function urn_process(args) {
     _set_conf(args);
     process.chdir(defaults_1.conf.root);
-    _init_log();
+    common.init_log();
     _log_arguments(args);
     _switch_command(args);
     // process.exit(1);
 }
 exports.urn_process = urn_process;
-function _init_log() {
-    if (!fs_1.default.existsSync(`${defaults_1.conf.root}/${defaults_1.defaults.log_filepath}`)) {
-        cp.execSync(`touch ${defaults_1.conf.root}/${defaults_1.defaults.log_filepath}`);
-    }
-}
 function _log_arguments(args) {
     output.verbose_log('args', JSON.stringify(args));
 }
 function _set_conf(args) {
-    if (typeof args.noverbose === 'boolean' && !!args.noverbose !== !defaults_1.conf.verbose) {
-        defaults_1.conf.verbose = !args.noverbose;
-    }
     const verbose = args.v || args.verbose;
     if (verbose == true) {
         defaults_1.conf.verbose = true;

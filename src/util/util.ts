@@ -12,7 +12,7 @@ import prettier from 'prettier';
 
 import {urn_util} from 'urn-lib';
 
-import * as output from '../log/';
+import * as output from '../output/';
 
 import {
 	abstract_repos,
