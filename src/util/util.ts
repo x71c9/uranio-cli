@@ -46,6 +46,7 @@ export function read_rc_file()
 		const rc_obj = JSON.parse(rc_content);
 		set_repo(rc_obj.repo);
 		conf.repo = rc_obj.repo;
+		conf.pacman = rc_obj.pacman;
 	}
 }
 

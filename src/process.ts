@@ -4,10 +4,6 @@
  * @packageDocumentation
  */
 
-// import fs from 'fs';
-
-// import * as cp from 'child_process';
-
 import {Arguments} from './types';
 
 import * as util from './util/';
@@ -43,6 +39,12 @@ function _log_arguments(args:Arguments){
 
 function _set_conf(args:Arguments){
 	
+	const force = args.f || args.force;
+	
+	if(force == true){
+		conf.force = true;
+	}
+	
 	const verbose = args.v || args.verbose;
 	
 	if(verbose == true){
@@ -70,7 +72,7 @@ function _set_conf(args:Arguments){
 		conf.blank = !args.noblank;
 	}
 	
-	const fullwidth = args.f || args.fullwidth;
+	const fullwidth = args.w || args.fullwidth;
 	
 	if(fullwidth == true){
 		conf.fullwidth = true;

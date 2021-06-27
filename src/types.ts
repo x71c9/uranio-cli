@@ -51,7 +51,8 @@ export type Options = {
 	prefix: string
 	root: string,
 	repo: Repo,
-	pacman: PacMan
+	pacman: PacMan,
+	force: boolean
 }
 
 // export type Conf = Options & {

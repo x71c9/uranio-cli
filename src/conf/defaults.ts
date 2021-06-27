@@ -70,6 +70,8 @@ export const conf:Options = {
 	
 	prefix: '',
 	
-	pacman: 'yarn'
+	pacman: 'yarn',
+	
+	force: false
 	
 };

@@ -36,7 +36,11 @@ export function init_run(options?:Partial<Options>)
 	if(!util.check_folder(conf.root)){
 		throw new Error(`Invalid root path [${conf.root}].`);
 	}
-		
+	
+	if(!util.check_repo(conf.repo)){
+		throw new Error(`Invalid repo [${conf.repo}].`);
+	}
+	
 	init_log();
 	
 	_log_options();

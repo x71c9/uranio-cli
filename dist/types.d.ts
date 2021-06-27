@@ -29,4 +29,5 @@ export declare type Options = {
     root: string;
     repo: Repo;
     pacman: PacMan;
+    force: boolean;
 };
