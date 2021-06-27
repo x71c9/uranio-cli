@@ -63,7 +63,7 @@ export const init = {
 				]).then(async (answer) => {
 					if(answer.proceed && answer.proceed === true){
 						
-						await _select_pacman(args);
+						await _ask_for_pacman(args);
 					
 					}else{
 						process.exit(0);
@@ -71,7 +71,7 @@ export const init = {
 				});
 		}else{
 			
-			await _select_pacman(args);
+			await _ask_for_pacman(args);
 			
 		}
 		
@@ -114,6 +114,7 @@ async function _initialize(root:string, repo:Repo, options?:Partial<Options>)
 	await _clone_dot();
 	_copy_dot_files();
 	await _clone_and_install_repo();
+	_create_client_server_folders();
 	_remove_tmp();
 		
 	output.end_log(`Initialization completed.`);
@@ -125,7 +126,7 @@ function _is_already_initialized(){
 	return (fs.existsSync(`${conf.root}/${jsonfile_path}`));
 }
 
-async function _select_pacman(args:Arguments){
+async function _ask_for_pacman(args:Arguments){
 	
 	const pacman = args.pacman;
 	
@@ -145,18 +146,18 @@ async function _select_pacman(args:Arguments){
 				
 				util.set_pacman(answers.pacman);
 				
-				await _select_repo(args);
+				await _ask_for_repo(args);
 				
 			});
 		
 	}else{
 		
-		await _select_repo(args);
+		await _ask_for_repo(args);
 		
 	}
 }
 
-async function _select_repo(args:Arguments){
+async function _ask_for_repo(args:Arguments){
 	
 	const repo = args.r || args.repo;
 	
@@ -265,9 +266,9 @@ function _copy_dot_eslint_files(){
 }
 
 function _copy_dot_files(){
-	// if(fs.existsSync(`${conf.root}/src`) === false){
-	_copy_dot_src_folder();
-	// }
+	if(fs.existsSync(`${conf.root}/src`) === false){
+		_copy_dot_src_folder();
+	}
 	// if(fs.existsSync(`${conf.root}/tsconfig.json`) === false){
 	_copy_dot_tsconfig();
 	// }
@@ -316,16 +317,29 @@ function _create_urn_folder(){
 	output.done_log('init', `Created folder ${defaults.folder}.`);
 }
 
+function _create_client_server_folders(){
+	output.start_loading(`Creating client folder...`);
+	util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}/client`);
+	output.start_loading(`Creating server folder...`);
+	util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}/server`);
+	if(conf.repo === 'ntl'){
+		output.start_loading(`Creating server functions folder...`);
+		util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}/server/functions`);
+	}
+	output.done_log('init', `Created client server folders.`);
+}
+
 function _update_aliases(){
 	output.start_loading('Updating aliases...');
 	const data = fs.readFileSync(`${conf.root}/package.json`, 'utf8');
 	const package_data = JSON.parse(data);
 	package_data['_moduleAliases'] = {
-		urn_books: `./dist/${defaults.folder}/books.js`,
-		uranio: `./dist/${defaults.folder}/${defaults.repo_folder}/`
+		'uranio': `./dist/${defaults.folder}/${defaults.repo_folder}/`,
+		'uranio-books': `./dist/${defaults.folder}/server/books.js`,
+		'uranio-client': `./dist/${defaults.folder}/${defaults.repo_folder}/client`
 	};
 	if(conf.repo !== 'core'){
-		package_data['_moduleAliases']['urn_core'] = `./dist/${defaults.folder}/${defaults.repo_folder}/core/`;
+		package_data['_moduleAliases']['uranio-core'] = `./dist/${defaults.folder}/${defaults.repo_folder}/core/`;
 	}
 	fs.writeFileSync(`${conf.root}/package.json`, JSON.stringify(package_data, null, '\t'));
 	output.done_log('alas', `Updated aliases.`);
@@ -356,14 +370,16 @@ async function _install_ntl_dep(){
 }
 
 async function _uninstall_dep(repo:string, context:string){
-	if(util.dependency_exists(repo)){
-		output.start_loading(`Uninstalling ${repo} dep...`);
-		const dep_folder = `${conf.root}/node_modules/${repo}`;
+	const short_repo = (repo.substr(0,3) === 'ssh' || repo.substr(0,7) === 'git+ssh') ?
+		repo.split('/').slice(-1)[0] : repo;
+	if(util.dependency_exists(short_repo)){
+		output.start_loading(`Uninstalling ${short_repo} dep...`);
+		const dep_folder = `${conf.root}/node_modules/${short_repo}`;
 		util.remove_folder_if_exists(context, dep_folder);
-		const dep_dev_folder = `${conf.root}/node_modules/${repo}`;
+		const dep_dev_folder = `${conf.root}/node_modules/${short_repo}`;
 		util.remove_folder_if_exists(context, dep_dev_folder);
-		await util.uninstall_dep(`${repo.split('/').slice(-1)[0]}`, context);
-		output.done_log(context, `Uninstalled ${repo} dependencies.`);
+		await util.uninstall_dep(`${short_repo}`, context);
+		output.done_log(context, `Uninstalled ${short_repo} dependencies.`);
 		return true;
 	}
 }

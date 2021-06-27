@@ -69,7 +69,7 @@ exports.init = {
                 }
             ]).then((answer) => __awaiter(void 0, void 0, void 0, function* () {
                 if (answer.proceed && answer.proceed === true) {
-                    yield _select_pacman(args);
+                    yield _ask_for_pacman(args);
                 }
                 else {
                     process.exit(0);
@@ -77,7 +77,7 @@ exports.init = {
             }));
         }
         else {
-            yield _select_pacman(args);
+            yield _ask_for_pacman(args);
         }
     })
 };
@@ -109,6 +109,7 @@ function _initialize(root, repo, options) {
         yield _clone_dot();
         _copy_dot_files();
         yield _clone_and_install_repo();
+        _create_client_server_folders();
         _remove_tmp();
         output.end_log(`Initialization completed.`);
     });
@@ -116,7 +117,7 @@ function _initialize(root, repo, options) {
 function _is_already_initialized() {
     return (fs_1.default.existsSync(`${defaults_1.conf.root}/${defaults_1.jsonfile_path}`));
 }
-function _select_pacman(args) {
+function _ask_for_pacman(args) {
     return __awaiter(this, void 0, void 0, function* () {
         const pacman = args.pacman;
         if (!pacman) {
@@ -131,15 +132,15 @@ function _select_pacman(args) {
                 }
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
                 util.set_pacman(answers.pacman);
-                yield _select_repo(args);
+                yield _ask_for_repo(args);
             }));
         }
         else {
-            yield _select_repo(args);
+            yield _ask_for_repo(args);
         }
     });
 }
-function _select_repo(args) {
+function _ask_for_repo(args) {
     return __awaiter(this, void 0, void 0, function* () {
         const repo = args.r || args.repo;
         if (!repo) {
@@ -232,9 +233,9 @@ function _copy_dot_eslint_files() {
     util.copy_files('dot', dot_eslint_files, dest);
 }
 function _copy_dot_files() {
-    // if(fs.existsSync(`${conf.root}/src`) === false){
-    _copy_dot_src_folder();
-    // }
+    if (fs_1.default.existsSync(`${defaults_1.conf.root}/src`) === false) {
+        _copy_dot_src_folder();
+    }
     // if(fs.existsSync(`${conf.root}/tsconfig.json`) === false){
     _copy_dot_tsconfig();
     // }
@@ -281,16 +282,28 @@ function _create_urn_folder() {
     util.create_folder_if_doesnt_exists('init', `${defaults_1.conf.root}/${defaults_1.defaults.folder}`);
     output.done_log('init', `Created folder ${defaults_1.defaults.folder}.`);
 }
+function _create_client_server_folders() {
+    output.start_loading(`Creating client folder...`);
+    util.create_folder_if_doesnt_exists('init', `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client`);
+    output.start_loading(`Creating server folder...`);
+    util.create_folder_if_doesnt_exists('init', `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server`);
+    if (defaults_1.conf.repo === 'ntl') {
+        output.start_loading(`Creating server functions folder...`);
+        util.create_folder_if_doesnt_exists('init', `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/functions`);
+    }
+    output.done_log('init', `Created client server folders.`);
+}
 function _update_aliases() {
     output.start_loading('Updating aliases...');
     const data = fs_1.default.readFileSync(`${defaults_1.conf.root}/package.json`, 'utf8');
     const package_data = JSON.parse(data);
     package_data['_moduleAliases'] = {
-        urn_books: `./dist/${defaults_1.defaults.folder}/books.js`,
-        uranio: `./dist/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/`
+        'uranio': `./dist/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/`,
+        'uranio-books': `./dist/${defaults_1.defaults.folder}/server/books.js`,
+        'uranio-client': `./dist/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/client`
     };
     if (defaults_1.conf.repo !== 'core') {
-        package_data['_moduleAliases']['urn_core'] = `./dist/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/core/`;
+        package_data['_moduleAliases']['uranio-core'] = `./dist/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/core/`;
     }
     fs_1.default.writeFileSync(`${defaults_1.conf.root}/package.json`, JSON.stringify(package_data, null, '\t'));
     output.done_log('alas', `Updated aliases.`);
@@ -324,14 +337,16 @@ function _install_ntl_dep() {
 }
 function _uninstall_dep(repo, context) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (util.dependency_exists(repo)) {
-            output.start_loading(`Uninstalling ${repo} dep...`);
-            const dep_folder = `${defaults_1.conf.root}/node_modules/${repo}`;
+        const short_repo = (repo.substr(0, 3) === 'ssh' || repo.substr(0, 7) === 'git+ssh') ?
+            repo.split('/').slice(-1)[0] : repo;
+        if (util.dependency_exists(short_repo)) {
+            output.start_loading(`Uninstalling ${short_repo} dep...`);
+            const dep_folder = `${defaults_1.conf.root}/node_modules/${short_repo}`;
             util.remove_folder_if_exists(context, dep_folder);
-            const dep_dev_folder = `${defaults_1.conf.root}/node_modules/${repo}`;
+            const dep_dev_folder = `${defaults_1.conf.root}/node_modules/${short_repo}`;
             util.remove_folder_if_exists(context, dep_dev_folder);
-            yield util.uninstall_dep(`${repo.split('/').slice(-1)[0]}`, context);
-            output.done_log(context, `Uninstalled ${repo} dependencies.`);
+            yield util.uninstall_dep(`${short_repo}`, context);
+            output.done_log(context, `Uninstalled ${short_repo} dependencies.`);
             return true;
         }
     });
