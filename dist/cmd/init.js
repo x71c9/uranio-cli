@@ -47,13 +47,15 @@ const common = __importStar(require("./common"));
 const title_1 = require("./title");
 exports.init = {
     run: (root, repo, options) => __awaiter(void 0, void 0, void 0, function* () {
+        options.root = root;
+        options.repo = repo;
         common.init_run(options);
-        yield _initialize(root, repo, options);
+        yield _initialize();
     }),
     command: (args) => __awaiter(void 0, void 0, void 0, function* () {
         console.clear();
         title_1.title();
-        if (_is_already_initialized()) {
+        if (_is_already_initialized() && defaults_1.conf.force === false) {
             output.stop_loading();
             let confirm_msg = '';
             confirm_msg += `It appears the repo is already initialized.\n`;
@@ -81,26 +83,15 @@ exports.init = {
         }
     })
 };
-function _initialize(root, repo, options) {
+function _initialize() {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!util.check_folder(root)) {
-            throw new Error(`Invalid root path [${root}].`);
-        }
-        if (!util.check_repo(repo)) {
-            throw new Error(`Invalid repo [${repo}].`);
-        }
-        defaults_1.conf.root = root;
-        defaults_1.conf.repo = repo;
-        if (options) {
-            util.merge_options(options);
-        }
-        if (defaults_1.conf.pacman === 'yarn' && !fs_1.default.existsSync(`!${defaults_1.conf.root}/yarn.lock`)) {
+        if (defaults_1.conf.pacman === 'yarn' && !fs_1.default.existsSync(`${defaults_1.conf.root}/yarn.lock`)) {
             yield new Promise((resolve, reject) => {
                 util.spawn_cmd(`yarn install`, 'yarn', 'Yarn install', resolve, reject);
             });
         }
         output.verbose_log('root', `$URNROOT$Project root: [${defaults_1.conf.root}]`);
-        output.verbose_log('repo', `Selected repo: [${repo}]`);
+        output.verbose_log('repo', `Selected repo: [${defaults_1.conf.repo}]`);
         output.start_loading('Initialization...');
         _update_aliases();
         _create_urn_folder();
@@ -120,7 +111,7 @@ function _is_already_initialized() {
 function _ask_for_pacman(args) {
     return __awaiter(this, void 0, void 0, function* () {
         const pacman = args.pacman;
-        if (!pacman) {
+        if (!pacman && defaults_1.conf.force === false) {
             output.stop_loading();
             inquirer_1.default.
                 prompt([
@@ -143,7 +134,7 @@ function _ask_for_pacman(args) {
 function _ask_for_repo(args) {
     return __awaiter(this, void 0, void 0, function* () {
         const repo = args.r || args.repo;
-        if (!repo) {
+        if (!repo && defaults_1.conf.force === false) {
             output.stop_loading();
             inquirer_1.default.
                 prompt([
@@ -167,7 +158,7 @@ function _proceed_with_repo(repo) {
         util.set_repo(repo);
         console.clear();
         title_1.title();
-        yield _initialize(defaults_1.conf.root, defaults_1.conf.repo);
+        yield _initialize();
     });
 }
 function _ignore_urn_folder() {
@@ -245,7 +236,8 @@ function _create_json_file() {
     output.start_loading('Creating rc file...');
     let content = ``;
     content += `{\n`;
-    content += `"repo": "${defaults_1.conf.repo}"\n`;
+    content += `\t"repo": "${defaults_1.conf.repo}",\n`;
+    content += `\t"pacman": "${defaults_1.conf.pacman}"\n`;
     content += `}`;
     fs_1.default.writeFileSync(`${defaults_1.conf.root}/${defaults_1.jsonfile_path}`, content);
     util.pretty(`${defaults_1.conf.root}/${defaults_1.jsonfile_path}`, 'json');

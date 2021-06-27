@@ -30,9 +30,12 @@ export const init = {
 	
 	run: async (root:string, repo:Repo, options:Partial<Options>):Promise<void> => {
 		
+		options.root = root;
+		options.repo = repo;
+		
 		common.init_run(options);
 		
-		await _initialize(root, repo, options);
+		await _initialize();
 		
 	},
 	
@@ -42,7 +45,7 @@ export const init = {
 		
 		title();
 		
-		if(_is_already_initialized()){
+		if(_is_already_initialized() && conf.force === false){
 			
 			output.stop_loading();
 			
@@ -79,32 +82,17 @@ export const init = {
 	
 };
 
-async function _initialize(root:string, repo:Repo, options?:Partial<Options>)
+async function _initialize()
 		:Promise<void>{
 	
-	if(!util.check_folder(root)){
-		throw new Error(`Invalid root path [${root}].`);
-	}
-	
-	if(!util.check_repo(repo)){
-		throw new Error(`Invalid repo [${repo}].`);
-	}
-	
-	conf.root = root;
-	conf.repo = repo;
-	
-	if(options){
-		util.merge_options(options);
-	}
-	
-	if(conf.pacman === 'yarn' && !fs.existsSync(`!${conf.root}/yarn.lock`)){
+	if(conf.pacman === 'yarn' && !fs.existsSync(`${conf.root}/yarn.lock`)){
 		await new Promise((resolve, reject) => {
 			util.spawn_cmd(`yarn install`, 'yarn', 'Yarn install', resolve, reject);
 		});
 	}
 	
 	output.verbose_log('root', `$URNROOT$Project root: [${conf.root}]`);
-	output.verbose_log('repo', `Selected repo: [${repo}]`);
+	output.verbose_log('repo', `Selected repo: [${conf.repo}]`);
 	output.start_loading('Initialization...');
 	
 	_update_aliases();
@@ -130,7 +118,7 @@ async function _ask_for_pacman(args:Arguments){
 	
 	const pacman = args.pacman;
 	
-	if(!pacman){
+	if(!pacman && conf.force === false){
 			
 		output.stop_loading();
 		
@@ -161,7 +149,7 @@ async function _ask_for_repo(args:Arguments){
 	
 	const repo = args.r || args.repo;
 	
-	if(!repo){
+	if(!repo && conf.force === false){
 			
 		output.stop_loading();
 		
@@ -194,7 +182,7 @@ async function _proceed_with_repo(repo:Repo){
 	
 	title();
 	
-	await _initialize(conf.root, conf.repo);
+	await _initialize();
 	
 }
 
@@ -279,7 +267,8 @@ function _create_json_file(){
 	output.start_loading('Creating rc file...');
 	let content = ``;
 	content += `{\n`;
-	content += `"repo": "${conf.repo}"\n`;
+	content += `\t"repo": "${conf.repo}",\n`;
+	content += `\t"pacman": "${conf.pacman}"\n`;
 	content += `}`;
 	fs.writeFileSync(`${conf.root}/${jsonfile_path}`, content);
 	util.pretty(`${conf.root}/${jsonfile_path}`, 'json');

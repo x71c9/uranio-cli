@@ -43,6 +43,10 @@ function _log_arguments(args) {
     output.verbose_log('args', JSON.stringify(args));
 }
 function _set_conf(args) {
+    const force = args.f || args.force;
+    if (force == true) {
+        defaults_1.conf.force = true;
+    }
     const verbose = args.v || args.verbose;
     if (verbose == true) {
         defaults_1.conf.verbose = true;
@@ -64,7 +68,7 @@ function _set_conf(args) {
     if (typeof args.noblank === 'boolean' && !!args.noblank !== !defaults_1.conf.blank) {
         defaults_1.conf.blank = !args.noblank;
     }
-    const fullwidth = args.f || args.fullwidth;
+    const fullwidth = args.w || args.fullwidth;
     if (fullwidth == true) {
         defaults_1.conf.fullwidth = true;
     }

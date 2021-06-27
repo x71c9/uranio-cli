@@ -48,6 +48,9 @@ function init_run(options) {
     if (!util.check_folder(defaults_1.conf.root)) {
         throw new Error(`Invalid root path [${defaults_1.conf.root}].`);
     }
+    if (!util.check_repo(defaults_1.conf.repo)) {
+        throw new Error(`Invalid repo [${defaults_1.conf.repo}].`);
+    }
     init_log();
     _log_options();
 }
