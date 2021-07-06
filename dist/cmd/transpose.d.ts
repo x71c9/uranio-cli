@@ -1,5 +1,5 @@
 /**
- * Init command module
+ * Transpose command module
  *
  * @packageDocumentation
  */
