@@ -38,15 +38,7 @@ export const alias = {
 		
 		const aliases = _get_aliases();
 		
-		// _replace_aliases(aliases);
-		
-		const filename = `${conf.root}/.uranio/lib/service/express/new.ts`;
-		
-		const modified = _replace_file_aliases(filename, aliases);
-		
-		console.log(modified);
-		
-		// _replace_modified_file(modified, filename);
+		_replace_aliases(aliases);
 		
 		output.end_log(`Aliases updated.`);
 		
@@ -58,6 +50,7 @@ const _project_option = {
 	manipulationSettings: {
 		indentationText: tsm.IndentationText.Tab,
 		quoteKind: tsm.QuoteKind.Single,
+		newLineKind: tsm.NewLineKind.LineFeed
 	}
 };
 
@@ -71,62 +64,78 @@ function _get_aliases():Aliases{
 	return tsconf_data['compilerOptions']['paths'];
 }
 
-// function _replace_modified_file(text:string, filename:string){
-//   output.start_loading(`Writing manipulated file...`);
-//   fs.writeFileSync(filename, text);
-//   output.done_log(`alias`, `File replaced to [].`);
-// }
+function _replace_modified_file(text:string, filename:string){
+	output.start_loading(`Writing manipulated file...`);
+	fs.writeFileSync(filename, text);
+	output.done_log(`alias`, `File replaced [${filename}].`);
+}
 
-// function _replace_aliases(aliases:Aliases){
-//   _traverse_ts(`${conf.root}/.uranio/`, aliases);
-// }
+function _replace_aliases(aliases:Aliases){
+	_traverse_ts(`${conf.root}/.uranio/`, aliases);
+}
 
 function _replace_file_aliases(filepath:string, aliases:Aliases){
 	
 	const _project = new tsm.Project(_project_option);
 	let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
-	sourceFile = _change_to_relative_imports(sourceFile, aliases);
-	return sourceFile.print();
-	// console.log(sourceFile);
+	const {found, source} = _change_to_relative_imports(sourceFile, aliases);
+	sourceFile = source;
+	if(found === true){
+		const modified = sourceFile.print();
+		_replace_modified_file(modified, filepath);
+	}
+}
+
+type FoundSource = {
+	found: boolean,
+	source: tsm.SourceFile
 }
 
 function _change_to_relative_imports(sourceFile:tsm.SourceFile, aliases:Aliases)
-		:tsm.SourceFile{
-	output.start_loading(`Changing relative imports...`);
+		:FoundSource{
+	let found = false;
 	const import_decls = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.ImportDeclaration);
 	for(const import_decl of import_decls){
-		_change_to_realtive_import(import_decl, aliases);
+		if(_change_to_realtive_import(import_decl, aliases)){
+			found = true;
+		}
 	}
-	output.done_log('impr', 'Changed relative imports.');
-	return sourceFile;
+	return {found, source: sourceFile};
 }
 
 function _change_to_realtive_import(node:tsm.Node, aliases:Aliases)
-		:tsm.Node{
-	output.start_loading(`Changing relative imports...`);
+		:boolean{
+	let found = false;
 	const str_lit = node.getFirstChildByKind(tsm.ts.SyntaxKind.StringLiteral);
 	if(str_lit){
 		const text = str_lit.getText();
 		const module_name = text.substr(1, text.length - 2);
 		if(module_name in aliases){
-			const realtive_path = path.relative(node.getSourceFile().getFilePath(), `${conf.root}/${aliases[module_name][0]}`);
-			str_lit.replaceWithText(`'${realtive_path}'`);
-			output.verbose_log(`alias`, `Changed [${module_name}] to [${realtive_path}].`);
+			found = true;
+			output.start_loading(`Changing relative imports...`);
+			const node_file_path = node.getSourceFile().getFilePath();
+			const node_file_dir = path.parse(node_file_path).dir;
+			const alias = aliases[module_name][0];
+			const relative_path = path.relative(node_file_dir, `${conf.root}/${alias}`);
+			const append = (alias.slice(-1) === '/') ? '/' : '';
+			const replace = `${relative_path}${append}`;
+			str_lit.replaceWithText(`'${replace}'`);
+			output.verbose_log(`alias`, `Changed [${module_name}] to [${replace}].`);
 		}
 	}
-	return node;
+	return found;
 }
 
-// function _traverse_ts(directory:string, aliases:Aliases) {
-//   fs.readdirSync(directory).forEach((filename) => {
-//     const full_path = path.resolve(directory, filename);
-//     if (fs.statSync(full_path).isDirectory() && filename != '.git') {
-//       return _traverse_ts(full_path, aliases);
-//     }else if(filename.split('.').pop() === 'ts'){
-//       _replace_file_aliases(full_path, aliases);
-//     }
-//   });
-// }
+function _traverse_ts(directory:string, aliases:Aliases) {
+	fs.readdirSync(directory).forEach((filename) => {
+		const full_path = path.resolve(directory, filename);
+		if (fs.statSync(full_path).isDirectory() && filename != '.git') {
+			return _traverse_ts(full_path, aliases);
+		}else if(filename.split('.').pop() === 'ts'){
+			_replace_file_aliases(full_path, aliases);
+		}
+	});
+}
 
 // function _delint(sourceFile: ts.SourceFile, aliases:Aliases, filepath:string) {
 	
@@ -142,8 +151,8 @@ function _change_to_realtive_import(node:tsm.Node, aliases:Aliases)
 //             const string_literal = child.getText();
 //             const module_name = string_literal.substr(1, string_literal.length - 2);
 //             if(module_name in aliases){
-//               const realtive_path = path.relative(filepath, `${conf.root}/${aliases[module_name][0]}`);
-//               const new_string_literal = ts.factory.createStringLiteral(`'${realtive_path}'`);
+//               const relative_path = path.relative(filepath, `${conf.root}/${aliases[module_name][0]}`);
+//               const new_string_literal = ts.factory.createStringLiteral(`'${relative_path}'`);
 //               child = new_string_literal;
 //             }
 //           }
