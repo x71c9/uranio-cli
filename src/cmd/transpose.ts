@@ -1,21 +1,12 @@
 /**
- * Init command module
+ * Transpose command module
  *
  * @packageDocumentation
  */
 
 import fs from 'fs';
 
-import {
-	ts,
-	Project,
-	Node,
-	VariableDeclaration,
-	VariableStatement,
-	SourceFile,
-	QuoteKind,
-	IndentationText
-} from 'ts-morph';
+import * as tsm from 'ts-morph';
 
 import {Options} from '../types';
 
@@ -71,12 +62,12 @@ export const transpose = {
 
 const _project_option = {
 	manipulationSettings: {
-		indentationText: IndentationText.Tab,
-		quoteKind: QuoteKind.Single,
+		indentationText: tsm.IndentationText.Tab,
+		quoteKind: tsm.QuoteKind.Single,
 	}
 };
 
-// const _project = new Project(
+// const _project = new tsm.Project(
 //   {
 //     manipulationSettings: {
 //       indentationText: IndentationText.Tab,
@@ -99,7 +90,7 @@ function _manipulate_file(filepath:string){
 	
 	// let sourceFile = _project.addSourceFileAtPath(`${conf.root}/src/book.ts`);
 	
-	const _project = new Project(_project_option);
+	const _project = new tsm.Project(_project_option);
 	
 	let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
 	
@@ -115,8 +106,8 @@ function _manipulate_file(filepath:string){
 	
 }
 
-function _replace_comments(sourceFile:SourceFile)
-		:SourceFile{
+function _replace_comments(sourceFile:tsm.SourceFile)
+		:tsm.SourceFile{
 	const node = sourceFile.getFirstChild();
 	if(node){
 		const comments = node.getLeadingCommentRanges();
@@ -136,8 +127,8 @@ function _replace_comments(sourceFile:SourceFile)
 	return sourceFile;
 }
 
-function _manipulate_atom_book(sourceFile:SourceFile)
-		:SourceFile{
+function _manipulate_atom_book(sourceFile:tsm.SourceFile)
+		:tsm.SourceFile{
 	output.start_loading(`Manipulating atom_book...`);
 	let book_decl = _find_atom_book_declaration(sourceFile);
 	if(book_decl){
@@ -152,17 +143,17 @@ function _manipulate_atom_book(sourceFile:SourceFile)
 }
 
 function _create_a_book(
-	sourceFile:SourceFile,
+	sourceFile:tsm.SourceFile,
 	book_name:string,
 	keep_property:string,
 	required_book_name:string
-):SourceFile{
+):tsm.SourceFile{
 	output.start_loading(`Creating ${book_name}_book...`);
 	const book_state = _find_atom_book_statement(sourceFile);
 	if(book_state){
 		const atom_book_state_text = book_state.getText();
 		
-		const _project = new Project(_project_option);
+		const _project = new tsm.Project(_project_option);
 		
 		const cloned_book_source = _project.createSourceFile(
 			`${conf.root}/${defaults.folder}/${book_name}_book.ts`,
@@ -170,7 +161,7 @@ function _create_a_book(
 			{ overwrite: true }
 		);
 		let cloned_book_decl = cloned_book_source
-			.getFirstDescendantByKind(ts.SyntaxKind.VariableDeclaration);
+			.getFirstDescendantByKind(tsm.ts.SyntaxKind.VariableDeclaration);
 		if(cloned_book_decl){
 			cloned_book_decl = _remove_type_reference(cloned_book_decl);
 			cloned_book_decl = _rename_book(book_name, cloned_book_decl);
@@ -178,7 +169,7 @@ function _create_a_book(
 			cloned_book_decl = _append_requried_book(cloned_book_decl, required_book_name);
 			cloned_book_decl = _add_as_const(cloned_book_decl);
 		}
-		const last = sourceFile.getLastChildByKind(ts.SyntaxKind.VariableStatement);
+		const last = sourceFile.getLastChildByKind(tsm.ts.SyntaxKind.VariableStatement);
 		if(last){
 			last.replaceWithText(last.getText() + cloned_book_source.getText());
 		}
@@ -187,26 +178,26 @@ function _create_a_book(
 	return sourceFile;
 }
 
-function _create_api_book(sourceFile:SourceFile)
-		:SourceFile{
+function _create_api_book(sourceFile:tsm.SourceFile)
+		:tsm.SourceFile{
 	return _create_a_book(sourceFile, 'api', 'api', 'api');
 }
 
-function _create_bll_book(sourceFile:SourceFile)
-		:SourceFile{
+function _create_bll_book(sourceFile:tsm.SourceFile)
+		:tsm.SourceFile{
 	return _create_a_book(sourceFile, 'bll', 'bll', 'bll');
 }
 
-function _clean_all_but(but:string, var_decl:VariableDeclaration)
-		:VariableDeclaration{
+function _clean_all_but(but:string, var_decl:tsm.VariableDeclaration)
+		:tsm.VariableDeclaration{
 	output.start_loading(`Cleaning all properties but [${but}]...`);
-	const book_expr = var_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+	const book_expr = var_decl.getFirstChildByKind(tsm.ts.SyntaxKind.ObjectLiteralExpression);
 	if(book_expr){
-		const atom_names = book_expr.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
+		const atom_names = book_expr.getChildrenOfKind(tsm.ts.SyntaxKind.PropertyAssignment);
 		for(const atom_name of atom_names){
-			const atom_def = atom_name.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+			const atom_def = atom_name.getFirstChildByKind(tsm.ts.SyntaxKind.ObjectLiteralExpression);
 			if(atom_def){
-				const atom_def_props = atom_def.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
+				const atom_def_props = atom_def.getChildrenOfKind(tsm.ts.SyntaxKind.PropertyAssignment);
 				for(const atom_def_prop of atom_def_props){
 					if(atom_def_prop.getName() !== but){
 						atom_def_prop.remove();
@@ -219,16 +210,16 @@ function _clean_all_but(but:string, var_decl:VariableDeclaration)
 	return var_decl;
 }
 
-function _clean_prop(prop:string, var_decl:VariableDeclaration)
-		:VariableDeclaration{
+function _clean_prop(prop:string, var_decl:tsm.VariableDeclaration)
+		:tsm.VariableDeclaration{
 	output.start_loading(`Cleaning property [${prop}]...`);
-	const book_expr = var_decl.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+	const book_expr = var_decl.getFirstChildByKind(tsm.ts.SyntaxKind.ObjectLiteralExpression);
 	if(book_expr){
-		const atom_names = book_expr.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
+		const atom_names = book_expr.getChildrenOfKind(tsm.ts.SyntaxKind.PropertyAssignment);
 		for(const atom_name of atom_names){
-			const atom_def = atom_name.getFirstChildByKind(ts.SyntaxKind.ObjectLiteralExpression);
+			const atom_def = atom_name.getFirstChildByKind(tsm.ts.SyntaxKind.ObjectLiteralExpression);
 			if(atom_def){
-				const atom_def_props = atom_def.getChildrenOfKind(ts.SyntaxKind.PropertyAssignment);
+				const atom_def_props = atom_def.getChildrenOfKind(tsm.ts.SyntaxKind.PropertyAssignment);
 				for(const atom_def_prop of atom_def_props){
 					if(atom_def_prop.getName() === prop){
 						atom_def_prop.remove();
@@ -241,23 +232,23 @@ function _clean_prop(prop:string, var_decl:VariableDeclaration)
 	return var_decl;
 }
 
-function _rename_book(book_name:string, var_decl:VariableDeclaration)
-		:VariableDeclaration{
-	const identifier = var_decl.getFirstChildByKind(ts.SyntaxKind.Identifier);
+function _rename_book(book_name:string, var_decl:tsm.VariableDeclaration)
+		:tsm.VariableDeclaration{
+	const identifier = var_decl.getFirstChildByKind(tsm.ts.SyntaxKind.Identifier);
 	if(identifier){
 		identifier.replaceWithText(`${book_name}_book`);
 	}
 	return var_decl;
 }
 
-function _get_variable_content(source:SourceFile, variable_name:string)
+function _get_variable_content(source:tsm.SourceFile, variable_name:string)
 		:string{
-	const states = source.getChildrenOfKind(ts.SyntaxKind.VariableStatement);
+	const states = source.getChildrenOfKind(tsm.ts.SyntaxKind.VariableStatement);
 	for(const state of states){
-		const var_decl = state.getFirstDescendantByKind(ts.SyntaxKind.VariableDeclaration);
+		const var_decl = state.getFirstDescendantByKind(tsm.ts.SyntaxKind.VariableDeclaration);
 		if(var_decl){
 			if(var_decl.getName() === variable_name){
-				const syntax_list = var_decl.getFirstDescendantByKind(ts.SyntaxKind.SyntaxList);
+				const syntax_list = var_decl.getFirstDescendantByKind(tsm.ts.SyntaxKind.SyntaxList);
 				if(syntax_list){
 					return syntax_list.getText();
 				}
@@ -268,13 +259,13 @@ function _get_variable_content(source:SourceFile, variable_name:string)
 }
 
 function _add_book_from_file(
-	book_decl:VariableDeclaration,
+	book_decl:tsm.VariableDeclaration,
 	required_book_name:string,
 	books_file_path:string
 ){
 	const book_content = fs.readFileSync(books_file_path, 'utf8');
 	
-	const _project = new Project(_project_option);
+	const _project = new tsm.Project(_project_option);
 	
 	const core_books_source = _project.createSourceFile(
 		`${conf.root}/${defaults.folder}/cloned_${required_book_name}.ts`,
@@ -282,13 +273,13 @@ function _add_book_from_file(
 		{ overwrite: true }
 	);
 	const core_var_content = _get_variable_content(core_books_source, required_book_name);
-	const syntax_list = book_decl.getFirstDescendantByKind(ts.SyntaxKind.SyntaxList);
+	const syntax_list = book_decl.getFirstDescendantByKind(tsm.ts.SyntaxKind.SyntaxList);
 	if(syntax_list){
 		syntax_list.replaceWithText(core_var_content + syntax_list.getText());
 	}
 }
 
-function _add_core_books(book_decl:VariableDeclaration, required_book_name:string){
+function _add_core_books(book_decl:tsm.VariableDeclaration, required_book_name:string){
 	let core_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
 	switch(conf.repo){
 		case 'core':{
@@ -305,20 +296,20 @@ function _add_core_books(book_decl:VariableDeclaration, required_book_name:strin
 	
 }
 
-function _add_web_books(book_decl:VariableDeclaration, required_book_name:string){
+function _add_web_books(book_decl:tsm.VariableDeclaration, required_book_name:string){
 	const web_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
 	const required_books_path = `${conf.root}/${web_repo_path}/books.ts`;
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 
-function _add_ntl_books(book_decl:VariableDeclaration, required_book_name:string){
+function _add_ntl_books(book_decl:tsm.VariableDeclaration, required_book_name:string){
 	const ntl_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
 	const required_books_path = `${conf.root}/${ntl_repo_path}/books.ts`;
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 
-function _append_requried_book(book_decl:VariableDeclaration, required_book_name:string)
-		:VariableDeclaration{
+function _append_requried_book(book_decl:tsm.VariableDeclaration, required_book_name:string)
+		:tsm.VariableDeclaration{
 	output.start_loading(`Adding required books...`);
 	switch(conf.repo){
 		case 'web':{
@@ -334,10 +325,10 @@ function _append_requried_book(book_decl:VariableDeclaration, required_book_name
 	return book_decl;
 }
 
-function _change_realtive_imports(sourceFile:SourceFile)
-		:SourceFile{
+function _change_realtive_imports(sourceFile:tsm.SourceFile)
+		:tsm.SourceFile{
 	output.start_loading(`Changing relative imports...`);
-	const import_decls = sourceFile.getChildrenOfKind(ts.SyntaxKind.ImportDeclaration);
+	const import_decls = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.ImportDeclaration);
 	for(const import_decl of import_decls){
 		_change_realtive_import(import_decl);
 	}
@@ -345,17 +336,17 @@ function _change_realtive_imports(sourceFile:SourceFile)
 	return sourceFile;
 }
 
-function _add_as_const(book_decl:VariableDeclaration){
+function _add_as_const(book_decl:tsm.VariableDeclaration){
 	output.start_loading(`Adding as const...`);
 	book_decl.replaceWithText(book_decl.getText() + ' as const');
 	output.done_verbose_log(`asco`, `Added as const.`);
 	return book_decl;
 }
 
-function _change_realtive_import(node:Node)
-		:Node{
+function _change_realtive_import(node:tsm.Node)
+		:tsm.Node{
 	output.start_loading(`Changing relative imports...`);
-	const str_lit = node.getFirstChildByKind(ts.SyntaxKind.StringLiteral);
+	const str_lit = node.getFirstChildByKind(tsm.ts.SyntaxKind.StringLiteral);
 	if(str_lit){
 		const text = str_lit.getText();
 		if(text.includes('./')){
@@ -373,9 +364,9 @@ function _copy_manipulated_file(text:string){
 	output.done_log(`trns`, `Manipulated books copied to [${defaults.folder}/books.ts].`);
 }
 
-function _remove_type_reference(book_decl:VariableDeclaration){
+function _remove_type_reference(book_decl:tsm.VariableDeclaration){
 	output.start_loading(`Removing type reference...`);
-	const type_ref = book_decl.getFirstChildByKind(ts.SyntaxKind.TypeReference);
+	const type_ref = book_decl.getFirstChildByKind(tsm.ts.SyntaxKind.TypeReference);
 	if(type_ref){
 		book_decl.removeType();
 	}
@@ -383,14 +374,14 @@ function _remove_type_reference(book_decl:VariableDeclaration){
 	return book_decl;
 }
 
-function _find_atom_book_declaration(sourceFile:SourceFile)
-		:VariableDeclaration | undefined{
+function _find_atom_book_declaration(sourceFile:tsm.SourceFile)
+		:tsm.VariableDeclaration | undefined{
 	output.start_loading(`Looking for atom_book declaration...`);
-	const var_states = sourceFile.getChildrenOfKind(ts.SyntaxKind.VariableStatement);
+	const var_states = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.VariableStatement);
 	for(const state of var_states){
-		const var_decl_list = state.getFirstChildByKind(ts.SyntaxKind.VariableDeclarationList);
+		const var_decl_list = state.getFirstChildByKind(tsm.ts.SyntaxKind.VariableDeclarationList);
 		if(var_decl_list){
-			const var_decl = var_decl_list.getFirstChildByKind(ts.SyntaxKind.VariableDeclaration);
+			const var_decl = var_decl_list.getFirstChildByKind(tsm.ts.SyntaxKind.VariableDeclaration);
 			if(var_decl){
 				const name = var_decl.getName();
 				if(name === 'atom_book'){
@@ -404,14 +395,14 @@ function _find_atom_book_declaration(sourceFile:SourceFile)
 	return undefined;
 }
 
-function _find_atom_book_statement(sourceFile:SourceFile)
-		:VariableStatement | undefined{
+function _find_atom_book_statement(sourceFile:tsm.SourceFile)
+		:tsm.VariableStatement | undefined{
 	output.start_loading(`Looking for atom_book statement...`);
-	const var_states = sourceFile.getChildrenOfKind(ts.SyntaxKind.VariableStatement);
+	const var_states = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.VariableStatement);
 	for(const state of var_states){
-		const var_decl_list = state.getFirstChildByKind(ts.SyntaxKind.VariableDeclarationList);
+		const var_decl_list = state.getFirstChildByKind(tsm.ts.SyntaxKind.VariableDeclarationList);
 		if(var_decl_list){
-			const var_decl = var_decl_list.getFirstChildByKind(ts.SyntaxKind.VariableDeclaration);
+			const var_decl = var_decl_list.getFirstChildByKind(tsm.ts.SyntaxKind.VariableDeclaration);
 			if(var_decl){
 				const name = var_decl.getName();
 				if(name === 'atom_book'){

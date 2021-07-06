@@ -8,7 +8,14 @@ import {Arguments} from './types';
 
 import * as util from './util/';
 
-import {help, init, transpose, dev, test} from './cmd/';
+import {
+	help,
+	init,
+	transpose,
+	dev,
+	test,
+	alias
+} from './cmd/';
 
 import {conf} from './conf/defaults';
 
@@ -143,6 +150,10 @@ function _switch_command(args:Arguments){
 		}
 		case 'transpose':{
 			transpose.command();
+			break;
+		}
+		case 'alias':{
+			alias.command();
 			break;
 		}
 		case 'dev':{

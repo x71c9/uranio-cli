@@ -128,6 +128,10 @@ function _switch_command(args) {
             cmd_1.transpose.command();
             break;
         }
+        case 'alias': {
+            cmd_1.alias.command();
+            break;
+        }
         case 'dev': {
             cmd_1.dev.command();
             break;

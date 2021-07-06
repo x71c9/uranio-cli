@@ -12,6 +12,7 @@
 		"test": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js test -vbf --noblank\"",
 		"version": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v\"",
 		"dev": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js dev\"",
+		"alias": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js alias -v\"",
 		"run": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/test.js\""
 	},
 	"repository": {
