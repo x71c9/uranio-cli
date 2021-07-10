@@ -43,6 +43,7 @@ const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const common = __importStar(require("./common"));
+const alias_1 = require("./alias");
 const atom_book_required_properties = ['properties', 'security', 'connection'];
 exports.transpose = {
     run: (root, options) => __awaiter(void 0, void 0, void 0, function* () {
@@ -57,6 +58,7 @@ exports.transpose = {
         util.create_folder_if_doesnt_exists('tmp', tmp_book_folder);
         util.copy_file('bkp', `${defaults_1.conf.root}/src/book.ts`, `${tmp_book_folder}/book.ts`);
         _manipulate_and_create_files(`${tmp_book_folder}/book.ts`);
+        _replace_book_aliases();
         util.remove_folder_if_exists('tmp', tmp_book_folder);
         output.end_log(`Transpose completed.`);
     })
@@ -75,9 +77,9 @@ const _project_option = {
 //     }
 //   }
 // );
-function _pretty_books() {
-    util.pretty(`${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/books/atom.ts`);
-}
+// function _pretty_books(){
+//   util.pretty(`${conf.root}/${defaults.folder}/server/books/atom.ts`);
+// }
 function _manipulate_and_create_files(filepath) {
     const action = `manipulating [src/book.ts]`;
     output.start_loading(`${action[0].toUpperCase()}${action.substr(1)}...`);
@@ -94,7 +96,7 @@ function _manipulate_and_create_files(filepath) {
     // sourceFile = _manipulate_atom_book(sourceFile);
     // const modified = sourceFile.print();
     // _create_manipulated_file(modified);
-    _pretty_books();
+    // _pretty_books();
     // _type_check_books();
 }
 function _replace_comments(sourceFile) {
@@ -408,6 +410,13 @@ function _copy_imports(sourceFile) {
     }
     output.verbose_log('book', `Copied import statements.`);
     return states;
+}
+function _replace_book_aliases() {
+    const books_dir = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/books/`;
+    const aliases = alias_1.get_aliases();
+    alias_1.replace_file_aliases(`${books_dir}/atom.ts`, aliases);
+    alias_1.replace_file_aliases(`${books_dir}/api.ts`, aliases);
+    alias_1.replace_file_aliases(`${books_dir}/bll.ts`, aliases);
 }
 // function _type_check_books(){
 //   // ****

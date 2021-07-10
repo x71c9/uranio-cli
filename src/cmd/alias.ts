@@ -36,7 +36,7 @@ export const alias = {
 		
 		util.read_rc_file();
 		
-		const aliases = _get_aliases();
+		const aliases = get_aliases();
 		
 		_replace_aliases(aliases);
 		
@@ -72,7 +72,7 @@ type Aliases = {
 	[key:string]: string[]
 }
 
-function _get_aliases():Aliases{
+export function get_aliases():Aliases{
 	const data = fs.readFileSync(`${conf.root}/tsconfig.json`, 'utf8');
 	const tsconf_data = JSON.parse(data);
 	return tsconf_data['compilerOptions']['paths'];
@@ -88,7 +88,7 @@ function _replace_aliases(aliases:Aliases){
 	_traverse_ts(`${conf.root}/.uranio/`, aliases);
 }
 
-function _replace_file_aliases(filepath:string, aliases:Aliases){
+export function replace_file_aliases(filepath:string, aliases:Aliases):void{
 	const _project = new tsm.Project(_project_option);
 	let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
 	const {found, source} = _change_to_relative_imports(sourceFile, aliases);
@@ -150,7 +150,7 @@ function _traverse_ts(directory:string, aliases:Aliases) {
 		if (fs.statSync(full_path).isDirectory() && filename != '.git') {
 			return _traverse_ts(full_path, aliases);
 		}else if(filename.split('.').pop() === 'ts'){
-			_replace_file_aliases(full_path, aliases);
+			replace_file_aliases(full_path, aliases);
 		}
 	});
 }
