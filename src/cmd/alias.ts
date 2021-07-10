@@ -96,6 +96,7 @@ function _replace_file_aliases(filepath:string, aliases:Aliases){
 	if(found === true){
 		const modified = sourceFile.print();
 		_replace_modified_file(modified, filepath);
+		util.pretty(filepath);
 	}
 }
 

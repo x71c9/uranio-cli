@@ -18,6 +18,8 @@ import * as util from '../util/';
 
 import * as common from './common';
 
+const atom_book_required_properties = ['properties', 'security', 'connection'];
+
 export const transpose = {
 	
 	run: async (root:string, options?:Partial<Options>):Promise<void> => {
@@ -46,11 +48,7 @@ export const transpose = {
 			`${tmp_book_folder}/book.ts`
 		);
 		
-		const modified = _manipulate_file(`${tmp_book_folder}/book.ts`);
-		
-		_copy_manipulated_file(modified);
-		
-		_pretty_books();
+		_manipulate_and_create_files(`${tmp_book_folder}/book.ts`);
 		
 		util.remove_folder_if_exists('tmp', tmp_book_folder);
 		
@@ -77,10 +75,10 @@ const _project_option = {
 // );
 
 function _pretty_books(){
-	util.pretty(`${conf.root}/${defaults.folder}/books.ts`);
+	util.pretty(`${conf.root}/${defaults.folder}/server/books/atom.ts`);
 }
 
-function _manipulate_file(filepath:string){
+function _manipulate_and_create_files(filepath:string){
 	
 	const action = `manipulating [src/book.ts]`;
 	
@@ -97,12 +95,21 @@ function _manipulate_file(filepath:string){
 	sourceFile = _replace_comments(sourceFile);
 	sourceFile = _change_realtive_imports(sourceFile);
 	
-	sourceFile = _create_bll_book(sourceFile);
-	sourceFile = _create_api_book(sourceFile);
+	const import_statements = _copy_imports(sourceFile);
 	
-	sourceFile = _manipulate_atom_book(sourceFile);
+	_create_bll_book(sourceFile, import_statements);
+	_create_api_book(sourceFile, import_statements);
+	_create_atom_book(sourceFile, import_statements);
 	
-	return sourceFile.print();
+	// sourceFile = _manipulate_atom_book(sourceFile);
+	
+	// const modified = sourceFile.print();
+	
+	// _create_manipulated_file(modified);
+	
+	_pretty_books();
+	
+	// _type_check_books();
 	
 }
 
@@ -127,25 +134,26 @@ function _replace_comments(sourceFile:tsm.SourceFile)
 	return sourceFile;
 }
 
-function _manipulate_atom_book(sourceFile:tsm.SourceFile)
-		:tsm.SourceFile{
-	output.start_loading(`Manipulating atom_book...`);
-	let book_decl = _find_atom_book_declaration(sourceFile);
-	if(book_decl){
-		book_decl = _remove_type_reference(book_decl);
-		book_decl = _clean_prop('bll', book_decl);
-		book_decl = _clean_prop('api', book_decl);
-		book_decl = _append_requried_book(book_decl, 'atom');
-		book_decl = _add_as_const(book_decl);
-	}
-	output.done_log('mnpl', 'Done manipulating atom_book.');
-	return sourceFile;
-}
+// function _manipulate_atom_book(sourceFile:tsm.SourceFile)
+//     :tsm.SourceFile{
+//   output.start_loading(`Manipulating atom_book...`);
+//   let book_decl = _find_atom_book_declaration(sourceFile);
+//   if(book_decl){
+//     book_decl = _remove_type_reference(book_decl);
+//     book_decl = _clean_prop('bll', book_decl);
+//     book_decl = _clean_prop('api', book_decl);
+//     book_decl = _append_requried_book(book_decl, 'atom');
+//     book_decl = _add_as_const(book_decl);
+//   }
+//   output.done_log('mnpl', 'Done manipulating atom_book.');
+//   return sourceFile;
+// }
 
 function _create_a_book(
 	sourceFile:tsm.SourceFile,
+	import_statements:string[],
 	book_name:string,
-	keep_property:string,
+	keep_properties:string[],
 	required_book_name:string
 ):tsm.SourceFile{
 	output.start_loading(`Creating ${book_name}_book...`);
@@ -156,7 +164,7 @@ function _create_a_book(
 		const _project = new tsm.Project(_project_option);
 		
 		const cloned_book_source = _project.createSourceFile(
-			`${conf.root}/${defaults.folder}/${book_name}_book.ts`,
+			`${conf.root}/${defaults.folder}/server/books/${book_name}.ts`,
 			atom_book_state_text,
 			{ overwrite: true }
 		);
@@ -165,30 +173,70 @@ function _create_a_book(
 		if(cloned_book_decl){
 			cloned_book_decl = _remove_type_reference(cloned_book_decl);
 			cloned_book_decl = _rename_book(book_name, cloned_book_decl);
-			cloned_book_decl = _clean_all_but(keep_property, cloned_book_decl);
+			cloned_book_decl = _clean_all_but(keep_properties, cloned_book_decl);
 			cloned_book_decl = _append_requried_book(cloned_book_decl, required_book_name);
 			cloned_book_decl = _add_as_const(cloned_book_decl);
 		}
-		const last = sourceFile.getLastChildByKind(tsm.ts.SyntaxKind.VariableStatement);
-		if(last){
-			last.replaceWithText(last.getText() + cloned_book_source.getText());
-		}
+		
+		// const last = sourceFile.getLastChildByKind(tsm.ts.SyntaxKind.VariableStatement);
+		// if(last){
+		//   last.replaceWithText(last.getText() + cloned_book_source.getText());
+		// }
+		
+		const required_imports = _get_required_imports(import_statements, cloned_book_source.getText());
+		
+		const filepath = `${conf.root}/${defaults.folder}/server/books/${book_name}.ts`;
+		const text = required_imports.join('\n') + cloned_book_source.getText();
+		_create_a_book_file(filepath, text);
+		
 	}
-	output.done_log(book_name, `Created ${book_name}_book.`);
+	output.done_log(book_name, `Created books/${book_name}.`);
 	return sourceFile;
 }
 
-function _create_api_book(sourceFile:tsm.SourceFile)
-		:tsm.SourceFile{
-	return _create_a_book(sourceFile, 'api', 'api', 'api');
+function _get_required_imports(import_statements:string[], text:string){
+	
+	const required_import_statements:string[] = [];
+	
+	const str_project = new tsm.Project({
+		tsConfigFilePath: `${conf.root}/tsconfig.json`,
+		skipFileDependencyResolution: true
+	});
+	for(let i = 0; i < import_statements.length; i++){
+		const imp_state = import_statements[i];
+		const str_source_file = str_project.createSourceFile(`file${i}.ts`, imp_state);
+		const import_decls = str_source_file.getDescendantsOfKind(tsm.ts.SyntaxKind.ImportDeclaration);
+		for(const decl of import_decls){
+			const identifiers = decl.getDescendantsOfKind(tsm.ts.SyntaxKind.Identifier);
+			for(const idf of identifiers){
+				const idf_text = idf.getText();
+				const regex = new RegExp(`\\b${idf_text}\\b`);
+				if(regex.test(text)){
+					required_import_statements.push(decl.getText());
+				}
+			}
+		}
+	}
+	
+	return required_import_statements;
 }
 
-function _create_bll_book(sourceFile:tsm.SourceFile)
+function _create_atom_book(sourceFile:tsm.SourceFile, import_statements:string[])
 		:tsm.SourceFile{
-	return _create_a_book(sourceFile, 'bll', 'bll', 'bll');
+	return _create_a_book(sourceFile, import_statements, 'atom', atom_book_required_properties, 'atom');
 }
 
-function _clean_all_but(but:string, var_decl:tsm.VariableDeclaration)
+function _create_api_book(sourceFile:tsm.SourceFile, import_statements:string[])
+		:tsm.SourceFile{
+	return _create_a_book(sourceFile, import_statements, 'api', ['api'], 'api');
+}
+
+function _create_bll_book(sourceFile:tsm.SourceFile, import_statements:string[])
+		:tsm.SourceFile{
+	return _create_a_book(sourceFile, import_statements, 'bll', ['bll'], 'bll');
+}
+
+function _clean_all_but(but:string[], var_decl:tsm.VariableDeclaration)
 		:tsm.VariableDeclaration{
 	output.start_loading(`Cleaning all properties but [${but}]...`);
 	const book_expr = var_decl.getFirstChildByKind(tsm.ts.SyntaxKind.ObjectLiteralExpression);
@@ -199,7 +247,7 @@ function _clean_all_but(but:string, var_decl:tsm.VariableDeclaration)
 			if(atom_def){
 				const atom_def_props = atom_def.getChildrenOfKind(tsm.ts.SyntaxKind.PropertyAssignment);
 				for(const atom_def_prop of atom_def_props){
-					if(atom_def_prop.getName() !== but){
+					if(!but.includes(atom_def_prop.getName())){
 						atom_def_prop.remove();
 					}
 				}
@@ -210,27 +258,27 @@ function _clean_all_but(but:string, var_decl:tsm.VariableDeclaration)
 	return var_decl;
 }
 
-function _clean_prop(prop:string, var_decl:tsm.VariableDeclaration)
-		:tsm.VariableDeclaration{
-	output.start_loading(`Cleaning property [${prop}]...`);
-	const book_expr = var_decl.getFirstChildByKind(tsm.ts.SyntaxKind.ObjectLiteralExpression);
-	if(book_expr){
-		const atom_names = book_expr.getChildrenOfKind(tsm.ts.SyntaxKind.PropertyAssignment);
-		for(const atom_name of atom_names){
-			const atom_def = atom_name.getFirstChildByKind(tsm.ts.SyntaxKind.ObjectLiteralExpression);
-			if(atom_def){
-				const atom_def_props = atom_def.getChildrenOfKind(tsm.ts.SyntaxKind.PropertyAssignment);
-				for(const atom_def_prop of atom_def_props){
-					if(atom_def_prop.getName() === prop){
-						atom_def_prop.remove();
-					}
-				}
-			}
-		}
-	}
-	output.done_verbose_log('prop', `Removed property [${prop}].`);
-	return var_decl;
-}
+// function _clean_prop(prop:string, var_decl:tsm.VariableDeclaration)
+//     :tsm.VariableDeclaration{
+//   output.start_loading(`Cleaning property [${prop}]...`);
+//   const book_expr = var_decl.getFirstChildByKind(tsm.ts.SyntaxKind.ObjectLiteralExpression);
+//   if(book_expr){
+//     const atom_names = book_expr.getChildrenOfKind(tsm.ts.SyntaxKind.PropertyAssignment);
+//     for(const atom_name of atom_names){
+//       const atom_def = atom_name.getFirstChildByKind(tsm.ts.SyntaxKind.ObjectLiteralExpression);
+//       if(atom_def){
+//         const atom_def_props = atom_def.getChildrenOfKind(tsm.ts.SyntaxKind.PropertyAssignment);
+//         for(const atom_def_prop of atom_def_props){
+//           if(atom_def_prop.getName() === prop){
+//             atom_def_prop.remove();
+//           }
+//         }
+//       }
+//     }
+//   }
+//   output.done_verbose_log('prop', `Removed property [${prop}].`);
+//   return var_decl;
+// }
 
 function _rename_book(book_name:string, var_decl:tsm.VariableDeclaration)
 		:tsm.VariableDeclaration{
@@ -350,7 +398,7 @@ function _change_realtive_import(node:tsm.Node)
 	if(str_lit){
 		const text = str_lit.getText();
 		if(text.includes('./')){
-			const replace = text.replace('./','../src/');
+			const replace = text.replace('./','../../../src/');
 			str_lit.replaceWithText(replace);
 			output.verbose_log(`impo`, `Changed [${text}] to [${replace}].`);
 		}
@@ -358,11 +406,11 @@ function _change_realtive_import(node:tsm.Node)
 	return node;
 }
 
-function _copy_manipulated_file(text:string){
-	output.start_loading(`Writing manipulated book...`);
-	fs.writeFileSync(`${conf.root}/${defaults.folder}/books.ts`, text);
-	output.done_log(`trns`, `Manipulated books copied to [${defaults.folder}/books.ts].`);
-}
+// function _create_manipulated_file(text:string){
+//   output.start_loading(`Writing manipulated book...`);
+//   fs.writeFileSync(`${conf.root}/${defaults.folder}/server/books/atom.ts`, text);
+//   output.done_log(`trns`, `Manipulated books copied to [${defaults.folder}/server/books/atom.ts].`);
+// }
 
 function _remove_type_reference(book_decl:tsm.VariableDeclaration){
 	output.start_loading(`Removing type reference...`);
@@ -374,26 +422,26 @@ function _remove_type_reference(book_decl:tsm.VariableDeclaration){
 	return book_decl;
 }
 
-function _find_atom_book_declaration(sourceFile:tsm.SourceFile)
-		:tsm.VariableDeclaration | undefined{
-	output.start_loading(`Looking for atom_book declaration...`);
-	const var_states = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.VariableStatement);
-	for(const state of var_states){
-		const var_decl_list = state.getFirstChildByKind(tsm.ts.SyntaxKind.VariableDeclarationList);
-		if(var_decl_list){
-			const var_decl = var_decl_list.getFirstChildByKind(tsm.ts.SyntaxKind.VariableDeclaration);
-			if(var_decl){
-				const name = var_decl.getName();
-				if(name === 'atom_book'){
-					output.verbose_log(`book`, `Declaration of atom_book found.`);
-					return var_decl;
-				}
-			}
-		}
-	}
-	output.verbose_log('book', `Cannot find atom_book`);
-	return undefined;
-}
+// function _find_atom_book_declaration(sourceFile:tsm.SourceFile)
+//     :tsm.VariableDeclaration | undefined{
+//   output.start_loading(`Looking for atom_book declaration...`);
+//   const var_states = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.VariableStatement);
+//   for(const state of var_states){
+//     const var_decl_list = state.getFirstChildByKind(tsm.ts.SyntaxKind.VariableDeclarationList);
+//     if(var_decl_list){
+//       const var_decl = var_decl_list.getFirstChildByKind(tsm.ts.SyntaxKind.VariableDeclaration);
+//       if(var_decl){
+//         const name = var_decl.getName();
+//         if(name === 'atom_book'){
+//           output.verbose_log(`book`, `Declaration of atom_book found.`);
+//           return var_decl;
+//         }
+//       }
+//     }
+//   }
+//   output.verbose_log('book', `Cannot find atom_book`);
+//   return undefined;
+// }
 
 function _find_atom_book_statement(sourceFile:tsm.SourceFile)
 		:tsm.VariableStatement | undefined{
@@ -415,3 +463,59 @@ function _find_atom_book_statement(sourceFile:tsm.SourceFile)
 	output.verbose_log('book', `Cannot find atom_book`);
 	return undefined;
 }
+
+function _create_a_book_file(filepath:string, text:string){
+	output.start_loading(`Creating book file [${filepath}]...`);
+	util.sync_exec(`rm -f ${filepath}`);
+	util.sync_exec(`touch ${filepath}`);
+	let comment = '';
+	comment += `/**\n`;
+	comment += ` *\n`;
+	comment += ` * Autogenerated book from urn-cli\n`;
+	comment += ` *\n`;
+	comment += ` */\n`;
+	const content = comment + text;
+	fs.writeFileSync(filepath, content);
+	util.pretty(filepath);
+	output.done_verbose_log(`book`, `Created book file [${filepath}].`);
+}
+
+function _copy_imports(sourceFile:tsm.SourceFile){
+	output.start_loading(`Copying import statements...`);
+	const import_states = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.ImportDeclaration);
+	const states:string[] = [];
+	for(const state of import_states){
+		states.push(state.getText());
+	}
+	output.verbose_log('book', `Copied import statements.`);
+	return states;
+}
+
+// function _type_check_books(){
+//   // ****
+//   // TS CHECKER WILL CHECK IF THE ERROR IS 6133 [is declared but never used]
+//   // ****
+//   // const file_paths = [`${conf.root}/${defaults.folder}/server/books/atom.ts`];
+//   // const _project = new tsm.Project({
+//   //   tsConfigFilePath: `${conf.root}/tsconfig.json`,
+//   //   skipFileDependencyResolution: true
+//   // });
+//   // _project.addSourceFilesAtPaths(file_paths);
+//   // _project.emitToMemory();
+//   // for (const diagnostic of _project.getPreEmitDiagnostics()){
+//   //   const filepath = diagnostic.getSourceFile()?.getFilePath();
+//   //   if(filepath === file_paths[0]){
+//   //     if(diagnostic.getCode() === 6133){
+//   //       console.log(diagnostic.getMessageText());
+//   //     }
+//   //   }
+//   // }
+//   // const _project = new tsm.Project({
+//   //   tsConfigFilePath: `${conf.root}/tsconfig.json`,
+//   //   skipFileDependencyResolution: true
+//   // });
+//   // _project.createSourceFile('file.ts','');
+// }
+
+
+
