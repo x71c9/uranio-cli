@@ -26,6 +26,8 @@ import * as common from './common';
 
 import {title} from './title';
 
+import {alias} from './alias';
+
 export const init = {
 	
 	run: async (root:string, repo:Repo, options:Partial<Options>):Promise<void> => {
@@ -102,9 +104,12 @@ async function _initialize()
 	await _clone_dot();
 	_copy_dot_files();
 	await _clone_and_install_repo();
+	_remove_git_files();
 	_create_client_server_folders();
 	_remove_tmp();
-		
+	
+	_update_relative_paths();
+	
 	output.end_log(`Initialization completed.`);
 	
 }
@@ -440,3 +445,17 @@ async function _clone_ntl(){
 	await util.clone_repo_recursive('ntl_', defaults.ntl_repo, `${conf.root}/${defaults.folder}/${defaults.repo_folder}`);
 	output.done_log('ntl', `Cloned ntl repo.`);
 }
+
+function _remove_git_files(){
+	output.start_loading(`Removing git files...`);
+	const cloned_repo_path = `${conf.root}/${defaults.folder}/${defaults.repo_folder}`;
+	util.sync_exec(`( find ${cloned_repo_path} -name ".git*" ) | xargs rm -rf`);
+	output.done_log('.git', `Removed uranio .git files.`);
+}
+
+function _update_relative_paths(){
+	output.start_loading(`Updating relative paths aliases...`);
+	alias.include();
+}
+
+

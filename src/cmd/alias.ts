@@ -22,15 +22,15 @@ import * as tsm from 'ts-morph';
 
 export const alias = {
 	
-	run: async (options?:Partial<Options>):Promise<void> => {
+	run: (options?:Partial<Options>):void => {
 		
 		common.init_run(options);
 		
-		await alias.command();
+		alias.command();
 		
 	},
 	
-	command: async ():Promise<void> => {
+	command: ():void => {
 		
 		output.start_loading('Updating aliases...');
 		
@@ -41,6 +41,20 @@ export const alias = {
 		_replace_aliases(aliases);
 		
 		output.end_log(`Aliases updated.`);
+		
+	},
+	
+	include: ():void => {
+		
+		const is_hidden = conf.hide;
+		
+		conf.hide = true;
+		
+		alias.command();
+		
+		conf.hide = is_hidden;
+		
+		output.done_log('alias', `Aliases updated.`);
 		
 	}
 	
@@ -67,7 +81,7 @@ function _get_aliases():Aliases{
 function _replace_modified_file(text:string, filename:string){
 	output.start_loading(`Writing manipulated file...`);
 	fs.writeFileSync(filename, text);
-	output.done_log(`alias`, `File replaced [${filename}].`);
+	output.done_verbose_log(`alias`, `File replaced [${filename}].`);
 }
 
 function _replace_aliases(aliases:Aliases){
@@ -75,7 +89,6 @@ function _replace_aliases(aliases:Aliases){
 }
 
 function _replace_file_aliases(filepath:string, aliases:Aliases){
-	
 	const _project = new tsm.Project(_project_option);
 	let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
 	const {found, source} = _change_to_relative_imports(sourceFile, aliases);
@@ -116,9 +129,13 @@ function _change_to_realtive_import(node:tsm.Node, aliases:Aliases)
 			const node_file_path = node.getSourceFile().getFilePath();
 			const node_file_dir = path.parse(node_file_path).dir;
 			const alias = aliases[module_name][0];
-			const relative_path = path.relative(node_file_dir, `${conf.root}/${alias}`);
-			const append = (alias.slice(-1) === '/') ? '/' : '';
-			const replace = `${relative_path}${append}`;
+			let relative_path = path.relative(node_file_dir, `${conf.root}/${alias}`);
+			if(relative_path === ''){
+				relative_path = './index';
+			}
+			const append = (alias.slice(-1) === '/' && relative_path !== './index') ? '/' : '';
+			const prepend = (relative_path.charAt(0) !== '.') ? './' : '';
+			const replace = `${prepend}${relative_path}${append}`;
 			str_lit.replaceWithText(`'${replace}'`);
 			output.verbose_log(`alias`, `Changed [${module_name}] to [${replace}].`);
 		}
@@ -136,39 +153,4 @@ function _traverse_ts(directory:string, aliases:Aliases) {
 		}
 	});
 }
-
-// function _delint(sourceFile: ts.SourceFile, aliases:Aliases, filepath:string) {
-	
-//   delintNode(sourceFile);
-	
-//   function delintNode(node: ts.Node) {
-//     switch (node.kind) {
-//       case ts.SyntaxKind.ImportDeclaration:{
-//         const children = node.getChildren();
-//         for(let i = 0; i < children.length; i++){
-//           let child = children[i];
-//           if(children[i].kind === ts.SyntaxKind.StringLiteral){
-//             const string_literal = child.getText();
-//             const module_name = string_literal.substr(1, string_literal.length - 2);
-//             if(module_name in aliases){
-//               const relative_path = path.relative(filepath, `${conf.root}/${aliases[module_name][0]}`);
-//               const new_string_literal = ts.factory.createStringLiteral(`'${relative_path}'`);
-//               child = new_string_literal;
-//             }
-//           }
-//         }
-//         break;
-//       }
-//     }
-//     ts.forEachChild(node, delintNode);
-//   }
-	
-//   // function report(node: ts.Node, message: string) {
-//   //   const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
-//   //   console.log(`${sourceFile.fileName} (${line + 1},${character + 1}): ${message}`);
-//   // }
-	
-//   return sourceFile;
-	
-// }
 
