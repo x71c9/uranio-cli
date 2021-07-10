@@ -83,6 +83,7 @@ function _replace_file_aliases(filepath, aliases) {
     if (found === true) {
         const modified = sourceFile.print();
         _replace_modified_file(modified, filepath);
+        util.pretty(filepath);
     }
 }
 function _change_to_relative_imports(sourceFile, aliases) {

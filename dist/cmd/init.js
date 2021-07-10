@@ -280,8 +280,10 @@ function _create_urn_folder() {
 function _create_client_server_folders() {
     output.start_loading(`Creating client folder...`);
     util.create_folder_if_doesnt_exists('init', `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client`);
+    util.create_folder_if_doesnt_exists('init', `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/books`);
     output.start_loading(`Creating server folder...`);
     util.create_folder_if_doesnt_exists('init', `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server`);
+    util.create_folder_if_doesnt_exists('init', `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/books`);
     if (defaults_1.conf.repo === 'ntl') {
         output.start_loading(`Creating server functions folder...`);
         util.create_folder_if_doesnt_exists('init', `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/functions`);
