@@ -18,6 +18,8 @@ import * as util from '../util/';
 
 import * as common from './common';
 
+import {replace_file_aliases, get_aliases} from './alias';
+
 const atom_book_required_properties = ['properties', 'security', 'connection'];
 
 export const transpose = {
@@ -50,6 +52,8 @@ export const transpose = {
 		
 		_manipulate_and_create_files(`${tmp_book_folder}/book.ts`);
 		
+		_replace_book_aliases();
+		
 		util.remove_folder_if_exists('tmp', tmp_book_folder);
 		
 		output.end_log(`Transpose completed.`);
@@ -74,9 +78,9 @@ const _project_option = {
 //   }
 // );
 
-function _pretty_books(){
-	util.pretty(`${conf.root}/${defaults.folder}/server/books/atom.ts`);
-}
+// function _pretty_books(){
+//   util.pretty(`${conf.root}/${defaults.folder}/server/books/atom.ts`);
+// }
 
 function _manipulate_and_create_files(filepath:string){
 	
@@ -107,7 +111,7 @@ function _manipulate_and_create_files(filepath:string){
 	
 	// _create_manipulated_file(modified);
 	
-	_pretty_books();
+	// _pretty_books();
 	
 	// _type_check_books();
 	
@@ -489,6 +493,14 @@ function _copy_imports(sourceFile:tsm.SourceFile){
 	}
 	output.verbose_log('book', `Copied import statements.`);
 	return states;
+}
+
+function _replace_book_aliases(){
+	const books_dir = `${conf.root}/${defaults.folder}/server/books/`;
+	const aliases = get_aliases();
+	replace_file_aliases(`${books_dir}/atom.ts`,aliases);
+	replace_file_aliases(`${books_dir}/api.ts`,aliases);
+	replace_file_aliases(`${books_dir}/bll.ts`,aliases);
 }
 
 // function _type_check_books(){

@@ -27,7 +27,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.alias = void 0;
+exports.replace_file_aliases = exports.get_aliases = exports.alias = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const defaults_1 = require("../conf/defaults");
@@ -43,7 +43,7 @@ exports.alias = {
     command: () => {
         output.start_loading('Updating aliases...');
         util.read_rc_file();
-        const aliases = _get_aliases();
+        const aliases = get_aliases();
         _replace_aliases(aliases);
         output.end_log(`Aliases updated.`);
     },
@@ -62,11 +62,12 @@ const _project_option = {
         newLineKind: tsm.NewLineKind.LineFeed
     }
 };
-function _get_aliases() {
+function get_aliases() {
     const data = fs_1.default.readFileSync(`${defaults_1.conf.root}/tsconfig.json`, 'utf8');
     const tsconf_data = JSON.parse(data);
     return tsconf_data['compilerOptions']['paths'];
 }
+exports.get_aliases = get_aliases;
 function _replace_modified_file(text, filename) {
     output.start_loading(`Writing manipulated file...`);
     fs_1.default.writeFileSync(filename, text);
@@ -75,7 +76,7 @@ function _replace_modified_file(text, filename) {
 function _replace_aliases(aliases) {
     _traverse_ts(`${defaults_1.conf.root}/.uranio/`, aliases);
 }
-function _replace_file_aliases(filepath, aliases) {
+function replace_file_aliases(filepath, aliases) {
     const _project = new tsm.Project(_project_option);
     let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
     const { found, source } = _change_to_relative_imports(sourceFile, aliases);
@@ -86,6 +87,7 @@ function _replace_file_aliases(filepath, aliases) {
         util.pretty(filepath);
     }
 }
+exports.replace_file_aliases = replace_file_aliases;
 function _change_to_relative_imports(sourceFile, aliases) {
     let found = false;
     const import_decls = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.ImportDeclaration);
@@ -128,7 +130,7 @@ function _traverse_ts(directory, aliases) {
             return _traverse_ts(full_path, aliases);
         }
         else if (filename.split('.').pop() === 'ts') {
-            _replace_file_aliases(full_path, aliases);
+            replace_file_aliases(full_path, aliases);
         }
     });
 }
