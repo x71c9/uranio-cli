@@ -45,6 +45,7 @@ const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const common = __importStar(require("./common"));
 const title_1 = require("./title");
+const alias_1 = require("./alias");
 exports.init = {
     run: (root, repo, options) => __awaiter(void 0, void 0, void 0, function* () {
         options.root = root;
@@ -100,8 +101,10 @@ function _initialize() {
         yield _clone_dot();
         _copy_dot_files();
         yield _clone_and_install_repo();
+        _remove_git_files();
         _create_client_server_folders();
         _remove_tmp();
+        _update_relative_paths();
         output.end_log(`Initialization completed.`);
     });
 }
@@ -417,5 +420,15 @@ function _clone_ntl() {
         yield util.clone_repo_recursive('ntl_', defaults_1.defaults.ntl_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`);
         output.done_log('ntl', `Cloned ntl repo.`);
     });
+}
+function _remove_git_files() {
+    output.start_loading(`Removing git files...`);
+    const cloned_repo_path = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`;
+    util.sync_exec(`( find ${cloned_repo_path} -name ".git*" ) | xargs rm -rf`);
+    output.done_log('.git', `Removed uranio .git files.`);
+}
+function _update_relative_paths() {
+    output.start_loading(`Updating relative paths aliases...`);
+    alias_1.alias.include();
 }
 //# sourceMappingURL=init.js.map

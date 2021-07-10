@@ -23,15 +23,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -45,17 +36,24 @@ const util = __importStar(require("../util/"));
 const common = __importStar(require("./common"));
 const tsm = __importStar(require("ts-morph"));
 exports.alias = {
-    run: (options) => __awaiter(void 0, void 0, void 0, function* () {
+    run: (options) => {
         common.init_run(options);
-        yield exports.alias.command();
-    }),
-    command: () => __awaiter(void 0, void 0, void 0, function* () {
+        exports.alias.command();
+    },
+    command: () => {
         output.start_loading('Updating aliases...');
         util.read_rc_file();
         const aliases = _get_aliases();
         _replace_aliases(aliases);
         output.end_log(`Aliases updated.`);
-    })
+    },
+    include: () => {
+        const is_hidden = defaults_1.conf.hide;
+        defaults_1.conf.hide = true;
+        exports.alias.command();
+        defaults_1.conf.hide = is_hidden;
+        output.done_log('alias', `Aliases updated.`);
+    }
 };
 const _project_option = {
     manipulationSettings: {
@@ -72,7 +70,7 @@ function _get_aliases() {
 function _replace_modified_file(text, filename) {
     output.start_loading(`Writing manipulated file...`);
     fs_1.default.writeFileSync(filename, text);
-    output.done_log(`alias`, `File replaced [${filename}].`);
+    output.done_verbose_log(`alias`, `File replaced [${filename}].`);
 }
 function _replace_aliases(aliases) {
     _traverse_ts(`${defaults_1.conf.root}/.uranio/`, aliases);
@@ -109,9 +107,13 @@ function _change_to_realtive_import(node, aliases) {
             const node_file_path = node.getSourceFile().getFilePath();
             const node_file_dir = path_1.default.parse(node_file_path).dir;
             const alias = aliases[module_name][0];
-            const relative_path = path_1.default.relative(node_file_dir, `${defaults_1.conf.root}/${alias}`);
-            const append = (alias.slice(-1) === '/') ? '/' : '';
-            const replace = `${relative_path}${append}`;
+            let relative_path = path_1.default.relative(node_file_dir, `${defaults_1.conf.root}/${alias}`);
+            if (relative_path === '') {
+                relative_path = './index';
+            }
+            const append = (alias.slice(-1) === '/' && relative_path !== './index') ? '/' : '';
+            const prepend = (relative_path.charAt(0) !== '.') ? './' : '';
+            const replace = `${prepend}${relative_path}${append}`;
             str_lit.replaceWithText(`'${replace}'`);
             output.verbose_log(`alias`, `Changed [${module_name}] to [${replace}].`);
         }
@@ -129,33 +131,4 @@ function _traverse_ts(directory, aliases) {
         }
     });
 }
-// function _delint(sourceFile: ts.SourceFile, aliases:Aliases, filepath:string) {
-//   delintNode(sourceFile);
-//   function delintNode(node: ts.Node) {
-//     switch (node.kind) {
-//       case ts.SyntaxKind.ImportDeclaration:{
-//         const children = node.getChildren();
-//         for(let i = 0; i < children.length; i++){
-//           let child = children[i];
-//           if(children[i].kind === ts.SyntaxKind.StringLiteral){
-//             const string_literal = child.getText();
-//             const module_name = string_literal.substr(1, string_literal.length - 2);
-//             if(module_name in aliases){
-//               const relative_path = path.relative(filepath, `${conf.root}/${aliases[module_name][0]}`);
-//               const new_string_literal = ts.factory.createStringLiteral(`'${relative_path}'`);
-//               child = new_string_literal;
-//             }
-//           }
-//         }
-//         break;
-//       }
-//     }
-//     ts.forEachChild(node, delintNode);
-//   }
-//   // function report(node: ts.Node, message: string) {
-//   //   const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
-//   //   console.log(`${sourceFile.fileName} (${line + 1},${character + 1}): ${message}`);
-//   // }
-//   return sourceFile;
-// }
 //# sourceMappingURL=alias.js.map
