@@ -79,7 +79,7 @@ function _replace_aliases(aliases) {
 function replace_file_aliases(filepath, aliases) {
     const _project = new tsm.Project(_project_option);
     let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
-    const { found, source } = _change_to_relative_imports(sourceFile, aliases);
+    const { found, source } = _change_to_relative_statements(sourceFile, aliases);
     sourceFile = source;
     if (found === true) {
         const modified = sourceFile.print();
@@ -88,27 +88,40 @@ function replace_file_aliases(filepath, aliases) {
     }
 }
 exports.replace_file_aliases = replace_file_aliases;
-function _change_to_relative_imports(sourceFile, aliases) {
+function _change_to_relative_statements(sourceFile, aliases) {
     let found = false;
     const import_decls = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.ImportDeclaration);
+    const export_decls = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.ExportDeclaration);
     for (const import_decl of import_decls) {
-        if (_change_to_realtive_import(import_decl, aliases)) {
+        if (_change_to_relative(import_decl, aliases)) {
+            found = true;
+        }
+    }
+    for (const export_decl of export_decls) {
+        if (_change_to_relative(export_decl, aliases)) {
             found = true;
         }
     }
     return { found, source: sourceFile };
 }
-function _change_to_realtive_import(node, aliases) {
+function _change_to_relative(node, aliases) {
     let found = false;
     const str_lit = node.getFirstChildByKind(tsm.ts.SyntaxKind.StringLiteral);
     if (str_lit) {
         const text = str_lit.getText();
-        const module_name = text.substr(1, text.length - 2);
-        if (module_name in aliases) {
+        const full_module_name = text.substr(1, text.length - 2);
+        let module_name = full_module_name;
+        const splitted_module = module_name.split('/');
+        if (module_name in aliases || splitted_module[0] in aliases) {
             found = true;
             output.start_loading(`Changing relative imports...`);
             const node_file_path = node.getSourceFile().getFilePath();
             const node_file_dir = path_1.default.parse(node_file_path).dir;
+            let module_append = '';
+            if (splitted_module.length > 1) {
+                module_append = '/' + splitted_module.slice(1).join('/');
+                module_name = splitted_module[0];
+            }
             const alias = aliases[module_name][0];
             let relative_path = path_1.default.relative(node_file_dir, `${defaults_1.conf.root}/${alias}`);
             if (relative_path === '') {
@@ -116,9 +129,9 @@ function _change_to_realtive_import(node, aliases) {
             }
             const append = (alias.slice(-1) === '/' && relative_path !== './index') ? '/' : '';
             const prepend = (relative_path.charAt(0) !== '.') ? './' : '';
-            const replace = `${prepend}${relative_path}${append}`;
+            const replace = `${prepend}${relative_path}${module_append}${append}`;
             str_lit.replaceWithText(`'${replace}'`);
-            output.verbose_log(`alias`, `Changed [${module_name}] to [${replace}].`);
+            output.verbose_log(`alias`, `Changed [${full_module_name}] to [${replace}].`);
         }
     }
     return found;

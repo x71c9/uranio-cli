@@ -91,7 +91,7 @@ function _replace_aliases(aliases:Aliases){
 export function replace_file_aliases(filepath:string, aliases:Aliases):void{
 	const _project = new tsm.Project(_project_option);
 	let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
-	const {found, source} = _change_to_relative_imports(sourceFile, aliases);
+	const {found, source} = _change_to_relative_statements(sourceFile, aliases);
 	sourceFile = source;
 	if(found === true){
 		const modified = sourceFile.print();
@@ -105,30 +105,43 @@ type FoundSource = {
 	source: tsm.SourceFile
 }
 
-function _change_to_relative_imports(sourceFile:tsm.SourceFile, aliases:Aliases)
+function _change_to_relative_statements(sourceFile:tsm.SourceFile, aliases:Aliases)
 		:FoundSource{
 	let found = false;
 	const import_decls = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.ImportDeclaration);
+	const export_decls = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.ExportDeclaration);
 	for(const import_decl of import_decls){
-		if(_change_to_realtive_import(import_decl, aliases)){
+		if(_change_to_relative(import_decl, aliases)){
+			found = true;
+		}
+	}
+	for(const export_decl of export_decls){
+		if(_change_to_relative(export_decl, aliases)){
 			found = true;
 		}
 	}
 	return {found, source: sourceFile};
 }
 
-function _change_to_realtive_import(node:tsm.Node, aliases:Aliases)
+function _change_to_relative(node:tsm.Node, aliases:Aliases)
 		:boolean{
 	let found = false;
 	const str_lit = node.getFirstChildByKind(tsm.ts.SyntaxKind.StringLiteral);
 	if(str_lit){
 		const text = str_lit.getText();
-		const module_name = text.substr(1, text.length - 2);
-		if(module_name in aliases){
+		const full_module_name = text.substr(1, text.length - 2);
+		let module_name = full_module_name;
+		const splitted_module = module_name.split('/');
+		if(module_name in aliases || splitted_module[0] in aliases){
 			found = true;
 			output.start_loading(`Changing relative imports...`);
 			const node_file_path = node.getSourceFile().getFilePath();
 			const node_file_dir = path.parse(node_file_path).dir;
+			let module_append = '';
+			if(splitted_module.length > 1){
+				module_append = '/' + splitted_module.slice(1).join('/');
+				module_name = splitted_module[0];
+			}
 			const alias = aliases[module_name][0];
 			let relative_path = path.relative(node_file_dir, `${conf.root}/${alias}`);
 			if(relative_path === ''){
@@ -136,9 +149,9 @@ function _change_to_realtive_import(node:tsm.Node, aliases:Aliases)
 			}
 			const append = (alias.slice(-1) === '/' && relative_path !== './index') ? '/' : '';
 			const prepend = (relative_path.charAt(0) !== '.') ? './' : '';
-			const replace = `${prepend}${relative_path}${append}`;
+			const replace = `${prepend}${relative_path}${module_append}${append}`;
 			str_lit.replaceWithText(`'${replace}'`);
-			output.verbose_log(`alias`, `Changed [${module_name}] to [${replace}].`);
+			output.verbose_log(`alias`, `Changed [${full_module_name}] to [${replace}].`);
 		}
 	}
 	return found;
