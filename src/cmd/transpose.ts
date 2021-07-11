@@ -206,7 +206,7 @@ function _create_a_book(
 		_create_a_book_file(filepath, text);
 		
 	}
-	output.done_log(book_name, `Created books/${book_name}.`);
+	output.done_log(book_name, `Generated server book [${book_name}].`);
 	return sourceFile;
 }
 
@@ -514,7 +514,7 @@ function _replace_book_aliases(){
 	replace_file_aliases(`${books_dir}/atom.ts`,aliases);
 	replace_file_aliases(`${books_dir}/api.ts`,aliases);
 	replace_file_aliases(`${books_dir}/bll.ts`,aliases);
-	output.done_log('alias', `Server book aliases replaced.`);
+	output.done_log('alias', `Server books aliases replaced.`);
 }
 
 function _generate_client_books(){
@@ -523,7 +523,7 @@ function _generate_client_books(){
 	_generate_client_book('api', api_book_required_client_second_props);
 	_generate_client_book('atom', atom_book_required_client_first_props);
 	
-	output.done_log('client', `Client books generated.`);
+	// output.done_log('client', `Client books generated.`);
 }
 
 function _generate_client_book(book_name:BookName, required_props:string[]){
@@ -555,7 +555,9 @@ function _replace_uranio_client_dependecy(sourceFile:tsm.SourceFile){
 		const str_lit = decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.StringLiteral);
 		const str_text = str_lit.getText();
 		if(str_text.substr(-7) === './lib/"'){
-			str_lit.replaceWithText(`${str_text.substr(0, str_text.length - 1)}client"`);
+			const replace_with = `${str_text.substr(0, str_text.length - 1)}client"`;
+			str_lit.replaceWithText(replace_with);
+			output.verbose_log('client', `Replaced [${str_text}] to [${replace_with}]`);
 		}
 	}
 	return sourceFile;
@@ -573,14 +575,18 @@ function _keep_only_client_first_level_properties(sourceFile:tsm.SourceFile, boo
 			for(const atom_def of atom_defs){
 				const atom_syntax_list = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
 				const atom_props = atom_syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+				const atom_name_identif = atom_def.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
+				const atom_name = atom_name_identif.getText();
 				for(const prop of atom_props){
 					const comma = prop.getNextSiblingIfKind(tsm.SyntaxKind.CommaToken);
 					const identif = prop.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
-					if(!required_props.includes(identif.getText())){
+					const ide_text = identif.getText();
+					if(!required_props.includes(ide_text)){
 						if(comma){
 							comma.replaceWithText('');
 						}
 						prop.replaceWithText('');
+						output.verbose_log('client', `Removed property [${atom_name}][${ide_text}]`);
 					}
 				}
 			}
@@ -601,17 +607,21 @@ function _keep_only_client_second_level_properties(sourceFile:tsm.SourceFile, bo
 			for(const atom_def of atom_defs){
 				const atom_syntax_list = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
 				const atom_props = atom_syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+				const atom_name_identif = atom_def.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
+				const atom_name = atom_name_identif.getText();
 				for(const prop of atom_props){
 					const second_syntax_list = prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
 					const second_prop_list = second_syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
 					for(const sec_prop of second_prop_list){
 						const comma = sec_prop.getNextSiblingIfKind(tsm.SyntaxKind.CommaToken);
 						const identif = sec_prop.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
+						const ide_text = identif.getText();
 						if(!required_props.includes(identif.getText())){
 							if(comma){
 								comma.replaceWithText('');
 							}
 							sec_prop.replaceWithText('');
+							output.verbose_log('client', `Removed property [${atom_name}][${ide_text}]`);
 						}
 					}
 				}
