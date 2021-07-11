@@ -331,7 +331,7 @@ function _change_realtive_import(node) {
     if (str_lit) {
         const text = str_lit.getText();
         if (text.includes('./')) {
-            const replace = text.replace('./', '../../../src/');
+            const replace = text.replace('./', '../../');
             str_lit.replaceWithText(replace);
             output.verbose_log(`impo`, `Changed [${text}] to [${replace}].`);
         }
