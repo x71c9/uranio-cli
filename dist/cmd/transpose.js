@@ -45,6 +45,10 @@ const util = __importStar(require("../util/"));
 const common = __importStar(require("./common"));
 const alias_1 = require("./alias");
 const atom_book_required_properties = ['properties', 'security', 'connection'];
+const api_book_required_properties = ['api'];
+const bll_book_required_properties = ['bll'];
+const atom_book_required_client_first_props = ['properties'];
+const api_book_required_client_second_props = ['url'];
 exports.transpose = {
     run: (root, options) => __awaiter(void 0, void 0, void 0, function* () {
         defaults_1.conf.root = root;
@@ -59,6 +63,7 @@ exports.transpose = {
         util.copy_file('bkp', `${defaults_1.conf.root}/src/book.ts`, `${tmp_book_folder}/book.ts`);
         _manipulate_and_create_files(`${tmp_book_folder}/book.ts`);
         _replace_book_aliases();
+        _generate_client_books();
         util.remove_folder_if_exists('tmp', tmp_book_folder);
         output.end_log(`Transpose completed.`);
     })
@@ -187,10 +192,10 @@ function _create_atom_book(sourceFile, import_statements) {
     return _create_a_book(sourceFile, import_statements, 'atom', atom_book_required_properties, 'atom');
 }
 function _create_api_book(sourceFile, import_statements) {
-    return _create_a_book(sourceFile, import_statements, 'api', ['api'], 'api');
+    return _create_a_book(sourceFile, import_statements, 'api', api_book_required_properties, 'api');
 }
 function _create_bll_book(sourceFile, import_statements) {
-    return _create_a_book(sourceFile, import_statements, 'bll', ['bll'], 'bll');
+    return _create_a_book(sourceFile, import_statements, 'bll', bll_book_required_properties, 'bll');
 }
 function _clean_all_but(but, var_decl) {
     output.start_loading(`Cleaning all properties but [${but}]...`);
@@ -412,11 +417,106 @@ function _copy_imports(sourceFile) {
     return states;
 }
 function _replace_book_aliases() {
+    output.start_loading(`Replacing book aliases...`);
     const books_dir = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/books/`;
     const aliases = alias_1.get_aliases();
     alias_1.replace_file_aliases(`${books_dir}/atom.ts`, aliases);
     alias_1.replace_file_aliases(`${books_dir}/api.ts`, aliases);
     alias_1.replace_file_aliases(`${books_dir}/bll.ts`, aliases);
+    output.done_log('alias', `Server book aliases replaced.`);
+}
+function _generate_client_books() {
+    output.start_loading(`Generating client books...`);
+    _generate_client_book('api', api_book_required_client_second_props);
+    _generate_client_book('atom', atom_book_required_client_first_props);
+    output.done_log('client', `Client books generated.`);
+}
+function _generate_client_book(book_name, required_props) {
+    const folder_path = `${defaults_1.conf.root}/${defaults_1.defaults.folder}`;
+    const server_books_dir = `${folder_path}/server/books`;
+    const client_books_dir = `${folder_path}/client/books`;
+    const _project = new tsm.Project(_project_option);
+    let sourceFile = _project.addSourceFileAtPath(`${server_books_dir}/${book_name}.ts`);
+    sourceFile = _replace_uranio_client_dependecy(sourceFile);
+    if (book_name === 'atom') {
+        sourceFile = _keep_only_client_first_level_properties(sourceFile, book_name, required_props);
+    }
+    else {
+        sourceFile = _keep_only_client_second_level_properties(sourceFile, book_name, required_props);
+    }
+    const filepath = `${client_books_dir}/${book_name}.ts`;
+    fs_1.default.writeFileSync(filepath, sourceFile.print());
+    util.pretty(filepath);
+    output.done_log('client', `Generated client book [${book_name}].`);
+}
+function _replace_uranio_client_dependecy(sourceFile) {
+    const imports = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.ImportDeclaration);
+    for (const decl of imports) {
+        const str_lit = decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.StringLiteral);
+        const str_text = str_lit.getText();
+        if (str_text.substr(-7) === './lib/"') {
+            str_lit.replaceWithText(`${str_text.substr(0, str_text.length - 1)}client"`);
+        }
+    }
+    return sourceFile;
+}
+function _keep_only_client_first_level_properties(sourceFile, book_name, required_props) {
+    const variable_stats = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.VariableStatement);
+    for (const var_stat of variable_stats) {
+        const var_decl = var_stat.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
+        const identifier = var_decl.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
+        if (identifier.getText() === `${book_name}_book`) {
+            const obj_lit_ex = var_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.ObjectLiteralExpression);
+            const syntax_list = obj_lit_ex.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+            const atom_defs = syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+            for (const atom_def of atom_defs) {
+                const atom_syntax_list = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+                const atom_props = atom_syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+                for (const prop of atom_props) {
+                    const comma = prop.getNextSiblingIfKind(tsm.SyntaxKind.CommaToken);
+                    const identif = prop.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
+                    if (!required_props.includes(identif.getText())) {
+                        if (comma) {
+                            comma.replaceWithText('');
+                        }
+                        prop.replaceWithText('');
+                    }
+                }
+            }
+        }
+    }
+    return sourceFile;
+}
+function _keep_only_client_second_level_properties(sourceFile, book_name, required_props) {
+    const variable_stats = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.VariableStatement);
+    for (const var_stat of variable_stats) {
+        const var_decl = var_stat.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
+        const identifier = var_decl.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
+        if (identifier.getText() === `${book_name}_book`) {
+            const obj_lit_ex = var_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.ObjectLiteralExpression);
+            const syntax_list = obj_lit_ex.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+            const atom_defs = syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+            for (const atom_def of atom_defs) {
+                const atom_syntax_list = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+                const atom_props = atom_syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+                for (const prop of atom_props) {
+                    const second_syntax_list = prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+                    const second_prop_list = second_syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+                    for (const sec_prop of second_prop_list) {
+                        const comma = sec_prop.getNextSiblingIfKind(tsm.SyntaxKind.CommaToken);
+                        const identif = sec_prop.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
+                        if (!required_props.includes(identif.getText())) {
+                            if (comma) {
+                                comma.replaceWithText('');
+                            }
+                            sec_prop.replaceWithText('');
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return sourceFile;
 }
 // function _type_check_books(){
 //   // ****

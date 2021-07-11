@@ -1,6 +1,11 @@
-import {init, transpose} from './cmd/';
+import {
+	init,
+	transpose,
+	alias
+} from './cmd/';
 
 export default {
 	init: init.run,
-	transpose: transpose.run
+	transpose: transpose.run,
+	alias: alias.run
 };
