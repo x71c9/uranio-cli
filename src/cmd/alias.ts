@@ -68,7 +68,7 @@ const _project_option = {
 	}
 };
 
-type Aliases = {
+export type Aliases = {
 	[key:string]: string[]
 }
 
@@ -85,7 +85,7 @@ function _replace_modified_file(text:string, filename:string){
 }
 
 function _replace_aliases(aliases:Aliases){
-	_traverse_ts(`${conf.root}/.uranio/`, aliases);
+	_traverse_ts_aliases(`${conf.root}/.uranio/`, aliases);
 }
 
 export function replace_file_aliases(filepath:string, aliases:Aliases):void{
@@ -157,11 +157,11 @@ function _change_to_relative(node:tsm.Node, aliases:Aliases)
 	return found;
 }
 
-function _traverse_ts(directory:string, aliases:Aliases) {
+function _traverse_ts_aliases(directory:string, aliases:Aliases) {
 	fs.readdirSync(directory).forEach((filename) => {
 		const full_path = path.resolve(directory, filename);
 		if (fs.statSync(full_path).isDirectory() && filename != '.git') {
-			return _traverse_ts(full_path, aliases);
+			return _traverse_ts_aliases(full_path, aliases);
 		}else if(filename.split('.').pop() === 'ts'){
 			replace_file_aliases(full_path, aliases);
 		}

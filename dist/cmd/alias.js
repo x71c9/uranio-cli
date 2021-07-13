@@ -74,7 +74,7 @@ function _replace_modified_file(text, filename) {
     output.done_verbose_log(`alias`, `File replaced [${filename}].`);
 }
 function _replace_aliases(aliases) {
-    _traverse_ts(`${defaults_1.conf.root}/.uranio/`, aliases);
+    _traverse_ts_aliases(`${defaults_1.conf.root}/.uranio/`, aliases);
 }
 function replace_file_aliases(filepath, aliases) {
     const _project = new tsm.Project(_project_option);
@@ -136,11 +136,11 @@ function _change_to_relative(node, aliases) {
     }
     return found;
 }
-function _traverse_ts(directory, aliases) {
+function _traverse_ts_aliases(directory, aliases) {
     fs_1.default.readdirSync(directory).forEach((filename) => {
         const full_path = path_1.default.resolve(directory, filename);
         if (fs_1.default.statSync(full_path).isDirectory() && filename != '.git') {
-            return _traverse_ts(full_path, aliases);
+            return _traverse_ts_aliases(full_path, aliases);
         }
         else if (filename.split('.').pop() === 'ts') {
             replace_file_aliases(full_path, aliases);

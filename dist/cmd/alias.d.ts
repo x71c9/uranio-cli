@@ -9,9 +9,8 @@ export declare const alias: {
     command: () => void;
     include: () => void;
 };
-declare type Aliases = {
+export declare type Aliases = {
     [key: string]: string[];
 };
 export declare function get_aliases(): Aliases;
 export declare function replace_file_aliases(filepath: string, aliases: Aliases): void;
-export {};
