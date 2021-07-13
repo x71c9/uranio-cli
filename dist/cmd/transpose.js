@@ -38,12 +38,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.transpose = void 0;
 const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 const tsm = __importStar(require("ts-morph"));
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const common = __importStar(require("./common"));
-const alias_1 = require("./alias");
+const alias = __importStar(require("./alias"));
 const atom_book_required_properties = ['properties', 'security', 'connection'];
 const api_book_required_properties = ['api'];
 const bll_book_required_properties = ['bll'];
@@ -62,8 +63,11 @@ exports.transpose = {
         util.create_folder_if_doesnt_exists('tmp', tmp_book_folder);
         util.copy_file('bkp', `${defaults_1.conf.root}/src/book.ts`, `${tmp_book_folder}/book.ts`);
         _manipulate_and_create_files(`${tmp_book_folder}/book.ts`);
-        _replace_book_aliases();
+        _resolve_book_aliases();
         _generate_client_books();
+        _copy_from_src_into_uranio_folder();
+        _resolve_aliases();
+        _replace_import_to_avoid_loops();
         util.remove_folder_if_exists('tmp', tmp_book_folder);
         output.end_log(`Transpose completed.`);
     })
@@ -74,17 +78,85 @@ const _project_option = {
         quoteKind: tsm.QuoteKind.Single,
     }
 };
-// const _project = new tsm.Project(
-//   {
-//     manipulationSettings: {
-//       indentationText: IndentationText.Tab,
-//       quoteKind: QuoteKind.Single,
-//     }
-//   }
-// );
-// function _pretty_books(){
-//   util.pretty(`${conf.root}/${defaults.folder}/server/books/atom.ts`);
-// }
+function _replace_import_to_avoid_loops() {
+    const server_dir = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/`;
+    if (fs_1.default.existsSync(server_dir)) {
+        _traverse_ts_avoid_import_loop(server_dir);
+    }
+}
+function _traverse_ts_resolve_aliases(directory, aliases) {
+    fs_1.default.readdirSync(directory).forEach((filename) => {
+        const full_path = path_1.default.resolve(directory, filename);
+        if (fs_1.default.statSync(full_path).isDirectory() && filename !== '.git' && filename !== 'books') {
+            return _traverse_ts_resolve_aliases(full_path, aliases);
+        }
+        else if (filename.split('.').pop() === 'ts') {
+            alias.replace_file_aliases(full_path, aliases);
+        }
+    });
+}
+function _traverse_ts_avoid_import_loop(directory) {
+    fs_1.default.readdirSync(directory).forEach((filename) => {
+        const full_path = path_1.default.resolve(directory, filename);
+        if (fs_1.default.statSync(full_path).isDirectory() && filename !== '.git' && filename !== 'books') {
+            return _traverse_ts_avoid_import_loop(full_path);
+        }
+        else if (filename.split('.').pop() === 'ts') {
+            _avoid_import_loop(full_path);
+        }
+    });
+}
+function _avoid_import_loop(filepath) {
+    const _project = new tsm.Project(_project_option);
+    const sourceFile = _project.addSourceFileAtPath(`${filepath}`);
+    const import_decls = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.ImportDeclaration);
+    let uranio_var_name = '';
+    for (const import_decl of import_decls) {
+        const str_lit = import_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.StringLiteral);
+        const module_name = str_lit.getText();
+        if (module_name.substr(-6) === '/lib/"') {
+            const identif = import_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+            uranio_var_name = identif.getText();
+            let uranio_bll_import_var_name = `${uranio_var_name}.core.bll.BLL`;
+            let append_core = 'core/';
+            if (defaults_1.conf.repo === 'core') {
+                uranio_bll_import_var_name = `${uranio_var_name}.bll.BLL`;
+                append_core = '';
+            }
+            const regex = new RegExp(`\\b${uranio_bll_import_var_name}\\b`);
+            const file_text = sourceFile.getText();
+            if (regex.test(file_text)) {
+                //eslint-disable-next-line no-useless-escape
+                // const new_bll_import_var_name = `${uranio_bll_import_var_name.replace(/\./g,'_')}`;
+                const new_bll_module_name = module_name.substr(1, module_name.length - 2) + `${append_core}bll/bll`;
+                const old_uranio_import = import_decl.getText();
+                import_decl.replaceWithText(`${old_uranio_import}\nimport {BLL} from "${new_bll_module_name}";`);
+                const prop_access_exps = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.PropertyAccessExpression);
+                const prop_to_change = [];
+                for (const prop_access_exp of prop_access_exps) {
+                    const prop_text = prop_access_exp.getText();
+                    if (prop_text === `${uranio_bll_import_var_name}`) {
+                        prop_to_change.push(prop_access_exp);
+                    }
+                }
+                for (const prop of prop_to_change) {
+                    prop.replaceWithText(`BLL`);
+                }
+                _project.save();
+            }
+            break;
+        }
+    }
+    return sourceFile;
+}
+function _copy_from_src_into_uranio_folder() {
+    if (fs_1.default.existsSync(`${defaults_1.conf.root}/src/server/`)) {
+        util.copy_files('copy', `${defaults_1.conf.root}/src/server/*`, `${defaults_1.conf.root}/.uranio/server/`);
+    }
+    if (fs_1.default.existsSync(`${defaults_1.conf.root}/src/client/`)) {
+        util.copy_files('copy', `${defaults_1.conf.root}/src/client/*`, `${defaults_1.conf.root}/.uranio/client/`);
+    }
+}
 function _manipulate_and_create_files(filepath) {
     const action = `manipulating [src/book.ts]`;
     output.start_loading(`${action[0].toUpperCase()}${action.substr(1)}...`);
@@ -416,13 +488,22 @@ function _copy_imports(sourceFile) {
     output.verbose_log('book', `Copied import statements.`);
     return states;
 }
-function _replace_book_aliases() {
+function _resolve_aliases() {
+    output.start_loading(`Replacing aliases with relative paths...`);
+    const aliases = alias.get_aliases();
+    const server_dir = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/`;
+    _traverse_ts_resolve_aliases(server_dir, aliases);
+    const client_dir = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/`;
+    _traverse_ts_resolve_aliases(client_dir, aliases);
+    output.done_log('alias', `Aliases replaced.`);
+}
+function _resolve_book_aliases() {
     output.start_loading(`Replacing book aliases...`);
-    const books_dir = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/books/`;
-    const aliases = alias_1.get_aliases();
-    alias_1.replace_file_aliases(`${books_dir}/atom.ts`, aliases);
-    alias_1.replace_file_aliases(`${books_dir}/api.ts`, aliases);
-    alias_1.replace_file_aliases(`${books_dir}/bll.ts`, aliases);
+    const books_dir = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/books`;
+    const aliases = alias.get_aliases();
+    alias.replace_file_aliases(`${books_dir}/atom.ts`, aliases);
+    alias.replace_file_aliases(`${books_dir}/api.ts`, aliases);
+    alias.replace_file_aliases(`${books_dir}/bll.ts`, aliases);
     output.done_log('alias', `Server books aliases replaced.`);
 }
 function _generate_client_books() {
