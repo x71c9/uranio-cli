@@ -635,7 +635,7 @@ function _generate_client_book(book_name:BookName, required_props:string[]){
 	fs.writeFileSync(filepath, sourceFile.print());
 	util.pretty(filepath);
 	
-	output.done_log('client', `Generated client book [${book_name}].`);
+	output.done_log('clnt', `Generated client book [${book_name}].`);
 }
 
 function _replace_uranio_client_dependecy(sourceFile:tsm.SourceFile){
@@ -646,7 +646,7 @@ function _replace_uranio_client_dependecy(sourceFile:tsm.SourceFile){
 		if(str_text.substr(-7) === './lib/"'){
 			const replace_with = `${str_text.substr(0, str_text.length - 1)}client"`;
 			str_lit.replaceWithText(replace_with);
-			output.verbose_log('client', `Replaced [${str_text}] to [${replace_with}]`);
+			output.verbose_log('clnt', `Replaced [${str_text}] to [${replace_with}]`);
 		}
 	}
 	return sourceFile;
@@ -675,7 +675,7 @@ function _keep_only_client_first_level_properties(sourceFile:tsm.SourceFile, boo
 							comma.replaceWithText('');
 						}
 						prop.replaceWithText('');
-						output.verbose_log('client', `Removed property [${atom_name}][${ide_text}]`);
+						output.verbose_log('clnt', `Removed property [${atom_name}][${ide_text}]`);
 					}
 				}
 			}
@@ -710,7 +710,7 @@ function _keep_only_client_second_level_properties(sourceFile:tsm.SourceFile, bo
 								comma.replaceWithText('');
 							}
 							sec_prop.replaceWithText('');
-							output.verbose_log('client', `Removed property [${atom_name}][${ide_text}]`);
+							output.verbose_log('clnt', `Removed property [${atom_name}][${ide_text}]`);
 						}
 					}
 				}

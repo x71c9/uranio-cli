@@ -42,6 +42,7 @@ const cp = __importStar(require("child_process"));
 const prettier_1 = __importDefault(require("prettier"));
 const urn_lib_1 = require("urn-lib");
 const output = __importStar(require("../output/"));
+const common = __importStar(require("../cmd/common"));
 const types_1 = require("../types");
 const defaults_1 = require("../conf/defaults");
 function merge_options(options) {
@@ -108,6 +109,7 @@ function auto_set_project_root() {
             throw new Error('Cannot find project root.');
         }
     }
+    common.init_log();
     output.done_verbose_log('root', `$URNROOT$Project root found [${defaults_1.conf.root}]`);
 }
 exports.auto_set_project_root = auto_set_project_root;
