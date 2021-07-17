@@ -189,19 +189,15 @@ function _remove_tmp() {
 function _install_dep(repo) {
     return __awaiter(this, void 0, void 0, function* () {
         yield _uninstall_core_dep();
-        yield _uninstall_web_dep();
-        yield _uninstall_ntl_dep();
+        yield _uninstall_api_dep();
+        // await _uninstall_ntl_dep();
         switch (repo) {
             case 'core': {
                 yield _install_core_dep();
                 return true;
             }
-            case 'web': {
-                yield _install_web_dep();
-                return true;
-            }
-            case 'ntl': {
-                yield _install_ntl_dep();
+            case 'api': {
+                yield _install_api_dep();
                 return true;
             }
             // default:{
@@ -254,12 +250,8 @@ function _clone_and_install_repo() {
                 yield _clone_core();
                 break;
             }
-            case 'web': {
-                yield _clone_web();
-                break;
-            }
-            case 'ntl': {
-                yield _clone_ntl();
+            case 'api': {
+                yield _clone_api();
                 break;
             }
             default: {
@@ -284,10 +276,10 @@ function _create_client_server_folders() {
     output.start_loading(`Creating server folder...`);
     util.create_folder_if_doesnt_exists('init', `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server`);
     util.create_folder_if_doesnt_exists('init', `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/books`);
-    if (defaults_1.conf.repo === 'ntl') {
-        output.start_loading(`Creating server functions folder...`);
-        util.create_folder_if_doesnt_exists('init', `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/functions`);
-    }
+    // if(conf.repo === 'ntl'){
+    //   output.start_loading(`Creating server functions folder...`);
+    //   util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}/server/functions`);
+    // }
     output.done_log('init', `Created client server folders.`);
 }
 function _update_aliases() {
@@ -314,24 +306,22 @@ function _install_core_dep() {
         return true;
     });
 }
-function _install_web_dep() {
+function _install_api_dep() {
     return __awaiter(this, void 0, void 0, function* () {
-        output.start_loading(`Installing web dep...`);
-        yield util.install_dep(defaults_1.defaults.web_dep_repo, 'web');
-        yield util.install_dep_dev(defaults_1.defaults.web_dep_dev_repo, 'web');
-        output.done_log('web', `Installed web dependencies.`);
+        output.start_loading(`Installing api dep...`);
+        yield util.install_dep(defaults_1.defaults.api_dep_repo, 'api');
+        yield util.install_dep_dev(defaults_1.defaults.api_dep_dev_repo, 'api');
+        output.done_log('api', `Installed web dependencies.`);
         return true;
     });
 }
-function _install_ntl_dep() {
-    return __awaiter(this, void 0, void 0, function* () {
-        output.start_loading(`Installing ntl dep...`);
-        yield util.install_dep(defaults_1.defaults.ntl_dep_repo, 'ntl');
-        yield util.install_dep_dev(defaults_1.defaults.ntl_dep_dev_repo, 'ntl');
-        output.done_log('ntl', `Installed ntl dependencies.`);
-        return true;
-    });
-}
+// async function _install_ntl_dep(){
+//   output.start_loading(`Installing ntl dep...`);
+//   await util.install_dep(defaults.ntl_dep_repo, 'ntl');
+//   await util.install_dep_dev(defaults.ntl_dep_dev_repo, 'ntl');
+//   output.done_log('ntl', `Installed ntl dependencies.`);
+//   return true;
+// }
 function _uninstall_dep(repo, context) {
     return __awaiter(this, void 0, void 0, function* () {
         const short_repo = (repo.substr(0, 3) === 'ssh' || repo.substr(0, 7) === 'git+ssh') ?
@@ -363,36 +353,34 @@ function _uninstall_core_dep() {
         return true;
     });
 }
-function _uninstall_web_dep() {
+function _uninstall_api_dep() {
     return __awaiter(this, void 0, void 0, function* () {
-        // output.start_loading(`Uninstalling web dep...`);
-        // const dep_folder = `${conf.root}/node_modules/${defaults.web_dep_repo}`;
-        // util.remove_folder_if_exists('web_', dep_folder);
-        // const dep_dev_folder = `${conf.root}/node_modules/${defaults.web_dep_dev_repo}`;
-        // util.remove_folder_if_exists('web_', dep_dev_folder);
-        // await util.uninstall_dep(`${defaults.web_dep_repo.split('/').slice(-1)[0]} ${defaults.web_dep_dev_repo.split('/').slice(-1)[0]}`, 'web_');
-        // output.done_log('web', `Uninstalled web dependencies.`);
+        // output.start_loading(`Uninstalling api dep...`);
+        // const dep_folder = `${conf.root}/node_modules/${defaults.api_dep_repo}`;
+        // util.remove_folder_if_exists('api', dep_folder);
+        // const dep_dev_folder = `${conf.root}/node_modules/${defaults.api_dep_dev_repo}`;
+        // util.remove_folder_if_exists('api', dep_dev_folder);
+        // await util.uninstall_dep(`${defaults.api_dep_repo.split('/').slice(-1)[0]} ${defaults.api_dep_dev_repo.split('/').slice(-1)[0]}`, 'web_');
+        // output.done_log('api', `Uninstalled web dependencies.`);
         // return true;
-        yield _uninstall_dep(defaults_1.defaults.web_dep_repo, 'web');
-        yield _uninstall_dep(defaults_1.defaults.web_dep_dev_repo, 'web');
+        yield _uninstall_dep(defaults_1.defaults.api_dep_repo, 'web');
+        yield _uninstall_dep(defaults_1.defaults.api_dep_dev_repo, 'web');
         return true;
     });
 }
-function _uninstall_ntl_dep() {
-    return __awaiter(this, void 0, void 0, function* () {
-        // output.start_loading(`Uninstalling ntl dep...`);
-        // const dep_folder = `${conf.root}/node_modules/${defaults.ntl_dep_repo}`;
-        // util.remove_folder_if_exists('ntl_', dep_folder);
-        // const dep_dev_folder = `${conf.root}/node_modules/${defaults.ntl_dep_dev_repo}`;
-        // util.remove_folder_if_exists('ntl_', dep_dev_folder);
-        // await util.uninstall_dep(`${defaults.ntl_dep_repo.split('/').slice(-1)[0]} ${defaults.ntl_dep_dev_repo.split('/').slice(-1)[0]}`, 'ntl_');
-        // output.done_log('ntl', `Uninstalled ntl dependencies.`);
-        // return true;
-        yield _uninstall_dep(defaults_1.defaults.ntl_dep_repo, 'ntl');
-        yield _uninstall_dep(defaults_1.defaults.ntl_dep_dev_repo, 'ntl');
-        return true;
-    });
-}
+// async function _uninstall_ntl_dep(){
+//   // output.start_loading(`Uninstalling ntl dep...`);
+//   // const dep_folder = `${conf.root}/node_modules/${defaults.ntl_dep_repo}`;
+//   // util.remove_folder_if_exists('ntl_', dep_folder);
+//   // const dep_dev_folder = `${conf.root}/node_modules/${defaults.ntl_dep_dev_repo}`;
+//   // util.remove_folder_if_exists('ntl_', dep_dev_folder);
+//   // await util.uninstall_dep(`${defaults.ntl_dep_repo.split('/').slice(-1)[0]} ${defaults.ntl_dep_dev_repo.split('/').slice(-1)[0]}`, 'ntl_');
+//   // output.done_log('ntl', `Uninstalled ntl dependencies.`);
+//   // return true;
+//   // await _uninstall_dep(defaults.ntl_dep_repo, 'ntl');
+//   // await _uninstall_dep(defaults.ntl_dep_dev_repo, 'ntl');
+//   return true;
+// }
 function _clone_dot() {
     return __awaiter(this, void 0, void 0, function* () {
         output.start_loading(`Cloning dot...`);
@@ -409,20 +397,18 @@ function _clone_core() {
         output.done_log('core', `Cloned core repo.`);
     });
 }
-function _clone_web() {
+function _clone_api() {
     return __awaiter(this, void 0, void 0, function* () {
-        output.start_loading(`Cloning web...`);
-        yield util.clone_repo_recursive('web_', defaults_1.defaults.web_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`);
-        output.done_log('web', `Cloned web repo.`);
+        output.start_loading(`Cloning api...`);
+        yield util.clone_repo_recursive('api', defaults_1.defaults.api_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`);
+        output.done_log('api', `Cloned api repo.`);
     });
 }
-function _clone_ntl() {
-    return __awaiter(this, void 0, void 0, function* () {
-        output.start_loading(`Cloning ntl...`);
-        yield util.clone_repo_recursive('ntl_', defaults_1.defaults.ntl_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`);
-        output.done_log('ntl', `Cloned ntl repo.`);
-    });
-}
+// async function _clone_ntl(){
+//   output.start_loading(`Cloning ntl...`);
+//   await util.clone_repo_recursive('ntl_', defaults.ntl_repo, `${conf.root}/${defaults.folder}/${defaults.repo_folder}`);
+//   output.done_log('ntl', `Cloned ntl repo.`);
+// }
 function _remove_git_files() {
     output.start_loading(`Removing git files...`);
     const cloned_repo_path = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`;

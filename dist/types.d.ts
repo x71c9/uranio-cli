@@ -8,8 +8,7 @@ export declare type Arguments = minimist.ParsedArgs;
 export declare type ParseOptions = minimist.Opts;
 export declare const abstract_repos: {
     readonly core: "";
-    readonly web: "";
-    readonly ntl: "";
+    readonly api: "";
 };
 export declare const abstract_pacman: {
     readonly yarn: "";

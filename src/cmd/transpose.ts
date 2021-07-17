@@ -428,8 +428,7 @@ function _add_core_books(book_decl:tsm.VariableDeclaration, required_book_name:B
 		case 'core':{
 			break;
 		}
-		case 'ntl':
-		case 'web':{
+		case 'api':{
 			core_repo_path = `${defaults.folder}/${defaults.repo_folder}/core`;
 			break;
 		}
@@ -439,28 +438,25 @@ function _add_core_books(book_decl:tsm.VariableDeclaration, required_book_name:B
 	
 }
 
-function _add_web_books(book_decl:tsm.VariableDeclaration, required_book_name:BookName){
-	const web_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
-	const required_books_path = `${conf.root}/${web_repo_path}/books.ts`;
+function _add_api_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName){
+	const api_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
+	const required_books_path = `${conf.root}/${api_repo_path}/books.ts`;
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 
-function _add_ntl_books(book_decl:tsm.VariableDeclaration, required_book_name:BookName){
-	const ntl_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
-	const required_books_path = `${conf.root}/${ntl_repo_path}/books.ts`;
-	_add_book_from_file(book_decl, required_book_name, required_books_path);
-}
+// function _add_ntl_books(book_decl:tsm.VariableDeclaration, required_book_name:BookName){
+//   const ntl_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
+//   const required_books_path = `${conf.root}/${ntl_repo_path}/books.ts`;
+//   _add_book_from_file(book_decl, required_book_name, required_books_path);
+// }
 
 function _append_requried_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName)
 		:tsm.VariableDeclaration{
 	output.start_loading(`Adding required books...`);
 	switch(conf.repo){
-		case 'web':{
-			_add_web_books(book_decl, required_book_name);
+		case 'api':{
+			_add_api_book(book_decl, required_book_name);
 			break;
-		}
-		case 'ntl':{
-			_add_ntl_books(book_decl, required_book_name);
 		}
 	}
 	_add_core_books(book_decl, required_book_name);
