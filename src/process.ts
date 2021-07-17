@@ -21,7 +21,7 @@ import {conf} from './conf/defaults';
 
 import * as output from './output/';
 
-// import * as common from './cmd/common';
+import * as common from './cmd/common';
 
 export function urn_process(args:Arguments)
 		:void{
