@@ -21,7 +21,7 @@ import {conf} from './conf/defaults';
 
 import * as output from './output/';
 
-import * as common from './cmd/common';
+// import * as common from './cmd/common';
 
 export function urn_process(args:Arguments)
 		:void{
@@ -30,7 +30,7 @@ export function urn_process(args:Arguments)
 	
 	process.chdir(conf.root);
 	
-	common.init_log();
+	// common.init_log();
 	
 	_log_arguments(args);
 	
@@ -117,6 +117,7 @@ function _set_conf(args:Arguments){
 			process.exit(1);
 		}else{
 			conf.root = root;
+			common.init_log();
 			output.done_verbose_log('root', `$URNROOT$Project root set to [${conf.root}]`);
 		}
 	}else{
