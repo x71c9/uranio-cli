@@ -14,6 +14,8 @@ import {urn_util} from 'urn-lib';
 
 import * as output from '../output/';
 
+import * as common from '../cmd/common';
+
 import {
 	abstract_repos,
 	valid_repos,
@@ -91,6 +93,7 @@ export function auto_set_project_root()
 			throw new Error('Cannot find project root.');
 		}
 	}
+	common.init_log();
 	output.done_verbose_log('root', `$URNROOT$Project root found [${conf.root}]`);
 }
 
