@@ -33,7 +33,7 @@ const common = __importStar(require("./cmd/common"));
 function urn_process(args) {
     _set_conf(args);
     process.chdir(defaults_1.conf.root);
-    common.init_log();
+    // common.init_log();
     _log_arguments(args);
     _switch_command(args);
     // process.exit(1);
@@ -98,6 +98,7 @@ function _set_conf(args) {
         }
         else {
             defaults_1.conf.root = root;
+            common.init_log();
             output.done_verbose_log('root', `$URNROOT$Project root set to [${defaults_1.conf.root}]`);
         }
     }
