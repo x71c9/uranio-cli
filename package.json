@@ -6,7 +6,7 @@
 	"types": "dist/index.d.ts",
 	"scripts": {
 		"build": "tsc -b",
-		"init": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js init -fv -r web\"",
+		"init": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js init -fv -r api\"",
 		"transpose": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js transpose -v\"",
 		"help": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -h\"",
 		"test": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js test -vbf --noblank\"",
