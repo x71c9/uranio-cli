@@ -138,7 +138,7 @@ function _format_text(context, text) {
                 - time.length
                 - 4;
             text = text.substr(0, remain) + ' ...';
-            text_lenght = remain - 4;
+            text_lenght = remain - 6;
         }
     }
     let output_text = prefix;
