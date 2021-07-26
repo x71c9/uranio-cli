@@ -156,7 +156,7 @@ function _format_text(context:string, text:string)
 				- time.length
 				- 4;
 			text = text.substr(0,remain) + ' ...';
-			text_lenght = remain - 4;
+			text_lenght = remain - 6;
 		}
 	}
 	
