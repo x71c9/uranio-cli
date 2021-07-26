@@ -134,12 +134,32 @@ function _format_text(context:string, text:string)
 	time = `[${time}]`;
 	
 	let text_lenght = 0;
+	text_lenght += prefix.length;
 	text_lenght += context.length;
 	text_lenght += text.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '').length; // eslint-disable-line no-control-regex
 	text_lenght += time.length;
-	text_lenght += prefix.length;
 	text_lenght += 4;
-
+	
+	if(conf.fullwidth === true){
+		const gap_lenght = process.stdout.columns - text_lenght;
+		if(gap_lenght < 0 && gap_lenght > -9){
+			time = time.replace(dateFormat(new Date, "yy-mm-dd'T'"), '');
+			text_lenght -= 9;
+		}else if(gap_lenght <= -9 && gap_lenght > -21){
+			time = '';
+			text_lenght -= 24;
+		}else if(gap_lenght <= -21){
+			time = '';
+			const remain = process.stdout.columns
+				- prefix.length
+				- context.length
+				- time.length
+				- 4;
+			text = text.substr(0,remain) + ' ...';
+			text_lenght = remain - 4;
+		}
+	}
+	
 	let output_text = prefix;
 	let dot = '.';
 	
