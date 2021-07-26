@@ -311,7 +311,7 @@ function _install_api_dep() {
         output.start_loading(`Installing api dep...`);
         yield util.install_dep(defaults_1.defaults.api_dep_repo, 'api');
         yield util.install_dep_dev(defaults_1.defaults.api_dep_dev_repo, 'api');
-        output.done_log('api', `Installed web dependencies.`);
+        output.done_log('api', `Installed api dependencies.`);
         return true;
     });
 }
@@ -360,11 +360,11 @@ function _uninstall_api_dep() {
         // util.remove_folder_if_exists('api', dep_folder);
         // const dep_dev_folder = `${conf.root}/node_modules/${defaults.api_dep_dev_repo}`;
         // util.remove_folder_if_exists('api', dep_dev_folder);
-        // await util.uninstall_dep(`${defaults.api_dep_repo.split('/').slice(-1)[0]} ${defaults.api_dep_dev_repo.split('/').slice(-1)[0]}`, 'web_');
-        // output.done_log('api', `Uninstalled web dependencies.`);
+        // await util.uninstall_dep(`${defaults.api_dep_repo.split('/').slice(-1)[0]} ${defaults.api_dep_dev_repo.split('/').slice(-1)[0]}`, 'api');
+        // output.done_log('api', `Uninstalled api dependencies.`);
         // return true;
-        yield _uninstall_dep(defaults_1.defaults.api_dep_repo, 'web');
-        yield _uninstall_dep(defaults_1.defaults.api_dep_dev_repo, 'web');
+        yield _uninstall_dep(defaults_1.defaults.api_dep_repo, 'api');
+        yield _uninstall_dep(defaults_1.defaults.api_dep_dev_repo, 'api');
         return true;
     });
 }
