@@ -150,13 +150,15 @@ function _format_text(context:string, text:string)
 			text_lenght -= 24;
 		}else if(gap_lenght <= -21){
 			time = '';
-			const remain = process.stdout.columns
-				- prefix.length
-				- context.length
-				- time.length
-				- 4;
-			text = text.substr(0,remain) + ' ...';
-			text_lenght = remain - 6;
+			let remain = process.stdout.columns + 2;
+			if(conf.blank === true){
+				remain -= 19;
+			}
+			text = text.substr(0,remain) + '...';
+			text_lenght = remain + 4;
+			if(conf.blank === true){
+				text_lenght += 19;
+			}
 		}
 	}
 	
