@@ -8,6 +8,8 @@ import fs from 'fs';
 
 import inquirer from 'inquirer';
 
+import {urn_util} from 'urn-lib';
+
 import {
 	Arguments,
 	Repo,
@@ -320,7 +322,7 @@ function _create_client_server_folders(){
 function _update_aliases(){
 	output.start_loading('Updating aliases...');
 	const data = fs.readFileSync(`${conf.root}/package.json`, 'utf8');
-	const package_data = JSON.parse(data);
+	const package_data = urn_util.json.clean_parse(data);
 	package_data['_moduleAliases'] = {
 		'uranio': `./dist/${defaults.folder}/${defaults.repo_folder}/`,
 		'uranio-books': `./dist/${defaults.folder}/server/books.js`,

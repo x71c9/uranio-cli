@@ -8,6 +8,8 @@ import fs from 'fs';
 
 import path from 'path';
 
+import {urn_util} from 'urn-lib';
+
 import {Options} from '../types';
 
 import {conf} from '../conf/defaults';
@@ -74,7 +76,7 @@ export type Aliases = {
 
 export function get_aliases():Aliases{
 	const data = fs.readFileSync(`${conf.root}/tsconfig.json`, 'utf8');
-	const tsconf_data = JSON.parse(data);
+	const tsconf_data = urn_util.json.clean_parse(data);
 	return tsconf_data['compilerOptions']['paths'];
 }
 

@@ -39,6 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.init = void 0;
 const fs_1 = __importDefault(require("fs"));
 const inquirer_1 = __importDefault(require("inquirer"));
+const urn_lib_1 = require("urn-lib");
 const types_1 = require("../types");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
@@ -285,7 +286,7 @@ function _create_client_server_folders() {
 function _update_aliases() {
     output.start_loading('Updating aliases...');
     const data = fs_1.default.readFileSync(`${defaults_1.conf.root}/package.json`, 'utf8');
-    const package_data = JSON.parse(data);
+    const package_data = urn_lib_1.urn_util.json.clean_parse(data);
     package_data['_moduleAliases'] = {
         'uranio': `./dist/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/`,
         'uranio-books': `./dist/${defaults_1.defaults.folder}/server/books.js`,
