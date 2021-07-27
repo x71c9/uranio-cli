@@ -63,7 +63,7 @@ function read_rc_file() {
     }
     else {
         const rc_content = fs_1.default.readFileSync(`${defaults_1.conf.root}/${defaults_1.jsonfile_path}`, 'utf8');
-        const rc_obj = JSON.parse(rc_content);
+        const rc_obj = urn_lib_1.urn_util.json.clean_parse(rc_content);
         set_repo(rc_obj.repo);
         defaults_1.conf.repo = rc_obj.repo;
         defaults_1.conf.pacman = rc_obj.pacman;
@@ -79,7 +79,7 @@ function check_folder(folder_path) {
     for (const file of data) {
         if (file === 'package.json') {
             const content = fs_1.default.readFileSync(`${folder_path}/${file}`, 'utf8');
-            const pack = JSON.parse(content);
+            const pack = urn_lib_1.urn_util.json.clean_parse(content);
             if (pack.name === 'urn-cli') {
                 return false;
             }
@@ -303,7 +303,7 @@ function _clone_repo(context, address, dest_folder, recursive = false) {
 }
 function dependency_exists(repo) {
     const data = fs_1.default.readFileSync(`${defaults_1.conf.root}/package.json`, 'utf8');
-    const package_data = JSON.parse(data);
+    const package_data = urn_lib_1.urn_util.json.clean_parse(data);
     return (typeof package_data['dependencies'][repo] === 'string' ||
         typeof package_data['devDependencies'][repo] === 'string');
 }

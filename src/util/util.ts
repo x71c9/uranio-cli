@@ -45,7 +45,7 @@ export function read_rc_file()
 		process.exit(1);
 	}else{
 		const rc_content = fs.readFileSync(`${conf.root}/${jsonfile_path}`, 'utf8');
-		const rc_obj = JSON.parse(rc_content);
+		const rc_obj = urn_util.json.clean_parse(rc_content);
 		set_repo(rc_obj.repo);
 		conf.repo = rc_obj.repo;
 		conf.pacman = rc_obj.pacman;
@@ -63,7 +63,7 @@ export function check_folder(folder_path:string)
 	for(const file of data){
 		if(file === 'package.json'){
 			const content = fs.readFileSync(`${folder_path}/${file}`,'utf8');
-			const pack = JSON.parse(content);
+			const pack = urn_util.json.clean_parse(content);
 			if(pack.name === 'urn-cli'){
 				return false;
 			}else if(pack.name === 'uranio'){
@@ -308,7 +308,7 @@ async function _clone_repo(context: string, address:string, dest_folder:string, 
 export function dependency_exists(repo:string)
 		:boolean{
 	const data = fs.readFileSync(`${conf.root}/package.json`, 'utf8');
-	const package_data = JSON.parse(data);
+	const package_data = urn_util.json.clean_parse(data);
 	return (
 		typeof package_data['dependencies'][repo] === 'string' ||
 		typeof package_data['devDependencies'][repo] === 'string'
