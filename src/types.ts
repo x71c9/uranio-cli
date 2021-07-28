@@ -51,7 +51,8 @@ export type Options = {
 	root: string,
 	repo: Repo,
 	pacman: PacMan,
-	force: boolean
+	force: boolean,
+	filelog: boolean
 }
 
 // export type Conf = Options & {

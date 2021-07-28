@@ -321,18 +321,27 @@ function _create_client_server_folders(){
 
 function _update_aliases(){
 	output.start_loading('Updating aliases...');
-	const data = fs.readFileSync(`${conf.root}/package.json`, 'utf8');
-	const package_data = urn_util.json.clean_parse(data);
-	package_data['_moduleAliases'] = {
-		'uranio': `./dist/${defaults.folder}/${defaults.repo_folder}/`,
-		'uranio-books': `./dist/${defaults.folder}/server/books.js`,
-		'uranio-client': `./dist/${defaults.folder}/${defaults.repo_folder}/client`
-	};
-	if(conf.repo !== 'core'){
-		package_data['_moduleAliases']['uranio-core'] = `./dist/${defaults.folder}/${defaults.repo_folder}/core/`;
+	const package_json_path = `${conf.root}/package.json`;
+	const data = fs.readFileSync(package_json_path, 'utf8');
+	try{
+		const package_data = urn_util.json.clean_parse(data);
+		package_data['_moduleAliases'] = {
+			'uranio': `./dist/${defaults.folder}/${defaults.repo_folder}/`,
+			'uranio-books': `./dist/${defaults.folder}/server/books.js`,
+			'uranio-client': `./dist/${defaults.folder}/${defaults.repo_folder}/client`
+		};
+		if(conf.repo !== 'core'){
+			package_data['_moduleAliases']['uranio-core'] = `./dist/${defaults.folder}/${defaults.repo_folder}/core/`;
+		}
+		try{
+			fs.writeFileSync(package_json_path, JSON.stringify(package_data, null, '\t'));
+			output.done_log('alia', `Updated aliases.`);
+		}catch(ex){
+			output.error_log('alia', `Cannot update ${package_json_path}.`);
+		}
+	}catch(ex){
+		output.error_log('alia', `Cannot parse ${package_json_path}.`);
 	}
-	fs.writeFileSync(`${conf.root}/package.json`, JSON.stringify(package_data, null, '\t'));
-	output.done_log('alas', `Updated aliases.`);
 }
 
 async function _install_core_dep(){

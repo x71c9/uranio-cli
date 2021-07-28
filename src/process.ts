@@ -88,6 +88,15 @@ function _set_conf(args:Arguments){
 		conf.fullwidth = !args.nofullwidth;
 	}
 	
+	const filelog = args.l || args.filelog;
+	
+	if(filelog == true){
+		conf.filelog = true;
+	}
+	if(typeof args.nofilelog === 'boolean' && !!args.nofilelog !== !conf.filelog){
+		conf.filelog = !args.nofilelog;
+	}
+	
 	const prefix = args.p || args.prefix;
 	
 	if(typeof prefix === 'string' && prefix !== ''){
@@ -150,7 +159,7 @@ function _switch_command(args:Arguments){
 			break;
 		}
 		case 'transpose':{
-			transpose.command();
+			transpose.command(args);
 			break;
 		}
 		case 'alias':{
