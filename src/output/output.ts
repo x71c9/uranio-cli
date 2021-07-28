@@ -88,9 +88,9 @@ export function wrong_end_log(text:string)
 	log('end', (!conf.blank) ? chalk.red(end_text) : end_text);
 }
 
-export function verbose_log(context:string, text:string)
+export function verbose_log(context:string, text:string, color='#668899')
 		:void{
-	const color_text = (!conf.blank) ? chalk.hex('#668899')(text) : text;
+	const color_text = (!conf.blank) ? chalk.hex(color)(text) : text;
 	_log(context, color_text, (conf.verbose === true));
 }
 
@@ -101,7 +101,9 @@ export function log(context:string, text:string)
 
 function _log(context:string, text:string, out=false){
 	const output_text = _format_text(context, text);
-	_log_to_file(output_text);
+	if(conf.filelog){
+		_log_to_file(output_text);
+	}
 	if(out){
 		let was_spinning = false;
 		if(spinner.isSpinning){

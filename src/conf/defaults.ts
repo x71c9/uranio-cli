@@ -66,6 +66,8 @@ export const conf:Options = {
 	
 	pacman: 'yarn',
 	
-	force: false
+	force: false,
+	
+	filelog: true
 	
 };

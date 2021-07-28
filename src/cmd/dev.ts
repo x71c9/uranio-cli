@@ -12,13 +12,14 @@ import path from 'path';
 
 import chokidar from 'chokidar';
 
-import chalk from 'chalk';
+// import chalk from 'chalk';
 
 import * as output from '../output/';
 
 import * as util from '../util/';
 
-import {conf} from '../conf/defaults';
+import {conf, defaults} from '../conf/defaults';
+// import {conf} from '../conf/defaults';
 
 import {transpose} from './transpose';
 
@@ -30,6 +31,8 @@ export const dev = {
 		
 		util.read_rc_file();
 		
+		conf.filelog = false;
+		
 		_start_dev();
 		
 	}
@@ -38,82 +41,37 @@ export const dev = {
 
 let watch_client_scanned = false;
 let watch_server_scanned = false;
-// let watch_transposed_server_scanned = false;
+let watch_book_scanned = false;
 
 const cli_options = {
 	hide: false,
 	verbose: true,
-	prefix: chalk.green('[urn] ')
 };
+
+const nuxt_color = '#677cc7';
+const tscw_color = '#8a5b5b';
+const watc_color = '#687a6a';
+
+let user_exit = false;
 
 async function _start_dev()
 		:Promise<any>{
 	
-	conf.prefix = chalk.green(`[urn] `);
+	// conf.prefix = chalk.green(`[urn] `);
 	
-	copyFolderRecursiveSync(
+	_copy_folder_recursive_sync(
 		`${conf.root}/src/client/.`,
 		`${conf.root}/.uranio/client/src/.`
 	);
 	
-	transpose.run(conf.root, cli_options);
+	transpose.run(conf.root, undefined, cli_options);
 	
-	const nuxt_dev = cp.spawn(
-		'npx',
-		[`nuxt`, `-c`, `.uranio/client/nuxt.config.js`],
-		// {stdio: [null, 'inherit', 'inherit']}
-	);
+	const nuxt_cmd = `npx nuxt -c ${defaults.folder}/client/nuxt.config.js`;
+	const nuxt_child = _spawn_log_command(nuxt_cmd, 'nuxt', nuxt_color);
 	
-	const tsc_watch = cp.spawn(
-		'npx',
-		[`tsc`, `-w`, `--project`, `${conf.root}/tsconfig.json`],
-		// {stdio: [null, null, null]}
-	);
-	
-	if(nuxt_dev.stdout){
-		nuxt_dev.stdout.setEncoding('utf8');
-		nuxt_dev.stdout.on('data', (chunk) => {
-			const plain_text = chunk
-				.toString()
-				.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
-				.replace(/\r?\n|\r/g, ' ');
-			output.verbose_log('nuxt', plain_text);
-		});
-	}
-	
-	if(nuxt_dev.stderr){
-		nuxt_dev.stderr.setEncoding('utf8');
-		nuxt_dev.stderr.on('data', (chunk) => {
-			const plain_text = chunk
-				.toString()
-				.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
-				.replace(/\r?\n|\r/g, ' ');
-			output.verbose_log('nuxt', plain_text);
-		});
-	}
-	
-	if(tsc_watch.stdout){
-		tsc_watch.stdout.setEncoding('utf8');
-		tsc_watch.stdout.on('data', (chunk) => {
-			const plain_text = chunk
-				.toString()
-				.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
-				.replace(/\r?\n|\r/g, ' ');
-			output.verbose_log('tscw', plain_text);
-		});
-	}
-	
-	if(tsc_watch.stderr){
-		tsc_watch.stderr.setEncoding('utf8');
-		tsc_watch.stderr.on('data', (chunk) => {
-			const plain_text = chunk
-				.toString()
-				.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
-				.replace(/\r?\n|\r/g, ' ');
-			output.verbose_log('tscw', plain_text);
-		});
-	}
-	
+	const tscw_cmd = `npx tsc -w --project ${conf.root}/tsconfig.json`;
+	const tscw_child = _spawn_log_command(tscw_cmd, 'tscw', tscw_color);
+
 	const client_folder = `${conf.root}/src/client/.`;
 	output.log(`wtch`, `Watching Client Folder [${client_folder}] ...`);
 	
@@ -121,14 +79,20 @@ async function _start_dev()
 		output.log(`wtch`, `Initial scanner completed for [${client_folder}].`);
 		watch_client_scanned = true;
 	}).on('all', (_event, _path) => {
-		output.verbose_log(_event, _path);
+		output.verbose_log(`wtch`, `${_event} ${_path}`, watc_color);
 		if(!watch_client_scanned){
 			return false;
 		}
-		copyFolderRecursiveSync(
-			`${conf.root}/src/client/.`,
-			`${conf.root}/.uranio/client/src/.`
-		);
+		if(_path.endsWith('.swp')){
+			return false;
+		}
+		const relative_path_to_client = _path.replace(`${conf.root}/src/client/`, '');
+		const new_path = `${conf.root}/${defaults.folder}/client/src/${relative_path_to_client}`;
+		if(_event === 'unlink'){
+			_delete_file_sync(new_path);
+		}else{
+			_copy_file_sync(_path, new_path);
+		}
 	});
 	
 	const server_folder = `${conf.root}/src/server/.`;
@@ -138,75 +102,153 @@ async function _start_dev()
 		output.log(`wtch`, `Initial scanner completed for [${server_folder}].`);
 		watch_server_scanned = true;
 	}).on('all', (_event, _path) => {
-		output.verbose_log(_event, _path);
+		output.verbose_log(`wtch`, `${_event} ${_path}`, watc_color);
 		if(!watch_server_scanned){
 			return false;
 		}
-		transpose.run(conf.root, cli_options);
+		const relative_path_to_server = _path.replace(`${conf.root}/src/server/`, '');
+		const new_path = `${conf.root}/${defaults.folder}/server/${relative_path_to_server}`;
+		if(_event === 'unlink'){
+			_delete_file_sync(new_path);
+		}else{
+			transpose.run(conf.root, _path, cli_options);
+		}
 	});
 	
-	// const transposed_server_folder = `${conf.root}/${defaults.folder}/server/.`;
-	// output.log(`wtch`, `Watching Transposed Server Folder [${server_folder}] ...`);
+	const book_path = `${conf.root}/src/book.ts`;
+	output.log(`wtch`, `Watching Book file [${book_path}] ...`);
 	
-	// const watch_transposed_server = chokidar.watch(transposed_server_folder).on('ready', () => {
-	//   output.log(`wtch`, `Initial scanner completed for [${transposed_server_folder}].`);
-	//   watch_transposed_server_scanned = true;
-	// }).on('all', (_event, _path) => {
-	//   output.verbose_log(_event, _path);
-	//   if(!watch_transposed_server_scanned){
-	//     return false;
-	//   }
-	// });
-
-
-
+	const watch_book = chokidar.watch(book_path).on('ready', () => {
+		output.log(`wtch`, `Initial scanner completed for [${book_path}].`);
+		watch_book_scanned = true;
+	}).on('all', (_event, _path) => {
+		output.verbose_log(`wtch`, `${_event} ${_path}`, watc_color);
+		if(!watch_book_scanned){
+			return false;
+		}
+		if(_event !== 'unlink'){
+			transpose.run(conf.root, _path, cli_options);
+		}
+	});
+	
 	process.on('SIGINT', function() {
+		user_exit = true;
 		watch_client.close().then(() => {
 			output.log(`wtch`, 'Stop watching client folder.');
 		});
 		watch_server.close().then(() => {
 			output.log(`wtch`, 'Stop watching server folder.');
 		});
-		// watch_transposed_server.close().then(() => {
-		//   output.log(`wtch`, 'Stop watching transposed server folder.');
-		// });
+		watch_book.close().then(() => {
+			output.log(`wtch`, 'Stop watching book file.');
+		});
 		process.stdout.write("\r--- Caught interrupt signal ---\n");
-		if(nuxt_dev.pid){
-			process.kill(nuxt_dev.pid);
+		if(nuxt_child.pid){
+			process.kill(nuxt_child.pid);
 		}
-		if(tsc_watch.pid){
-			process.kill(tsc_watch.pid);
+		if(tscw_child.pid){
+			process.kill(tscw_child.pid);
 		}
 	});
 	
 }
-function copyFileSync(source:string, target:string) {
-	let targetFile = target;
-	// If target is a directory, a new file with the same name will be created
-	if(fs.existsSync(target)) {
-		if(fs.lstatSync(target).isDirectory()) {
-			targetFile = path.join(target, path.basename(source));
-		}
-	}
-	fs.writeFileSync(targetFile, fs.readFileSync(source));
+
+function _clean_chunk(chunk:string){
+	const plain_text = chunk
+		.toString()
+		.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
+		.replace(/\r?\n|\r/g, ' ')
+		.trim();
+	return plain_text;
 }
-//
-function copyFolderRecursiveSync(source:string, target:string) {
-	let files = [];
-	// Check if folder needs to be created or integrated
-	const targetFolder = path.join( target, path.basename( source ) );
-	if(!fs.existsSync(targetFolder)){
-		fs.mkdirSync( targetFolder );
+
+function _spawn_log_command(command:string, context:string, color:string){
+	
+	const splitted_command = command.split(' ');
+	
+	const spawned = cp.spawn(
+		splitted_command[0],
+		splitted_command.slice(1),
+		// {stdio: [null, 'inherit', 'inherit']}
+	);
+	
+	if(spawned.stdout){
+		spawned.stdout.setEncoding('utf8');
+		spawned.stdout.on('data', (chunk) => {
+			const plain_text = _clean_chunk(chunk);
+			// if(plain_text.includes('error')){
+			//   process.stdout.write(chunk);
+			// }else
+			if(plain_text != ''){
+				output.verbose_log(context, plain_text, color);
+			}
+		});
 	}
-	// Copy
+	
+	if(spawned.stderr){
+		spawned.stderr.setEncoding('utf8');
+		spawned.stderr.on('data', (chunk) => {
+			process.stdout.write(chunk);
+			// const plain_text = _clean_chunk(chunk);
+			// if(plain_text != ''){
+			//   output.error_log(context, plain_text);
+			// }
+		});
+	}
+	
+	spawned.on('close', (code) => {
+		switch(code){
+			case 0:{
+				output.verbose_log(context, `Closed.`, color);
+				break;
+			}
+			default:{
+				if(user_exit === false){
+					output.error_log(context, `Child process exited with code ${code}`);
+				}
+			}
+		}
+	});
+	
+	spawned.on('error', (err) => {
+		if(user_exit === false){
+			output.error_log(context, `${err}`);
+		}
+	});
+	
+	return spawned;
+}
+
+
+function _delete_file_sync(file_path:string) {
+	fs.unlinkSync(file_path);
+	output.verbose_log('dl', `Deleted file ${file_path}.`);
+}
+
+function _copy_file_sync(source:string, target:string) {
+	let target_file = target;
+	if(fs.existsSync(target) && fs.lstatSync(target).isDirectory()) {
+		target_file = path.join(target, path.basename(source));
+	}
+	fs.writeFileSync(target_file, fs.readFileSync(source));
+	output.verbose_log('cp', `Copied file ${target_file}.`);
+}
+
+
+function _copy_folder_recursive_sync(source:string, target:string) {
+	let files = [];
+	const target_folder = path.join(target, path.basename( source ));
+	if(!fs.existsSync(target_folder)){
+		fs.mkdirSync( target_folder );
+	}
 	if(fs.lstatSync(source).isDirectory()) {
 		files = fs.readdirSync(source);
 		files.forEach(function (file) {
-			const curSource = path.join(source, file);
-			if(fs.lstatSync(curSource).isDirectory()) {
-				copyFolderRecursiveSync(curSource, targetFolder);
-			}else if(!curSource.endsWith('.swp')){
-				copyFileSync(curSource, targetFolder);
+			const cur_source = path.join(source, file);
+			if(fs.lstatSync(cur_source).isDirectory()) {
+				_copy_folder_recursive_sync(cur_source, target_folder);
+			}else if(!cur_source.endsWith('.swp')){
+				_copy_file_sync(cur_source, target_folder);
 			}
 		});
 	}

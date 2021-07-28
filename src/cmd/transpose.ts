@@ -10,7 +10,7 @@ import path from 'path';
 
 import * as tsm from 'ts-morph';
 
-import {Options} from '../types';
+import {Options, Arguments} from '../types';
 
 import {conf, defaults} from '../conf/defaults';
 
@@ -31,11 +31,21 @@ const bll_book_required_properties = ['bll'];
 const atom_book_required_client_first_props = ['properties'];
 const api_book_required_client_second_props = ['url'];
 
+type TransposeOptions = {
+	file?:string;
+}
+
+const transpose_options:TransposeOptions = {};
+
 export const transpose = {
 	
-	run: async (root:string, options?:Partial<Options>):Promise<void> => {
+	run: async (root:string, file?:string, options?:Partial<Options>):Promise<void> => {
 		
 		conf.root = root;
+		
+		if(typeof file === 'string'){
+			transpose_options.file = util.relative_to_absolute_path(file);
+		}
 		
 		common.init_run(options);
 		
@@ -43,37 +53,38 @@ export const transpose = {
 		
 	},
 	
-	command: async ():Promise<void> => {
+	command: async (args?:Arguments):Promise<void> => {
 		
 		output.start_loading('Transposing...');
 		
 		util.read_rc_file();
 		
-		const tmp_book_folder = `${conf.root}/${defaults.folder}/.tmp`;
+		if(args && args.file){
+			const filepath = args.file;
+			if(typeof filepath === 'string' && filepath !== ''){
+				transpose_options.file = util.relative_to_absolute_path(filepath);
+			}
+		}
 		
-		util.create_folder_if_doesnt_exists('tmp', tmp_book_folder);
+		if(typeof transpose_options.file === 'string'){
+			
+			const parsed_path = path.parse(transpose_options.file);
+			if(typeof parsed_path.ext === 'string' && parsed_path.ext !== ''){
+				
+				_transpose_file(transpose_options.file);
+				
+			}else{
+				
+				_transpose_folder(transpose_options.file);
+				
+			}
+			
+		}else{
+			
+			_transpose_all();
+			
+		}
 		
-		util.copy_file(
-			'bkp',
-			`${conf.root}/src/book.ts`,
-			`${tmp_book_folder}/book.ts`
-		);
-		
-		_manipulate_and_create_files(`${tmp_book_folder}/book.ts`);
-		
-		_resolve_book_aliases();
-		
-		_generate_client_books();
-		
-		_copy_from_src_into_uranio_folder();
-		
-		_resolve_aliases();
-		
-		_replace_import_to_avoid_loops();
-		
-		util.remove_folder_if_exists('tmp', tmp_book_folder);
-		
-		output.end_log(`Transpose completed.`);
 		
 	}
 	
@@ -85,6 +96,90 @@ const _project_option = {
 		quoteKind: tsm.QuoteKind.Single,
 	}
 };
+
+function _transpose_file(file_path:string){
+	
+	if(transpose_options.file === `${conf.root}/src/book.ts`){
+		
+		_transpose_book();
+		
+	}else{
+			
+		const server_path = `${conf.root}/src/server/`;
+		const client_path = `${conf.root}/src/client/`;
+		
+		if(fs.existsSync(file_path) && file_path.includes(`${conf.root}/src/`)){
+			if(file_path.includes(server_path) || file_path.includes(client_path)){
+				let new_path = '';
+				if(file_path.includes(server_path)){
+					new_path = file_path.replace(server_path, `${conf.root}/${defaults.folder}/server/`);
+					util.copy_file(`trsp`, file_path, new_path);
+				}else if(file_path.includes(client_path)){
+					new_path = file_path.replace(client_path, `${conf.root}/${defaults.folder}/client/src/`);
+					util.copy_file(`trsp`, file_path, new_path);
+				}
+				if(new_path !== ''){
+					alias.replace_file_aliases(new_path, alias.get_aliases());
+					_avoid_import_loop(new_path);
+					output.done_verbose_log('trsp', `Transposed file [${file_path}].`);
+				}
+			}else{
+				output.error_log(`trsp`, `Invalid file path [${file_path}].`);
+			}
+		}else{
+			output.error_log(`trsp`, `Invalid file path [${file_path}].`);
+		}
+		
+	}
+	
+}
+
+function _transpose_folder(dir_path:string){
+	fs.readdirSync(dir_path).forEach((filename) => {
+		const full_path = path.resolve(dir_path, filename);
+		if (fs.statSync(full_path).isDirectory() && filename !== '.git'){
+			return _transpose_folder(full_path);
+		}else{
+			return _transpose_file(full_path);
+		}
+	});
+}
+
+function _transpose_book(){
+
+	const tmp_book_folder = `${conf.root}/${defaults.folder}/.tmp`;
+	
+	util.remove_folder_if_exists('tmp', tmp_book_folder);
+	util.create_folder_if_doesnt_exists('tmp', tmp_book_folder);
+	
+	util.copy_file(
+		'bkp',
+		`${conf.root}/src/book.ts`,
+		`${tmp_book_folder}/book.ts`
+	);
+	
+	_manipulate_and_create_files(`${tmp_book_folder}/book.ts`);
+	
+	_resolve_book_aliases();
+	
+	_generate_client_books();
+	
+	util.remove_folder_if_exists('tmp', tmp_book_folder);
+	
+}
+
+function _transpose_all(){
+	
+	_transpose_book();
+	
+	_copy_from_src_into_uranio_folder();
+	
+	_resolve_aliases();
+	
+	_replace_import_to_avoid_loops();
+	
+	output.end_log(`Transpose completed.`);
+}
 
 function _replace_import_to_avoid_loops(){
 	const server_dir = `${conf.root}/${defaults.folder}/server/`;
@@ -165,7 +260,7 @@ function _copy_from_src_into_uranio_folder(){
 		util.copy_files('copy', `${conf.root}/src/server/*`, `${conf.root}/.uranio/server/`);
 	}
 	if(fs.existsSync(`${conf.root}/src/client/`)){
-		util.copy_files('copy', `${conf.root}/src/client/*`, `${conf.root}/.uranio/client/`);
+		util.copy_files('copy', `${conf.root}/src/client/*`, `${conf.root}/.uranio/client/src/`);
 	}
 }
 

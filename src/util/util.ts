@@ -44,11 +44,17 @@ export function read_rc_file()
 		output.error_log('init', err);
 		process.exit(1);
 	}else{
-		const rc_content = fs.readFileSync(`${conf.root}/${jsonfile_path}`, 'utf8');
-		const rc_obj = urn_util.json.clean_parse(rc_content);
-		set_repo(rc_obj.repo);
-		conf.repo = rc_obj.repo;
-		conf.pacman = rc_obj.pacman;
+		const rcfile_path = `${conf.root}/${jsonfile_path}`;
+		try{
+			const rc_content = fs.readFileSync(rcfile_path, 'utf8');
+			const rc_obj = urn_util.json.clean_parse(rc_content);
+			set_repo(rc_obj.repo);
+			conf.repo = rc_obj.repo;
+			conf.pacman = rc_obj.pacman;
+		}catch(ex){
+			output.wrong_end_log(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
+			process.exit(1);
+		}
 	}
 }
 
@@ -62,20 +68,26 @@ export function check_folder(folder_path:string)
 	const data = fs.readdirSync(folder_path);
 	for(const file of data){
 		if(file === 'package.json'){
-			const content = fs.readFileSync(`${folder_path}/${file}`,'utf8');
-			const pack = urn_util.json.clean_parse(content);
-			if(pack.name === 'urn-cli'){
-				return false;
-			}else if(pack.name === 'uranio'){
-				const bld_path = `${folder_path}/urn-bld`;
-				if(!fs.existsSync(bld_path)){
+			const package_json_path = `${folder_path}/${file}`;
+			try{
+				const content = fs.readFileSync(package_json_path,'utf8');
+				const pack = urn_util.json.clean_parse(content);
+				if(pack.name === 'urn-cli'){
 					return false;
+				}else if(pack.name === 'uranio'){
+					const bld_path = `${folder_path}/urn-bld`;
+					if(!fs.existsSync(bld_path)){
+						return false;
+					}
+					conf.root = bld_path;
+					return true;
 				}
-				conf.root = bld_path;
+				conf.root = folder_path;
 				return true;
+			}catch(ex){
+				output.error_log(`root`, `Invalid ${package_json_path}. ${ex.message}`);
+				return false;
 			}
-			conf.root = folder_path;
-			return true;
 		}
 	}
 	return false;
@@ -152,7 +164,8 @@ export function remove_folder_if_exists(context:string, folder_path:string)
 		:void{
 	if(fs.existsSync(folder_path)){
 		output.start_loading(`Removing folder [${folder_path}]`);
-		sync_exec(`rm -rf ${folder_path}`);
+		fs.rmdirSync(folder_path, {recursive: true});
+		// sync_exec(`rm -rf ${folder_path}`);
 		output.done_verbose_log(context, `Folder [${folder_path}] removed.`);
 	}
 }
@@ -160,9 +173,14 @@ export function remove_folder_if_exists(context:string, folder_path:string)
 export function create_folder_if_doesnt_exists(context:string, folder_path:string)
 		:void{
 	if(!fs.existsSync(folder_path)){
-		output.start_loading(`Creating folder [${folder_path}]`);
-		sync_exec(`mkdir ${folder_path}`);
-		output.done_verbose_log(context, `Folder [${folder_path}] created.`);
+		try{
+			output.start_loading(`Creating folder [${folder_path}]`);
+			fs.mkdirSync(folder_path);
+			// sync_exec(`mkdir ${folder_path}`);
+			output.done_verbose_log(context, `Folder [${folder_path}] created.`);
+		}catch(ex){
+			output.error_log(context, `Failed creating folder [${folder_path}]. ${ex.message}.`);
+		}
 	}
 }
 
@@ -307,12 +325,18 @@ async function _clone_repo(context: string, address:string, dest_folder:string, 
 
 export function dependency_exists(repo:string)
 		:boolean{
-	const data = fs.readFileSync(`${conf.root}/package.json`, 'utf8');
-	const package_data = urn_util.json.clean_parse(data);
-	return (
-		typeof package_data['dependencies'][repo] === 'string' ||
-		typeof package_data['devDependencies'][repo] === 'string'
-	);
+	const package_json_path = `${conf.root}/package.json`;
+	try{
+		const data = fs.readFileSync(package_json_path, 'utf8');
+		const package_data = urn_util.json.clean_parse(data);
+		return (
+			typeof package_data['dependencies'][repo] === 'string' ||
+			typeof package_data['devDependencies'][repo] === 'string'
+		);
+	}catch(ex){
+		output.wrong_end_log(`Invalid ${package_json_path}. ${ex.message}`);
+		process.exit(1);
+	}
 }
 
 const _pacman_commands = {
