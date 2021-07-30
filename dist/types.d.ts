@@ -29,4 +29,5 @@ export declare type Options = {
     repo: Repo;
     pacman: PacMan;
     force: boolean;
+    filelog: boolean;
 };

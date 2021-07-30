@@ -3,8 +3,9 @@
  *
  * @packageDocumentation
  */
+/// <reference types="minimist" />
 import { Options } from '../types';
 export declare const transpose: {
-    run: (root: string, options?: Partial<Options> | undefined) => Promise<void>;
-    command: () => Promise<void>;
+    run: (root: string, file?: string | undefined, options?: Partial<Options> | undefined) => Promise<void>;
+    command: (args?: import("minimist").ParsedArgs | undefined) => Promise<void>;
 };
