@@ -75,6 +75,13 @@ function _set_conf(args) {
     if (typeof args.nofullwidth === 'boolean' && !!args.nofullwidth !== !defaults_1.conf.fullwidth) {
         defaults_1.conf.fullwidth = !args.nofullwidth;
     }
+    const filelog = args.l || args.filelog;
+    if (filelog == true) {
+        defaults_1.conf.filelog = true;
+    }
+    if (typeof args.nofilelog === 'boolean' && !!args.nofilelog !== !defaults_1.conf.filelog) {
+        defaults_1.conf.filelog = !args.nofilelog;
+    }
     const prefix = args.p || args.prefix;
     if (typeof prefix === 'string' && prefix !== '') {
         defaults_1.conf.prefix = prefix;
@@ -126,7 +133,7 @@ function _switch_command(args) {
             break;
         }
         case 'transpose': {
-            cmd_1.transpose.command();
+            cmd_1.transpose.command(args);
             break;
         }
         case 'alias': {

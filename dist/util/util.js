@@ -62,11 +62,18 @@ function read_rc_file() {
         process.exit(1);
     }
     else {
-        const rc_content = fs_1.default.readFileSync(`${defaults_1.conf.root}/${defaults_1.jsonfile_path}`, 'utf8');
-        const rc_obj = urn_lib_1.urn_util.json.clean_parse(rc_content);
-        set_repo(rc_obj.repo);
-        defaults_1.conf.repo = rc_obj.repo;
-        defaults_1.conf.pacman = rc_obj.pacman;
+        const rcfile_path = `${defaults_1.conf.root}/${defaults_1.jsonfile_path}`;
+        try {
+            const rc_content = fs_1.default.readFileSync(rcfile_path, 'utf8');
+            const rc_obj = urn_lib_1.urn_util.json.clean_parse(rc_content);
+            set_repo(rc_obj.repo);
+            defaults_1.conf.repo = rc_obj.repo;
+            defaults_1.conf.pacman = rc_obj.pacman;
+        }
+        catch (ex) {
+            output.wrong_end_log(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
+            process.exit(1);
+        }
     }
 }
 exports.read_rc_file = read_rc_file;
@@ -78,21 +85,28 @@ function check_folder(folder_path) {
     const data = fs_1.default.readdirSync(folder_path);
     for (const file of data) {
         if (file === 'package.json') {
-            const content = fs_1.default.readFileSync(`${folder_path}/${file}`, 'utf8');
-            const pack = urn_lib_1.urn_util.json.clean_parse(content);
-            if (pack.name === 'urn-cli') {
-                return false;
-            }
-            else if (pack.name === 'uranio') {
-                const bld_path = `${folder_path}/urn-bld`;
-                if (!fs_1.default.existsSync(bld_path)) {
+            const package_json_path = `${folder_path}/${file}`;
+            try {
+                const content = fs_1.default.readFileSync(package_json_path, 'utf8');
+                const pack = urn_lib_1.urn_util.json.clean_parse(content);
+                if (pack.name === 'urn-cli') {
                     return false;
                 }
-                defaults_1.conf.root = bld_path;
+                else if (pack.name === 'uranio') {
+                    const bld_path = `${folder_path}/urn-bld`;
+                    if (!fs_1.default.existsSync(bld_path)) {
+                        return false;
+                    }
+                    defaults_1.conf.root = bld_path;
+                    return true;
+                }
+                defaults_1.conf.root = folder_path;
                 return true;
             }
-            defaults_1.conf.root = folder_path;
-            return true;
+            catch (ex) {
+                output.error_log(`root`, `Invalid ${package_json_path}. ${ex.message}`);
+                return false;
+            }
         }
     }
     return false;
@@ -161,16 +175,23 @@ exports.pretty = pretty;
 function remove_folder_if_exists(context, folder_path) {
     if (fs_1.default.existsSync(folder_path)) {
         output.start_loading(`Removing folder [${folder_path}]`);
-        sync_exec(`rm -rf ${folder_path}`);
+        fs_1.default.rmdirSync(folder_path, { recursive: true });
+        // sync_exec(`rm -rf ${folder_path}`);
         output.done_verbose_log(context, `Folder [${folder_path}] removed.`);
     }
 }
 exports.remove_folder_if_exists = remove_folder_if_exists;
 function create_folder_if_doesnt_exists(context, folder_path) {
     if (!fs_1.default.existsSync(folder_path)) {
-        output.start_loading(`Creating folder [${folder_path}]`);
-        sync_exec(`mkdir ${folder_path}`);
-        output.done_verbose_log(context, `Folder [${folder_path}] created.`);
+        try {
+            output.start_loading(`Creating folder [${folder_path}]`);
+            fs_1.default.mkdirSync(folder_path);
+            // sync_exec(`mkdir ${folder_path}`);
+            output.done_verbose_log(context, `Folder [${folder_path}] created.`);
+        }
+        catch (ex) {
+            output.error_log(context, `Failed creating folder [${folder_path}]. ${ex.message}.`);
+        }
     }
 }
 exports.create_folder_if_doesnt_exists = create_folder_if_doesnt_exists;
@@ -302,10 +323,17 @@ function _clone_repo(context, address, dest_folder, recursive = false) {
     });
 }
 function dependency_exists(repo) {
-    const data = fs_1.default.readFileSync(`${defaults_1.conf.root}/package.json`, 'utf8');
-    const package_data = urn_lib_1.urn_util.json.clean_parse(data);
-    return (typeof package_data['dependencies'][repo] === 'string' ||
-        typeof package_data['devDependencies'][repo] === 'string');
+    const package_json_path = `${defaults_1.conf.root}/package.json`;
+    try {
+        const data = fs_1.default.readFileSync(package_json_path, 'utf8');
+        const package_data = urn_lib_1.urn_util.json.clean_parse(data);
+        return (typeof package_data['dependencies'][repo] === 'string' ||
+            typeof package_data['devDependencies'][repo] === 'string');
+    }
+    catch (ex) {
+        output.wrong_end_log(`Invalid ${package_json_path}. ${ex.message}`);
+        process.exit(1);
+    }
 }
 exports.dependency_exists = dependency_exists;
 const _pacman_commands = {

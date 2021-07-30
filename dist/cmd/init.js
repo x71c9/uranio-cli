@@ -285,18 +285,29 @@ function _create_client_server_folders() {
 }
 function _update_aliases() {
     output.start_loading('Updating aliases...');
-    const data = fs_1.default.readFileSync(`${defaults_1.conf.root}/package.json`, 'utf8');
-    const package_data = urn_lib_1.urn_util.json.clean_parse(data);
-    package_data['_moduleAliases'] = {
-        'uranio': `./dist/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/`,
-        'uranio-books': `./dist/${defaults_1.defaults.folder}/server/books.js`,
-        'uranio-client': `./dist/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/client`
-    };
-    if (defaults_1.conf.repo !== 'core') {
-        package_data['_moduleAliases']['uranio-core'] = `./dist/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/core/`;
+    const package_json_path = `${defaults_1.conf.root}/package.json`;
+    const data = fs_1.default.readFileSync(package_json_path, 'utf8');
+    try {
+        const package_data = urn_lib_1.urn_util.json.clean_parse(data);
+        package_data['_moduleAliases'] = {
+            'uranio': `./dist/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/`,
+            'uranio-books': `./dist/${defaults_1.defaults.folder}/server/books.js`,
+            'uranio-client': `./dist/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/client`
+        };
+        if (defaults_1.conf.repo !== 'core') {
+            package_data['_moduleAliases']['uranio-core'] = `./dist/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}/core/`;
+        }
+        try {
+            fs_1.default.writeFileSync(package_json_path, JSON.stringify(package_data, null, '\t'));
+            output.done_log('alia', `Updated aliases.`);
+        }
+        catch (ex) {
+            output.error_log('alia', `Cannot update ${package_json_path}.`);
+        }
     }
-    fs_1.default.writeFileSync(`${defaults_1.conf.root}/package.json`, JSON.stringify(package_data, null, '\t'));
-    output.done_log('alas', `Updated aliases.`);
+    catch (ex) {
+        output.error_log('alia', `Cannot parse ${package_json_path}.`);
+    }
 }
 function _install_core_dep() {
     return __awaiter(this, void 0, void 0, function* () {

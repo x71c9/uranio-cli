@@ -64,9 +64,16 @@ const _project_option = {
     }
 };
 function get_aliases() {
-    const data = fs_1.default.readFileSync(`${defaults_1.conf.root}/tsconfig.json`, 'utf8');
-    const tsconf_data = urn_lib_1.urn_util.json.clean_parse(data);
-    return tsconf_data['compilerOptions']['paths'];
+    const tsconfig_path = `${defaults_1.conf.root}/tsconfig.json`;
+    const data = fs_1.default.readFileSync(tsconfig_path, 'utf8');
+    try {
+        const tsconf_data = urn_lib_1.urn_util.json.clean_parse(data);
+        return tsconf_data['compilerOptions']['paths'];
+    }
+    catch (ex) {
+        output.wrong_end_log(`Error parsing ${tsconfig_path}. ${ex.message}`);
+        process.exit(1);
+    }
 }
 exports.get_aliases = get_aliases;
 function _replace_modified_file(text, filename) {

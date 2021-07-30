@@ -76,8 +76,8 @@ function wrong_end_log(text) {
     log('end', (!defaults_1.conf.blank) ? chalk_1.default.red(end_text) : end_text);
 }
 exports.wrong_end_log = wrong_end_log;
-function verbose_log(context, text) {
-    const color_text = (!defaults_1.conf.blank) ? chalk_1.default.hex('#668899')(text) : text;
+function verbose_log(context, text, color = '#668899') {
+    const color_text = (!defaults_1.conf.blank) ? chalk_1.default.hex(color)(text) : text;
     _log(context, color_text, (defaults_1.conf.verbose === true));
 }
 exports.verbose_log = verbose_log;
@@ -87,7 +87,9 @@ function log(context, text) {
 exports.log = log;
 function _log(context, text, out = false) {
     const output_text = _format_text(context, text);
-    _log_to_file(output_text);
+    if (defaults_1.conf.filelog) {
+        _log_to_file(output_text);
+    }
     if (out) {
         let was_spinning = false;
         if (spinner.isSpinning) {

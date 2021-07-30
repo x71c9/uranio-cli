@@ -36,6 +36,7 @@ exports.conf = {
     repo: exports.defaults.default_repo,
     prefix: '',
     pacman: 'yarn',
-    force: false
+    force: false,
+    filelog: true
 };
 //# sourceMappingURL=defaults.js.map

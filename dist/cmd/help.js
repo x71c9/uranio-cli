@@ -44,12 +44,13 @@ exports.help = {
         console.log(`list of arguments`);
         console.log(`  -r --repo .......... set uranio repo to use.`);
         console.log(`  -s --root .......... set the project root folder.`);
-        console.log(`  -f --force ......... initialize without prompts.`);
+        console.log(`  -f --force ......... run without prompts.`);
         console.log(`  -v --verbose ....... log in verbose mode.`);
         console.log(`  -n --hide .......... do not output log.`);
         console.log(`  -b --blank ......... log with no colors.`);
         console.log(`  -w --fullwidth ..... log in full width.`);
         console.log(`  -p --prefix ........ set a log prefix.`);
+        console.log(`  -l --filelog ....... save log on file.`);
         console.log(``);
         console.log(``);
         process.exit(0);

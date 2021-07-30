@@ -41,84 +41,61 @@ const cp = __importStar(require("child_process"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const chokidar_1 = __importDefault(require("chokidar"));
-const chalk_1 = __importDefault(require("chalk"));
+// import chalk from 'chalk';
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const defaults_1 = require("../conf/defaults");
+// import {conf} from '../conf/defaults';
 const transpose_1 = require("./transpose");
 exports.dev = {
     command: () => __awaiter(void 0, void 0, void 0, function* () {
         output.stop_loading();
         util.read_rc_file();
+        defaults_1.conf.filelog = false;
         _start_dev();
     })
 };
 let watch_client_scanned = false;
 let watch_server_scanned = false;
-// let watch_transposed_server_scanned = false;
+let watch_book_scanned = false;
 const cli_options = {
     hide: false,
     verbose: true,
-    prefix: chalk_1.default.green('[urn] ')
 };
+const nuxt_color = '#677cc7';
+const tscw_color = '#8a5b5b';
+const watc_color = '#687a6a';
+let user_exit = false;
 function _start_dev() {
     return __awaiter(this, void 0, void 0, function* () {
-        defaults_1.conf.prefix = chalk_1.default.green(`[urn] `);
-        copyFolderRecursiveSync(`${defaults_1.conf.root}/src/client/.`, `${defaults_1.conf.root}/.uranio/client/src/.`);
-        transpose_1.transpose.run(defaults_1.conf.root, cli_options);
-        const nuxt_dev = cp.spawn('npx', [`nuxt`, `-c`, `.uranio/client/nuxt.config.js`]);
-        const tsc_watch = cp.spawn('npx', [`tsc`, `-w`, `--project`, `${defaults_1.conf.root}/tsconfig.json`]);
-        if (nuxt_dev.stdout) {
-            nuxt_dev.stdout.setEncoding('utf8');
-            nuxt_dev.stdout.on('data', (chunk) => {
-                const plain_text = chunk
-                    .toString()
-                    .replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
-                    .replace(/\r?\n|\r/g, ' ');
-                output.verbose_log('nuxt', plain_text);
-            });
-        }
-        if (nuxt_dev.stderr) {
-            nuxt_dev.stderr.setEncoding('utf8');
-            nuxt_dev.stderr.on('data', (chunk) => {
-                const plain_text = chunk
-                    .toString()
-                    .replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
-                    .replace(/\r?\n|\r/g, ' ');
-                output.verbose_log('nuxt', plain_text);
-            });
-        }
-        if (tsc_watch.stdout) {
-            tsc_watch.stdout.setEncoding('utf8');
-            tsc_watch.stdout.on('data', (chunk) => {
-                const plain_text = chunk
-                    .toString()
-                    .replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
-                    .replace(/\r?\n|\r/g, ' ');
-                output.verbose_log('tscw', plain_text);
-            });
-        }
-        if (tsc_watch.stderr) {
-            tsc_watch.stderr.setEncoding('utf8');
-            tsc_watch.stderr.on('data', (chunk) => {
-                const plain_text = chunk
-                    .toString()
-                    .replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
-                    .replace(/\r?\n|\r/g, ' ');
-                output.verbose_log('tscw', plain_text);
-            });
-        }
+        // conf.prefix = chalk.green(`[urn] `);
+        _copy_folder_recursive_sync(`${defaults_1.conf.root}/src/client/.`, `${defaults_1.conf.root}/.uranio/client/src/.`);
+        transpose_1.transpose.run(defaults_1.conf.root, undefined, cli_options);
+        const nuxt_cmd = `npx nuxt -c ${defaults_1.defaults.folder}/client/nuxt.config.js`;
+        const nuxt_child = _spawn_log_command(nuxt_cmd, 'nuxt', nuxt_color);
+        const tscw_cmd = `npx tsc -w --project ${defaults_1.conf.root}/tsconfig.json`;
+        const tscw_child = _spawn_log_command(tscw_cmd, 'tscw', tscw_color);
         const client_folder = `${defaults_1.conf.root}/src/client/.`;
         output.log(`wtch`, `Watching Client Folder [${client_folder}] ...`);
         const watch_client = chokidar_1.default.watch(client_folder).on('ready', () => {
             output.log(`wtch`, `Initial scanner completed for [${client_folder}].`);
             watch_client_scanned = true;
         }).on('all', (_event, _path) => {
-            output.verbose_log(_event, _path);
+            output.verbose_log(`wtch`, `${_event} ${_path}`, watc_color);
             if (!watch_client_scanned) {
                 return false;
             }
-            copyFolderRecursiveSync(`${defaults_1.conf.root}/src/client/.`, `${defaults_1.conf.root}/.uranio/client/src/.`);
+            if (_path.endsWith('.swp')) {
+                return false;
+            }
+            const relative_path_to_client = _path.replace(`${defaults_1.conf.root}/src/client/`, '');
+            const new_path = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/${relative_path_to_client}`;
+            if (_event === 'unlink') {
+                _delete_file_sync(new_path);
+            }
+            else {
+                _copy_file_sync(_path, new_path);
+            }
         });
         const server_folder = `${defaults_1.conf.root}/src/server/.`;
         output.log(`wtch`, `Watching Server Folder [${server_folder}] ...`);
@@ -126,71 +103,134 @@ function _start_dev() {
             output.log(`wtch`, `Initial scanner completed for [${server_folder}].`);
             watch_server_scanned = true;
         }).on('all', (_event, _path) => {
-            output.verbose_log(_event, _path);
+            output.verbose_log(`wtch`, `${_event} ${_path}`, watc_color);
             if (!watch_server_scanned) {
                 return false;
             }
-            transpose_1.transpose.run(defaults_1.conf.root, cli_options);
+            const relative_path_to_server = _path.replace(`${defaults_1.conf.root}/src/server/`, '');
+            const new_path = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/${relative_path_to_server}`;
+            if (_event === 'unlink') {
+                _delete_file_sync(new_path);
+            }
+            else {
+                transpose_1.transpose.run(defaults_1.conf.root, _path, cli_options);
+            }
         });
-        // const transposed_server_folder = `${conf.root}/${defaults.folder}/server/.`;
-        // output.log(`wtch`, `Watching Transposed Server Folder [${server_folder}] ...`);
-        // const watch_transposed_server = chokidar.watch(transposed_server_folder).on('ready', () => {
-        //   output.log(`wtch`, `Initial scanner completed for [${transposed_server_folder}].`);
-        //   watch_transposed_server_scanned = true;
-        // }).on('all', (_event, _path) => {
-        //   output.verbose_log(_event, _path);
-        //   if(!watch_transposed_server_scanned){
-        //     return false;
-        //   }
-        // });
+        const book_path = `${defaults_1.conf.root}/src/book.ts`;
+        output.log(`wtch`, `Watching Book file [${book_path}] ...`);
+        const watch_book = chokidar_1.default.watch(book_path).on('ready', () => {
+            output.log(`wtch`, `Initial scanner completed for [${book_path}].`);
+            watch_book_scanned = true;
+        }).on('all', (_event, _path) => {
+            output.verbose_log(`wtch`, `${_event} ${_path}`, watc_color);
+            if (!watch_book_scanned) {
+                return false;
+            }
+            if (_event !== 'unlink') {
+                transpose_1.transpose.run(defaults_1.conf.root, _path, cli_options);
+            }
+        });
         process.on('SIGINT', function () {
+            user_exit = true;
             watch_client.close().then(() => {
                 output.log(`wtch`, 'Stop watching client folder.');
             });
             watch_server.close().then(() => {
                 output.log(`wtch`, 'Stop watching server folder.');
             });
-            // watch_transposed_server.close().then(() => {
-            //   output.log(`wtch`, 'Stop watching transposed server folder.');
-            // });
+            watch_book.close().then(() => {
+                output.log(`wtch`, 'Stop watching book file.');
+            });
             process.stdout.write("\r--- Caught interrupt signal ---\n");
-            if (nuxt_dev.pid) {
-                process.kill(nuxt_dev.pid);
+            if (nuxt_child.pid) {
+                process.kill(nuxt_child.pid);
             }
-            if (tsc_watch.pid) {
-                process.kill(tsc_watch.pid);
+            if (tscw_child.pid) {
+                process.kill(tscw_child.pid);
             }
         });
     });
 }
-function copyFileSync(source, target) {
-    let targetFile = target;
-    // If target is a directory, a new file with the same name will be created
-    if (fs_1.default.existsSync(target)) {
-        if (fs_1.default.lstatSync(target).isDirectory()) {
-            targetFile = path_1.default.join(target, path_1.default.basename(source));
-        }
-    }
-    fs_1.default.writeFileSync(targetFile, fs_1.default.readFileSync(source));
+function _clean_chunk(chunk) {
+    const plain_text = chunk
+        .toString()
+        .replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
+        .replace(/\r?\n|\r/g, ' ')
+        .trim();
+    return plain_text;
 }
-//
-function copyFolderRecursiveSync(source, target) {
-    let files = [];
-    // Check if folder needs to be created or integrated
-    const targetFolder = path_1.default.join(target, path_1.default.basename(source));
-    if (!fs_1.default.existsSync(targetFolder)) {
-        fs_1.default.mkdirSync(targetFolder);
+function _spawn_log_command(command, context, color) {
+    const splitted_command = command.split(' ');
+    const spawned = cp.spawn(splitted_command[0], splitted_command.slice(1));
+    if (spawned.stdout) {
+        spawned.stdout.setEncoding('utf8');
+        spawned.stdout.on('data', (chunk) => {
+            const plain_text = _clean_chunk(chunk);
+            // if(plain_text.includes('error')){
+            //   process.stdout.write(chunk);
+            // }else
+            if (plain_text != '') {
+                output.verbose_log(context, plain_text, color);
+            }
+        });
     }
-    // Copy
+    if (spawned.stderr) {
+        spawned.stderr.setEncoding('utf8');
+        spawned.stderr.on('data', (chunk) => {
+            process.stdout.write(chunk);
+            // const plain_text = _clean_chunk(chunk);
+            // if(plain_text != ''){
+            //   output.error_log(context, plain_text);
+            // }
+        });
+    }
+    spawned.on('close', (code) => {
+        switch (code) {
+            case 0: {
+                output.verbose_log(context, `Closed.`, color);
+                break;
+            }
+            default: {
+                if (user_exit === false) {
+                    output.error_log(context, `Child process exited with code ${code}`);
+                }
+            }
+        }
+    });
+    spawned.on('error', (err) => {
+        if (user_exit === false) {
+            output.error_log(context, `${err}`);
+        }
+    });
+    return spawned;
+}
+function _delete_file_sync(file_path) {
+    fs_1.default.unlinkSync(file_path);
+    output.verbose_log('dl', `Deleted file ${file_path}.`);
+}
+function _copy_file_sync(source, target) {
+    let target_file = target;
+    if (fs_1.default.existsSync(target) && fs_1.default.lstatSync(target).isDirectory()) {
+        target_file = path_1.default.join(target, path_1.default.basename(source));
+    }
+    fs_1.default.writeFileSync(target_file, fs_1.default.readFileSync(source));
+    output.verbose_log('cp', `Copied file ${target_file}.`);
+}
+function _copy_folder_recursive_sync(source, target) {
+    let files = [];
+    const target_folder = path_1.default.join(target, path_1.default.basename(source));
+    if (!fs_1.default.existsSync(target_folder)) {
+        fs_1.default.mkdirSync(target_folder);
+    }
     if (fs_1.default.lstatSync(source).isDirectory()) {
         files = fs_1.default.readdirSync(source);
         files.forEach(function (file) {
-            const curSource = path_1.default.join(source, file);
-            if (fs_1.default.lstatSync(curSource).isDirectory()) {
-                copyFolderRecursiveSync(curSource, targetFolder);
+            const cur_source = path_1.default.join(source, file);
+            if (fs_1.default.lstatSync(cur_source).isDirectory()) {
+                _copy_folder_recursive_sync(cur_source, target_folder);
             }
-            else if (!curSource.endsWith('.swp')) {
-                copyFileSync(curSource, targetFolder);
+            else if (!cur_source.endsWith('.swp')) {
+                _copy_file_sync(cur_source, target_folder);
             }
         });
     }
