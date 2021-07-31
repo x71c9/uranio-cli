@@ -66,12 +66,15 @@ async function _start_dev()
 	
 	transpose.run(conf.root, undefined, cli_options);
 	
-	const nuxt_cmd = `npx nuxt -c ${defaults.folder}/client/nuxt.config.js`;
-	const nuxt_child = _spawn_log_command(nuxt_cmd, 'nuxt', nuxt_color);
+	// const nuxt_cmd = `npx nuxt -c ${defaults.folder}/client/nuxt.config.js`;
+	// const nuxt_child = _spawn_log_command(nuxt_cmd, 'nuxt', nuxt_color);
+	
+	const ntl_cmd = `npx ntl dev`;
+	const ntl_child = _spawn_log_command(ntl_cmd, 'ntl', nuxt_color);
 	
 	const tscw_cmd = `npx tsc -w --project ${conf.root}/tsconfig.json`;
 	const tscw_child = _spawn_log_command(tscw_cmd, 'tscw', tscw_color);
-
+	
 	const client_folder = `${conf.root}/src/client/.`;
 	output.log(`wtch`, `Watching Client Folder [${client_folder}] ...`);
 	
@@ -91,6 +94,7 @@ async function _start_dev()
 		if(_event === 'unlink'){
 			_delete_file_sync(new_path);
 		}else{
+			output.log(`wtch`, `[Client watch] Copy file sync [${_path}] to [${new_path}]`);
 			_copy_file_sync(_path, new_path);
 		}
 	});
@@ -109,8 +113,10 @@ async function _start_dev()
 		const relative_path_to_server = _path.replace(`${conf.root}/src/server/`, '');
 		const new_path = `${conf.root}/${defaults.folder}/server/${relative_path_to_server}`;
 		if(_event === 'unlink'){
+			output.log(`wtch`, `[Server watch] Unlink [${_path}].`);
 			_delete_file_sync(new_path);
 		}else{
+			output.log(`wtch`, `[Server watch] Transpose [${_path}].`);
 			transpose.run(conf.root, _path, cli_options);
 		}
 	});
@@ -127,6 +133,7 @@ async function _start_dev()
 			return false;
 		}
 		if(_event !== 'unlink'){
+			output.log(`wtch`, `[Book watch] Transpose [${_path}].`);
 			transpose.run(conf.root, _path, cli_options);
 		}
 	});
@@ -143,8 +150,11 @@ async function _start_dev()
 			output.log(`wtch`, 'Stop watching book file.');
 		});
 		process.stdout.write("\r--- Caught interrupt signal ---\n");
-		if(nuxt_child.pid){
-			process.kill(nuxt_child.pid);
+		// if(nuxt_child.pid){
+		//   process.kill(nuxt_child.pid);
+		// }
+		if(ntl_child.pid){
+			process.kill(ntl_child.pid);
 		}
 		if(tscw_child.pid){
 			process.kill(tscw_child.pid);
@@ -158,6 +168,8 @@ function _clean_chunk(chunk:string){
 		.toString()
 		.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
 		.replace(/\r?\n|\r/g, ' ')
+		.replace('┌─────────────────────────────────────────────────┐    │                                                 │    │   ', '')
+		.replace('   │    │                                                 │    └─────────────────────────────────────────────────┘', '')
 		.trim();
 	return plain_text;
 }
