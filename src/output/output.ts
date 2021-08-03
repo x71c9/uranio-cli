@@ -70,7 +70,9 @@ export function done_verbose_log(context:string, text:string)
 export function error_log(context:string, text:string)
 		:void{
 	stop_loading();
-	const error_text = `${chalk.red(`[ERROR] ${text}`)}`;
+	// const error_text = `${chalk.bgHex(`#4a3030`).hex(`#8b6666`)(`[ERROR] ${text}`)}`;
+	// const error_text = `${chalk.hex(`#922424`)(`[ERROR] ${text}`)}`;
+	const error_text = `${chalk.hex(`#874040`)(`[ERROR] ${text}`)}`;
 	log(context, error_text);
 }
 

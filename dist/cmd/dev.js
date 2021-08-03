@@ -63,7 +63,8 @@ const cli_options = {
     verbose: true,
 };
 const nuxt_color = '#677cc7';
-const tscw_color = '#8a5b5b';
+// const tscw_color = '#8a5b5b';
+const tscw_color = '#734de3';
 const watc_color = '#687a6a';
 let user_exit = false;
 function _start_dev() {
@@ -120,6 +121,7 @@ function _start_dev() {
                 output.log(`wtch`, `[Server watch] Transpose [${_path}].`);
                 transpose_1.transpose.run(defaults_1.conf.root, _path, cli_options);
             }
+            // _replace_netlify_function_file();
         });
         const book_path = `${defaults_1.conf.root}/src/book.ts`;
         output.log(`wtch`, `Watching Book file [${book_path}] ...`);
@@ -135,6 +137,7 @@ function _start_dev() {
                 output.log(`wtch`, `[Book watch] Transpose [${_path}].`);
                 transpose_1.transpose.run(defaults_1.conf.root, _path, cli_options);
             }
+            // _replace_netlify_function_file();
         });
         process.on('SIGINT', function () {
             user_exit = true;
@@ -160,14 +163,18 @@ function _start_dev() {
         });
     });
 }
+// function _replace_netlify_function_file(){
+//   util.copy_file(
+//     'fnc',
+//     `${conf.root}/.uranio/functions/api.ts`,
+//     `${conf.root}/.uranio/functions/api.ts`
+//   );
+// }
 function _clean_chunk(chunk) {
     const plain_text = chunk
         .toString()
         .replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
-        .replace(/\r?\n|\r/g, ' ')
-        .replace('┌─────────────────────────────────────────────────┐    │                                                 │    │   ', '')
-        .replace('   │    │                                                 │    └─────────────────────────────────────────────────┘', '')
-        .trim();
+        .replace(/\r?\n|\r/g, ' ');
     return plain_text;
 }
 function _spawn_log_command(command, context, color) {
@@ -176,23 +183,31 @@ function _spawn_log_command(command, context, color) {
     if (spawned.stdout) {
         spawned.stdout.setEncoding('utf8');
         spawned.stdout.on('data', (chunk) => {
-            const plain_text = _clean_chunk(chunk);
-            // if(plain_text.includes('error')){
-            //   process.stdout.write(chunk);
-            // }else
-            if (plain_text != '') {
-                output.verbose_log(context, plain_text, color);
+            const splitted_chunk = chunk.split('\n');
+            for (const split of splitted_chunk) {
+                const plain_text = _clean_chunk(split);
+                if (plain_text.includes('<error>')) {
+                    output.error_log(context, plain_text);
+                    // process.stdout.write(chunk);
+                }
+                else if (plain_text != '') {
+                    output.verbose_log(context, plain_text, color);
+                }
             }
         });
     }
     if (spawned.stderr) {
         spawned.stderr.setEncoding('utf8');
         spawned.stderr.on('data', (chunk) => {
-            process.stdout.write(chunk);
-            // const plain_text = _clean_chunk(chunk);
-            // if(plain_text != ''){
-            //   output.error_log(context, plain_text);
-            // }
+            const splitted_chunk = chunk.split('\n');
+            for (const split of splitted_chunk) {
+                const plain_text = _clean_chunk(split);
+                if (plain_text !== '') {
+                    output.error_log(context, plain_text);
+                }
+                // process.stdout.write(chunk);
+                // process.stderr.write(`[${context}] ${chunk}`);
+            }
         });
     }
     spawned.on('close', (code) => {

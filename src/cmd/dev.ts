@@ -49,7 +49,8 @@ const cli_options = {
 };
 
 const nuxt_color = '#677cc7';
-const tscw_color = '#8a5b5b';
+// const tscw_color = '#8a5b5b';
+const tscw_color = '#734de3';
 const watc_color = '#687a6a';
 
 let user_exit = false;
@@ -119,6 +120,7 @@ async function _start_dev()
 			output.log(`wtch`, `[Server watch] Transpose [${_path}].`);
 			transpose.run(conf.root, _path, cli_options);
 		}
+		// _replace_netlify_function_file();
 	});
 	
 	const book_path = `${conf.root}/src/book.ts`;
@@ -136,6 +138,7 @@ async function _start_dev()
 			output.log(`wtch`, `[Book watch] Transpose [${_path}].`);
 			transpose.run(conf.root, _path, cli_options);
 		}
+		// _replace_netlify_function_file();
 	});
 	
 	process.on('SIGINT', function() {
@@ -163,14 +166,19 @@ async function _start_dev()
 	
 }
 
+// function _replace_netlify_function_file(){
+//   util.copy_file(
+//     'fnc',
+//     `${conf.root}/.uranio/functions/api.ts`,
+//     `${conf.root}/.uranio/functions/api.ts`
+//   );
+// }
+
 function _clean_chunk(chunk:string){
 	const plain_text = chunk
 		.toString()
 		.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
-		.replace(/\r?\n|\r/g, ' ')
-		.replace('┌─────────────────────────────────────────────────┐    │                                                 │    │   ', '')
-		.replace('   │    │                                                 │    └─────────────────────────────────────────────────┘', '')
-		.trim();
+		.replace(/\r?\n|\r/g, ' ');
 	return plain_text;
 }
 
@@ -186,13 +194,16 @@ function _spawn_log_command(command:string, context:string, color:string){
 	
 	if(spawned.stdout){
 		spawned.stdout.setEncoding('utf8');
-		spawned.stdout.on('data', (chunk) => {
-			const plain_text = _clean_chunk(chunk);
-			// if(plain_text.includes('error')){
-			//   process.stdout.write(chunk);
-			// }else
-			if(plain_text != ''){
-				output.verbose_log(context, plain_text, color);
+		spawned.stdout.on('data', (chunk:string) => {
+			const splitted_chunk = chunk.split('\n');
+			for(const split of splitted_chunk){
+				const plain_text = _clean_chunk(split);
+				if(plain_text.includes('<error>')){
+					output.error_log(context, plain_text);
+					// process.stdout.write(chunk);
+				}else if(plain_text != ''){
+					output.verbose_log(context, plain_text, color);
+				}
 			}
 		});
 	}
@@ -200,11 +211,15 @@ function _spawn_log_command(command:string, context:string, color:string){
 	if(spawned.stderr){
 		spawned.stderr.setEncoding('utf8');
 		spawned.stderr.on('data', (chunk) => {
-			process.stdout.write(chunk);
-			// const plain_text = _clean_chunk(chunk);
-			// if(plain_text != ''){
-			//   output.error_log(context, plain_text);
-			// }
+			const splitted_chunk = chunk.split('\n');
+			for(const split of splitted_chunk){
+				const plain_text = _clean_chunk(split);
+				if(plain_text !== ''){
+					output.error_log(context, plain_text);
+				}
+				// process.stdout.write(chunk);
+				// process.stderr.write(`[${context}] ${chunk}`);
+			}
 		});
 	}
 	
