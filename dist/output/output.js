@@ -60,7 +60,9 @@ function done_verbose_log(context, text) {
 exports.done_verbose_log = done_verbose_log;
 function error_log(context, text) {
     stop_loading();
-    const error_text = `${chalk_1.default.red(`[ERROR] ${text}`)}`;
+    // const error_text = `${chalk.bgHex(`#4a3030`).hex(`#8b6666`)(`[ERROR] ${text}`)}`;
+    // const error_text = `${chalk.hex(`#922424`)(`[ERROR] ${text}`)}`;
+    const error_text = `${chalk_1.default.hex(`#874040`)(`[ERROR] ${text}`)}`;
     log(context, error_text);
 }
 exports.error_log = error_log;
