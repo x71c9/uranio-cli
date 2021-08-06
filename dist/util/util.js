@@ -36,8 +36,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dependency_exists = exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.pretty = exports.check_pacman = exports.check_repo = exports.set_pacman = exports.set_repo = exports.auto_set_project_root = exports.check_folder = exports.is_initialized = exports.read_rc_file = exports.merge_options = void 0;
+exports.spawn_log_command = exports.delete_file_sync = exports.copy_folder_recursive_sync = exports.copy_file_sync = exports.dependency_exists = exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.pretty = exports.check_pacman = exports.check_repo = exports.set_pacman = exports.set_repo = exports.auto_set_project_root = exports.check_folder = exports.is_initialized = exports.read_rc_file = exports.merge_options = exports.watch_child_list = exports.child_list = void 0;
 const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 const cp = __importStar(require("child_process"));
 const prettier_1 = __importDefault(require("prettier"));
 const urn_lib_1 = require("urn-lib");
@@ -45,6 +46,26 @@ const output = __importStar(require("../output/"));
 const common = __importStar(require("../cmd/common"));
 const types_1 = require("../types");
 const defaults_1 = require("../conf/defaults");
+let user_exit = false;
+exports.child_list = [];
+exports.watch_child_list = [];
+util.child_list.push(ntl_child);
+process.on('SIGINT', function () {
+    user_exit = true;
+    process.stdout.write("\r--- Caught interrupt signal ---\n");
+    for (let i = 0; i < exports.watch_child_list.length; i++) {
+        const watch_child_object = exports.watch_child_list[i];
+        watch_child_object.child.close().then(() => {
+            output.log(watch_child_object.context, `Stop ${watch_child_object.text}`);
+        });
+    }
+    for (let i = 0; i < exports.child_list.length; i++) {
+        const child = exports.child_list[i];
+        if (child.pid) {
+            process.kill(child.pid);
+        }
+    }
+});
 function merge_options(options) {
     let k;
     for (k in defaults_1.conf) {
@@ -163,13 +184,13 @@ function check_pacman(pacman) {
     return urn_lib_1.urn_util.object.has_key(types_1.abstract_pacman, pacman);
 }
 exports.check_pacman = check_pacman;
-function pretty(path, parser = 'typescript') {
-    output.start_loading(`Prettier [${path}]...`);
-    const content = fs_1.default.readFileSync(path, 'utf8');
+function pretty(filepath, parser = 'typescript') {
+    output.start_loading(`Prettier [${filepath}]...`);
+    const content = fs_1.default.readFileSync(filepath, 'utf8');
     const pretty_string = prettier_1.default.format(content, { useTabs: true, tabWidth: 2, parser: parser });
-    fs_1.default.writeFileSync(path, pretty_string);
-    // cp.execSync(`npx prettier --write ${path} --use-tabs --tab-width 2`);
-    output.done_verbose_log('prtt', `Prettier [${path}] done.`);
+    fs_1.default.writeFileSync(filepath, pretty_string);
+    // cp.execSync(`npx prettier --write ${filepath} --use-tabs --tab-width 2`);
+    output.done_verbose_log('prtt', `Prettier [${filepath}] done.`);
 }
 exports.pretty = pretty;
 function remove_folder_if_exists(context, folder_path) {
@@ -227,6 +248,7 @@ function relative_to_absolute_path(path) {
 }
 exports.relative_to_absolute_path = relative_to_absolute_path;
 function sync_exec(command) {
+    output.log(`exec`, `Executing ${command}`);
     cp.execSync(command);
 }
 exports.sync_exec = sync_exec;
@@ -336,6 +358,102 @@ function dependency_exists(repo) {
     }
 }
 exports.dependency_exists = dependency_exists;
+function copy_file_sync(source, target) {
+    let target_file = target;
+    if (fs_1.default.existsSync(target) && fs_1.default.lstatSync(target).isDirectory()) {
+        target_file = path_1.default.join(target, path_1.default.basename(source));
+    }
+    fs_1.default.writeFileSync(target_file, fs_1.default.readFileSync(source));
+    output.verbose_log('cp', `Copied file ${target_file}.`);
+}
+exports.copy_file_sync = copy_file_sync;
+function copy_folder_recursive_sync(source, target) {
+    let files = [];
+    const target_folder = path_1.default.join(target, path_1.default.basename(source));
+    if (!fs_1.default.existsSync(target_folder)) {
+        fs_1.default.mkdirSync(target_folder);
+    }
+    if (fs_1.default.lstatSync(source).isDirectory()) {
+        files = fs_1.default.readdirSync(source);
+        files.forEach(function (file) {
+            const cur_source = path_1.default.join(source, file);
+            if (fs_1.default.lstatSync(cur_source).isDirectory()) {
+                copy_folder_recursive_sync(cur_source, target_folder);
+            }
+            else if (!cur_source.endsWith('.swp')) {
+                copy_file_sync(cur_source, target_folder);
+            }
+        });
+    }
+}
+exports.copy_folder_recursive_sync = copy_folder_recursive_sync;
+function delete_file_sync(file_path) {
+    fs_1.default.unlinkSync(file_path);
+    output.verbose_log('dl', `Deleted file ${file_path}.`);
+}
+exports.delete_file_sync = delete_file_sync;
+function _clean_chunk(chunk) {
+    const plain_text = chunk
+        .toString()
+        .replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
+        .replace(/\r?\n|\r/g, ' ');
+    return plain_text;
+}
+function spawn_log_command(command, context, color) {
+    const splitted_command = command.split(' ');
+    const spawned = cp.spawn(splitted_command[0], splitted_command.slice(1));
+    if (spawned.stdout) {
+        spawned.stdout.setEncoding('utf8');
+        spawned.stdout.on('data', (chunk) => {
+            const splitted_chunk = chunk.split('\n');
+            for (const split of splitted_chunk) {
+                const plain_text = _clean_chunk(split);
+                if (plain_text.includes('<error>')) {
+                    output.error_log(context, plain_text);
+                    // process.stdout.write(chunk);
+                }
+                else if (plain_text != '') {
+                    output.verbose_log(context, plain_text, color);
+                }
+            }
+        });
+    }
+    if (spawned.stderr) {
+        spawned.stderr.setEncoding('utf8');
+        spawned.stderr.on('data', (chunk) => {
+            const splitted_chunk = chunk.split('\n');
+            for (const split of splitted_chunk) {
+                const plain_text = _clean_chunk(split);
+                if (plain_text !== '') {
+                    output.error_log(context, plain_text);
+                }
+                // process.stdout.write(chunk);
+                // process.stderr.write(`[${context}] ${chunk}`);
+            }
+        });
+    }
+    spawned.on('close', (code) => {
+        switch (code) {
+            case 0: {
+                output.verbose_log(context, `Closed.`, color);
+                break;
+            }
+            default: {
+                if (user_exit === false) {
+                    output.error_log(context, `Child process exited with code ${code}`);
+                }
+            }
+        }
+    });
+    spawned.on('error', (err) => {
+        if (user_exit === false) {
+            output.error_log(context, `${err}`);
+        }
+    });
+    exports.child_list.push(spawned);
+    return spawned;
+}
+exports.spawn_log_command = spawn_log_command;
 const _pacman_commands = {
     install: {
         npm(repo) {

@@ -136,6 +136,10 @@ function _switch_command(args) {
             cmd_1.transpose.command(args);
             break;
         }
+        case 'generate': {
+            cmd_1.generate.command();
+            break;
+        }
         case 'alias': {
             cmd_1.alias.command();
             break;
@@ -153,7 +157,8 @@ function _switch_command(args) {
             break;
         }
         default: {
-            console.log('Command not found.');
+            output.wrong_end_log('Command not found.');
+            process.exit(1);
         }
     }
 }

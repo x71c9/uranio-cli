@@ -14,7 +14,8 @@ import {
 	transpose,
 	dev,
 	test,
-	alias
+	alias,
+	generate
 } from './cmd/';
 
 import {conf} from './conf/defaults';
@@ -162,6 +163,10 @@ function _switch_command(args:Arguments){
 			transpose.command(args);
 			break;
 		}
+		case 'generate':{
+			generate.command();
+			break;
+		}
 		case 'alias':{
 			alias.command();
 			break;
@@ -179,7 +184,8 @@ function _switch_command(args:Arguments){
 			break;
 		}
 		default:{
-			console.log('Command not found.');
+			output.wrong_end_log('Command not found.');
+			process.exit(1);
 		}
 	}
 }
