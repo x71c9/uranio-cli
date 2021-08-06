@@ -148,7 +148,8 @@ function _transpose_all() {
     _copy_from_src_into_uranio_folder();
     _resolve_aliases();
     _replace_import_to_avoid_loops();
-    output.end_log(`Transpose completed.`);
+    // output.end_log(`Transpose completed.`);
+    output.done_log(`end`, `Transpose completed.`);
 }
 function _replace_import_to_avoid_loops() {
     const server_dir = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/`;

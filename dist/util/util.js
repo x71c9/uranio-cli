@@ -49,7 +49,6 @@ const defaults_1 = require("../conf/defaults");
 let user_exit = false;
 exports.child_list = [];
 exports.watch_child_list = [];
-util.child_list.push(ntl_child);
 process.on('SIGINT', function () {
     user_exit = true;
     process.stdout.write("\r--- Caught interrupt signal ---\n");
