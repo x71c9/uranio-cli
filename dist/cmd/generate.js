@@ -63,6 +63,7 @@ exports.generate = {
         }
         util.copy_folder_recursive_sync(client_folder, `${defaults_1.conf.root}/.uranio/client/src/.`);
         transpose_1.transpose.run(defaults_1.conf.root, undefined, cli_options);
+        defaults_1.conf.spinner = true;
         // util.sync_exec(`npx tsc -b --verbose`);
         // util.sync_exec(`npx nuxt generate -c .uranio/client/nuxt.config.js`);
         // util.spawn_log_command(`npx tsc -b --verbose`, `gnrt`, '');

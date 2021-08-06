@@ -42,7 +42,6 @@ type WatchProcessObject = {
 export const child_list:cp.ChildProcessWithoutNullStreams[] = [];
 
 export const watch_child_list:WatchProcessObject[] = [];
-	util.child_list.push(ntl_child);
 
 process.on('SIGINT', function() {
 	

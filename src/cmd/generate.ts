@@ -55,6 +55,8 @@ export const generate = {
 		
 		transpose.run(conf.root, undefined, cli_options);
 		
+		conf.spinner = true;
+		
 		// util.sync_exec(`npx tsc -b --verbose`);
 		
 		// util.sync_exec(`npx nuxt generate -c .uranio/client/nuxt.config.js`);

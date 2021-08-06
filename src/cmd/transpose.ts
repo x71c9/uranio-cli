@@ -178,7 +178,8 @@ function _transpose_all(){
 	
 	_replace_import_to_avoid_loops();
 	
-	output.end_log(`Transpose completed.`);
+	// output.end_log(`Transpose completed.`);
+	output.done_log(`end`,`Transpose completed.`);
 }
 
 function _replace_import_to_avoid_loops(){
