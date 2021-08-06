@@ -6,7 +6,11 @@
 
 import fs from 'fs';
 
+import path from 'path';
+
 import * as cp from 'child_process';
+
+import chokidar from 'chokidar';
 
 import prettier from 'prettier';
 
@@ -26,6 +30,41 @@ import {
 	Options} from '../types';
 
 import {conf, jsonfile_path} from '../conf/defaults';
+
+let user_exit =  false;
+
+type WatchProcessObject = {
+	child: chokidar.FSWatcher
+	text: string,
+	context: string
+}
+
+export const child_list:cp.ChildProcessWithoutNullStreams[] = [];
+
+export const watch_child_list:WatchProcessObject[] = [];
+	util.child_list.push(ntl_child);
+
+process.on('SIGINT', function() {
+	
+	user_exit = true;
+	
+	process.stdout.write("\r--- Caught interrupt signal ---\n");
+	
+	for(let i = 0; i < watch_child_list.length; i++){
+		const watch_child_object = watch_child_list[i];
+		watch_child_object.child.close().then(() => {
+			output.log(watch_child_object.context, `Stop ${watch_child_object.text}`);
+		});
+	}
+	
+	for(let i = 0; i < child_list.length; i++){
+		const child = child_list[i];
+		if(child.pid){
+			process.kill(child.pid);
+		}
+	}
+	
+});
 
 export function merge_options(options:Partial<Options>):void{
 	let k:keyof Options;
@@ -147,17 +186,17 @@ export function check_pacman(pacman:string)
 	return urn_util.object.has_key(abstract_pacman, pacman);
 }
 
-export function pretty(path:string, parser='typescript')
+export function pretty(filepath:string, parser='typescript')
 	:void{
-	output.start_loading(`Prettier [${path}]...`);
-	const content = fs.readFileSync(path, 'utf8');
+	output.start_loading(`Prettier [${filepath}]...`);
+	const content = fs.readFileSync(filepath, 'utf8');
 	const pretty_string = prettier.format(
 		content,
 		{ useTabs: true, tabWidth: 2, parser: parser }
 	);
-	fs.writeFileSync(path, pretty_string);
-	// cp.execSync(`npx prettier --write ${path} --use-tabs --tab-width 2`);
-	output.done_verbose_log('prtt', `Prettier [${path}] done.`);
+	fs.writeFileSync(filepath, pretty_string);
+	// cp.execSync(`npx prettier --write ${filepath} --use-tabs --tab-width 2`);
+	output.done_verbose_log('prtt', `Prettier [${filepath}] done.`);
 }
 
 export function remove_folder_if_exists(context:string, folder_path:string)
@@ -221,6 +260,7 @@ export function relative_to_absolute_path(path:string)
 
 export function sync_exec(command:string)
 		:void{
+	output.log(`exec`, `Executing ${command}`);
 	cp.execSync(command);
 }
 
@@ -337,6 +377,114 @@ export function dependency_exists(repo:string)
 		output.wrong_end_log(`Invalid ${package_json_path}. ${ex.message}`);
 		process.exit(1);
 	}
+}
+
+export function copy_file_sync(source:string, target:string):void {
+	let target_file = target;
+	if(fs.existsSync(target) && fs.lstatSync(target).isDirectory()) {
+		target_file = path.join(target, path.basename(source));
+	}
+	fs.writeFileSync(target_file, fs.readFileSync(source));
+	output.verbose_log('cp', `Copied file ${target_file}.`);
+}
+
+export function copy_folder_recursive_sync(source:string, target:string):void {
+	let files = [];
+	const target_folder = path.join(target, path.basename( source ));
+	if(!fs.existsSync(target_folder)){
+		fs.mkdirSync( target_folder );
+	}
+	if(fs.lstatSync(source).isDirectory()) {
+		files = fs.readdirSync(source);
+		files.forEach(function (file) {
+			const cur_source = path.join(source, file);
+			if(fs.lstatSync(cur_source).isDirectory()) {
+				copy_folder_recursive_sync(cur_source, target_folder);
+			}else if(!cur_source.endsWith('.swp')){
+				copy_file_sync(cur_source, target_folder);
+			}
+		});
+	}
+}
+
+export function delete_file_sync(file_path:string)
+		:void{
+	fs.unlinkSync(file_path);
+	output.verbose_log('dl', `Deleted file ${file_path}.`);
+}
+
+function _clean_chunk(chunk:string){
+	const plain_text = chunk
+		.toString()
+		.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
+		.replace(/\r?\n|\r/g, ' ');
+	return plain_text;
+}
+
+export function spawn_log_command(command:string, context:string, color:string)
+		:cp.ChildProcessWithoutNullStreams{
+	const splitted_command = command.split(' ');
+	
+	const spawned = cp.spawn(
+		splitted_command[0],
+		splitted_command.slice(1),
+		// {stdio: [null, 'inherit', 'inherit']}
+	);
+	
+	if(spawned.stdout){
+		spawned.stdout.setEncoding('utf8');
+		spawned.stdout.on('data', (chunk:string) => {
+			const splitted_chunk = chunk.split('\n');
+			for(const split of splitted_chunk){
+				const plain_text = _clean_chunk(split);
+				if(plain_text.includes('<error>')){
+					output.error_log(context, plain_text);
+					// process.stdout.write(chunk);
+				}else if(plain_text != ''){
+					output.verbose_log(context, plain_text, color);
+				}
+			}
+		});
+	}
+	
+	if(spawned.stderr){
+		spawned.stderr.setEncoding('utf8');
+		spawned.stderr.on('data', (chunk) => {
+			const splitted_chunk = chunk.split('\n');
+			for(const split of splitted_chunk){
+				const plain_text = _clean_chunk(split);
+				if(plain_text !== ''){
+					output.error_log(context, plain_text);
+				}
+				// process.stdout.write(chunk);
+				// process.stderr.write(`[${context}] ${chunk}`);
+			}
+		});
+	}
+	
+	spawned.on('close', (code) => {
+		switch(code){
+			case 0:{
+				output.verbose_log(context, `Closed.`, color);
+				break;
+			}
+			default:{
+				if(user_exit === false){
+					output.error_log(context, `Child process exited with code ${code}`);
+				}
+			}
+		}
+	});
+	
+	spawned.on('error', (err) => {
+		if(user_exit === false){
+			output.error_log(context, `${err}`);
+		}
+	});
+	
+	child_list.push(spawned);
+	
+	return spawned;
 }
 
 const _pacman_commands = {
