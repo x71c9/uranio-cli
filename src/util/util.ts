@@ -47,7 +47,8 @@ process.on('SIGINT', function() {
 	
 	user_exit = true;
 	
-	process.stdout.write("\r--- Caught interrupt signal ---\n");
+	output.wrong_end_log("\r--- Caught interrupt signal ---");
+	// process.stdout.write("\r--- Caught interrupt signal ---\n");
 	
 	for(let i = 0; i < watch_child_list.length; i++){
 		const watch_child_object = watch_child_list[i];
@@ -64,6 +65,22 @@ process.on('SIGINT', function() {
 	}
 	
 });
+
+type WatchEvent = 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir';
+
+export function watch(
+	watch_path: string,
+	watch_text: string,
+	on_ready: () => void,
+	on_all: (_event:WatchEvent, _path:string) => void
+):void{
+	const watch_server = chokidar.watch(watch_path).on('ready', on_ready).on('all', on_all);
+	watch_child_list.push({
+		child: watch_server,
+		context: `wtch`,
+		text: watch_text
+	});
+}
 
 export function merge_options(options:Partial<Options>):void{
 	let k:keyof Options;
@@ -89,6 +106,7 @@ export function read_rc_file()
 			set_repo(rc_obj.repo);
 			conf.repo = rc_obj.repo;
 			conf.pacman = rc_obj.pacman;
+			conf.netlify = rc_obj.netlify;
 		}catch(ex){
 			output.wrong_end_log(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
 			process.exit(1);
@@ -173,6 +191,11 @@ export function set_pacman(pacman:string)
 		output.wrong_end_log(end_log);
 		process.exit(1);
 	}
+}
+
+export function set_netlify(netlify:boolean)
+		:void{
+	conf.netlify = netlify;
 }
 
 export function check_repo(repo:string)

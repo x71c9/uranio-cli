@@ -98,7 +98,7 @@ function _initialize() {
         _update_aliases();
         _create_urn_folder();
         _ignore_urn_folder();
-        _create_json_file();
+        _create_rc_file();
         yield _clone_dot();
         _copy_dot_files();
         yield _clone_and_install_repo();
@@ -127,6 +127,28 @@ function _ask_for_pacman(args) {
                 }
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
                 util.set_pacman(answers.pacman);
+                yield _ask_for_netlify(args);
+            }));
+        }
+        else {
+            yield _ask_for_netlify(args);
+        }
+    });
+}
+function _ask_for_netlify(args) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const ntlf = args.n || args.netlify;
+        if (!ntlf && defaults_1.conf.force === false) {
+            output.stop_loading();
+            inquirer_1.default.
+                prompt([
+                {
+                    type: 'confirm',
+                    name: 'ntlf',
+                    message: 'Do you want to use netlify for deploy?'
+                }
+            ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
+                util.set_netlify(answers.ntlf);
                 yield _ask_for_repo(args);
             }));
         }
@@ -223,6 +245,11 @@ function _copy_dot_eslint_files() {
     const dest = `${defaults_1.conf.root}/`;
     util.copy_files('dot', dot_eslint_files, dest);
 }
+function _copy_netlify_files() {
+    const netlify_file = `${defaults_1.conf.root}/${defaults_1.defaults.tmp_folder}/urn-dot/ntlf/netlify.toml`;
+    const dest = `${defaults_1.conf.root}/`;
+    util.copy_file('dot', netlify_file, dest);
+}
 function _copy_dot_files() {
     if (fs_1.default.existsSync(`${defaults_1.conf.root}/src`) === false) {
         _copy_dot_src_folder();
@@ -231,13 +258,17 @@ function _copy_dot_files() {
     _copy_dot_tsconfig();
     // }
     _copy_dot_eslint_files();
+    if (defaults_1.conf.netlify) {
+        _copy_netlify_files();
+    }
 }
-function _create_json_file() {
+function _create_rc_file() {
     output.start_loading('Creating rc file...');
     let content = ``;
     content += `{\n`;
     content += `\t"repo": "${defaults_1.conf.repo}",\n`;
     content += `\t"pacman": "${defaults_1.conf.pacman}"\n`;
+    content += `\t"netlify": "${defaults_1.conf.netlify}"\n`;
     content += `}`;
     fs_1.default.writeFileSync(`${defaults_1.conf.root}/${defaults_1.jsonfile_path}`, content);
     util.pretty(`${defaults_1.conf.root}/${defaults_1.jsonfile_path}`, 'json');

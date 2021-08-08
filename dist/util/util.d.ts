@@ -14,6 +14,8 @@ declare type WatchProcessObject = {
 };
 export declare const child_list: cp.ChildProcessWithoutNullStreams[];
 export declare const watch_child_list: WatchProcessObject[];
+declare type WatchEvent = 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir';
+export declare function watch(watch_path: string, watch_text: string, on_ready: () => void, on_all: (_event: WatchEvent, _path: string) => void): void;
 export declare function merge_options(options: Partial<Options>): void;
 export declare function read_rc_file(): void;
 export declare function is_initialized(): boolean;
@@ -21,6 +23,7 @@ export declare function check_folder(folder_path: string): boolean;
 export declare function auto_set_project_root(): void;
 export declare function set_repo(repo: string): void;
 export declare function set_pacman(pacman: string): void;
+export declare function set_netlify(netlify: boolean): void;
 export declare function check_repo(repo: string): boolean;
 export declare function check_pacman(pacman: string): boolean;
 export declare function pretty(filepath: string, parser?: string): void;

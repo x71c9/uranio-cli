@@ -36,10 +36,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.spawn_log_command = exports.delete_file_sync = exports.copy_folder_recursive_sync = exports.copy_file_sync = exports.dependency_exists = exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.pretty = exports.check_pacman = exports.check_repo = exports.set_pacman = exports.set_repo = exports.auto_set_project_root = exports.check_folder = exports.is_initialized = exports.read_rc_file = exports.merge_options = exports.watch_child_list = exports.child_list = void 0;
+exports.spawn_log_command = exports.delete_file_sync = exports.copy_folder_recursive_sync = exports.copy_file_sync = exports.dependency_exists = exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.pretty = exports.check_pacman = exports.check_repo = exports.set_netlify = exports.set_pacman = exports.set_repo = exports.auto_set_project_root = exports.check_folder = exports.is_initialized = exports.read_rc_file = exports.merge_options = exports.watch = exports.watch_child_list = exports.child_list = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const cp = __importStar(require("child_process"));
+const chokidar_1 = __importDefault(require("chokidar"));
 const prettier_1 = __importDefault(require("prettier"));
 const urn_lib_1 = require("urn-lib");
 const output = __importStar(require("../output/"));
@@ -51,7 +52,8 @@ exports.child_list = [];
 exports.watch_child_list = [];
 process.on('SIGINT', function () {
     user_exit = true;
-    process.stdout.write("\r--- Caught interrupt signal ---\n");
+    output.wrong_end_log("\r--- Caught interrupt signal ---");
+    // process.stdout.write("\r--- Caught interrupt signal ---\n");
     for (let i = 0; i < exports.watch_child_list.length; i++) {
         const watch_child_object = exports.watch_child_list[i];
         watch_child_object.child.close().then(() => {
@@ -65,6 +67,15 @@ process.on('SIGINT', function () {
         }
     }
 });
+function watch(watch_path, watch_text, on_ready, on_all) {
+    const watch_server = chokidar_1.default.watch(watch_path).on('ready', on_ready).on('all', on_all);
+    exports.watch_child_list.push({
+        child: watch_server,
+        context: `wtch`,
+        text: watch_text
+    });
+}
+exports.watch = watch;
 function merge_options(options) {
     let k;
     for (k in defaults_1.conf) {
@@ -89,6 +100,7 @@ function read_rc_file() {
             set_repo(rc_obj.repo);
             defaults_1.conf.repo = rc_obj.repo;
             defaults_1.conf.pacman = rc_obj.pacman;
+            defaults_1.conf.netlify = rc_obj.netlify;
         }
         catch (ex) {
             output.wrong_end_log(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
@@ -175,6 +187,10 @@ function set_pacman(pacman) {
     }
 }
 exports.set_pacman = set_pacman;
+function set_netlify(netlify) {
+    defaults_1.conf.netlify = netlify;
+}
+exports.set_netlify = set_netlify;
 function check_repo(repo) {
     return urn_lib_1.urn_util.object.has_key(types_1.abstract_repos, repo);
 }
