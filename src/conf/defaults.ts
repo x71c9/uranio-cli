@@ -68,6 +68,8 @@ export const conf:Options = {
 	
 	force: false,
 	
-	filelog: true
+	filelog: true,
+	
+	netlify: false
 	
 };

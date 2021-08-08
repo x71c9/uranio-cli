@@ -102,7 +102,7 @@ async function _initialize()
 	_update_aliases();
 	_create_urn_folder();
 	_ignore_urn_folder();
-	_create_json_file();
+	_create_rc_file();
 	await _clone_dot();
 	_copy_dot_files();
 	await _clone_and_install_repo();
@@ -141,6 +141,35 @@ async function _ask_for_pacman(args:Arguments){
 				
 				util.set_pacman(answers.pacman);
 				
+				await _ask_for_netlify(args);
+				
+			});
+		
+	}else{
+		
+		await _ask_for_netlify(args);
+		
+	}
+}
+
+async function _ask_for_netlify(args:Arguments){
+	
+	const ntlf = args.n || args.netlify;
+	
+	if(!ntlf && conf.force === false){
+			
+		output.stop_loading();
+		
+		inquirer.
+			prompt([
+				{
+					type: 'confirm',
+					name: 'ntlf',
+					message: 'Do you want to use netlify for deploy?'
+				}
+			]).then(async (answers) => {
+				
+				util.set_netlify(answers.ntlf);
 				await _ask_for_repo(args);
 				
 			});
@@ -256,6 +285,12 @@ function _copy_dot_eslint_files(){
 	util.copy_files('dot', dot_eslint_files, dest);
 }
 
+function _copy_netlify_files(){
+	const netlify_file = `${conf.root}/${defaults.tmp_folder}/urn-dot/ntlf/netlify.toml`;
+	const dest = `${conf.root}/`;
+	util.copy_file('dot', netlify_file, dest);
+}
+
 function _copy_dot_files(){
 	if(fs.existsSync(`${conf.root}/src`) === false){
 		_copy_dot_src_folder();
@@ -264,14 +299,19 @@ function _copy_dot_files(){
 	_copy_dot_tsconfig();
 	// }
 	_copy_dot_eslint_files();
+	
+	if(conf.netlify){
+		_copy_netlify_files();
+	}
 }
 
-function _create_json_file(){
+function _create_rc_file(){
 	output.start_loading('Creating rc file...');
 	let content = ``;
 	content += `{\n`;
 	content += `\t"repo": "${conf.repo}",\n`;
 	content += `\t"pacman": "${conf.pacman}"\n`;
+	content += `\t"netlify": "${conf.netlify}"\n`;
 	content += `}`;
 	fs.writeFileSync(`${conf.root}/${jsonfile_path}`, content);
 	util.pretty(`${conf.root}/${jsonfile_path}`, 'json');

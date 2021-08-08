@@ -42,17 +42,18 @@ export type Repo = keyof typeof abstract_repos;
 export type PacMan = keyof typeof abstract_pacman;
 
 export type Options = {
-	verbose: boolean,
-	blank: boolean,
-	hide: boolean,
-	spinner: boolean,
-	fullwidth: boolean,
+	verbose: boolean
+	blank: boolean
+	hide: boolean
+	spinner: boolean
+	fullwidth: boolean
 	prefix: string
-	root: string,
-	repo: Repo,
-	pacman: PacMan,
-	force: boolean,
+	root: string
+	repo: Repo
+	pacman: PacMan
+	force: boolean
 	filelog: boolean
+	netlify: boolean
 }
 
 // export type Conf = Options & {

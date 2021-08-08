@@ -30,4 +30,5 @@ export declare type Options = {
     pacman: PacMan;
     force: boolean;
     filelog: boolean;
+    netlify: boolean;
 };
