@@ -51,6 +51,7 @@ exports.help = {
         console.log(`  -w --fullwidth ..... log in full width.`);
         console.log(`  -p --prefix ........ set a log prefix.`);
         console.log(`  -l --filelog ....... save log on file.`);
+        console.log(`  -d --deploy ....... set deploy.`);
         console.log(``);
         console.log(``);
         process.exit(0);

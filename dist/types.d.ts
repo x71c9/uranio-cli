@@ -14,10 +14,16 @@ export declare const abstract_pacman: {
     readonly yarn: "";
     readonly npm: "";
 };
+export declare const abstract_deploy: {
+    readonly netlify: "";
+    readonly express: "";
+};
 export declare function valid_repos(): string[];
 export declare function valid_pacman(): string[];
+export declare function valid_deploy(): string[];
 export declare type Repo = keyof typeof abstract_repos;
 export declare type PacMan = keyof typeof abstract_pacman;
+export declare type Deploy = keyof typeof abstract_deploy;
 export declare type Options = {
     verbose: boolean;
     blank: boolean;
@@ -30,5 +36,5 @@ export declare type Options = {
     pacman: PacMan;
     force: boolean;
     filelog: boolean;
-    netlify: boolean;
+    deploy: Deploy;
 };

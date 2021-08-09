@@ -38,6 +38,6 @@ exports.conf = {
     pacman: 'yarn',
     force: false,
     filelog: true,
-    netlify: false
+    deploy: 'netlify'
 };
 //# sourceMappingURL=defaults.js.map

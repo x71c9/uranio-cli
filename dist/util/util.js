@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.spawn_log_command = exports.delete_file_sync = exports.copy_folder_recursive_sync = exports.copy_file_sync = exports.dependency_exists = exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.pretty = exports.check_pacman = exports.check_repo = exports.set_netlify = exports.set_pacman = exports.set_repo = exports.auto_set_project_root = exports.check_folder = exports.is_initialized = exports.read_rc_file = exports.merge_options = exports.watch = exports.watch_child_list = exports.child_list = void 0;
+exports.spawn_log_command = exports.delete_file_sync = exports.copy_folder_recursive_sync = exports.copy_file_sync = exports.dependency_exists = exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.pretty = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.set_deploy = exports.set_pacman = exports.set_repo = exports.auto_set_project_root = exports.check_folder = exports.is_initialized = exports.read_rc_file = exports.merge_options = exports.watch = exports.watch_child_list = exports.child_list = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const cp = __importStar(require("child_process"));
@@ -100,7 +100,7 @@ function read_rc_file() {
             set_repo(rc_obj.repo);
             defaults_1.conf.repo = rc_obj.repo;
             defaults_1.conf.pacman = rc_obj.pacman;
-            defaults_1.conf.netlify = rc_obj.netlify;
+            defaults_1.conf.deploy = rc_obj.deploy;
         }
         catch (ex) {
             output.wrong_end_log(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
@@ -187,10 +187,20 @@ function set_pacman(pacman) {
     }
 }
 exports.set_pacman = set_pacman;
-function set_netlify(netlify) {
-    defaults_1.conf.netlify = netlify;
+function set_deploy(deploy) {
+    if (check_deploy(deploy)) {
+        defaults_1.conf.deploy = deploy;
+    }
+    else {
+        const valid_deploy_str = types_1.valid_deploy().join(', ');
+        let end_log = '';
+        end_log += `Wrong deploy value. `;
+        end_log += `Deploy value must be one of the following [${valid_deploy_str}]`;
+        output.wrong_end_log(end_log);
+        process.exit(1);
+    }
 }
-exports.set_netlify = set_netlify;
+exports.set_deploy = set_deploy;
 function check_repo(repo) {
     return urn_lib_1.urn_util.object.has_key(types_1.abstract_repos, repo);
 }
@@ -199,6 +209,10 @@ function check_pacman(pacman) {
     return urn_lib_1.urn_util.object.has_key(types_1.abstract_pacman, pacman);
 }
 exports.check_pacman = check_pacman;
+function check_deploy(deploy) {
+    return urn_lib_1.urn_util.object.has_key(types_1.abstract_deploy, deploy);
+}
+exports.check_deploy = check_deploy;
 function pretty(filepath, parser = 'typescript') {
     output.start_loading(`Prettier [${filepath}]...`);
     const content = fs_1.default.readFileSync(filepath, 'utf8');

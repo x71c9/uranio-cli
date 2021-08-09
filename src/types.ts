@@ -20,6 +20,11 @@ export const abstract_pacman = {
 	npm: '',
 } as const;
 
+export const abstract_deploy = {
+	netlify: '',
+	express: '',
+} as const;
+
 export function valid_repos()
 		:string[]{
 	const vals:string[] = [];
@@ -38,8 +43,17 @@ export function valid_pacman()
 	return vals;
 }
 
+export function valid_deploy()
+		:string[]{
+	const vals:string[] = [];
+	for(const k in abstract_deploy){
+		vals.push(k);
+	}
+	return vals;
+}
 export type Repo = keyof typeof abstract_repos;
 export type PacMan = keyof typeof abstract_pacman;
+export type Deploy = keyof typeof abstract_deploy;
 
 export type Options = {
 	verbose: boolean
@@ -53,7 +67,7 @@ export type Options = {
 	pacman: PacMan
 	force: boolean
 	filelog: boolean
-	netlify: boolean
+	deploy: Deploy
 }
 
 // export type Conf = Options & {

@@ -27,6 +27,9 @@ import {
 	abstract_pacman,
 	valid_pacman,
 	PacMan,
+	abstract_deploy,
+	valid_deploy,
+	Deploy,
 	Options} from '../types';
 
 import {conf, jsonfile_path} from '../conf/defaults';
@@ -106,7 +109,7 @@ export function read_rc_file()
 			set_repo(rc_obj.repo);
 			conf.repo = rc_obj.repo;
 			conf.pacman = rc_obj.pacman;
-			conf.netlify = rc_obj.netlify;
+			conf.deploy = rc_obj.deploy;
 		}catch(ex){
 			output.wrong_end_log(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
 			process.exit(1);
@@ -193,9 +196,18 @@ export function set_pacman(pacman:string)
 	}
 }
 
-export function set_netlify(netlify:boolean)
+export function set_deploy(deploy:string)
 		:void{
-	conf.netlify = netlify;
+	if(check_deploy(deploy)){
+		conf.deploy = deploy as Deploy;
+	}else{
+		const valid_deploy_str = valid_deploy().join(', ');
+		let end_log = '';
+		end_log += `Wrong deploy value. `;
+		end_log += `Deploy value must be one of the following [${valid_deploy_str}]`;
+		output.wrong_end_log(end_log);
+		process.exit(1);
+	}
 }
 
 export function check_repo(repo:string)
@@ -206,6 +218,11 @@ export function check_repo(repo:string)
 export function check_pacman(pacman:string)
 		:boolean{
 	return urn_util.object.has_key(abstract_pacman, pacman);
+}
+
+export function check_deploy(deploy:string)
+		:boolean{
+	return urn_util.object.has_key(abstract_deploy, deploy);
 }
 
 export function pretty(filepath:string, parser='typescript')
