@@ -54,7 +54,7 @@ async function _start_dev()
 	
 	transpose.run(conf.root, undefined, cli_options);
 	
-	if(conf.netlify){
+	if(conf.deploy === 'netlify'){
 		const ntl_cmd = `npx ntl dev`;
 		util.spawn_log_command(ntl_cmd, 'ntlf', nuxt_color);
 	}else{

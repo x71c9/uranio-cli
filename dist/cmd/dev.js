@@ -65,7 +65,7 @@ function _start_dev() {
     return __awaiter(this, void 0, void 0, function* () {
         util.copy_folder_recursive_sync(`${defaults_1.conf.root}/src/client/.`, `${defaults_1.conf.root}/.uranio/client/src/.`);
         transpose_1.transpose.run(defaults_1.conf.root, undefined, cli_options);
-        if (defaults_1.conf.netlify) {
+        if (defaults_1.conf.deploy === 'netlify') {
             const ntl_cmd = `npx ntl dev`;
             util.spawn_log_command(ntl_cmd, 'ntlf', nuxt_color);
         }

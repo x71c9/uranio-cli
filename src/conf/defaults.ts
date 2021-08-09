@@ -70,6 +70,6 @@ export const conf:Options = {
 	
 	filelog: true,
 	
-	netlify: false
+	deploy: 'netlify'
 	
 };
