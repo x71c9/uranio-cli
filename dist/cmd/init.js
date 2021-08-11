@@ -358,7 +358,7 @@ function _update_package_aliases() {
         }
         try {
             fs_1.default.writeFileSync(package_json_path, JSON.stringify(package_data, null, '\t'));
-            output.done_log('alia', `Updated aliases.`);
+            output.done_log('alia', `Updated package.json module aliases.`);
         }
         catch (ex) {
             output.error_log('alia', `Cannot update ${package_json_path}.`);

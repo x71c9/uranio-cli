@@ -277,7 +277,7 @@ function relative_to_absolute_path(path) {
 }
 exports.relative_to_absolute_path = relative_to_absolute_path;
 function sync_exec(command) {
-    output.log(`exec`, `Executing ${command}`);
+    output.verbose_log(`exec`, `Executing ${command}`);
     cp.execSync(command);
 }
 exports.sync_exec = sync_exec;

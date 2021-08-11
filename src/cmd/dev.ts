@@ -173,10 +173,12 @@ function _replace_netlify_function_file(){
 	const result = fs.readFileSync(api_file_path);
 	let new_content = result.toString();
 	const splitted = new_content.split(`\n`);
-	if(splitted[splitted.length - 1] === '\\'){
-		new_content = splitted.splice(-1).join('\n');
+	const comment = '// uranio autoupdate';
+	if(splitted[splitted.length - 1] === comment){
+		splitted.splice(-1);
+		new_content = splitted.join('\n');
 	}else{
-		new_content += `\n//uranio autoupdate`;
+		new_content += `\n${comment}`;
 	}
 	fs.writeFileSync(api_file_path, new_content, 'utf8');
 }

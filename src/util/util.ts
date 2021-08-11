@@ -299,7 +299,7 @@ export function relative_to_absolute_path(path:string)
 
 export function sync_exec(command:string)
 		:void{
-	output.log(`exec`, `Executing ${command}`);
+	output.verbose_log(`exec`, `Executing ${command}`);
 	cp.execSync(command);
 }
 
