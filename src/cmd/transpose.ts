@@ -24,11 +24,11 @@ import * as alias from './alias';
 
 type BookName = 'atom' | 'api' | 'bll';
 
-const atom_book_required_properties = ['properties', 'security', 'connection'];
+const atom_book_required_properties = ['properties', 'security', 'connection', 'plural'];
 const api_book_required_properties = ['api'];
 const bll_book_required_properties = ['bll'];
 
-const atom_book_required_client_first_props = ['properties'];
+const atom_book_required_client_first_props = ['properties', 'plural'];
 const api_book_required_client_second_props = ['url'];
 
 type TransposeOptions = {
