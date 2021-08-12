@@ -467,9 +467,12 @@ function _add_book_from_file(
 		book_content,
 		{ overwrite: true }
 	);
-	const core_var_content = _get_variable_content(core_books_source, required_book_name);
+	let core_var_content = _get_variable_content(core_books_source, required_book_name);
 	const syntax_list = book_decl.getFirstDescendantByKind(tsm.ts.SyntaxKind.SyntaxList);
 	if(syntax_list){
+		if(core_var_content[core_var_content.length - 1] !== ','){
+			core_var_content += ',';
+		}
 		syntax_list.replaceWithText(core_var_content + syntax_list.getText());
 	}
 }

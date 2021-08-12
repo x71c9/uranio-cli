@@ -374,9 +374,12 @@ function _add_book_from_file(book_decl, required_book_name, books_file_path) {
     const book_content = fs_1.default.readFileSync(books_file_path, 'utf8');
     const _project = new tsm.Project(_project_option);
     const core_books_source = _project.createSourceFile(`${defaults_1.conf.root}/${defaults_1.defaults.folder}/cloned_${required_book_name}.ts`, book_content, { overwrite: true });
-    const core_var_content = _get_variable_content(core_books_source, required_book_name);
+    let core_var_content = _get_variable_content(core_books_source, required_book_name);
     const syntax_list = book_decl.getFirstDescendantByKind(tsm.ts.SyntaxKind.SyntaxList);
     if (syntax_list) {
+        if (core_var_content[core_var_content.length - 1] !== ',') {
+            core_var_content += ',';
+        }
         syntax_list.replaceWithText(core_var_content + syntax_list.getText());
     }
 }
