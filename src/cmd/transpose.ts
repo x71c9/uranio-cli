@@ -29,7 +29,7 @@ const api_book_required_properties = ['api'];
 const bll_book_required_properties = ['bll'];
 
 const atom_book_required_client_first_props = ['properties', 'plural'];
-const api_book_required_client_second_props = ['url'];
+const api_book_required_client_second_props = ['url', 'routes'];
 
 type TransposeOptions = {
 	file?:string;
@@ -632,6 +632,56 @@ function _generate_client_books(){
 	// output.done_log('client', `Client books generated.`);
 }
 
+function _remove_api_route_call_implementation(sourceFile:tsm.SourceFile){
+	const syntax_list = sourceFile.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+	const variable_stats = syntax_list.getChildrenOfKind(tsm.SyntaxKind.VariableStatement);
+	for(const var_stat of variable_stats){
+		const var_decl = var_stat.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
+		const identifier = var_decl.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
+		if(identifier.getText() === `api_book`){
+			const obj_lit_ex = var_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.ObjectLiteralExpression);
+			const syntax_list = obj_lit_ex.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+			const atom_defs = syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+			for(const atom_def of atom_defs){
+				const atom_syntax_list = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+				const api_key_list = atom_syntax_list.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+				const api_keys = api_key_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+				const atom_id = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+				const atom_name = atom_id.getText();
+				for(const api_key of api_keys){
+					const key_name_identifier = api_key.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+					const key_name = key_name_identifier.getText();
+					if(key_name === 'routes'){
+						const routes_syntax = api_key.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+						const routes_props = routes_syntax.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+						for(const route of routes_props){
+							const route_syntax = route.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+							const route_props = route_syntax.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+							for(const prop of route_props){
+								const comma = prop.getNextSiblingIfKind(tsm.SyntaxKind.CommaToken);
+								const prop_id = prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+								const prop_id_name = prop_id.getText();
+								if(prop_id_name === 'call'){
+									if(comma){
+										comma.replaceWithText('');
+									}
+									prop.replaceWithText('');
+									output.verbose_log('clnt', `Removed route implementation [${atom_name}][${prop_id_name}]`);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	output.done_log('clnt', `Removed call implementation in api book.`);
+	
+	return sourceFile;
+}
+
 function _generate_client_book(book_name:BookName, required_props:string[]){
 	const folder_path = `${conf.root}/${defaults.folder}`;
 	const server_books_dir = `${folder_path}/server/books`;
@@ -647,6 +697,10 @@ function _generate_client_book(book_name:BookName, required_props:string[]){
 	}else{
 		sourceFile = _keep_only_client_second_level_properties(sourceFile, book_name, required_props);
 	}
+	if(book_name === 'api'){
+		sourceFile = _remove_api_route_call_implementation(sourceFile);
+	}
+	
 	const filepath = `${client_books_dir}/${book_name}.ts`;
 	fs.writeFileSync(filepath, sourceFile.print());
 	util.pretty(filepath);
@@ -669,7 +723,8 @@ function _replace_uranio_client_dependecy(sourceFile:tsm.SourceFile){
 }
 
 function _keep_only_client_first_level_properties(sourceFile:tsm.SourceFile, book_name:BookName, required_props:string[]){
-	const variable_stats = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.VariableStatement);
+	const syntax_list = sourceFile.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+	const variable_stats = syntax_list.getChildrenOfKind(tsm.SyntaxKind.VariableStatement);
 	for(const var_stat of variable_stats){
 		const var_decl = var_stat.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
 		const identifier = var_decl.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
@@ -701,7 +756,8 @@ function _keep_only_client_first_level_properties(sourceFile:tsm.SourceFile, boo
 }
 
 function _keep_only_client_second_level_properties(sourceFile:tsm.SourceFile, book_name:BookName, required_props:string[]){
-	const variable_stats = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.VariableStatement);
+	const syntax_list = sourceFile.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+	const variable_stats = syntax_list.getChildrenOfKind(tsm.SyntaxKind.VariableStatement);
 	for(const var_stat of variable_stats){
 		const var_decl = var_stat.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
 		const identifier = var_decl.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
