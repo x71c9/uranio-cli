@@ -151,8 +151,12 @@ function auto_set_project_root() {
         const arr_folder = folder_path.split('/');
         arr_folder.pop();
         folder_path = arr_folder.join('/');
-        if (folder_path === '/') {
-            throw new Error('Cannot find project root.');
+        if (folder_path === '/' || arr_folder.length === 2) {
+            defaults_1.conf.filelog = false;
+            let err_msg = `Cannot find project root.`;
+            err_msg += ' Be sure to run `uranio` inside an NPM project.';
+            output.wrong_end_log(err_msg);
+            process.exit(1);
         }
     }
     common.init_log();
