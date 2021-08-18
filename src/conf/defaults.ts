@@ -10,7 +10,7 @@ const cloud_address = 'ssh://git@bitbucket.org/nbl7/';
 
 export const defaults = {
 	
-	default_repo: 'api',
+	default_repo: 'trx',
 	
 	folder: '.uranio',
 	
@@ -26,9 +26,15 @@ export const defaults = {
 	
 	dot_repo: `${cloud_address}urn-dot.git`,
 	
+	trx_repo: `${cloud_address}urn-trx.git`,
+	
 	api_repo: `${cloud_address}urn-api.git`,
 	
 	core_repo: `${cloud_address}urn-core.git`,
+	
+	trx_dep_repo: `${cloud_address}urn-trx-dep`,
+	
+	trx_dep_dev_repo: `${cloud_address}urn-trx-dep-dev`,
 	
 	api_dep_repo: `${cloud_address}urn-api-dep`,
 	

@@ -8,7 +8,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.valid_deploy = exports.valid_pacman = exports.valid_repos = exports.abstract_deploy = exports.abstract_pacman = exports.abstract_repos = void 0;
 exports.abstract_repos = {
     core: '',
-    api: ''
+    api: '',
+    trx: ''
 };
 exports.abstract_pacman = {
     yarn: '',

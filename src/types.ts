@@ -12,7 +12,8 @@ export type ParseOptions = minimist.Opts;
 
 export const abstract_repos = {
 	core: '',
-	api: ''
+	api: '',
+	trx: ''
 } as const;
 
 export const abstract_pacman = {
