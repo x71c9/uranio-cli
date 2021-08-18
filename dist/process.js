@@ -144,6 +144,10 @@ function _switch_command(args) {
             cmd_1.alias.command();
             break;
         }
+        case 'hooks': {
+            cmd_1.hooks.command();
+            break;
+        }
         case 'dev': {
             cmd_1.dev.command();
             break;

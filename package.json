@@ -14,6 +14,7 @@
 		"version": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v\"",
 		"dev": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js dev\"",
 		"alias": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js alias -wv\"",
+		"hooks": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js hooks -wv\"",
 		"run": "./node_modules/.bin/tsc-watch --onSuccess \"node -r source-map-support/register ./dist/test.js\""
 	},
 	"repository": {
