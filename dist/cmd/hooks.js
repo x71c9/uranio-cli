@@ -158,23 +158,23 @@ function _get_custom_routes() {
                     const dock_prop_name = dock_prop_id.getText();
                     if (dock_prop_name === 'routes') {
                         const routes_syntax_list = dock_prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
-                        const routes_props = routes_syntax_list.getChildrenOfKind(tsm.SyntaxKind.SyntaxList);
-                        for (const route_prop of routes_props) {
-                            const route_prop_id = route_prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
-                            const route_prop_name = route_prop_id.getText(); // routes name
+                        const routes_props = routes_syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+                        for (const routes_prop of routes_props) {
+                            const routes_prop_id = routes_prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+                            const routes_prop_name = routes_prop_id.getText(); // routes name
                             if (!routes_by_atom[atom_name]) {
                                 routes_by_atom[atom_name] = {};
                             }
-                            routes_by_atom[atom_name][route_prop_name] = {};
-                            const route_syntax = route_prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+                            routes_by_atom[atom_name][routes_prop_name] = {};
+                            const route_syntax = routes_prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
                             const route_props = route_syntax.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
                             for (const route_prop of route_props) { // [url, query, action, method, call]
-                                const route_prop_id = route_prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+                                const route_prop_id = route_prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
                                 const route_prop_name = route_prop_id.getText();
                                 if (route_prop_name === 'url') {
-                                    const url_string_lit = route_prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+                                    const url_string_lit = route_prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.StringLiteral);
                                     const url_string = url_string_lit.getText();
-                                    routes_by_atom[atom_name][route_prop_name].url = url_string;
+                                    routes_by_atom[atom_name][routes_prop_name].url = url_string.replace(/"/g, '');
                                 }
                             }
                         }
@@ -221,7 +221,7 @@ function _generate_args(params) {
     for (const p of params) {
         param_text.push(`${p}:string, `);
     }
-    return param_text.join();
+    return param_text.join('');
 }
 function _text_args_for_url(url) {
     const params = _get_parameters_from_url(url);
@@ -231,7 +231,7 @@ function _text_lines_in_args_params(url) {
     const lines = [];
     const url_params = _get_parameters_from_url(url);
     for (const p of url_params) {
-        lines.push(`${p}: ${p}`);
+        lines.push(`${p}: ${p},`);
     }
     return lines;
 }
