@@ -30,12 +30,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.replace_file_aliases = exports.get_aliases = exports.alias = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const tsm = __importStar(require("ts-morph"));
 const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const common = __importStar(require("./common"));
-const tsm = __importStar(require("ts-morph"));
 exports.alias = {
     run: (options) => {
         common.init_run(options);

@@ -8,6 +8,8 @@ import fs from 'fs';
 
 import path from 'path';
 
+import * as tsm from 'ts-morph';
+
 import {urn_util} from 'urn-lib';
 
 import {Options} from '../types';
@@ -19,8 +21,6 @@ import * as output from '../output/';
 import * as util from '../util/';
 
 import * as common from './common';
-
-import * as tsm from 'ts-morph';
 
 export const alias = {
 	

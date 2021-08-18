@@ -15,6 +15,7 @@ import {
 	dev,
 	test,
 	alias,
+	hooks,
 	generate
 } from './cmd/';
 
@@ -171,6 +172,10 @@ function _switch_command(args:Arguments){
 			alias.command();
 			break;
 		}
+		case 'hooks':{
+			hooks.command();
+			break;
+		}
 		case 'dev':{
 			dev.command();
 			break;
@@ -188,5 +193,6 @@ function _switch_command(args:Arguments){
 			process.exit(1);
 		}
 	}
+	
 }
 
