@@ -9,6 +9,7 @@ export declare type ParseOptions = minimist.Opts;
 export declare const abstract_repos: {
     readonly core: "";
     readonly api: "";
+    readonly trx: "";
 };
 export declare const abstract_pacman: {
     readonly yarn: "";

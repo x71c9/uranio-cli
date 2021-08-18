@@ -209,7 +209,7 @@ async function _ask_for_repo(args:Arguments){
 				
 				util.set_repo(answers.repo);
 				
-				if(answers.repo === 'api'){
+				if(answers.repo !== 'core'){
 					
 					await _ask_for_deploy(args);
 					
@@ -266,7 +266,7 @@ async function _install_dep(repo:Repo)
 		:Promise<true>{
 	await _uninstall_core_dep();
 	await _uninstall_api_dep();
-	// await _uninstall_ntl_dep();
+	await _uninstall_trx_dep();
 	switch(repo){
 		case 'core':{
 			await _install_core_dep();
@@ -274,6 +274,10 @@ async function _install_dep(repo:Repo)
 		}
 		case 'api':{
 			await _install_api_dep();
+			return true;
+		}
+		case 'trx':{
+			await _install_trx_dep();
 			return true;
 		}
 		// default:{
@@ -368,6 +372,10 @@ async function _clone_and_install_repo(){
 			await _clone_api();
 			break;
 		}
+		case 'trx':{
+			await _clone_trx();
+			break;
+		}
 		default:{
 			output.log('init', `Selected repo is not valid. [${conf.repo}]`);
 			process.exit(1);
@@ -439,6 +447,14 @@ async function _install_api_dep(){
 	return true;
 }
 
+async function _install_trx_dep(){
+	output.start_loading(`Installing trx dep...`);
+	await util.install_dep(defaults.trx_dep_repo, 'trx');
+	await util.install_dep_dev(defaults.trx_dep_dev_repo, 'trx');
+	output.done_log('trx', `Installed trx dependencies.`);
+	return true;
+}
+
 // async function _install_ntl_dep(){
 //   output.start_loading(`Installing ntl dep...`);
 //   await util.install_dep(defaults.ntl_dep_repo, 'ntl');
@@ -490,6 +506,19 @@ async function _uninstall_api_dep(){
 	return true;
 }
 
+async function _uninstall_trx_dep(){
+	// output.start_loading(`Uninstalling api dep...`);
+	// const dep_folder = `${conf.root}/node_modules/${defaults.api_dep_repo}`;
+	// util.remove_folder_if_exists('api', dep_folder);
+	// const dep_dev_folder = `${conf.root}/node_modules/${defaults.api_dep_dev_repo}`;
+	// util.remove_folder_if_exists('api', dep_dev_folder);
+	// await util.uninstall_dep(`${defaults.api_dep_repo.split('/').slice(-1)[0]} ${defaults.api_dep_dev_repo.split('/').slice(-1)[0]}`, 'api');
+	// output.done_log('api', `Uninstalled api dependencies.`);
+	// return true;
+	await _uninstall_dep(defaults.trx_dep_repo, 'trx');
+	await _uninstall_dep(defaults.trx_dep_dev_repo, 'trx');
+	return true;
+}
 // async function _uninstall_ntl_dep(){
 //   // output.start_loading(`Uninstalling ntl dep...`);
 //   // const dep_folder = `${conf.root}/node_modules/${defaults.ntl_dep_repo}`;
@@ -524,11 +553,11 @@ async function _clone_api(){
 	output.done_log('api', `Cloned api repo.`);
 }
 
-// async function _clone_ntl(){
-//   output.start_loading(`Cloning ntl...`);
-//   await util.clone_repo_recursive('ntl_', defaults.ntl_repo, `${conf.root}/${defaults.folder}/${defaults.repo_folder}`);
-//   output.done_log('ntl', `Cloned ntl repo.`);
-// }
+async function _clone_trx(){
+	output.start_loading(`Cloning trx...`);
+	await util.clone_repo_recursive('trx', defaults.trx_repo, `${conf.root}/${defaults.folder}/${defaults.repo_folder}`);
+	output.done_log('trx', `Cloned trx repo.`);
+}
 
 function _remove_git_files(){
 	output.start_loading(`Removing git files...`);

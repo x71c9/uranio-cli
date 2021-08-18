@@ -176,7 +176,7 @@ function _ask_for_repo(args) {
                 }
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
                 util.set_repo(answers.repo);
-                if (answers.repo === 'api') {
+                if (answers.repo !== 'core') {
                     yield _ask_for_deploy(args);
                 }
                 else {
@@ -222,7 +222,7 @@ function _install_dep(repo) {
     return __awaiter(this, void 0, void 0, function* () {
         yield _uninstall_core_dep();
         yield _uninstall_api_dep();
-        // await _uninstall_ntl_dep();
+        yield _uninstall_trx_dep();
         switch (repo) {
             case 'core': {
                 yield _install_core_dep();
@@ -230,6 +230,10 @@ function _install_dep(repo) {
             }
             case 'api': {
                 yield _install_api_dep();
+                return true;
+            }
+            case 'trx': {
+                yield _install_trx_dep();
                 return true;
             }
             // default:{
@@ -314,6 +318,10 @@ function _clone_and_install_repo() {
                 yield _clone_api();
                 break;
             }
+            case 'trx': {
+                yield _clone_trx();
+                break;
+            }
             default: {
                 output.log('init', `Selected repo is not valid. [${defaults_1.conf.repo}]`);
                 process.exit(1);
@@ -386,6 +394,15 @@ function _install_api_dep() {
         return true;
     });
 }
+function _install_trx_dep() {
+    return __awaiter(this, void 0, void 0, function* () {
+        output.start_loading(`Installing trx dep...`);
+        yield util.install_dep(defaults_1.defaults.trx_dep_repo, 'trx');
+        yield util.install_dep_dev(defaults_1.defaults.trx_dep_dev_repo, 'trx');
+        output.done_log('trx', `Installed trx dependencies.`);
+        return true;
+    });
+}
 // async function _install_ntl_dep(){
 //   output.start_loading(`Installing ntl dep...`);
 //   await util.install_dep(defaults.ntl_dep_repo, 'ntl');
@@ -439,6 +456,21 @@ function _uninstall_api_dep() {
         return true;
     });
 }
+function _uninstall_trx_dep() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // output.start_loading(`Uninstalling api dep...`);
+        // const dep_folder = `${conf.root}/node_modules/${defaults.api_dep_repo}`;
+        // util.remove_folder_if_exists('api', dep_folder);
+        // const dep_dev_folder = `${conf.root}/node_modules/${defaults.api_dep_dev_repo}`;
+        // util.remove_folder_if_exists('api', dep_dev_folder);
+        // await util.uninstall_dep(`${defaults.api_dep_repo.split('/').slice(-1)[0]} ${defaults.api_dep_dev_repo.split('/').slice(-1)[0]}`, 'api');
+        // output.done_log('api', `Uninstalled api dependencies.`);
+        // return true;
+        yield _uninstall_dep(defaults_1.defaults.trx_dep_repo, 'trx');
+        yield _uninstall_dep(defaults_1.defaults.trx_dep_dev_repo, 'trx');
+        return true;
+    });
+}
 // async function _uninstall_ntl_dep(){
 //   // output.start_loading(`Uninstalling ntl dep...`);
 //   // const dep_folder = `${conf.root}/node_modules/${defaults.ntl_dep_repo}`;
@@ -475,11 +507,13 @@ function _clone_api() {
         output.done_log('api', `Cloned api repo.`);
     });
 }
-// async function _clone_ntl(){
-//   output.start_loading(`Cloning ntl...`);
-//   await util.clone_repo_recursive('ntl_', defaults.ntl_repo, `${conf.root}/${defaults.folder}/${defaults.repo_folder}`);
-//   output.done_log('ntl', `Cloned ntl repo.`);
-// }
+function _clone_trx() {
+    return __awaiter(this, void 0, void 0, function* () {
+        output.start_loading(`Cloning trx...`);
+        yield util.clone_repo_recursive('trx', defaults_1.defaults.trx_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`);
+        output.done_log('trx', `Cloned trx repo.`);
+    });
+}
 function _remove_git_files() {
     output.start_loading(`Removing git files...`);
     const cloned_repo_path = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/${defaults_1.defaults.repo_folder}`;

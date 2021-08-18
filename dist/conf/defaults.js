@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.conf = exports.jsonfile_path = exports.defaults = void 0;
 const cloud_address = 'ssh://git@bitbucket.org/nbl7/';
 exports.defaults = {
-    default_repo: 'api',
+    default_repo: 'trx',
     folder: '.uranio',
     repo_folder: 'lib',
     tmp_folder: '.tmp',
@@ -16,8 +16,11 @@ exports.defaults = {
     json_filename: `uranio.json`,
     time_format: "yy-mm-dd'T'HH:MM:ss:l",
     dot_repo: `${cloud_address}urn-dot.git`,
+    trx_repo: `${cloud_address}urn-trx.git`,
     api_repo: `${cloud_address}urn-api.git`,
     core_repo: `${cloud_address}urn-core.git`,
+    trx_dep_repo: `${cloud_address}urn-trx-dep`,
+    trx_dep_dev_repo: `${cloud_address}urn-trx-dep-dev`,
     api_dep_repo: `${cloud_address}urn-api-dep`,
     api_dep_dev_repo: `${cloud_address}urn-api-dep-dev`,
     core_dep_repo: `${cloud_address}urn-core-dep`,

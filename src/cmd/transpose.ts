@@ -22,14 +22,14 @@ import * as common from './common';
 
 import * as alias from './alias';
 
-type BookName = 'atom' | 'api' | 'bll';
+type BookName = 'atom' | 'dock' | 'bll';
 
 const atom_book_required_properties = ['properties', 'security', 'connection', 'plural'];
-const api_book_required_properties = ['api'];
+const dock_book_required_properties = ['dock'];
 const bll_book_required_properties = ['bll'];
 
 const atom_book_required_client_first_props = ['properties', 'plural'];
-const api_book_required_client_second_props = ['url', 'routes'];
+const dock_book_required_client_second_props = ['url', 'routes'];
 
 type TransposeOptions = {
 	file?:string;
@@ -284,7 +284,7 @@ function _manipulate_and_create_files(filepath:string){
 	const import_statements = _copy_imports(sourceFile);
 	
 	_create_bll_book(sourceFile, import_statements);
-	_create_api_book(sourceFile, import_statements);
+	_create_dock_book(sourceFile, import_statements);
 	_create_atom_book(sourceFile, import_statements);
 	
 	// sourceFile = _manipulate_atom_book(sourceFile);
@@ -395,9 +395,9 @@ function _create_atom_book(sourceFile:tsm.SourceFile, import_statements:string[]
 	return _create_a_book(sourceFile, import_statements, 'atom', atom_book_required_properties, 'atom');
 }
 
-function _create_api_book(sourceFile:tsm.SourceFile, import_statements:string[])
+function _create_dock_book(sourceFile:tsm.SourceFile, import_statements:string[])
 		:tsm.SourceFile{
-	return _create_a_book(sourceFile, import_statements, 'api', api_book_required_properties, 'api');
+	return _create_a_book(sourceFile, import_statements, 'dock', dock_book_required_properties, 'dock');
 }
 
 function _create_bll_book(sourceFile:tsm.SourceFile, import_statements:string[])
@@ -469,7 +469,7 @@ function _add_book_from_file(
 	);
 	let core_var_content = _get_variable_content(core_books_source, required_book_name);
 	const syntax_list = book_decl.getFirstDescendantByKind(tsm.ts.SyntaxKind.SyntaxList);
-	if(syntax_list){
+	if(syntax_list && core_var_content.length > 0){
 		if(core_var_content[core_var_content.length - 1] !== ','){
 			core_var_content += ',';
 		}
@@ -487,14 +487,44 @@ function _add_core_books(book_decl:tsm.VariableDeclaration, required_book_name:B
 			core_repo_path = `${defaults.folder}/${defaults.repo_folder}/core`;
 			break;
 		}
+		case 'trx':{
+			core_repo_path = `${defaults.folder}/${defaults.repo_folder}/api/core`;
+			break;
+		}
 	}
 	const required_books_path = `${conf.root}/${core_repo_path}/books.ts`;
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 
 function _add_api_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName){
-	const api_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
+	let api_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
+	switch(conf.repo){
+		case 'core':
+		case 'api':{
+			break;
+		}
+		case 'trx':{
+			api_repo_path = `${defaults.folder}/${defaults.repo_folder}/api`;
+			break;
+		}
+	}
 	const required_books_path = `${conf.root}/${api_repo_path}/books.ts`;
+	_add_book_from_file(book_decl, required_book_name, required_books_path);
+	// const api_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
+	// const required_books_path = `${conf.root}/${api_repo_path}/books.ts`;
+	// _add_book_from_file(book_decl, required_book_name, required_books_path);
+}
+
+function _add_trx_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName){
+	const trx_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
+	switch(conf.repo){
+		case 'core':
+		case 'api':
+		case 'trx':{
+			break;
+		}
+	}
+	const required_books_path = `${conf.root}/${trx_repo_path}/books.ts`;
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 
@@ -504,6 +534,11 @@ function _append_requried_book(book_decl:tsm.VariableDeclaration, required_book_
 	switch(conf.repo){
 		case 'api':{
 			_add_api_book(book_decl, required_book_name);
+			break;
+		}
+		case 'trx':{
+			_add_api_book(book_decl, required_book_name);
+			_add_trx_book(book_decl, required_book_name);
 			break;
 		}
 	}
@@ -618,7 +653,7 @@ function _resolve_book_aliases(){
 	const books_dir = `${conf.root}/${defaults.folder}/server/books`;
 	const aliases = alias.get_aliases();
 	alias.replace_file_aliases(`${books_dir}/atom.ts`,aliases);
-	alias.replace_file_aliases(`${books_dir}/api.ts`,aliases);
+	alias.replace_file_aliases(`${books_dir}/dock.ts`,aliases);
 	alias.replace_file_aliases(`${books_dir}/bll.ts`,aliases);
 	output.done_log('alias', `Server books aliases replaced.`);
 }
@@ -626,33 +661,33 @@ function _resolve_book_aliases(){
 function _generate_client_books(){
 	output.start_loading(`Generating client books...`);
 	
-	_generate_client_book('api', api_book_required_client_second_props);
+	_generate_client_book('dock', dock_book_required_client_second_props);
 	_generate_client_book('atom', atom_book_required_client_first_props);
 	
 	// output.done_log('client', `Client books generated.`);
 }
 
-function _remove_api_route_call_implementation(sourceFile:tsm.SourceFile){
+function _remove_dock_route_call_implementation(sourceFile:tsm.SourceFile){
 	const syntax_list = sourceFile.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
 	const variable_stats = syntax_list.getChildrenOfKind(tsm.SyntaxKind.VariableStatement);
 	for(const var_stat of variable_stats){
 		const var_decl = var_stat.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
 		const identifier = var_decl.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
-		if(identifier.getText() === `api_book`){
+		if(identifier.getText() === `dock_book`){
 			const obj_lit_ex = var_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.ObjectLiteralExpression);
 			const syntax_list = obj_lit_ex.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
 			const atom_defs = syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
 			for(const atom_def of atom_defs){
 				const atom_syntax_list = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
-				const api_key_list = atom_syntax_list.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
-				const api_keys = api_key_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+				const dock_key_list = atom_syntax_list.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+				const dock_keys = dock_key_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
 				const atom_id = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
 				const atom_name = atom_id.getText();
-				for(const api_key of api_keys){
-					const key_name_identifier = api_key.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+				for(const dock_key of dock_keys){
+					const key_name_identifier = dock_key.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
 					const key_name = key_name_identifier.getText();
 					if(key_name === 'routes'){
-						const routes_syntax = api_key.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+						const routes_syntax = dock_key.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
 						const routes_props = routes_syntax.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
 						for(const route of routes_props){
 							const route_syntax = route.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
@@ -677,7 +712,7 @@ function _remove_api_route_call_implementation(sourceFile:tsm.SourceFile){
 		}
 	}
 	
-	output.done_log('clnt', `Removed call implementation in api book.`);
+	output.done_log('clnt', `Removed call implementation in dock book.`);
 	
 	return sourceFile;
 }
@@ -697,8 +732,8 @@ function _generate_client_book(book_name:BookName, required_props:string[]){
 	}else{
 		sourceFile = _keep_only_client_second_level_properties(sourceFile, book_name, required_props);
 	}
-	if(book_name === 'api'){
-		sourceFile = _remove_api_route_call_implementation(sourceFile);
+	if(book_name === 'dock'){
+		sourceFile = _remove_dock_route_call_implementation(sourceFile);
 	}
 	
 	const filepath = `${client_books_dir}/${book_name}.ts`;
