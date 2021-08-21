@@ -14,6 +14,8 @@ import {conf, defaults} from '../conf/defaults';
 
 import {transpose} from './transpose';
 
+import {hooks} from './hooks';
+
 export const dev = {
 	
 	command: async ():Promise<void> => {
@@ -56,6 +58,10 @@ async function _start_dev()
 	}
 	
 	transpose.run(conf.root, undefined, cli_options);
+	
+	if(conf.repo === 'trx'){
+		hooks.run(cli_options);
+	}
 	
 	if(conf.deploy === 'netlify'){
 		const ntl_cmd = `npx ntl dev`;
@@ -176,12 +182,17 @@ function _replace_netlify_function_file(){
 	let new_content = result.toString();
 	const splitted = new_content.split(`\n`);
 	const comment = '// uranio autoupdate';
-	if(splitted[splitted.length - 1] === comment){
-		splitted.splice(-1);
-		new_content = splitted.join('\n');
-	}else{
+	if(splitted[splitted.length - 2] !== comment){
 		new_content += `\n${comment}`;
+		new_content += `\n// 0`;
+	}else{
+		const last_update = splitted.splice(-1);
+		const last_update_split = last_update[0].split(' ');
+		const update_number = Number(last_update_split[1]);
+		new_content = splitted.join('\n');
+		new_content += `\n// ${update_number + 1}`;
 	}
 	fs.writeFileSync(api_file_path, new_content, 'utf8');
+	output.verbose_log('less', `Replacing Netlify serverless function file.`);
 }
 

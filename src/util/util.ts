@@ -50,7 +50,7 @@ process.on('SIGINT', function() {
 	
 	user_exit = true;
 	
-	output.wrong_end_log("\r--- Caught interrupt signal ---");
+	output.wrong_end_log("--- Caught interrupt signal ---");
 	// process.stdout.write("\r--- Caught interrupt signal ---\n");
 	
 	for(let i = 0; i < watch_child_list.length; i++){

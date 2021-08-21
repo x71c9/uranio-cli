@@ -52,7 +52,7 @@ exports.child_list = [];
 exports.watch_child_list = [];
 process.on('SIGINT', function () {
     user_exit = true;
-    output.wrong_end_log("\r--- Caught interrupt signal ---");
+    output.wrong_end_log("--- Caught interrupt signal ---");
     // process.stdout.write("\r--- Caught interrupt signal ---\n");
     for (let i = 0; i < exports.watch_child_list.length; i++) {
         const watch_child_object = exports.watch_child_list[i];
