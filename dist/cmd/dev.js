@@ -42,6 +42,7 @@ const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const defaults_1 = require("../conf/defaults");
 const transpose_1 = require("./transpose");
+const hooks_1 = require("./hooks");
 exports.dev = {
     command: () => __awaiter(void 0, void 0, void 0, function* () {
         output.stop_loading();
@@ -68,6 +69,9 @@ function _start_dev() {
             util.copy_folder_recursive_sync(client_folder, `${defaults_1.conf.root}/.uranio/client/src/.`);
         }
         transpose_1.transpose.run(defaults_1.conf.root, undefined, cli_options);
+        if (defaults_1.conf.repo === 'trx') {
+            hooks_1.hooks.run(cli_options);
+        }
         if (defaults_1.conf.deploy === 'netlify') {
             const ntl_cmd = `npx ntl dev`;
             util.spawn_log_command(ntl_cmd, 'ntlf', nuxt_color);
@@ -160,13 +164,18 @@ function _replace_netlify_function_file() {
     let new_content = result.toString();
     const splitted = new_content.split(`\n`);
     const comment = '// uranio autoupdate';
-    if (splitted[splitted.length - 1] === comment) {
-        splitted.splice(-1);
-        new_content = splitted.join('\n');
+    if (splitted[splitted.length - 2] !== comment) {
+        new_content += `\n${comment}`;
+        new_content += `\n// 0`;
     }
     else {
-        new_content += `\n${comment}`;
+        const last_update = splitted.splice(-1);
+        const last_update_split = last_update[0].split(' ');
+        const update_number = Number(last_update_split[1]);
+        new_content = splitted.join('\n');
+        new_content += `\n// ${update_number + 1}`;
     }
     fs_1.default.writeFileSync(api_file_path, new_content, 'utf8');
+    output.verbose_log('less', `Replacing Netlify serverless function file.`);
 }
 //# sourceMappingURL=dev.js.map

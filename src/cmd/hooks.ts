@@ -63,7 +63,7 @@ export const hooks = {
 		
 		_save_to_file(text);
 		
-		output.end_log(`TRX Hooks generated.`);
+		output.done_log(`end`, `TRX Hooks generated.`);
 		
 	},
 	
@@ -301,7 +301,7 @@ function _generate_text(){
 }
 
 function _save_to_file(text:string){
-	const filepath = `${conf.root}/${defaults.folder}/lib/hooks.ts`;
+	const filepath = `${conf.root}/${defaults.folder}/lib/hooks/index.ts`;
 	fs.writeFileSync(filepath, text);
 	util.pretty(filepath);
 	output.done_verbose_log(`hooks`, `Created hooks file [${filepath}].`);

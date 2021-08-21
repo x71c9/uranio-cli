@@ -141,6 +141,8 @@ function _format_text(context:string, text:string)
 	text_lenght += prefix.length;
 	text_lenght += context.length;
 	text_lenght += text.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '').length; // eslint-disable-line no-control-regex
+	const count_tabs = (text.match(new RegExp("\t", "g")) || []).length; // eslint-disable-line no-control-regex
+	text_lenght += count_tabs * 7;
 	text_lenght += time.length;
 	text_lenght += 4;
 	

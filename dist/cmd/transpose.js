@@ -152,6 +152,7 @@ function _transpose_all() {
     _resolve_aliases();
     _replace_import_to_avoid_loops();
     // output.end_log(`Transpose completed.`);
+    output.stop_loading();
     output.done_log(`end`, `Transpose completed.`);
 }
 function _replace_import_to_avoid_loops() {
@@ -644,30 +645,32 @@ function _remove_dock_route_call_implementation(sourceFile) {
             const atom_defs = syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
             for (const atom_def of atom_defs) {
                 const atom_syntax_list = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
-                const dock_key_list = atom_syntax_list.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
-                const dock_keys = dock_key_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
-                const atom_id = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
-                const atom_name = atom_id.getText();
-                for (const dock_key of dock_keys) {
-                    const key_name_identifier = dock_key.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
-                    const key_name = key_name_identifier.getText();
-                    if (key_name === 'routes') {
-                        const routes_syntax = dock_key.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
-                        const routes_props = routes_syntax.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
-                        for (const route of routes_props) {
-                            const route_syntax = route.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
-                            const route_props = route_syntax.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
-                            for (const prop of route_props) {
-                                const comma = prop.getNextSiblingIfKind(tsm.SyntaxKind.CommaToken);
-                                const prop_id = prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
-                                const prop_id_name = prop_id.getText();
-                                if (prop_id_name === 'call') {
-                                    if (comma) {
-                                        comma.replaceWithText('');
+                const dock_key_list = atom_syntax_list.getFirstDescendantByKind(tsm.SyntaxKind.SyntaxList);
+                if (dock_key_list) {
+                    const dock_keys = dock_key_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+                    const atom_id = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+                    const atom_name = atom_id.getText();
+                    for (const dock_key of dock_keys) {
+                        const key_name_identifier = dock_key.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+                        const key_name = key_name_identifier.getText();
+                        if (key_name === 'routes') {
+                            const routes_syntax = dock_key.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+                            const routes_props = routes_syntax.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+                            for (const route of routes_props) {
+                                const route_syntax = route.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+                                const route_props = route_syntax.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+                                for (const prop of route_props) {
+                                    const comma = prop.getNextSiblingIfKind(tsm.SyntaxKind.CommaToken);
+                                    const prop_id = prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+                                    const prop_id_name = prop_id.getText();
+                                    if (prop_id_name === 'call') {
+                                        if (comma) {
+                                            comma.replaceWithText('');
+                                        }
+                                        prop.replaceWithText('');
+                                        output.verbose_log('clnt', `Removed route implementation [${atom_name}][${prop_id_name}]`);
+                                        break;
                                     }
-                                    prop.replaceWithText('');
-                                    output.verbose_log('clnt', `Removed route implementation [${atom_name}][${prop_id_name}]`);
-                                    break;
                                 }
                             }
                         }
