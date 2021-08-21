@@ -63,7 +63,10 @@ const tscw_color = '#734de3';
 const watc_color = '#687a6a';
 function _start_dev() {
     return __awaiter(this, void 0, void 0, function* () {
-        util.copy_folder_recursive_sync(`${defaults_1.conf.root}/src/client/.`, `${defaults_1.conf.root}/.uranio/client/src/.`);
+        const client_folder = `${defaults_1.conf.root}/src/client/.`;
+        if (fs_1.default.existsSync(client_folder)) {
+            util.copy_folder_recursive_sync(client_folder, `${defaults_1.conf.root}/.uranio/client/src/.`);
+        }
         transpose_1.transpose.run(defaults_1.conf.root, undefined, cli_options);
         if (defaults_1.conf.deploy === 'netlify') {
             const ntl_cmd = `npx ntl dev`;
@@ -75,7 +78,6 @@ function _start_dev() {
         }
         const tscw_cmd = `npx tsc -w --project ${defaults_1.conf.root}/tsconfig.json`;
         util.spawn_log_command(tscw_cmd, 'tscw', tscw_color);
-        const client_folder = `${defaults_1.conf.root}/src/client/.`;
         output.log(`wtch`, `Watching Client Folder [${client_folder}] ...`);
         util.watch(client_folder, `watching client folder.`, () => {
             output.log(`wtch`, `Initial scanner completed for [${client_folder}].`);

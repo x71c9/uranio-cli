@@ -246,9 +246,9 @@ function _generate_text() {
     text += ` * @packageDocumentation\n`;
     text += ` */\n`;
     text += `\n`;
-    text += `import * as uranio from './cln/main';\n`;
+    text += `import * as uranio from '../cln/main';\n`;
     text += `\n`;
-    text += `export const trx = {\n`;
+    text += `export const hooks = {\n`;
     for (const atom_name of atom_names) {
         const plural = (typeof atom_plurals[atom_name] === 'string') ?
             atom_plurals[atom_name] : `${atom_name}s`;
@@ -267,13 +267,13 @@ function _generate_text() {
             }
             text += `\t\t\t\t...options\n`;
             text += `\t\t\t};\n`;
-            text += `\t\t\treturn await uranio.trx.create('${atom_name}').hook('${route_name}')(args);\n`;
+            text += `\t\t\treturn await uranio.base.create('${atom_name}').hook('${route_name}')(args);\n`;
             text += `\t\t},\n`;
         }
         text += `\t},\n`;
     }
     text += `} as const;\n`;
-    output.done_verbose_log(`hooks`, `Generated text.`);
+    output.done_verbose_log(`hooks`, `Generated hooks text.`);
     return text;
 }
 function _save_to_file(text) {

@@ -48,8 +48,9 @@ const alias = __importStar(require("./alias"));
 const atom_book_required_properties = ['properties', 'security', 'connection', 'plural'];
 const dock_book_required_properties = ['dock'];
 const bll_book_required_properties = ['bll'];
-const atom_book_required_client_first_props = ['properties', 'plural'];
+const atom_book_required_client_first_props = ['properties', 'plural', 'connection'];
 const dock_book_required_client_second_props = ['url', 'routes'];
+const submodules = ['core', 'api'];
 const transpose_options = {};
 exports.transpose = {
     run: (root, file, options) => __awaiter(void 0, void 0, void 0, function* () {
@@ -81,6 +82,8 @@ exports.transpose = {
         else {
             _transpose_all();
         }
+        // output.stop_loading();
+        // process.exit(0);
     })
 };
 const _project_option = {
@@ -156,6 +159,10 @@ function _replace_import_to_avoid_loops() {
     if (fs_1.default.existsSync(server_dir)) {
         _traverse_ts_avoid_import_loop(server_dir);
     }
+    const client_dir = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/`;
+    if (fs_1.default.existsSync(client_dir)) {
+        _traverse_ts_avoid_import_loop(client_dir);
+    }
 }
 function _traverse_ts_resolve_aliases(directory, aliases) {
     fs_1.default.readdirSync(directory).forEach((filename) => {
@@ -171,7 +178,8 @@ function _traverse_ts_resolve_aliases(directory, aliases) {
 function _traverse_ts_avoid_import_loop(directory) {
     fs_1.default.readdirSync(directory).forEach((filename) => {
         const full_path = path_1.default.resolve(directory, filename);
-        if (fs_1.default.statSync(full_path).isDirectory() && filename !== '.git' && filename !== 'books') {
+        // if (fs.statSync(full_path).isDirectory() && filename !== '.git' && filename !== 'books'){
+        if (fs_1.default.statSync(full_path).isDirectory() && filename !== '.git') {
             return _traverse_ts_avoid_import_loop(full_path);
         }
         else if (filename.split('.').pop() === 'ts') {
@@ -180,6 +188,9 @@ function _traverse_ts_avoid_import_loop(directory) {
     });
 }
 function _avoid_import_loop(filepath) {
+    const modules = {};
+    const expressions = {};
+    let uranio_import_state = '';
     const _project = new tsm.Project(_project_option);
     const sourceFile = _project.addSourceFileAtPath(`${filepath}`);
     const import_decls = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.ImportDeclaration);
@@ -187,40 +198,108 @@ function _avoid_import_loop(filepath) {
     for (const import_decl of import_decls) {
         const str_lit = import_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.StringLiteral);
         const module_name = str_lit.getText();
-        if (module_name.substr(-6) === '/lib/"') {
+        if (module_name.substr(-6) === `/${defaults_1.defaults.repo_folder}/"` || module_name.substr(-5) === `/${defaults_1.defaults.repo_folder}"`) {
+            uranio_import_state = import_decl.getText();
             const identif = import_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
             uranio_var_name = identif.getText();
-            let uranio_bll_import_var_name = `${uranio_var_name}.core.bll.BLL`;
-            let append_core = 'core/';
-            if (defaults_1.conf.repo === 'core') {
-                uranio_bll_import_var_name = `${uranio_var_name}.bll.BLL`;
-                append_core = '';
+            const prop_access_exps = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.PropertyAccessExpression);
+            const qualified_name = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.QualifiedName);
+            const nodes_to_check = prop_access_exps.concat(qualified_name);
+            for (const prop_access_exp of nodes_to_check) {
+                const prop_text = prop_access_exp.getText();
+                const exploded_text = prop_text.split('.');
+                if (exploded_text[0] !== uranio_var_name) {
+                    continue;
+                }
+                exploded_text.shift();
+                let parent_module = uranio_var_name;
+                while (submodules.includes(exploded_text[0])) {
+                    parent_module = exploded_text[0];
+                    exploded_text.shift();
+                }
+                if (exploded_text.length !== 1) {
+                    continue;
+                }
+                const module_name = exploded_text[0];
+                if (!modules[parent_module]) {
+                    modules[parent_module] = [];
+                }
+                if (!modules[parent_module].includes(module_name)) {
+                    modules[parent_module].push(module_name);
+                }
+                if (!expressions[module_name]) {
+                    expressions[module_name] = [];
+                }
+                if (!expressions[module_name].includes(prop_text)) {
+                    expressions[module_name].push(prop_text);
+                }
             }
-            const regex = new RegExp(`\\b${uranio_bll_import_var_name}\\b`);
-            const file_text = sourceFile.getText();
-            if (regex.test(file_text)) {
-                //eslint-disable-next-line no-useless-escape
-                // const new_bll_import_var_name = `${uranio_bll_import_var_name.replace(/\./g,'_')}`;
-                const new_bll_module_name = module_name.substr(1, module_name.length - 2) + `${append_core}bll/bll`;
-                const old_uranio_import = import_decl.getText();
-                import_decl.replaceWithText(`${old_uranio_import}\nimport {BLL} from "${new_bll_module_name}";`);
-                const prop_access_exps = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.PropertyAccessExpression);
-                const prop_to_change = [];
-                for (const prop_access_exp of prop_access_exps) {
-                    const prop_text = prop_access_exp.getText();
-                    if (prop_text === `${uranio_bll_import_var_name}`) {
-                        prop_to_change.push(prop_access_exp);
-                    }
-                }
-                for (const prop of prop_to_change) {
-                    prop.replaceWithText(`BLL`);
-                }
-                _project.save();
+        }
+    }
+    const import_states = [];
+    const is_server_folder = (filepath.includes(`${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/`));
+    // const is_client_folder = (filepath.includes(`${conf.root}/${defaults.folder}/client/`));
+    const folderpath = path_1.default.parse(filepath).dir;
+    const lib_path = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/lib/`;
+    const relative_root = path_1.default.relative(folderpath, lib_path);
+    const clnsrv_folder = (is_server_folder) ? 'srv' : 'cln';
+    let relative_path = '';
+    for (const submodule_name in modules) {
+        for (const module_name of modules[submodule_name]) {
+            if (module_name === 'types') {
+                relative_path = `${relative_root}/${clnsrv_folder}/types`;
+            }
+            else {
+                const submod_tree = _resolve_path_tree(submodule_name);
+                relative_path = `${relative_root}/${submod_tree}${module_name}`;
+            }
+            const import_state = `import * as ${_generate_variable_name(module_name)} from '${relative_path}'`;
+            import_states.push(import_state);
+        }
+    }
+    const file_content = sourceFile.print();
+    const regex = new RegExp(`${uranio_import_state}`);
+    const with_imports = file_content.replace(regex, import_states.join('\n'));
+    let with_imports_and_variables = with_imports;
+    for (const module_name in expressions) {
+        for (const expression of expressions[module_name]) {
+            const regex = new RegExp(`\\b${expression}\\b`, 'g');
+            with_imports_and_variables = with_imports_and_variables.replace(regex, _generate_variable_name(module_name));
+        }
+    }
+    fs_1.default.writeFileSync(filepath, with_imports_and_variables);
+    util.pretty(filepath);
+}
+function _generate_variable_name(str) {
+    let num = "";
+    for (let i = 0; i < str.length; i++) {
+        const code = str.toUpperCase().charCodeAt(i);
+        if (code > 64 && code < 91) {
+            num += (code - 64);
+        }
+    }
+    return `${str}_${num}`;
+}
+function _resolve_path_tree(submodule_name) {
+    switch (defaults_1.conf.repo) {
+        case 'trx': {
+            switch (submodule_name) {
+                case 'core': return 'api/core/';
+                case 'api': return 'api/';
             }
             break;
         }
+        case 'api': {
+            switch (submodule_name) {
+                case 'core': return 'core/';
+            }
+            break;
+        }
+        case 'core': {
+            return '';
+        }
     }
-    return sourceFile;
+    return '';
 }
 function _copy_from_src_into_uranio_folder() {
     if (fs_1.default.existsSync(`${defaults_1.conf.root}/src/server/`)) {
