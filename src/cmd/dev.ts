@@ -47,10 +47,13 @@ const watc_color = '#687a6a';
 async function _start_dev()
 		:Promise<any>{
 	
-	util.copy_folder_recursive_sync(
-		`${conf.root}/src/client/.`,
-		`${conf.root}/.uranio/client/src/.`
-	);
+	const client_folder = `${conf.root}/src/client/.`;
+	if(fs.existsSync(client_folder)){
+		util.copy_folder_recursive_sync(
+			client_folder,
+			`${conf.root}/.uranio/client/src/.`
+		);
+	}
 	
 	transpose.run(conf.root, undefined, cli_options);
 	
@@ -65,7 +68,6 @@ async function _start_dev()
 	const tscw_cmd = `npx tsc -w --project ${conf.root}/tsconfig.json`;
 	util.spawn_log_command(tscw_cmd, 'tscw', tscw_color);
 	
-	const client_folder = `${conf.root}/src/client/.`;
 	output.log(`wtch`, `Watching Client Folder [${client_folder}] ...`);
 	
 	util.watch(

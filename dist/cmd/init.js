@@ -267,7 +267,11 @@ function _copy_netlify_files() {
     if (!fs_1.default.existsSync(function_folder)) {
         fs_1.default.mkdirSync(function_folder);
     }
-    const functions_file = `${dot_deploy_folder}/netlify/functions/api.txt`;
+    let api_file = `trx-api.txt`;
+    if (defaults_1.conf.repo === 'api') {
+        api_file = `api-api.txt`;
+    }
+    const functions_file = `${dot_deploy_folder}/netlify/functions/${api_file}`;
     const functions_dest = `${function_folder}/api.ts`;
     util.copy_file('dot', functions_file, functions_dest);
 }
