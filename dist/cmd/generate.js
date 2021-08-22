@@ -42,6 +42,7 @@ const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const common = __importStar(require("./common"));
+const hooks_1 = require("./hooks");
 const transpose_1 = require("./transpose");
 const cli_options = {
     hide: false,
@@ -63,6 +64,9 @@ exports.generate = {
         }
         util.copy_folder_recursive_sync(client_folder, `${defaults_1.conf.root}/.uranio/client/src/.`);
         transpose_1.transpose.run(defaults_1.conf.root, undefined, cli_options);
+        if (defaults_1.conf.repo === 'trx') {
+            hooks_1.hooks.run(cli_options);
+        }
         defaults_1.conf.spinner = true;
         // util.sync_exec(`npx tsc -b --verbose`);
         // util.sync_exec(`npx nuxt generate -c .uranio/client/nuxt.config.js`);

@@ -16,6 +16,8 @@ import * as util from '../util/';
 
 import * as common from './common';
 
+import {hooks} from './hooks';
+
 import {transpose} from './transpose';
 
 const cli_options = {
@@ -54,6 +56,10 @@ export const generate = {
 		);
 		
 		transpose.run(conf.root, undefined, cli_options);
+		
+		if(conf.repo === 'trx'){
+			hooks.run(cli_options);
+		}
 		
 		conf.spinner = true;
 		
