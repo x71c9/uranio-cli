@@ -199,7 +199,18 @@ function _avoid_import_loop(filepath) {
     for (const import_decl of import_decls) {
         const str_lit = import_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.StringLiteral);
         const module_name = str_lit.getText();
-        if (module_name.substr(-6) === `/${defaults_1.defaults.repo_folder}/"` || module_name.substr(-5) === `/${defaults_1.defaults.repo_folder}"`) {
+        let is_importing_uranio = false;
+        const repo_length = defaults_1.defaults.repo_folder.length;
+        if (module_name.substr(-1 * (repo_length + 3)) === `/${defaults_1.defaults.repo_folder}/"`) {
+            is_importing_uranio = true;
+        }
+        if (module_name.substr(-1 * (repo_length + 2)) === `/${defaults_1.defaults.repo_folder}"`) {
+            is_importing_uranio = true;
+        }
+        if (module_name.substr(-1 * (repo_length + 9)) === `/${defaults_1.defaults.repo_folder}/client"`) {
+            is_importing_uranio = true;
+        }
+        if (is_importing_uranio) {
             uranio_import_state = import_decl.getText();
             const identif = import_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
             uranio_var_name = identif.getText();
