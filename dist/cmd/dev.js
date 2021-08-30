@@ -99,7 +99,7 @@ function _start_dev() {
             if (_event === 'unlink') {
                 util.delete_file_sync(new_path);
             }
-            else if (_event === 'add') {
+            else if (_event === 'add' || _event === 'change') {
                 output.log(`wtch`, `[Client watch] Copy file sync [${_path}] to [${new_path}]`);
                 util.copy_file_sync(_path, new_path);
             }
