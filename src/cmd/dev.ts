@@ -95,9 +95,12 @@ async function _start_dev()
 			const new_path = `${conf.root}/${defaults.folder}/client/src/${relative_path_to_client}`;
 			if(_event === 'unlink'){
 				util.delete_file_sync(new_path);
-			}else{
+			}else if(_event === 'add'){
 				output.log(`wtch`, `[Client watch] Copy file sync [${_path}] to [${new_path}]`);
 				util.copy_file_sync(_path, new_path);
+			}else if(_event === 'addDir'){
+				output.log(`wtch`, `[Client watch] Copy dir sync [${_path}] to [${new_path}]`);
+				util.copy_folder_recursive_sync(_path, new_path);
 			}
 		}
 	);
