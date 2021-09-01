@@ -382,8 +382,8 @@ function dependency_exists(repo) {
     try {
         const data = fs_1.default.readFileSync(package_json_path, 'utf8');
         const package_data = urn_lib_1.urn_util.json.clean_parse(data);
-        return (typeof package_data['dependencies'][repo] === 'string' ||
-            typeof package_data['devDependencies'][repo] === 'string');
+        return ((package_data['dependencies'] && typeof package_data['dependencies'][repo] === 'string') ||
+            (package_data['devDependencies'] && typeof package_data['devDependencies'][repo] === 'string'));
     }
     catch (ex) {
         output.wrong_end_log(`Invalid ${package_json_path}. ${ex.message}`);
