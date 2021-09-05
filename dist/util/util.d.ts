@@ -47,4 +47,5 @@ export declare function copy_file_sync(source: string, target: string): void;
 export declare function copy_folder_recursive_sync(source: string, target: string): void;
 export declare function delete_file_sync(file_path: string): void;
 export declare function spawn_log_command(command: string, context: string, color: string): cp.ChildProcessWithoutNullStreams;
+export declare function spawn_verbose_log_command(command: string, context: string, color: string): cp.ChildProcessWithoutNullStreams;
 export {};

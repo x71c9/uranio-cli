@@ -9,7 +9,8 @@ exports.valid_deploy = exports.valid_pacman = exports.valid_repos = exports.abst
 exports.abstract_repos = {
     core: '',
     api: '',
-    trx: ''
+    trx: '',
+    adm: ''
 };
 exports.abstract_pacman = {
     yarn: '',

@@ -96,9 +96,10 @@ export function verbose_log(context:string, text:string, color='#668899')
 	_log(context, color_text, (conf.verbose === true));
 }
 
-export function log(context:string, text:string)
+export function log(context:string, text:string, color='#859900')
 		:void{
-	_log(context, text, true);
+	const color_text = (!conf.blank) ? chalk.hex(color)(text) : text;
+	_log(context, color_text, true);
 }
 
 function _log(context:string, text:string, out=false){

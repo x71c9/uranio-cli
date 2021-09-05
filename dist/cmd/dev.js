@@ -68,6 +68,7 @@ function _start_dev() {
         if (fs_1.default.existsSync(client_folder)) {
             util.copy_folder_recursive_sync(client_folder, `${defaults_1.conf.root}/.uranio/client/src/.`);
         }
+        cli_options.verbose = defaults_1.conf.verbose;
         transpose_1.transpose.run(defaults_1.conf.root, undefined, cli_options);
         if (defaults_1.conf.repo === 'trx') {
             hooks_1.hooks.run(cli_options);
@@ -82,9 +83,9 @@ function _start_dev() {
         }
         const tscw_cmd = `npx tsc -w --project ${defaults_1.conf.root}/tsconfig.json`;
         util.spawn_log_command(tscw_cmd, 'tscw', tscw_color);
-        output.log(`wtch`, `Watching Client Folder [${client_folder}] ...`);
+        output.log(`wtch`, `Watching Client Folder [${client_folder}] ...`, watc_color);
         util.watch(client_folder, `watching client folder.`, () => {
-            output.log(`wtch`, `Initial scanner completed for [${client_folder}].`);
+            output.done_log(`wtch`, `Initial scanner completed for [${client_folder}].`);
             watch_client_scanned = true;
         }, (_event, _path) => {
             output.verbose_log(`wtch`, `${_event} ${_path}`, watc_color);
@@ -96,22 +97,30 @@ function _start_dev() {
             }
             const relative_path_to_client = _path.replace(`${defaults_1.conf.root}/src/client/`, '');
             const new_path = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/${relative_path_to_client}`;
+            const pre_str = `[Client watch]`;
+            const post_str = `sync [${_path}] to [${new_path}]`;
             if (_event === 'unlink') {
                 util.delete_file_sync(new_path);
+                output.done_log(`wtch`, `[Server watch] Unlinked [${_path}].`);
             }
             else if (_event === 'add' || _event === 'change') {
-                output.log(`wtch`, `[Client watch] Copy file sync [${_path}] to [${new_path}]`);
-                util.copy_file_sync(_path, new_path);
+                const what = 'file';
+                // output.start_loading(`${pre_str} Copying ${what} ${post_str}`);
+                // util.copy_file_sync(_path, new_path);
+                transpose_1.transpose.run(defaults_1.conf.root, _path, cli_options);
+                output.done_log(`wtch`, `${pre_str} Copied ${what} ${post_str}`);
             }
             else if (_event === 'addDir') {
-                output.log(`wtch`, `[Client watch] Copy dir sync [${_path}] to [${new_path}]`);
+                const what = 'dir';
+                // output.start_loading(`${pre_str} Copying ${what} ${post_str}`);
                 util.copy_folder_recursive_sync(_path, new_path);
+                output.done_log(`wtch`, `${pre_str} Copied ${what} ${post_str}`);
             }
         });
         const server_folder = `${defaults_1.conf.root}/src/server/.`;
-        output.log(`wtch`, `Watching Server Folder [${server_folder}] ...`);
+        output.log(`wtch`, `Watching Server Folder [${server_folder}] ...`, watc_color);
         util.watch(server_folder, `watching server folder.`, () => {
-            output.log(`wtch`, `Initial scanner completed for [${server_folder}].`);
+            output.done_log(`wtch`, `Initial scanner completed for [${server_folder}].`);
             watch_server_scanned = true;
         }, (_event, _path) => {
             output.verbose_log(`wtch`, `${_event} ${_path}`, watc_color);
@@ -120,20 +129,28 @@ function _start_dev() {
             }
             const relative_path_to_server = _path.replace(`${defaults_1.conf.root}/src/server/`, '');
             const new_path = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/${relative_path_to_server}`;
+            const pre_str = `[Server watch]`;
+            const post_str = `sync [${_path}] to [${new_path}]`;
             if (_event === 'unlink') {
-                output.log(`wtch`, `[Server watch] Unlink [${_path}].`);
                 util.delete_file_sync(new_path);
+                output.done_log(`wtch`, `${pre_str} Unlinked [${_path}].`);
             }
-            else {
-                output.log(`wtch`, `[Server watch] Transpose [${_path}].`);
+            else if (_event === 'add' || _event === 'change') {
+                const what = 'file';
                 transpose_1.transpose.run(defaults_1.conf.root, _path, cli_options);
+                output.done_log(`wtch`, `${pre_str} Copied ${what} ${post_str}`);
+            }
+            else if (_event === 'addDir') {
+                const what = 'dir';
+                util.copy_folder_recursive_sync(_path, new_path);
+                output.done_log(`wtch`, `${pre_str} Copied ${what} ${post_str}`);
             }
             _replace_netlify_function_file();
         });
         const book_path = `${defaults_1.conf.root}/src/book.ts`;
-        output.log(`wtch`, `Watching Book file [${book_path}] ...`);
+        output.log(`wtch`, `Watching Book file [${book_path}] ...`, watc_color);
         util.watch(book_path, `watching book file.`, () => {
-            output.log(`wtch`, `Initial scanner completed for [${book_path}].`);
+            output.done_log(`wtch`, `Initial scanner completed for [${book_path}].`);
             watch_book_scanned = true;
         }, (_event, _path) => {
             output.verbose_log(`wtch`, `${_event} ${_path}`, watc_color);
@@ -141,15 +158,15 @@ function _start_dev() {
                 return false;
             }
             if (_event !== 'unlink') {
-                output.log(`wtch`, `[Book watch] Transpose [${_path}].`);
                 transpose_1.transpose.run(defaults_1.conf.root, _path, cli_options);
+                output.done_log(`wtch`, `[Book watch] Transposed [${_path}].`);
             }
             _replace_netlify_function_file();
         });
         const lib_path = `${defaults_1.conf.root}/.uranio/lib/.`;
-        output.log(`wtch`, `Watching Lib folder [${lib_path}] ...`);
+        output.log(`wtch`, `Watching Lib folder [${lib_path}] ...`, watc_color);
         util.watch(lib_path, `watching lib folder.`, () => {
-            output.log(`wtch`, `Initial scanner completed for [${lib_path}].`);
+            output.done_log(`wtch`, `Initial scanner completed for [${lib_path}].`);
             watch_lib_scanned = true;
         }, (_event, _path) => {
             if (_event !== 'add' && _event !== 'addDir') {

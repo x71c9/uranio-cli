@@ -109,6 +109,9 @@ function _initialize() {
         _copy_dot_files();
         _remove_tmp();
         _update_relative_paths();
+        if (defaults_1.conf.repo === 'adm') {
+            _add_admin_files();
+        }
         output.end_log(`Initialization completed.`);
     });
 }
@@ -196,6 +199,13 @@ function _proceed() {
         yield _initialize();
     });
 }
+function _add_admin_files() {
+    output.start_loading(`Adding admin files...`);
+    const fix_file_nuxt_types = `${defaults_1.conf.root}/node_modules/@nuxt/types/node_modules/index.d.ts`;
+    if (!fs_1.default.existsSync(fix_file_nuxt_types)) {
+        util.sync_exec(`touch ${fix_file_nuxt_types}`);
+    }
+}
 function _ignore_urn_folder() {
     output.start_loading(`Adding ${defaults_1.defaults.folder} to .gitignore...`);
     const gitignore = `${defaults_1.conf.root}/.gitignore`;
@@ -207,7 +217,7 @@ function _ignore_urn_folder() {
         content += `\n${defaults_1.defaults.folder}/`;
     }
     if (content.indexOf(defaults_1.defaults.log_filepath + '/') === -1) {
-        content += `\n${defaults_1.defaults.log_filepath}/`;
+        content += `\n${defaults_1.defaults.log_filepath}`;
     }
     fs_1.default.writeFileSync(gitignore, content);
     const log_msg = `Added ${defaults_1.defaults.folder} and ${defaults_1.defaults.log_filepath} to .gitignore.`;
@@ -234,6 +244,10 @@ function _install_dep(repo) {
             }
             case 'trx': {
                 yield _install_trx_dep();
+                return true;
+            }
+            case 'adm': {
+                // await _install_adm_dep();
                 return true;
             }
             // default:{

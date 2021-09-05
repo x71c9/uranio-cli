@@ -23,15 +23,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -53,15 +44,15 @@ const dock_book_required_client_second_props = ['url', 'routes'];
 const submodules = ['core', 'api'];
 const transpose_options = {};
 exports.transpose = {
-    run: (root, file, options) => __awaiter(void 0, void 0, void 0, function* () {
+    run: (root, file, options) => {
         defaults_1.conf.root = root;
         if (typeof file === 'string') {
             transpose_options.file = util.relative_to_absolute_path(file);
         }
         common.init_run(options);
-        yield exports.transpose.command();
-    }),
-    command: (args) => __awaiter(void 0, void 0, void 0, function* () {
+        exports.transpose.command();
+    },
+    command: (args) => {
         output.start_loading('Transposing...');
         util.read_rc_file();
         if (args && args.file) {
@@ -84,7 +75,7 @@ exports.transpose = {
         }
         // output.stop_loading();
         // process.exit(0);
-    })
+    }
 };
 const _project_option = {
     manipulationSettings: {
@@ -110,7 +101,7 @@ function _transpose_file(file_path) {
                     new_path = file_path.replace(client_path, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/`);
                     util.copy_file(`trsp`, file_path, new_path);
                 }
-                if (new_path !== '') {
+                if (new_path !== '' && path_1.default.extname(file_path) === 'ts') {
                     alias.replace_file_aliases(new_path, alias.get_aliases());
                     _avoid_import_loop(new_path);
                     output.done_verbose_log('trsp', `Transposed file [${file_path}].`);
@@ -718,11 +709,20 @@ function _replace_uranio_client_dependecy(sourceFile) {
     const imports = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.ImportDeclaration);
     for (const decl of imports) {
         const str_lit = decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.StringLiteral);
-        const str_text = str_lit.getText();
-        if (str_text.substr(-7) === './lib/"') {
-            const replace_with = `${str_text.substr(0, str_text.length - 1)}client"`;
+        const module_name = str_lit.getText();
+        let is_importing_uranio = false;
+        const repo_length = defaults_1.defaults.repo_folder.length;
+        if (module_name.substr(-1 * (repo_length + 3)) === `/${defaults_1.defaults.repo_folder}/"`) {
+            is_importing_uranio = true;
+        }
+        if (module_name.substr(-1 * (repo_length + 2)) === `/${defaults_1.defaults.repo_folder}"`) {
+            is_importing_uranio = true;
+        }
+        if (is_importing_uranio) {
+            const slash = (module_name[module_name.length - 2] === '/') ? '' : '/';
+            const replace_with = `"${module_name.substr(1, module_name.length - 2)}${slash}client"`;
             str_lit.replaceWithText(replace_with);
-            output.verbose_log('clnt', `Replaced [${str_text}] to [${replace_with}]`);
+            output.verbose_log('clnt', `Replaced [${module_name}] to [${replace_with}]`);
         }
     }
     return sourceFile;

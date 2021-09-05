@@ -464,7 +464,17 @@ function _clean_chunk(chunk:string){
 	return plain_text;
 }
 
-export function spawn_log_command(command:string, context:string, color:string)
+export function spawn_log_command(command:string, context:string, color: string)
+		:cp.ChildProcessWithoutNullStreams{
+	return _spawn_log_command(command, context, color, false);
+}
+
+export function spawn_verbose_log_command(command:string, context:string, color:string)
+		:cp.ChildProcessWithoutNullStreams{
+	return _spawn_log_command(command, context, color, true);
+}
+
+function _spawn_log_command(command:string, context:string, color:string, verbose=true)
 		:cp.ChildProcessWithoutNullStreams{
 	const splitted_command = command.split(' ');
 	
@@ -484,7 +494,11 @@ export function spawn_log_command(command:string, context:string, color:string)
 					output.error_log(context, plain_text);
 					// process.stdout.write(chunk);
 				}else if(plain_text != ''){
-					output.verbose_log(context, plain_text, color);
+					if(verbose){
+						output.verbose_log(context, plain_text, color);
+					}else{
+						output.log(context, plain_text, color);
+					}
 				}
 			}
 		});
