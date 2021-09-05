@@ -83,8 +83,9 @@ function verbose_log(context, text, color = '#668899') {
     _log(context, color_text, (defaults_1.conf.verbose === true));
 }
 exports.verbose_log = verbose_log;
-function log(context, text) {
-    _log(context, text, true);
+function log(context, text, color = '#859900') {
+    const color_text = (!defaults_1.conf.blank) ? chalk_1.default.hex(color)(text) : text;
+    _log(context, color_text, true);
 }
 exports.log = log;
 function _log(context, text, out = false) {

@@ -41,7 +41,7 @@ const transpose_options:TransposeOptions = {};
 
 export const transpose = {
 	
-	run: async (root:string, file?:string, options?:Partial<Options>):Promise<void> => {
+	run: (root:string, file?:string, options?:Partial<Options>):void => {
 		
 		conf.root = root;
 		
@@ -51,11 +51,11 @@ export const transpose = {
 		
 		common.init_run(options);
 		
-		await transpose.command();
+		transpose.command();
 		
 	},
 	
-	command: async (args?:Arguments):Promise<void> => {
+	command: (args?:Arguments):void => {
 		
 		output.start_loading('Transposing...');
 		
@@ -120,7 +120,7 @@ function _transpose_file(file_path:string){
 					new_path = file_path.replace(client_path, `${conf.root}/${defaults.folder}/client/src/`);
 					util.copy_file(`trsp`, file_path, new_path);
 				}
-				if(new_path !== ''){
+				if(new_path !== '' && path.extname(file_path) === 'ts'){
 					alias.replace_file_aliases(new_path, alias.get_aliases());
 					_avoid_import_loop(new_path);
 					output.done_verbose_log('trsp', `Transposed file [${file_path}].`);
@@ -858,11 +858,21 @@ function _replace_uranio_client_dependecy(sourceFile:tsm.SourceFile){
 	const imports = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.ImportDeclaration);
 	for(const decl of imports){
 		const str_lit = decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.StringLiteral);
-		const str_text = str_lit.getText();
-		if(str_text.substr(-7) === './lib/"'){
-			const replace_with = `${str_text.substr(0, str_text.length - 1)}client"`;
+		const module_name = str_lit.getText();
+		let is_importing_uranio = false;
+		const repo_length = defaults.repo_folder.length;
+		if(module_name.substr(-1 * (repo_length + 3)) === `/${defaults.repo_folder}/"`){
+			is_importing_uranio = true;
+		}
+		if(module_name.substr(-1 * (repo_length + 2)) === `/${defaults.repo_folder}"`){
+			is_importing_uranio = true;
+		}
+		
+		if(is_importing_uranio){
+			const slash = (module_name[module_name.length - 2] === '/') ? '' : '/';
+			const replace_with = `"${module_name.substr(1, module_name.length -2)}${slash}client"`;
 			str_lit.replaceWithText(replace_with);
-			output.verbose_log('clnt', `Replaced [${str_text}] to [${replace_with}]`);
+			output.verbose_log('clnt', `Replaced [${module_name}] to [${replace_with}]`);
 		}
 	}
 	return sourceFile;

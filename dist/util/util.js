@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.spawn_log_command = exports.delete_file_sync = exports.copy_folder_recursive_sync = exports.copy_file_sync = exports.dependency_exists = exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.pretty = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.set_deploy = exports.set_pacman = exports.set_repo = exports.auto_set_project_root = exports.check_folder = exports.is_initialized = exports.read_rc_file = exports.merge_options = exports.watch = exports.watch_child_list = exports.child_list = void 0;
+exports.spawn_verbose_log_command = exports.spawn_log_command = exports.delete_file_sync = exports.copy_folder_recursive_sync = exports.copy_file_sync = exports.dependency_exists = exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.pretty = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.set_deploy = exports.set_pacman = exports.set_repo = exports.auto_set_project_root = exports.check_folder = exports.is_initialized = exports.read_rc_file = exports.merge_options = exports.watch = exports.watch_child_list = exports.child_list = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const cp = __importStar(require("child_process"));
@@ -433,6 +433,14 @@ function _clean_chunk(chunk) {
     return plain_text;
 }
 function spawn_log_command(command, context, color) {
+    return _spawn_log_command(command, context, color, false);
+}
+exports.spawn_log_command = spawn_log_command;
+function spawn_verbose_log_command(command, context, color) {
+    return _spawn_log_command(command, context, color, true);
+}
+exports.spawn_verbose_log_command = spawn_verbose_log_command;
+function _spawn_log_command(command, context, color, verbose = true) {
     const splitted_command = command.split(' ');
     const spawned = cp.spawn(splitted_command[0], splitted_command.slice(1));
     if (spawned.stdout) {
@@ -446,7 +454,12 @@ function spawn_log_command(command, context, color) {
                     // process.stdout.write(chunk);
                 }
                 else if (plain_text != '') {
-                    output.verbose_log(context, plain_text, color);
+                    if (verbose) {
+                        output.verbose_log(context, plain_text, color);
+                    }
+                    else {
+                        output.log(context, plain_text, color);
+                    }
                 }
             }
         });
@@ -486,7 +499,6 @@ function spawn_log_command(command, context, color) {
     exports.child_list.push(spawned);
     return spawned;
 }
-exports.spawn_log_command = spawn_log_command;
 const _pacman_commands = {
     install: {
         npm(repo) {

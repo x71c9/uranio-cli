@@ -10,6 +10,7 @@ export declare const abstract_repos: {
     readonly core: "";
     readonly api: "";
     readonly trx: "";
+    readonly adm: "";
 };
 export declare const abstract_pacman: {
     readonly yarn: "";
