@@ -159,6 +159,9 @@ function _start_dev() {
             }
             if (_event !== 'unlink') {
                 transpose_1.transpose.run(defaults_1.conf.root, _path, cli_options);
+                if (defaults_1.conf.repo === 'trx') {
+                    hooks_1.hooks.run(cli_options);
+                }
                 output.done_log(`wtch`, `[Book watch] Transposed [${_path}].`);
             }
             _replace_netlify_function_file();

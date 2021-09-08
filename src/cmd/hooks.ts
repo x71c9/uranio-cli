@@ -21,6 +21,7 @@ import * as util from '../util/';
 import * as common from './common';
 
 const default_routes = {
+	count: {url: '/count'},
 	find: {url: '/'},
 	find_id: {url: '/:id'},
 	find_one: {url: '/'},

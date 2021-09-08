@@ -37,6 +37,7 @@ const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const common = __importStar(require("./common"));
 const default_routes = {
+    count: { url: '/count' },
     find: { url: '/' },
     find_id: { url: '/:id' },
     find_one: { url: '/' },
