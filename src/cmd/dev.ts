@@ -44,7 +44,7 @@ const cli_options = {
 	verbose: true,
 };
 
-// const nuxt_color = '#677cc7';
+const nuxt_color = '#677cc7';
 // const tscw_color = '#734de3';
 const watc_color = '#687a6a';
 
@@ -68,13 +68,13 @@ async function _start_dev()
 		hooks.run(cli_options);
 	}
 	
-	// if(conf.deploy === 'netlify'){
-	//   const ntl_cmd = `npx ntl dev`;
-	//   util.spawn_log_command(ntl_cmd, 'ntlf', nuxt_color);
-	// }else{
-	//   const nuxt_cmd = `npx nuxt -c ${defaults.folder}/client/nuxt.config.js`;
-	//   util.spawn_log_command(nuxt_cmd, 'nuxt', nuxt_color);
-	// }
+	if(conf.deploy === 'netlify'){
+		const ntl_cmd = `npx ntl dev`;
+		util.spawn_log_command(ntl_cmd, 'ntlf', nuxt_color);
+	}else{
+		const nuxt_cmd = `npx nuxt -c ${defaults.folder}/client/nuxt.config.js`;
+		util.spawn_log_command(nuxt_cmd, 'nuxt', nuxt_color);
+	}
 	
 	// const tscw_cmd = `npx tsc -w --project ${conf.root}/tsconfig.json`;
 	// util.spawn_log_command(tscw_cmd, 'tscw', tscw_color);
