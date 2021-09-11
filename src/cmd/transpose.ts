@@ -194,17 +194,6 @@ function _replace_import_to_avoid_loops(){
 	}
 }
 
-function _traverse_ts_resolve_aliases(directory:string, aliases:alias.Aliases) {
-	fs.readdirSync(directory).forEach((filename) => {
-		const full_path = path.resolve(directory, filename);
-		if (fs.statSync(full_path).isDirectory() && filename !== '.git' && filename !== 'books'){
-			return _traverse_ts_resolve_aliases(full_path, aliases);
-		}else if(filename.split('.').pop() === 'ts'){
-			alias.replace_file_aliases(full_path, aliases);
-		}
-	});
-}
-
 function _traverse_ts_avoid_import_loop(directory:string) {
 	fs.readdirSync(directory).forEach((filename) => {
 		const full_path = path.resolve(directory, filename);
@@ -212,6 +201,17 @@ function _traverse_ts_avoid_import_loop(directory:string) {
 			return _traverse_ts_avoid_import_loop(full_path);
 		}else if(filename.split('.').pop() === 'ts'){
 			_avoid_import_loop(full_path);
+		}
+	});
+}
+
+function _traverse_ts_resolve_aliases(directory:string, aliases:alias.Aliases) {
+	fs.readdirSync(directory).forEach((filename) => {
+		const full_path = path.resolve(directory, filename);
+		if (fs.statSync(full_path).isDirectory() && filename !== '.git' && filename !== 'books'){
+			return _traverse_ts_resolve_aliases(full_path, aliases);
+		}else if(filename.split('.').pop() === 'ts'){
+			alias.replace_file_aliases(full_path, aliases);
 		}
 	});
 }
@@ -236,12 +236,15 @@ function _avoid_import_loop(filepath:string){
 	const import_decls = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.ImportDeclaration);
 	let uranio_var_name = '';
 	
-	let is_importing_uranio = false;
+	let is_file_importing_uranio = false;
 	
 	for(const import_decl of import_decls){
 		const str_lit = import_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.StringLiteral);
 		const module_name = str_lit.getText();
 		const repo_length = defaults.repo_folder.length;
+		
+		let is_importing_uranio = false;
+		
 		if(module_name.substr(-1 * (repo_length + 3)) === `/${defaults.repo_folder}/"`){
 			is_importing_uranio = true;
 		}
@@ -252,6 +255,7 @@ function _avoid_import_loop(filepath:string){
 			is_importing_uranio = true;
 		}
 		if(is_importing_uranio){
+			is_file_importing_uranio = true;
 			uranio_import_state = import_decl.getText();
 			const identif = import_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
 			uranio_var_name = identif.getText();
@@ -319,6 +323,7 @@ function _avoid_import_loop(filepath:string){
 	
 	const file_content = sourceFile.print();
 	const regex = new RegExp(`${uranio_import_state}`);
+	
 	const with_imports = file_content.replace(regex, import_states.join('\n'));
 	
 	let with_imports_and_variables = with_imports;
@@ -329,7 +334,7 @@ function _avoid_import_loop(filepath:string){
 		}
 	}
 	
-	if(is_importing_uranio){
+	if(is_file_importing_uranio){
 		fs.writeFileSync(filepath, with_imports_and_variables);
 		util.pretty(filepath);
 	}
