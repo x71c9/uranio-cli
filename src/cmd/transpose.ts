@@ -22,7 +22,7 @@ import * as common from './common';
 
 import * as alias from './alias';
 
-type BookName = 'atom' | 'dock' | 'bll';
+type BookName = 'atom' | 'dock' | 'bll' | 'routes';
 
 const atom_book_required_properties = ['properties', 'security', 'connection', 'plural'];
 const dock_book_required_properties = ['dock'];
@@ -41,12 +41,12 @@ const transpose_options:TransposeOptions = {};
 
 export const transpose = {
 	
-	run: (root:string, file?:string, options?:Partial<Options>):void => {
+	run: (root:string, filepath?:string, options?:Partial<Options>):void => {
 		
 		conf.root = root;
 		
-		if(typeof file === 'string'){
-			transpose_options.file = util.relative_to_absolute_path(file);
+		if(typeof filepath === 'string'){
+			transpose_options.file = util.relative_to_absolute_path(filepath);
 		}
 		
 		common.init_run(options);
@@ -107,29 +107,26 @@ function _transpose_file(file_path:string){
 		
 	}else{
 			
-		const server_path = `${conf.root}/src/server/`;
-		const client_path = `${conf.root}/src/client/`;
+		const src_path = `${conf.root}/src/`;
 		
 		if(fs.existsSync(file_path) && file_path.includes(`${conf.root}/src/`)){
-			if(file_path.includes(server_path) || file_path.includes(client_path)){
-				let new_path = '';
-				if(file_path.includes(server_path)){
-					new_path = file_path.replace(server_path, `${conf.root}/${defaults.folder}/server/`);
-					util.copy_file(`trsp`, file_path, new_path);
-				}else if(file_path.includes(client_path)){
-					new_path = file_path.replace(client_path, `${conf.root}/${defaults.folder}/client/src/`);
-					util.copy_file(`trsp`, file_path, new_path);
-				}
-				if(new_path !== '' && path.extname(file_path) === 'ts'){
-					alias.replace_file_aliases(new_path, alias.get_aliases());
-					_avoid_import_loop(new_path);
-					output.done_verbose_log('trsp', `Transposed file [${file_path}].`);
-				}
-			}else{
-				output.error_log(`trsp`, `Invalid file path [${file_path}].`);
+			
+			const base_folder = `${conf.root}/${defaults.folder}`;
+			const new_path_server = file_path.replace(src_path, `${base_folder}/server/src/`);
+			const new_path_client = file_path.replace(src_path, `${base_folder}/client/src/`);
+			util.copy_file(`trsp`, file_path, new_path_server);
+			util.copy_file(`trsp`, file_path, new_path_client);
+			
+			if(path.extname(file_path) === '.ts'){
+				alias.replace_file_aliases(new_path_server, alias.get_aliases(`${base_folder}/server/tsconfig.json`));
+				alias.replace_file_aliases(new_path_client, alias.get_aliases(`${base_folder}/client/tsconfig.json`));
+				_avoid_import_loop(new_path_server);
+				_avoid_import_loop(new_path_client);
+				output.done_verbose_log('trsp', `Transposed file [${file_path}].`);
 			}
+			
 		}else{
-			output.error_log(`trsp`, `Invalid file path [${file_path}].`);
+			output.error_log(`trsp`, `Invalid file path [${file_path}]. File must be in [${conf.root}/src/].`);
 		}
 		
 	}
@@ -162,9 +159,9 @@ function _transpose_book(){
 	
 	_manipulate_and_create_files(`${tmp_book_folder}/book.ts`);
 	
-	_resolve_book_aliases();
-	
 	_generate_client_books();
+
+	_resolve_book_aliases();
 	
 	util.remove_folder_if_exists('tmp', tmp_book_folder);
 	
@@ -181,6 +178,7 @@ function _transpose_all(){
 	_replace_import_to_avoid_loops();
 	
 	// output.end_log(`Transpose completed.`);
+	
 	output.stop_loading();
 	output.done_log(`end`,`Transpose completed.`);
 }
@@ -210,7 +208,6 @@ function _traverse_ts_resolve_aliases(directory:string, aliases:alias.Aliases) {
 function _traverse_ts_avoid_import_loop(directory:string) {
 	fs.readdirSync(directory).forEach((filename) => {
 		const full_path = path.resolve(directory, filename);
-		// if (fs.statSync(full_path).isDirectory() && filename !== '.git' && filename !== 'books'){
 		if (fs.statSync(full_path).isDirectory() && filename !== '.git'){
 			return _traverse_ts_avoid_import_loop(full_path);
 		}else if(filename.split('.').pop() === 'ts'){
@@ -238,10 +235,12 @@ function _avoid_import_loop(filepath:string){
 	const sourceFile = _project.addSourceFileAtPath(`${filepath}`);
 	const import_decls = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.ImportDeclaration);
 	let uranio_var_name = '';
+	
+	let is_importing_uranio = false;
+	
 	for(const import_decl of import_decls){
 		const str_lit = import_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.StringLiteral);
 		const module_name = str_lit.getText();
-		let is_importing_uranio = false;
 		const repo_length = defaults.repo_folder.length;
 		if(module_name.substr(-1 * (repo_length + 3)) === `/${defaults.repo_folder}/"`){
 			is_importing_uranio = true;
@@ -296,8 +295,10 @@ function _avoid_import_loop(filepath:string){
 	const is_server_folder = (filepath.includes(`${conf.root}/${defaults.folder}/server/`));
 	// const is_client_folder = (filepath.includes(`${conf.root}/${defaults.folder}/client/`));
 	
+	const parent_folder = (is_server_folder) ? 'server' : 'client';
+	
 	const folderpath = path.parse(filepath).dir;
-	const lib_path = `${conf.root}/${defaults.folder}/lib/`;
+	const lib_path = `${conf.root}/${defaults.folder}/${parent_folder}/src/${defaults.repo_folder}/`;
 	const relative_root = path.relative(folderpath, lib_path);
 
 	const clnsrv_folder = (is_server_folder) ? 'srv' : 'cln';
@@ -328,8 +329,11 @@ function _avoid_import_loop(filepath:string){
 		}
 	}
 	
-	fs.writeFileSync(filepath, with_imports_and_variables);
-	util.pretty(filepath);
+	if(is_importing_uranio){
+		fs.writeFileSync(filepath, with_imports_and_variables);
+		util.pretty(filepath);
+	}
+	
 }
 
 function _generate_variable_name(str:string){
@@ -366,12 +370,29 @@ function _resolve_path_tree(submodule_name:string){
 }
 
 function _copy_from_src_into_uranio_folder(){
-	if(fs.existsSync(`${conf.root}/src/server/`)){
-		util.copy_files('copy', `${conf.root}/src/server/*`, `${conf.root}/.uranio/server/`);
-	}
-	if(fs.existsSync(`${conf.root}/src/client/`)){
-		util.copy_files('copy', `${conf.root}/src/client/*`, `${conf.root}/.uranio/client/src/`);
-	}
+	
+	util.copy_files(
+		`trsp`,
+		`${conf.root}/src/.`,
+		`${conf.root}/${defaults.folder}/client/src/`
+	);
+	
+	util.copy_files(
+		`trsp`,
+		`${conf.root}/src/.`,
+		`${conf.root}/${defaults.folder}/server/src/`
+	);
+	
+	util.remove_file_if_exists(`book`, `${conf.root}/${defaults.folder}/server/src/book.ts`);
+	util.remove_file_if_exists(`book`, `${conf.root}/${defaults.folder}/client/src/book.ts`);
+	
+	// if(fs.existsSync(`${conf.root}/src/server/`)){
+	//   util.copy_files('copy', `${conf.root}/src/server/*`, `${conf.root}/${defaults.folder}/server/src/`);
+	// }
+	// if(fs.existsSync(`${conf.root}/src/client/`)){
+	//   util.copy_files('copy', `${conf.root}/src/client/*`, `${conf.root}/${defaults.folder}/client/src/`);
+	// }
+	
 }
 
 function _manipulate_and_create_files(filepath:string){
@@ -388,13 +409,15 @@ function _manipulate_and_create_files(filepath:string){
 	let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
 	
 	sourceFile = _replace_comments(sourceFile);
-	sourceFile = _change_realtive_imports(sourceFile);
+	// sourceFile = _change_realtive_imports(sourceFile);
 	
-	const import_statements = _copy_imports(sourceFile);
+	let import_statements = _copy_imports(sourceFile);
+	import_statements = _change_import_statements_relative_path(import_statements);
 	
+	_create_atom_book(sourceFile, import_statements);
 	_create_bll_book(sourceFile, import_statements);
 	_create_dock_book(sourceFile, import_statements);
-	_create_atom_book(sourceFile, import_statements);
+	_create_routes_book(sourceFile, import_statements);
 	
 	// sourceFile = _manipulate_atom_book(sourceFile);
 	
@@ -405,6 +428,28 @@ function _manipulate_and_create_files(filepath:string){
 	// _pretty_books();
 	
 	// _type_check_books();
+}
+
+function _change_import_statements_relative_path(import_statements:string[])
+		:string[]{
+	const modified_import_statements:string[] = [];
+	for(const import_statement of import_statements){
+		const _project = new tsm.Project(_project_option);
+		const node = _project.createSourceFile(
+			`${conf.root}/${defaults.folder}/server/src/books/imports.ts`,
+			import_statement,
+			{ overwrite: true }
+		);
+		const str_lit = node.getFirstDescendantByKind(tsm.ts.SyntaxKind.StringLiteral);
+		if(str_lit){
+			const text = str_lit.getText();
+			if(text.slice(1,3) === './'){
+				str_lit.replaceWithText(`'.${text.slice(1, text.length-1)}'`);
+			}
+			modified_import_statements.push(node.getText());
+		}
+	}
+	return modified_import_statements;
 }
 
 function _replace_comments(sourceFile:tsm.SourceFile)
@@ -439,11 +484,9 @@ function _create_a_book(
 	const book_state = _find_atom_book_statement(sourceFile);
 	if(book_state){
 		const atom_book_state_text = book_state.getText();
-		
 		const _project = new tsm.Project(_project_option);
-		
 		const cloned_book_source = _project.createSourceFile(
-			`${conf.root}/${defaults.folder}/server/books/${book_name}.ts`,
+			`${conf.root}/${defaults.folder}/server/src/books/${book_name}.ts`,
 			atom_book_state_text,
 			{ overwrite: true }
 		);
@@ -453,31 +496,31 @@ function _create_a_book(
 			cloned_book_decl = _remove_type_reference(cloned_book_decl);
 			cloned_book_decl = _rename_book(book_name, cloned_book_decl);
 			cloned_book_decl = _clean_all_but(keep_properties, cloned_book_decl);
-			cloned_book_decl = _append_requried_book(cloned_book_decl, required_book_name);
+			cloned_book_decl = _append_required_book(cloned_book_decl, required_book_name);
 			cloned_book_decl = _add_as_const(cloned_book_decl);
 		}
-		
-		// const last = sourceFile.getLastChildByKind(tsm.ts.SyntaxKind.VariableStatement);
-		// if(last){
-		//   last.replaceWithText(last.getText() + cloned_book_source.getText());
-		// }
-		
 		const required_imports = _get_required_imports(import_statements, cloned_book_source.getText());
-		
-		const filepath = `${conf.root}/${defaults.folder}/server/books/${book_name}.ts`;
+		const filepath = `${conf.root}/${defaults.folder}/server/src/books/${book_name}.ts`;
 		const text = required_imports.join('\n') + cloned_book_source.getText();
 		_create_a_book_file(filepath, text);
-		
+		output.done_log(book_name, `Generated server book [${book_name}].`);
+		cloned_book_source.replaceWithText(text);
+		return cloned_book_source;
 	}
-	output.done_log(book_name, `Generated server book [${book_name}].`);
 	return sourceFile;
 }
 
+/**
+ *
+ * This function check if the identifiers in the import statements are used in `text`.
+ * Return an Array of the import statements required for that `text`.
+ *
+ */
 function _get_required_imports(import_statements:string[], text:string){
 	const required_import_statements:string[] = [];
 	
 	const str_project = new tsm.Project({
-		tsConfigFilePath: `${conf.root}/tsconfig.json`,
+		tsConfigFilePath: `${conf.root}/${defaults.folder}/server/tsconfig.json`,
 		skipFileDependencyResolution: true
 	});
 	for(let i = 0; i < import_statements.length; i++){
@@ -504,15 +547,27 @@ function _create_atom_book(sourceFile:tsm.SourceFile, import_statements:string[]
 	return _create_a_book(sourceFile, import_statements, 'atom', atom_book_required_properties, 'atom');
 }
 
+function _create_bll_book(sourceFile:tsm.SourceFile, import_statements:string[])
+		:tsm.SourceFile{
+	return _create_a_book(sourceFile, import_statements, 'bll', bll_book_required_properties, 'bll');
+}
+
 function _create_dock_book(sourceFile:tsm.SourceFile, import_statements:string[])
 		:tsm.SourceFile{
 	return _create_a_book(sourceFile, import_statements, 'dock', dock_book_required_properties, 'dock');
 }
 
-function _create_bll_book(sourceFile:tsm.SourceFile, import_statements:string[])
+function _create_routes_book(sourceFile:tsm.SourceFile, import_statements:string[])
 		:tsm.SourceFile{
-	return _create_a_book(sourceFile, import_statements, 'bll', bll_book_required_properties, 'bll');
+	let source_file = _create_a_book(sourceFile, import_statements, 'routes', dock_book_required_properties, 'dock');
+	source_file = _remove_dock_route_call_implementation(source_file);
+	
+	const filepath = `${conf.root}/${defaults.folder}/server/src/books/routes.ts`;
+	_create_a_book_file(filepath, source_file.getText());
+	
+	return source_file;
 }
+
 
 function _clean_all_but(but:string[], var_decl:tsm.VariableDeclaration)
 		:tsm.VariableDeclaration{
@@ -587,17 +642,17 @@ function _add_book_from_file(
 }
 
 function _add_core_books(book_decl:tsm.VariableDeclaration, required_book_name:BookName){
-	let core_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
+	let core_repo_path = `${defaults.folder}/server/src/${defaults.repo_folder}`;
 	switch(conf.repo){
 		case 'core':{
 			break;
 		}
 		case 'api':{
-			core_repo_path = `${defaults.folder}/${defaults.repo_folder}/core`;
+			core_repo_path = `${defaults.folder}/server/src/${defaults.repo_folder}/core`;
 			break;
 		}
 		case 'trx':{
-			core_repo_path = `${defaults.folder}/${defaults.repo_folder}/api/core`;
+			core_repo_path = `${defaults.folder}/server/src/${defaults.repo_folder}/api/core`;
 			break;
 		}
 	}
@@ -606,26 +661,23 @@ function _add_core_books(book_decl:tsm.VariableDeclaration, required_book_name:B
 }
 
 function _add_api_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName){
-	let api_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
+	let api_repo_path = `${defaults.folder}/server/src/${defaults.repo_folder}`;
 	switch(conf.repo){
 		case 'core':
 		case 'api':{
 			break;
 		}
 		case 'trx':{
-			api_repo_path = `${defaults.folder}/${defaults.repo_folder}/api`;
+			api_repo_path = `${defaults.folder}/server/src/${defaults.repo_folder}/api`;
 			break;
 		}
 	}
 	const required_books_path = `${conf.root}/${api_repo_path}/books.ts`;
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
-	// const api_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
-	// const required_books_path = `${conf.root}/${api_repo_path}/books.ts`;
-	// _add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 
 function _add_trx_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName){
-	const trx_repo_path = `${defaults.folder}/${defaults.repo_folder}`;
+	const trx_repo_path = `${defaults.folder}/server/src/${defaults.repo_folder}`;
 	switch(conf.repo){
 		case 'core':
 		case 'api':
@@ -637,7 +689,7 @@ function _add_trx_book(book_decl:tsm.VariableDeclaration, required_book_name:Boo
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 
-function _append_requried_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName)
+function _append_required_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName)
 		:tsm.VariableDeclaration{
 	output.start_loading(`Adding required books...`);
 	switch(conf.repo){
@@ -656,16 +708,16 @@ function _append_requried_book(book_decl:tsm.VariableDeclaration, required_book_
 	return book_decl;
 }
 
-function _change_realtive_imports(sourceFile:tsm.SourceFile)
-		:tsm.SourceFile{
-	output.start_loading(`Changing relative imports...`);
-	const import_decls = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.ImportDeclaration);
-	for(const import_decl of import_decls){
-		_change_realtive_import(import_decl);
-	}
-	output.done_log('impr', 'Changed relative imports.');
-	return sourceFile;
-}
+// function _change_realtive_imports(sourceFile:tsm.SourceFile)
+//     :tsm.SourceFile{
+//   output.start_loading(`Changing relative imports...`);
+//   const import_decls = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.ImportDeclaration);
+//   for(const import_decl of import_decls){
+//     _change_realtive_import(import_decl);
+//   }
+//   output.done_log('impr', 'Changed relative imports.');
+//   return sourceFile;
+// }
 
 function _add_as_const(book_decl:tsm.VariableDeclaration){
 	output.start_loading(`Adding as const...`);
@@ -674,20 +726,20 @@ function _add_as_const(book_decl:tsm.VariableDeclaration){
 	return book_decl;
 }
 
-function _change_realtive_import(node:tsm.Node)
-		:tsm.Node{
-	output.start_loading(`Changing relative imports...`);
-	const str_lit = node.getFirstChildByKind(tsm.ts.SyntaxKind.StringLiteral);
-	if(str_lit){
-		const text = str_lit.getText();
-		if(text.includes('./')){
-			const replace = text.replace('./','../../');
-			str_lit.replaceWithText(replace);
-			output.verbose_log(`impo`, `Changed [${text}] to [${replace}].`);
-		}
-	}
-	return node;
-}
+// function _change_realtive_import(node:tsm.Node)
+//     :tsm.Node{
+//   output.start_loading(`Changing relative imports...`);
+//   const str_lit = node.getFirstChildByKind(tsm.ts.SyntaxKind.StringLiteral);
+//   if(str_lit){
+//     const text = str_lit.getText();
+//     if(text.includes('./')){
+//       const replace = text.replace('./','../../');
+//       str_lit.replaceWithText(replace);
+//       output.verbose_log(`impo`, `Changed [${text}] to [${replace}].`);
+//     }
+//   }
+//   return node;
+// }
 
 function _remove_type_reference(book_decl:tsm.VariableDeclaration){
 	output.start_loading(`Removing type reference...`);
@@ -701,6 +753,11 @@ function _remove_type_reference(book_decl:tsm.VariableDeclaration){
 
 function _find_atom_book_statement(sourceFile:tsm.SourceFile)
 		:tsm.VariableStatement | undefined{
+	return _find_book_statement(sourceFile, 'atom_book');
+}
+
+function _find_book_statement(sourceFile:tsm.SourceFile, book_name:string)
+		:tsm.VariableStatement | undefined{
 	output.start_loading(`Looking for atom_book statement...`);
 	const var_states = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.VariableStatement);
 	for(const state of var_states){
@@ -709,14 +766,14 @@ function _find_atom_book_statement(sourceFile:tsm.SourceFile)
 			const var_decl = var_decl_list.getFirstChildByKind(tsm.ts.SyntaxKind.VariableDeclaration);
 			if(var_decl){
 				const name = var_decl.getName();
-				if(name === 'atom_book'){
-					output.verbose_log(`book`, `Statement of atom_book found.`);
+				if(name === book_name){
+					output.verbose_log(`book`, `Statement of ${book_name} found.`);
 					return state;
 				}
 			}
 		}
 	}
-	output.verbose_log('book', `Cannot find atom_book`);
+	output.verbose_log('book', `Cannot find ${book_name}`);
 	return undefined;
 }
 
@@ -749,22 +806,42 @@ function _copy_imports(sourceFile:tsm.SourceFile){
 
 function _resolve_aliases(){
 	output.start_loading(`Replacing aliases with relative paths...`);
-	const aliases = alias.get_aliases();
-	const server_dir = `${conf.root}/${defaults.folder}/server/`;
-	_traverse_ts_resolve_aliases(server_dir, aliases);
-	const client_dir = `${conf.root}/${defaults.folder}/client/`;
-	_traverse_ts_resolve_aliases(client_dir, aliases);
-	output.done_log('alias', `Aliases replaced.`);
+	const base_folder = `${conf.root}/${defaults.folder}`;
+	
+	const tsconfig_server = `${base_folder}/server/tsconfig.json`;
+	const aliases_server = alias.get_aliases(tsconfig_server);
+	const server_dir = `${conf.root}/${defaults.folder}/server/src/`;
+	_traverse_ts_resolve_aliases(server_dir, aliases_server);
+	output.done_log('alias', `Server aliases replaced.`);
+	
+	const tsconfig_client = `${base_folder}/client/tsconfig.json`;
+	const aliases_client = alias.get_aliases(tsconfig_client);
+	const client_dir = `${conf.root}/${defaults.folder}/client/src/`;
+	_traverse_ts_resolve_aliases(client_dir, aliases_client);
+	output.done_log('alias', `Client aliases replaced.`);
 }
 
 function _resolve_book_aliases(){
 	output.start_loading(`Replacing book aliases...`);
-	const books_dir = `${conf.root}/${defaults.folder}/server/books`;
-	const aliases = alias.get_aliases();
-	alias.replace_file_aliases(`${books_dir}/atom.ts`,aliases);
-	alias.replace_file_aliases(`${books_dir}/dock.ts`,aliases);
-	alias.replace_file_aliases(`${books_dir}/bll.ts`,aliases);
+	const base_folder = `${conf.root}/${defaults.folder}`;
+	
+	const books_dir_server = `${base_folder}/server/src/books`;
+	const tsconfig_server = `${base_folder}/server/tsconfig.json`;
+	const aliases_server = alias.get_aliases(tsconfig_server);
+	alias.replace_file_aliases(`${books_dir_server}/atom.ts`,aliases_server);
+	alias.replace_file_aliases(`${books_dir_server}/dock.ts`,aliases_server);
+	alias.replace_file_aliases(`${books_dir_server}/routes.ts`,aliases_server);
+	alias.replace_file_aliases(`${books_dir_server}/bll.ts`,aliases_server);
 	output.done_log('alias', `Server books aliases replaced.`);
+	
+	const books_dir_client = `${base_folder}/client/src/books`;
+	const tsconfig_client = `${base_folder}/client/tsconfig.json`;
+	const aliases_client = alias.get_aliases(tsconfig_client);
+	alias.replace_file_aliases(`${books_dir_client}/atom.ts`,aliases_client);
+	alias.replace_file_aliases(`${books_dir_client}/dock.ts`,aliases_client);
+	alias.replace_file_aliases(`${books_dir_client}/routes.ts`,aliases_client);
+	output.done_log('alias', `Client books aliases replaced.`);
+	
 }
 
 function _generate_client_books(){
@@ -773,7 +850,21 @@ function _generate_client_books(){
 	_generate_client_book('dock', dock_book_required_client_second_props);
 	_generate_client_book('atom', atom_book_required_client_first_props);
 	
+	_copy_routes_book();
+	
 	// output.done_log('client', `Client books generated.`);
+}
+
+function _copy_routes_book(){
+	const base_folder = `${conf.root}/${defaults.folder}`;
+	const routes_server = `${base_folder}/server/src/books/routes.ts`;
+	const routes_client = `${base_folder}/client/src/books/routes.ts`;
+	util.copy_file(
+		'rout',
+		routes_server,
+		routes_client
+	);
+	output.done_verbose_log('rout', `Copied [${routes_server}] to [${routes_client}]`);
 }
 
 function _remove_dock_route_call_implementation(sourceFile:tsm.SourceFile){
@@ -830,8 +921,8 @@ function _remove_dock_route_call_implementation(sourceFile:tsm.SourceFile){
 
 function _generate_client_book(book_name:BookName, required_props:string[]){
 	const folder_path = `${conf.root}/${defaults.folder}`;
-	const server_books_dir = `${folder_path}/server/books`;
-	const client_books_dir = `${folder_path}/client/books`;
+	const server_books_dir = `${folder_path}/server/src/books`;
+	const client_books_dir = `${folder_path}/client/src/books`;
 	
 	const _project = new tsm.Project(_project_option);
 	let sourceFile = _project.addSourceFileAtPath(`${server_books_dir}/${book_name}.ts`);
@@ -847,11 +938,31 @@ function _generate_client_book(book_name:BookName, required_props:string[]){
 		sourceFile = _remove_dock_route_call_implementation(sourceFile);
 	}
 	
-	const filepath = `${client_books_dir}/${book_name}.ts`;
-	fs.writeFileSync(filepath, sourceFile.print());
-	util.pretty(filepath);
+	const book_state = _find_book_statement(sourceFile, `${book_name}_book`);
 	
-	output.done_log('clnt', `Generated client book [${book_name}].`);
+	if(book_state){
+		
+		const atom_book_state_text = book_state.getText();
+		const _project = new tsm.Project(_project_option);
+		const cloned_book_source = _project.createSourceFile(
+			`${conf.root}/${defaults.folder}/client/src/books/tmp_${book_name}.ts`,
+			atom_book_state_text,
+			{ overwrite: true }
+		);
+		const text_without_imports = cloned_book_source.getText();
+		const imports = _copy_imports(sourceFile);
+		const required_imports = _get_required_imports(imports, text_without_imports);
+		const text = required_imports.join('\n') + text_without_imports;
+		const filepath = `${client_books_dir}/${book_name}.ts`;
+		fs.writeFileSync(filepath, text);
+		util.pretty(filepath);
+		output.done_log('clnt', `Generated client book [${book_name}].`);
+	
+	}else{
+		
+		output.error_log(`err`, `Cannot find client book statements for [${book_name}]`);
+		
+	}
 }
 
 function _replace_uranio_client_dependecy(sourceFile:tsm.SourceFile){

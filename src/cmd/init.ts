@@ -31,6 +31,12 @@ import {title} from './title';
 
 import {alias} from './alias';
 
+type InitOptions = {
+	dot_branch?:string
+}
+
+const init_options:InitOptions = {};
+
 export const init = {
 	
 	run: async (root:string, repo:Repo, options:Partial<Options>):Promise<void> => {
@@ -45,6 +51,13 @@ export const init = {
 	},
 	
 	command: async (args:Arguments):Promise<void> => {
+		
+		if(args && args.dot_branch){
+			const dot_branch = args.dot_branch;
+			if(typeof dot_branch === 'string' && dot_branch !== ''){
+				init_options.dot_branch = dot_branch;
+			}
+		}
 		
 		console.clear();
 		
@@ -72,7 +85,7 @@ export const init = {
 					if(answer.proceed && answer.proceed === true){
 						
 						await _ask_for_pacman(args);
-					
+						
 					}else{
 						process.exit(0);
 					}
@@ -93,6 +106,7 @@ async function _initialize()
 	output.start_loading('Initialization...');
 	
 	if(conf.pacman === 'yarn' && !fs.existsSync(`${conf.root}/yarn.lock`)){
+		output.log('yarn', `Yarn is not initalized. Yarn initialization started.`);
 		await new Promise((resolve, reject) => {
 			util.spawn_cmd(`yarn install`, 'yarn', 'Yarn install', resolve, reject);
 		});
@@ -109,14 +123,14 @@ async function _initialize()
 	_create_urn_folder();
 	_ignore_urn_folder();
 	_create_rc_file();
+	_create_client_server_folders();
 	await _clone_and_install_repo();
 	_remove_git_files();
-	_create_client_server_folders();
-	await _clone_dot();
+	await _clone_dot(init_options.dot_branch);
 	_copy_dot_files();
 	_remove_tmp();
 	
-	_update_relative_paths();
+	_replace_aliases();
 	
 	if(conf.repo === 'adm'){
 		_add_admin_files();
@@ -308,10 +322,18 @@ function _copy_dot_src_folder(){
 	util.copy_folder('dot', dot_src_folder, dest);
 }
 
-function _copy_dot_tsconfig(){
+function _copy_dot_tsconfigs(){
 	const dot_tsc_file = `${conf.root}/${defaults.tmp_folder}/urn-dot/tsconfig.json`;
 	const dest = `${conf.root}/`;
 	util.copy_file('dot', dot_tsc_file, dest);
+	
+	const dot_tsc_file_server = `${conf.root}/${defaults.tmp_folder}/urn-dot/.uranio/server/tsconfig.json`;
+	const dest_server = `${conf.root}/.uranio/server/`;
+	util.copy_file('dot', dot_tsc_file_server, dest_server);
+	
+	const dot_tsc_file_client = `${conf.root}/${defaults.tmp_folder}/urn-dot/.uranio/client/tsconfig.json`;
+	const dest_client = `${conf.root}/.uranio/client/`;
+	util.copy_file('dot', dot_tsc_file_client, dest_client);
 }
 
 function _copy_dot_eslint_files(){
@@ -327,7 +349,7 @@ function _copy_netlify_files(){
 	const toml_dest = `${conf.root}/`;
 	util.copy_file('dot', toml_file, toml_dest);
 	
-	const function_folder = `${conf.root}/${defaults.folder}/server/functions`;
+	const function_folder = `${conf.root}/${defaults.folder}/server/src/functions`;
 	if(!fs.existsSync(function_folder)){
 		fs.mkdirSync(function_folder);
 	}
@@ -357,7 +379,7 @@ function _copy_dot_files(){
 	if(fs.existsSync(`${conf.root}/src`) === false){
 		_copy_dot_src_folder();
 	}
-	_copy_dot_tsconfig();
+	_copy_dot_tsconfigs();
 	_copy_dot_eslint_files();
 	if(conf.deploy === 'netlify'){
 		_copy_netlify_files();
@@ -411,16 +433,14 @@ function _create_urn_folder(){
 }
 
 function _create_client_server_folders(){
-	output.start_loading(`Creating client folder...`);
-	util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}/client`);
-	util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}/client/books`);
 	output.start_loading(`Creating server folder...`);
 	util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}/server`);
-	util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}/server/books`);
-	// if(conf.repo === 'ntl'){
-	//   output.start_loading(`Creating server functions folder...`);
-	//   util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}/server/functions`);
-	// }
+	util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}/server/src`);
+	util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}/server/src/books`);
+	output.start_loading(`Creating client folder...`);
+	util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}/client`);
+	util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}/client/src`);
+	util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}/client/src/books`);
 	output.done_log('init', `Created client server folders.`);
 }
 
@@ -431,12 +451,23 @@ function _update_package_aliases(){
 	try{
 		const package_data = urn_util.json.clean_parse(data);
 		package_data['_moduleAliases'] = {
-			'uranio': `./dist/${defaults.folder}/${defaults.repo_folder}/`,
-			'uranio-books': `./dist/${defaults.folder}/server/books.js`,
-			'uranio-client': `./dist/${defaults.folder}/${defaults.repo_folder}/client`
+			'uranio': `./dist/${defaults.folder}/server/src/${defaults.repo_folder}/`,
+			'uranio-books': `./dist/${defaults.folder}/server/src/books/`,
+			'uranio-client': `./dist/${defaults.folder}/client/src/${defaults.repo_folder}/client`
 		};
-		if(conf.repo !== 'core'){
-			package_data['_moduleAliases']['uranio-core'] = `./dist/${defaults.folder}/${defaults.repo_folder}/core/`;
+		switch(conf.repo){
+			case 'trx':{
+				package_data['_moduleAliases']['uranio-api'] = `./dist/${defaults.folder}/server/src/${defaults.repo_folder}/api/`;
+				package_data['_moduleAliases']['uranio-core'] = `./dist/${defaults.folder}/server/src/${defaults.repo_folder}/api/core/`;
+				break;
+			}
+			case 'api':{
+				package_data['_moduleAliases']['uranio-core'] = `./dist/${defaults.folder}/server/src/${defaults.repo_folder}/api/core/`;
+				break;
+			}
+			case 'core':{
+				break;
+			}
 		}
 		try{
 			fs.writeFileSync(package_json_path, JSON.stringify(package_data, null, '\t'));
@@ -551,40 +582,45 @@ async function _uninstall_trx_dep(){
 //   return true;
 // }
 
-async function _clone_dot(){
+async function _clone_dot(branch='master'){
 	output.start_loading(`Cloning dot...`);
 	util.remove_folder_if_exists('dot', defaults.tmp_folder);
 	util.create_folder_if_doesnt_exists('dot', defaults.tmp_folder);
-	await util.clone_repo('dot', defaults.dot_repo, `${conf.root}/${defaults.tmp_folder}/urn-dot`);
+	await util.clone_repo('dot', defaults.dot_repo, `${conf.root}/${defaults.tmp_folder}/urn-dot`, branch);
 	output.done_log('dot', `Cloned dot repo.`);
 }
 
 async function _clone_core(){
 	output.start_loading(`Cloning core...`);
-	await util.clone_repo('core', defaults.core_repo, `${conf.root}/${defaults.folder}/${defaults.repo_folder}`);
+	await util.clone_repo('core', defaults.core_repo, `${conf.root}/${defaults.folder}/server/src/${defaults.repo_folder}`);
+	await util.clone_repo('core', defaults.core_repo, `${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}`);
 	output.done_log('core', `Cloned core repo.`);
 }
 
 async function _clone_api(){
 	output.start_loading(`Cloning api...`);
-	await util.clone_repo_recursive('api', defaults.api_repo, `${conf.root}/${defaults.folder}/${defaults.repo_folder}`);
+	await util.clone_repo_recursive('api', defaults.api_repo, `${conf.root}/${defaults.folder}/server/src/${defaults.repo_folder}`);
+	await util.clone_repo_recursive('api', defaults.api_repo, `${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}`);
 	output.done_log('api', `Cloned api repo.`);
 }
 
 async function _clone_trx(){
 	output.start_loading(`Cloning trx...`);
-	await util.clone_repo_recursive('trx', defaults.trx_repo, `${conf.root}/${defaults.folder}/${defaults.repo_folder}`);
+	await util.clone_repo_recursive('trx', defaults.trx_repo, `${conf.root}/${defaults.folder}/server/src/${defaults.repo_folder}`);
+	await util.clone_repo_recursive('trx', defaults.trx_repo, `${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}`);
 	output.done_log('trx', `Cloned trx repo.`);
 }
 
 function _remove_git_files(){
 	output.start_loading(`Removing git files...`);
-	const cloned_repo_path = `${conf.root}/${defaults.folder}/${defaults.repo_folder}`;
-	util.sync_exec(`( find ${cloned_repo_path} -name ".git*" ) | xargs rm -rf`);
+	const cloned_server_repo_path = `${conf.root}/${defaults.folder}/server/src/${defaults.repo_folder}`;
+	util.sync_exec(`( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`);
+	const cloned_client_repo_path = `${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}`;
+	util.sync_exec(`( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`);
 	output.done_log('.git', `Removed uranio .git files.`);
 }
 
-function _update_relative_paths(){
+function _replace_aliases(){
 	output.start_loading(`Updating relative paths aliases...`);
 	alias.include();
 }

@@ -14,7 +14,7 @@ import {urn_util} from 'urn-lib';
 
 import {Options} from '../types';
 
-import {conf} from '../conf/defaults';
+import {conf, defaults} from '../conf/defaults';
 
 import * as output from '../output/';
 
@@ -38,9 +38,13 @@ export const alias = {
 		
 		util.read_rc_file();
 		
-		const aliases = get_aliases();
+		const tsconfig_path_server = `${conf.root}/.uranio/server/tsconfig.json`;
+		const tsconfig_path_client = `${conf.root}/.uranio/client/tsconfig.json`;
+		const aliases_server = get_aliases(tsconfig_path_server);
+		const aliases_client = get_aliases(tsconfig_path_client);
 		
-		_replace_aliases(aliases);
+		_replace_aliases_server(aliases_server);
+		_replace_aliases_client(aliases_client);
 		
 		output.end_log(`Aliases updated.`);
 		
@@ -74,8 +78,7 @@ export type Aliases = {
 	[key:string]: string[]
 }
 
-export function get_aliases():Aliases{
-	const tsconfig_path = `${conf.root}/tsconfig.json`;
+export function get_aliases(tsconfig_path:string):Aliases{
 	const data = fs.readFileSync(tsconfig_path, 'utf8');
 	try{
 		const tsconf_data = urn_util.json.clean_parse(data);
@@ -92,8 +95,12 @@ function _replace_modified_file(text:string, filename:string){
 	output.done_verbose_log(`alias`, `File replaced [${filename}].`);
 }
 
-function _replace_aliases(aliases:Aliases){
-	_traverse_ts_aliases(`${conf.root}/.uranio/`, aliases);
+function _replace_aliases_server(aliases:Aliases){
+	_traverse_ts_aliases(`${conf.root}/.uranio/server/src/`, aliases);
+}
+
+function _replace_aliases_client(aliases:Aliases){
+	_traverse_ts_aliases(`${conf.root}/.uranio/client/src/`, aliases);
 }
 
 export function replace_file_aliases(filepath:string, aliases:Aliases):void{
@@ -145,13 +152,17 @@ function _change_to_relative(node:tsm.Node, aliases:Aliases)
 			output.start_loading(`Changing relative imports...`);
 			const node_file_path = node.getSourceFile().getFilePath();
 			const node_file_dir = path.parse(node_file_path).dir;
+			let parent_folder = 'server';
+			if(node_file_dir.includes(`${conf.root}/${defaults.folder}/client`)){
+				parent_folder = 'client';
+			}
 			let module_append = '';
 			if(splitted_module.length > 1){
 				module_append = '/' + splitted_module.slice(1).join('/');
 				module_name = splitted_module[0];
 			}
 			const alias = aliases[module_name][0];
-			let relative_path = path.relative(node_file_dir, `${conf.root}/${alias}`);
+			let relative_path = path.relative(node_file_dir, `${conf.root}/${defaults.folder}/${parent_folder}/${alias}`);
 			if(relative_path === ''){
 				relative_path = './index';
 			}
