@@ -73,7 +73,7 @@ const _project_option = {
     }
 };
 function _get_book_atom_def(book_name) {
-    const atom_book_path = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/books/${book_name}.ts`;
+    const atom_book_path = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/books/${book_name}.ts`;
     const _project = new tsm.Project(_project_option);
     const sourceFile = _project.addSourceFileAtPath(atom_book_path);
     const syntax_list = sourceFile.getLastChildByKindOrThrow(tsm.SyntaxKind.SyntaxList);
@@ -256,8 +256,8 @@ function _generate_text() {
         text += `\t${plural}: {\n`;
         for (const route_name in atom_routes[atom_name]) {
             const text_args = _text_args_for_url(atom_routes[atom_name][route_name].url);
-            text += `\t\t${route_name}: async (${text_args}options?:uranio.types.HookArguments<'${atom_name}', '${route_name}'>) => {\n`;
-            text += `\t\t\tconst args:uranio.types.HookArguments<'${atom_name}', '${route_name}'> = {\n`;
+            text += `\t\t${route_name}: async (${text_args}options?:uranio.types.Hook.Arguments<'${atom_name}', '${route_name}'>) => {\n`;
+            text += `\t\t\tconst args:uranio.types.Hook.Arguments<'${atom_name}', '${route_name}'> = {\n`;
             const lines = _text_lines_in_args_params(atom_routes[atom_name][route_name].url);
             if (lines.length > 0) {
                 text += `\t\t\t\tparams: {\n`;
@@ -278,9 +278,13 @@ function _generate_text() {
     return text;
 }
 function _save_to_file(text) {
-    const filepath = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/lib/hooks/index.ts`;
-    fs_1.default.writeFileSync(filepath, text);
-    util.pretty(filepath);
-    output.done_verbose_log(`hooks`, `Created hooks file [${filepath}].`);
+    const filepath_server = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/hooks/index.ts`;
+    fs_1.default.writeFileSync(filepath_server, text);
+    util.pretty(filepath_server);
+    output.done_verbose_log(`hooks`, `Created hooks file [${filepath_server}].`);
+    const filepath_client = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}/hooks/index.ts`;
+    fs_1.default.writeFileSync(filepath_client, text);
+    util.pretty(filepath_client);
+    output.done_verbose_log(`hooks`, `Created hooks file [${filepath_client}].`);
 }
 //# sourceMappingURL=hooks.js.map

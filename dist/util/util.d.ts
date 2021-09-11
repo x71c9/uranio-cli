@@ -29,6 +29,7 @@ export declare function check_pacman(pacman: string): boolean;
 export declare function check_deploy(deploy: string): boolean;
 export declare function pretty(filepath: string, parser?: string): void;
 export declare function remove_folder_if_exists(context: string, folder_path: string): void;
+export declare function remove_file_if_exists(context: string, file_path: string): void;
 export declare function create_folder_if_doesnt_exists(context: string, folder_path: string): void;
 export declare function copy_files(context: string, source: string, destination: string): void;
 export declare function copy_file(context: string, source: string, destination: string): void;
@@ -40,8 +41,8 @@ export declare function spawn_cmd(command: string, context: string, action: stri
 export declare function install_dep(repo: string, context: string): Promise<any>;
 export declare function install_dep_dev(repo: string, context: string): Promise<any>;
 export declare function uninstall_dep(repo: string, context: string): Promise<any>;
-export declare function clone_repo(context: string, address: string, dest_folder: string): Promise<any>;
-export declare function clone_repo_recursive(context: string, address: string, dest_folder: string): Promise<any>;
+export declare function clone_repo(context: string, address: string, dest_folder: string, branch?: string): Promise<any>;
+export declare function clone_repo_recursive(context: string, address: string, dest_folder: string, branch?: string): Promise<any>;
 export declare function dependency_exists(repo: string): boolean;
 export declare function copy_file_sync(source: string, target: string): void;
 export declare function copy_folder_recursive_sync(source: string, target: string): void;

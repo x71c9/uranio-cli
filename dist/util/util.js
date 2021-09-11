@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.spawn_verbose_log_command = exports.spawn_log_command = exports.delete_file_sync = exports.copy_folder_recursive_sync = exports.copy_file_sync = exports.dependency_exists = exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_folder_if_exists = exports.pretty = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.set_deploy = exports.set_pacman = exports.set_repo = exports.auto_set_project_root = exports.check_folder = exports.is_initialized = exports.read_rc_file = exports.merge_options = exports.watch = exports.watch_child_list = exports.child_list = void 0;
+exports.spawn_verbose_log_command = exports.spawn_log_command = exports.delete_file_sync = exports.copy_folder_recursive_sync = exports.copy_file_sync = exports.dependency_exists = exports.clone_repo_recursive = exports.clone_repo = exports.uninstall_dep = exports.install_dep_dev = exports.install_dep = exports.spawn_cmd = exports.sync_exec = exports.relative_to_absolute_path = exports.copy_folder = exports.copy_file = exports.copy_files = exports.create_folder_if_doesnt_exists = exports.remove_file_if_exists = exports.remove_folder_if_exists = exports.pretty = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.set_deploy = exports.set_pacman = exports.set_repo = exports.auto_set_project_root = exports.check_folder = exports.is_initialized = exports.read_rc_file = exports.merge_options = exports.watch = exports.watch_child_list = exports.child_list = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const cp = __importStar(require("child_process"));
@@ -235,6 +235,14 @@ function remove_folder_if_exists(context, folder_path) {
     }
 }
 exports.remove_folder_if_exists = remove_folder_if_exists;
+function remove_file_if_exists(context, file_path) {
+    if (fs_1.default.existsSync(file_path)) {
+        output.start_loading(`Removing file [${file_path}]`);
+        fs_1.default.unlinkSync(file_path);
+        output.done_verbose_log(context, `File [${file_path}] removed.`);
+    }
+}
+exports.remove_file_if_exists = remove_file_if_exists;
 function create_folder_if_doesnt_exists(context, folder_path) {
     if (!fs_1.default.existsSync(folder_path)) {
         try {
@@ -249,6 +257,12 @@ function create_folder_if_doesnt_exists(context, folder_path) {
     }
 }
 exports.create_folder_if_doesnt_exists = create_folder_if_doesnt_exists;
+// export function rsync(context:string, source:string, destination:string)
+//     :void{
+//   output.start_loading(`Rsync files [${source}] to [${destination}]...`);
+//   sync_exec(`rsync -a ${source} ${destination}`);
+//   output.done_verbose_log(context, `Rsynced files [${source}] to [${destination}]`);
+// }
 function copy_files(context, source, destination) {
     output.start_loading(`Copying files [${source}] to [${destination}]...`);
     sync_exec(`cp -rf -t ${destination} ${source}`);
@@ -354,24 +368,26 @@ function uninstall_dep(repo, context) {
     });
 }
 exports.uninstall_dep = uninstall_dep;
-function clone_repo(context, address, dest_folder) {
+function clone_repo(context, address, dest_folder, branch = 'master') {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield _clone_repo(context, address, dest_folder);
+        return yield _clone_repo(context, address, dest_folder, branch);
     });
 }
 exports.clone_repo = clone_repo;
-function clone_repo_recursive(context, address, dest_folder) {
+function clone_repo_recursive(context, address, dest_folder, branch = 'master') {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield _clone_repo(context, address, dest_folder, true);
+        return yield _clone_repo(context, address, dest_folder, branch, true);
     });
 }
 exports.clone_repo_recursive = clone_repo_recursive;
-function _clone_repo(context, address, dest_folder, recursive = false) {
+function _clone_repo(context, address, dest_folder, branch = 'master', recursive = false) {
     return __awaiter(this, void 0, void 0, function* () {
         const action = `cloning repo [${address}]`;
         output.verbose_log(context, `Started ${action}`);
         return new Promise((resolve, reject) => {
-            let cmd = `git clone ${address} ${dest_folder} --progress`;
+            const branch_str = (branch !== 'master' && typeof branch === 'string') ?
+                `-b ${branch} ` : '';
+            let cmd = `git clone ${branch_str}${address} ${dest_folder} --progress`;
             cmd += (recursive === true) ? ` --recurse-submodules` : '';
             spawn_cmd(cmd, context, action, resolve, reject);
         });

@@ -44,8 +44,12 @@ exports.alias = {
     command: () => {
         output.start_loading('Updating aliases...');
         util.read_rc_file();
-        const aliases = get_aliases();
-        _replace_aliases(aliases);
+        const tsconfig_path_server = `${defaults_1.conf.root}/.uranio/server/tsconfig.json`;
+        const tsconfig_path_client = `${defaults_1.conf.root}/.uranio/client/tsconfig.json`;
+        const aliases_server = get_aliases(tsconfig_path_server);
+        const aliases_client = get_aliases(tsconfig_path_client);
+        _replace_aliases_server(aliases_server);
+        _replace_aliases_client(aliases_client);
         output.end_log(`Aliases updated.`);
     },
     include: () => {
@@ -63,8 +67,7 @@ const _project_option = {
         newLineKind: tsm.NewLineKind.LineFeed
     }
 };
-function get_aliases() {
-    const tsconfig_path = `${defaults_1.conf.root}/tsconfig.json`;
+function get_aliases(tsconfig_path) {
     const data = fs_1.default.readFileSync(tsconfig_path, 'utf8');
     try {
         const tsconf_data = urn_lib_1.urn_util.json.clean_parse(data);
@@ -81,8 +84,11 @@ function _replace_modified_file(text, filename) {
     fs_1.default.writeFileSync(filename, text);
     output.done_verbose_log(`alias`, `File replaced [${filename}].`);
 }
-function _replace_aliases(aliases) {
-    _traverse_ts_aliases(`${defaults_1.conf.root}/.uranio/`, aliases);
+function _replace_aliases_server(aliases) {
+    _traverse_ts_aliases(`${defaults_1.conf.root}/.uranio/server/src/`, aliases);
+}
+function _replace_aliases_client(aliases) {
+    _traverse_ts_aliases(`${defaults_1.conf.root}/.uranio/client/src/`, aliases);
 }
 function replace_file_aliases(filepath, aliases) {
     const _project = new tsm.Project(_project_option);
@@ -125,13 +131,17 @@ function _change_to_relative(node, aliases) {
             output.start_loading(`Changing relative imports...`);
             const node_file_path = node.getSourceFile().getFilePath();
             const node_file_dir = path_1.default.parse(node_file_path).dir;
+            let parent_folder = 'server';
+            if (node_file_dir.includes(`${defaults_1.conf.root}/${defaults_1.defaults.folder}/client`)) {
+                parent_folder = 'client';
+            }
             let module_append = '';
             if (splitted_module.length > 1) {
                 module_append = '/' + splitted_module.slice(1).join('/');
                 module_name = splitted_module[0];
             }
             const alias = aliases[module_name][0];
-            let relative_path = path_1.default.relative(node_file_dir, `${defaults_1.conf.root}/${alias}`);
+            let relative_path = path_1.default.relative(node_file_dir, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/${parent_folder}/${alias}`);
             if (relative_path === '') {
                 relative_path = './index';
             }

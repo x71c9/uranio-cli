@@ -252,6 +252,15 @@ export function remove_folder_if_exists(context:string, folder_path:string)
 	}
 }
 
+export function remove_file_if_exists(context:string, file_path:string)
+		:void{
+	if(fs.existsSync(file_path)){
+		output.start_loading(`Removing file [${file_path}]`);
+		fs.unlinkSync(file_path);
+		output.done_verbose_log(context, `File [${file_path}] removed.`);
+	}
+}
+
 export function create_folder_if_doesnt_exists(context:string, folder_path:string)
 		:void{
 	if(!fs.existsSync(folder_path)){
@@ -265,6 +274,13 @@ export function create_folder_if_doesnt_exists(context:string, folder_path:strin
 		}
 	}
 }
+
+// export function rsync(context:string, source:string, destination:string)
+//     :void{
+//   output.start_loading(`Rsync files [${source}] to [${destination}]...`);
+//   sync_exec(`rsync -a ${source} ${destination}`);
+//   output.done_verbose_log(context, `Rsynced files [${source}] to [${destination}]`);
+// }
 
 export function copy_files(context:string, source:string, destination:string)
 		:void{
@@ -385,22 +401,24 @@ export async function uninstall_dep(repo:string, context:string)
 	});
 }
 
-export async function clone_repo(context: string, address:string, dest_folder:string)
+export async function clone_repo(context: string, address:string, dest_folder:string, branch='master')
 		:Promise<any>{
-	return await _clone_repo(context, address, dest_folder);
+	return await _clone_repo(context, address, dest_folder, branch);
 }
 
-export async function clone_repo_recursive(context: string, address:string, dest_folder:string)
+export async function clone_repo_recursive(context: string, address:string, dest_folder:string, branch='master')
 		:Promise<any>{
-	return await _clone_repo(context, address, dest_folder, true);
+	return await _clone_repo(context, address, dest_folder, branch, true);
 }
 
-async function _clone_repo(context: string, address:string, dest_folder:string, recursive=false)
+async function _clone_repo(context: string, address:string, dest_folder:string, branch='master', recursive=false)
 		:Promise<any>{
 	const action = `cloning repo [${address}]`;
 	output.verbose_log(context, `Started ${action}`);
 	return new Promise((resolve, reject) => {
-		let cmd = `git clone ${address} ${dest_folder} --progress`;
+		const branch_str = (branch !== 'master' && typeof branch === 'string') ?
+			`-b ${branch} ` : '';
+		let cmd = `git clone ${branch_str}${address} ${dest_folder} --progress`;
 		cmd += (recursive === true) ? ` --recurse-submodules` : '';
 		spawn_cmd(cmd, context, action, resolve, reject);
 	});

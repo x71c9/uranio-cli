@@ -14,7 +14,7 @@ export const defaults = {
 	
 	folder: '.uranio',
 	
-	repo_folder: 'lib',
+	repo_folder: 'uranio',
 	
 	tmp_folder: '.tmp',
 	
@@ -76,6 +76,6 @@ export const conf:Options = {
 	
 	filelog: true,
 	
-	deploy: 'netlify'
+	deploy: 'netlify',
 	
 };
