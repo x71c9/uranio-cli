@@ -255,18 +255,20 @@ function _avoid_import_loop(filepath) {
         }
     }
     const file_content = sourceFile.print();
-    const regex = new RegExp(`${uranio_import_state}`);
-    const with_imports = file_content.replace(regex, import_states.join('\n'));
-    let with_imports_and_variables = with_imports;
-    for (const module_name in expressions) {
-        for (const expression of expressions[module_name]) {
-            const regex = new RegExp(`\\b${expression}\\b`, 'g');
-            with_imports_and_variables = with_imports_and_variables.replace(regex, _generate_variable_name(module_name));
+    if (uranio_import_state !== '') {
+        const regex = new RegExp(`${uranio_import_state}`);
+        const with_imports = file_content.replace(regex, import_states.join('\n'));
+        let with_imports_and_variables = with_imports;
+        for (const module_name in expressions) {
+            for (const expression of expressions[module_name]) {
+                const regex = new RegExp(`\\b${expression.replace(".", "\\.")}\\b`, 'g');
+                with_imports_and_variables = with_imports_and_variables.replace(regex, _generate_variable_name(module_name));
+            }
         }
-    }
-    if (is_file_importing_uranio) {
-        fs_1.default.writeFileSync(filepath, with_imports_and_variables);
-        util.pretty(filepath);
+        if (is_file_importing_uranio) {
+            fs_1.default.writeFileSync(filepath, with_imports_and_variables);
+            util.pretty(filepath);
+        }
     }
 }
 function _generate_variable_name(str) {
@@ -434,7 +436,9 @@ function _create_dock_book(sourceFile, import_statements) {
 }
 function _create_routes_book(sourceFile, import_statements) {
     let source_file = _create_a_book(sourceFile, import_statements, 'routes', dock_book_required_properties, 'dock');
+    console.log(source_file.getText());
     source_file = _remove_dock_route_call_implementation(source_file);
+    console.log(source_file.getText());
     const filepath = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/books/routes.ts`;
     _create_a_book_file(filepath, source_file.getText());
     return source_file;
@@ -695,7 +699,7 @@ function _remove_dock_route_call_implementation(sourceFile) {
     for (const var_stat of variable_stats) {
         const var_decl = var_stat.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
         const identifier = var_decl.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
-        if (identifier.getText() === `dock_book`) {
+        if (identifier.getText() === `dock_book` || identifier.getText() === `routes_book`) {
             const obj_lit_ex = var_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.ObjectLiteralExpression);
             const syntax_list = obj_lit_ex.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
             const atom_defs = syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
