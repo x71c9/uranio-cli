@@ -162,7 +162,7 @@ function _traverse_ts_avoid_import_loop(directory) {
 function _traverse_ts_resolve_aliases(directory, aliases) {
     fs_1.default.readdirSync(directory).forEach((filename) => {
         const full_path = path_1.default.resolve(directory, filename);
-        if (fs_1.default.statSync(full_path).isDirectory() && filename !== '.git' && filename !== 'books') {
+        if (fs_1.default.statSync(full_path).isDirectory() && filename !== '.git' && filename !== 'books' && filename !== 'uranio') {
             return _traverse_ts_resolve_aliases(full_path, aliases);
         }
         else if (filename.split('.').pop() === 'ts') {
@@ -436,9 +436,7 @@ function _create_dock_book(sourceFile, import_statements) {
 }
 function _create_routes_book(sourceFile, import_statements) {
     let source_file = _create_a_book(sourceFile, import_statements, 'routes', dock_book_required_properties, 'dock');
-    console.log(source_file.getText());
     source_file = _remove_dock_route_call_implementation(source_file);
-    console.log(source_file.getText());
     const filepath = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/books/routes.ts`;
     _create_a_book_file(filepath, source_file.getText());
     return source_file;

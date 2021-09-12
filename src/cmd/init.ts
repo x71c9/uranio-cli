@@ -32,7 +32,7 @@ import {title} from './title';
 import {alias} from './alias';
 
 type InitOptions = {
-	dot_branch?:string
+	branch?:string
 }
 
 const init_options:InitOptions = {};
@@ -52,10 +52,10 @@ export const init = {
 	
 	command: async (args:Arguments):Promise<void> => {
 		
-		if(args && args.dot_branch){
-			const dot_branch = args.dot_branch;
-			if(typeof dot_branch === 'string' && dot_branch !== ''){
-				init_options.dot_branch = dot_branch;
+		if(args && args.branch){
+			const branch = args.branch;
+			if(typeof branch === 'string' && branch !== ''){
+				init_options.branch = branch;
 			}
 		}
 		
@@ -124,9 +124,9 @@ async function _initialize()
 	_ignore_urn_folder();
 	_create_rc_file();
 	_create_client_server_folders();
-	await _clone_and_install_repo();
+	await _clone_and_install_repo(init_options.branch);
 	_remove_git_files();
-	await _clone_dot(init_options.dot_branch);
+	await _clone_dot(init_options.branch);
 	_copy_dot_files();
 	_remove_tmp();
 	
@@ -401,19 +401,19 @@ function _create_rc_file(){
 	output.done_log('rcfl', `Created file ${jsonfile_path}.`);
 }
 
-async function _clone_and_install_repo(){
+async function _clone_and_install_repo(branch='master'){
 	output.start_loading(`Cloning and intalling [${conf.repo}]...`);
 	switch(conf.repo){
 		case 'core':{
-			await _clone_core();
+			await _clone_core(branch);
 			break;
 		}
 		case 'api':{
-			await _clone_api();
+			await _clone_api(branch);
 			break;
 		}
 		case 'trx':{
-			await _clone_trx();
+			await _clone_trx(branch);
 			break;
 		}
 		default:{
@@ -586,28 +586,63 @@ async function _clone_dot(branch='master'){
 	output.start_loading(`Cloning dot...`);
 	util.remove_folder_if_exists('dot', defaults.tmp_folder);
 	util.create_folder_if_doesnt_exists('dot', defaults.tmp_folder);
-	await util.clone_repo('dot', defaults.dot_repo, `${conf.root}/${defaults.tmp_folder}/urn-dot`, branch);
+	await util.clone_repo(
+		'dot',
+		defaults.dot_repo,
+		`${conf.root}/${defaults.tmp_folder}/urn-dot`,
+		branch
+	);
 	output.done_log('dot', `Cloned dot repo.`);
 }
 
-async function _clone_core(){
+async function _clone_core(branch='master'){
 	output.start_loading(`Cloning core...`);
-	await util.clone_repo('core', defaults.core_repo, `${conf.root}/${defaults.folder}/server/src/${defaults.repo_folder}`);
-	await util.clone_repo('core', defaults.core_repo, `${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}`);
+	await util.clone_repo(
+		'core',
+		defaults.core_repo,
+		`${conf.root}/${defaults.folder}/server/src/${defaults.repo_folder}`,
+		branch
+	);
+	await util.clone_repo(
+		'core',
+		defaults.core_repo,
+		`${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
+		branch
+	);
 	output.done_log('core', `Cloned core repo.`);
 }
 
-async function _clone_api(){
+async function _clone_api(branch='master'){
 	output.start_loading(`Cloning api...`);
-	await util.clone_repo_recursive('api', defaults.api_repo, `${conf.root}/${defaults.folder}/server/src/${defaults.repo_folder}`);
-	await util.clone_repo_recursive('api', defaults.api_repo, `${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}`);
+	await util.clone_repo_recursive(
+		'api',
+		defaults.api_repo,
+		`${conf.root}/${defaults.folder}/server/src/${defaults.repo_folder}`,
+		branch
+	);
+	await util.clone_repo_recursive(
+		'api',
+		defaults.api_repo,
+		`${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
+		branch
+	);
 	output.done_log('api', `Cloned api repo.`);
 }
 
-async function _clone_trx(){
+async function _clone_trx(branch='master'){
 	output.start_loading(`Cloning trx...`);
-	await util.clone_repo_recursive('trx', defaults.trx_repo, `${conf.root}/${defaults.folder}/server/src/${defaults.repo_folder}`);
-	await util.clone_repo_recursive('trx', defaults.trx_repo, `${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}`);
+	await util.clone_repo_recursive(
+		'trx',
+		defaults.trx_repo,
+		`${conf.root}/${defaults.folder}/server/src/${defaults.repo_folder}`,
+		branch
+	);
+	await util.clone_repo_recursive(
+		'trx',
+		defaults.trx_repo,
+		`${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
+		branch
+	);
 	output.done_log('trx', `Cloned trx repo.`);
 }
 
