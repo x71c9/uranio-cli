@@ -83,10 +83,10 @@ function _start_dev() {
             util.spawn_log_command(ntl_cmd, 'ntlf', nuxt_color);
         }
         else {
-            const nuxt_cmd = `npx client:dev`;
+            const nuxt_cmd = `yarn client:dev`;
             util.spawn_log_command(nuxt_cmd, 'nuxt', nuxt_color);
         }
-        const tscw_cmd = `npx tsc -w --project ${defaults_1.conf.root}/tsconfig.json`;
+        const tscw_cmd = `yarn server:dev`;
         util.spawn_log_command(tscw_cmd, 'tscw', tscw_color);
         const src_path = `${defaults_1.conf.root}/src/`;
         output.log(`wtch`, `Watching \`src\` folder [${src_path}] ...`, watc_color);

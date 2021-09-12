@@ -56,10 +56,10 @@ exports.init = {
         yield _initialize();
     }),
     command: (args) => __awaiter(void 0, void 0, void 0, function* () {
-        if (args && args.dot_branch) {
-            const dot_branch = args.dot_branch;
-            if (typeof dot_branch === 'string' && dot_branch !== '') {
-                init_options.dot_branch = dot_branch;
+        if (args && args.branch) {
+            const branch = args.branch;
+            if (typeof branch === 'string' && branch !== '') {
+                init_options.branch = branch;
             }
         }
         console.clear();
@@ -111,9 +111,9 @@ function _initialize() {
         _ignore_urn_folder();
         _create_rc_file();
         _create_client_server_folders();
-        yield _clone_and_install_repo();
+        yield _clone_and_install_repo(init_options.branch);
         _remove_git_files();
-        yield _clone_dot(init_options.dot_branch);
+        yield _clone_dot(init_options.branch);
         _copy_dot_files();
         _remove_tmp();
         _replace_aliases();
@@ -338,20 +338,20 @@ function _create_rc_file() {
     util.pretty(`${defaults_1.conf.root}/${defaults_1.jsonfile_path}`, 'json');
     output.done_log('rcfl', `Created file ${defaults_1.jsonfile_path}.`);
 }
-function _clone_and_install_repo() {
+function _clone_and_install_repo(branch = 'master') {
     return __awaiter(this, void 0, void 0, function* () {
         output.start_loading(`Cloning and intalling [${defaults_1.conf.repo}]...`);
         switch (defaults_1.conf.repo) {
             case 'core': {
-                yield _clone_core();
+                yield _clone_core(branch);
                 break;
             }
             case 'api': {
-                yield _clone_api();
+                yield _clone_api(branch);
                 break;
             }
             case 'trx': {
-                yield _clone_trx();
+                yield _clone_trx(branch);
                 break;
             }
             default: {
@@ -534,27 +534,27 @@ function _clone_dot(branch = 'master') {
         output.done_log('dot', `Cloned dot repo.`);
     });
 }
-function _clone_core() {
+function _clone_core(branch = 'master') {
     return __awaiter(this, void 0, void 0, function* () {
         output.start_loading(`Cloning core...`);
-        yield util.clone_repo('core', defaults_1.defaults.core_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}`);
-        yield util.clone_repo('core', defaults_1.defaults.core_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}`);
+        yield util.clone_repo('core', defaults_1.defaults.core_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}`, branch);
+        yield util.clone_repo('core', defaults_1.defaults.core_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}`, branch);
         output.done_log('core', `Cloned core repo.`);
     });
 }
-function _clone_api() {
+function _clone_api(branch = 'master') {
     return __awaiter(this, void 0, void 0, function* () {
         output.start_loading(`Cloning api...`);
-        yield util.clone_repo_recursive('api', defaults_1.defaults.api_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}`);
-        yield util.clone_repo_recursive('api', defaults_1.defaults.api_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}`);
+        yield util.clone_repo_recursive('api', defaults_1.defaults.api_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}`, branch);
+        yield util.clone_repo_recursive('api', defaults_1.defaults.api_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}`, branch);
         output.done_log('api', `Cloned api repo.`);
     });
 }
-function _clone_trx() {
+function _clone_trx(branch = 'master') {
     return __awaiter(this, void 0, void 0, function* () {
         output.start_loading(`Cloning trx...`);
-        yield util.clone_repo_recursive('trx', defaults_1.defaults.trx_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}`);
-        yield util.clone_repo_recursive('trx', defaults_1.defaults.trx_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}`);
+        yield util.clone_repo_recursive('trx', defaults_1.defaults.trx_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}`, branch);
+        yield util.clone_repo_recursive('trx', defaults_1.defaults.trx_repo, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}`, branch);
         output.done_log('trx', `Cloned trx repo.`);
     });
 }
