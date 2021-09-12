@@ -45,7 +45,7 @@ const cli_options = {
 };
 
 const nuxt_color = '#677cc7';
-// const tscw_color = '#734de3';
+const tscw_color = '#734de3';
 const watc_color = '#687a6a';
 
 async function _start_dev()
@@ -72,12 +72,12 @@ async function _start_dev()
 		const ntl_cmd = `npx ntl dev`;
 		util.spawn_log_command(ntl_cmd, 'ntlf', nuxt_color);
 	}else{
-		const nuxt_cmd = `npx nuxt -c ${defaults.folder}/client/nuxt.config.js`;
+		const nuxt_cmd = `npx client:dev`;
 		util.spawn_log_command(nuxt_cmd, 'nuxt', nuxt_color);
 	}
 	
-	// const tscw_cmd = `npx tsc -w --project ${conf.root}/tsconfig.json`;
-	// util.spawn_log_command(tscw_cmd, 'tscw', tscw_color);
+	const tscw_cmd = `npx tsc -w --project ${conf.root}/tsconfig.json`;
+	util.spawn_log_command(tscw_cmd, 'tscw', tscw_color);
 	
 	const src_path = `${conf.root}/src/`;
 	output.log(`wtch`, `Watching \`src\` folder [${src_path}] ...`, watc_color);
