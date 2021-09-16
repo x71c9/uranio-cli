@@ -94,6 +94,7 @@ async function _start_dev()
 			if(!watch_src_scanned){
 				return false;
 			}
+			
 			if(_event !== 'unlink'){
 				
 				transpose.run(conf.root, _path, cli_options);
