@@ -1,6 +1,6 @@
 #### TODO
 
-Refactor and make clearer functions for executing commands:
+##### Refactor and make clearer functions for executing commands:
 
 - execute
 - execute sync
@@ -12,3 +12,9 @@ Refactor and make clearer functions for executing commands:
 - command inside other commands
 - verbose spawn
 
+##### Nomalize colors for logs
+
+- tscw
+- watch
+- nuxt
+- netlify
