@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import {Options} from '../types';
+import {Options, Arguments} from '../types';
 
 import {conf} from '../conf/defaults';
 
@@ -13,6 +13,8 @@ import * as output from '../output/';
 import * as util from '../util/';
 
 import * as common from './common';
+
+const nuxt_color = '#677cc7';
 
 export const client_dev = {
 	
@@ -26,26 +28,22 @@ export const client_dev = {
 		
 	},
 	
-	command: async ():Promise<void> => {
+	command: async (args?:Arguments):Promise<void> => {
 		
-		output.start_loading('Starting client dev...');
+		output.stop_loading();
 		
 		util.read_rc_file();
 		
-		conf.spinner = true;
+		const native = args?.native || false;
 		
-		// util.sync_exec(`cd ${conf.root}/.uranio/client && npx nuxt dev -c ./nuxt.config.js`);
+		const cd_cmd = `cd ${conf.root}/.uranio/client`;
+		const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
 		
-		await new Promise((resolve, reject) => {
-			util.spawn_cmd(
-				`cd ${conf.root}/.uranio/client && npx nuxt dev -c ./nuxt.config.js`,
-				`nuxt`,
-				`Nuxt dev.`,
-				resolve,
-				reject
-			);
-		});
-		
+		if(native === true){
+			util.spawn_native_log_command(`${cd_cmd} && ${nu_cmd}`, 'nuxt', nuxt_color);
+		}else{
+			util.spawn_log_command(`${cd_cmd} && ${nu_cmd}`, 'nuxt', nuxt_color);
+		}
 	}
 	
 };

@@ -72,11 +72,11 @@ async function _start_dev()
 		const ntl_cmd = `npx ntl dev`;
 		util.spawn_log_command(ntl_cmd, 'ntlf', nuxt_color);
 	}else{
-		const nuxt_cmd = `yarn client:dev`;
+		const nuxt_cmd = `cd ${conf.root}/.uranio/client && npx nuxt dev -c ./nuxt.config.js`;
 		util.spawn_log_command(nuxt_cmd, 'nuxt', nuxt_color);
 	}
 	
-	const tscw_cmd = `yarn server:dev`;
+	const tscw_cmd = `cd ${conf.root}/.uranio/server && npx tsc -w --project ./tsconfig.json`;
 	util.spawn_log_command(tscw_cmd, 'tscw', tscw_color);
 	
 	const src_path = `${conf.root}/src/`;

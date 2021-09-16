@@ -154,7 +154,7 @@ export function check_folder(folder_path:string)
 
 export function auto_set_project_root()
 		:void{
-	output.start_loading('Getting project root...');
+	// output.start_loading('Getting project root...');
 	let folder_path = process.cwd();
 	while(!check_folder(folder_path)){
 		const arr_folder = folder_path.split('/');
@@ -489,33 +489,48 @@ export function spawn_log_command(command:string, context:string, color: string)
 
 export function spawn_verbose_log_command(command:string, context:string, color:string)
 		:cp.ChildProcessWithoutNullStreams{
-	return _spawn_log_command(command, context, color, true);
+	return _spawn_log_command(command, context, color);
 }
 
-function _spawn_log_command(command:string, context:string, color:string, verbose=true)
+export function spawn_native_log_command(command:string, context:string, color:string)
 		:cp.ChildProcessWithoutNullStreams{
-	const splitted_command = command.split(' ');
+	return _spawn_log_command(command, context, color, true, true);
+}
+
+function _spawn_log_command(
+	command:string,
+	context:string,
+	color:string,
+	verbose=true,
+	native=false
+):cp.ChildProcessWithoutNullStreams{
 	
-	const spawned = cp.spawn(
-		splitted_command[0],
-		splitted_command.slice(1),
-		// {stdio: [null, 'inherit', 'inherit']}
-	);
+	// const splitted_command = command.split(' ');
+	// const spawned = cp.spawn(
+	//   splitted_command[0],
+	//   splitted_command.slice(1),
+	//   // {stdio: [null, 'inherit', 'inherit']}
+	// );
+	
+	const spawned = cp.spawn(command,{shell: true});
 	
 	if(spawned.stdout){
 		spawned.stdout.setEncoding('utf8');
 		spawned.stdout.on('data', (chunk:string) => {
 			const splitted_chunk = chunk.split('\n');
 			for(const split of splitted_chunk){
-				const plain_text = _clean_chunk(split);
-				if(plain_text.includes('<error>')){
-					output.error_log(context, plain_text);
-					// process.stdout.write(chunk);
-				}else if(plain_text != ''){
-					if(verbose){
-						output.verbose_log(context, plain_text, color);
-					}else{
-						output.log(context, plain_text, color);
+				if(native){
+					process.stdout.write(split + `\n`);
+				}else{
+					const plain_text = _clean_chunk(split);
+					if(plain_text.includes('<error>')){
+						output.error_log(context, plain_text);
+					}else if(plain_text != ''){
+						if(verbose){
+							output.verbose_log(context, plain_text, color);
+						}else{
+							output.log(context, plain_text, color);
+						}
 					}
 				}
 			}

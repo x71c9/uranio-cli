@@ -187,7 +187,7 @@ function _switch_command(args:Arguments){
 			break;
 		}
 		case 'client:dev':{
-			client_dev.command();
+			client_dev.command(args);
 			break;
 		}
 		case 'help':{
