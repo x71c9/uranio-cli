@@ -157,7 +157,7 @@ function _switch_command(args) {
             break;
         }
         case 'client:dev': {
-            cmd_1.client_dev.command();
+            cmd_1.client_dev.command(args);
             break;
         }
         case 'help': {

@@ -38,20 +38,25 @@ const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const common = __importStar(require("./common"));
+const nuxt_color = '#677cc7';
 exports.client_dev = {
     run: (root, options) => __awaiter(void 0, void 0, void 0, function* () {
         defaults_1.conf.root = root;
         common.init_run(options);
         yield exports.client_dev.command();
     }),
-    command: () => __awaiter(void 0, void 0, void 0, function* () {
-        output.start_loading('Starting client dev...');
+    command: (args) => __awaiter(void 0, void 0, void 0, function* () {
+        output.stop_loading();
         util.read_rc_file();
-        defaults_1.conf.spinner = true;
-        // util.sync_exec(`cd ${conf.root}/.uranio/client && npx nuxt dev -c ./nuxt.config.js`);
-        yield new Promise((resolve, reject) => {
-            util.spawn_cmd(`cd ${defaults_1.conf.root}/.uranio/client && npx nuxt dev -c ./nuxt.config.js`, `nuxt`, `Nuxt dev.`, resolve, reject);
-        });
+        const native = (args === null || args === void 0 ? void 0 : args.native) || false;
+        const cd_cmd = `cd ${defaults_1.conf.root}/.uranio/client`;
+        const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
+        if (native === true) {
+            util.spawn_native_log_command(`${cd_cmd} && ${nu_cmd}`, 'nuxt', nuxt_color);
+        }
+        else {
+            util.spawn_log_command(`${cd_cmd} && ${nu_cmd}`, 'nuxt', nuxt_color);
+        }
     })
 };
 //# sourceMappingURL=client_dev.js.map

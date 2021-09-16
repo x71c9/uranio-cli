@@ -38,6 +38,7 @@ const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const common = __importStar(require("./common"));
+const tscw_color = '#734de3';
 exports.server_dev = {
     run: (root, options) => __awaiter(void 0, void 0, void 0, function* () {
         defaults_1.conf.root = root;
@@ -45,13 +46,11 @@ exports.server_dev = {
         yield exports.server_dev.command();
     }),
     command: () => __awaiter(void 0, void 0, void 0, function* () {
-        output.start_loading('Starting server dev...');
+        output.stop_loading();
         util.read_rc_file();
-        defaults_1.conf.spinner = true;
-        // util.sync_exec(`cd ${conf.root}/.uranio/server && npx tsc -w --project ./tsconfig.json`);
-        yield new Promise((resolve, reject) => {
-            util.spawn_cmd(`cd ${defaults_1.conf.root}/.uranio/server && npx tsc -w --project ./tsconfig.json`, `tscw`, `Typescript watch server.`, resolve, reject);
-        });
+        const cd_cmd = `cd ${defaults_1.conf.root}/.uranio/server`;
+        const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
+        util.spawn_log_command(`${cd_cmd} && ${ts_cmd}`, 'tscw', tscw_color);
     })
 };
 //# sourceMappingURL=server_dev.js.map
