@@ -20,7 +20,10 @@ __exportStar(require("./init"), exports);
 __exportStar(require("./transpose"), exports);
 __exportStar(require("./alias"), exports);
 __exportStar(require("./hooks"), exports);
-__exportStar(require("./generate"), exports);
 __exportStar(require("./dev"), exports);
 __exportStar(require("./test"), exports);
+__exportStar(require("./build"), exports);
+__exportStar(require("./server_dev"), exports);
+__exportStar(require("./client_dev"), exports);
+;
 //# sourceMappingURL=index.js.map

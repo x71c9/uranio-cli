@@ -136,10 +136,6 @@ function _switch_command(args) {
             cmd_1.transpose.command(args);
             break;
         }
-        case 'generate': {
-            cmd_1.generate.command();
-            break;
-        }
         case 'alias': {
             cmd_1.alias.command();
             break;
@@ -150,6 +146,18 @@ function _switch_command(args) {
         }
         case 'dev': {
             cmd_1.dev.command();
+            break;
+        }
+        case 'build': {
+            cmd_1.build.command();
+            break;
+        }
+        case 'server:dev': {
+            cmd_1.server_dev.command();
+            break;
+        }
+        case 'client:dev': {
+            cmd_1.client_dev.command();
             break;
         }
         case 'help': {
