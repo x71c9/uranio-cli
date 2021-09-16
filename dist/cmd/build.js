@@ -38,12 +38,12 @@ const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const common = __importStar(require("./common"));
-const hooks_1 = require("./hooks");
-const transpose_1 = require("./transpose");
 const cli_options = {
     hide: false,
-    verbose: true,
+    verbose: false,
 };
+const server_1 = require("./server");
+const client_1 = require("./client");
 exports.build = {
     run: (root, options) => __awaiter(void 0, void 0, void 0, function* () {
         defaults_1.conf.root = root;
@@ -53,22 +53,9 @@ exports.build = {
     command: () => __awaiter(void 0, void 0, void 0, function* () {
         output.start_loading('Building...');
         util.read_rc_file();
-        transpose_1.transpose.run(defaults_1.conf.root, undefined, cli_options);
-        if (defaults_1.conf.repo === 'trx') {
-            hooks_1.hooks.run(cli_options);
-        }
-        defaults_1.conf.spinner = true;
-        // util.sync_exec(`cd ${conf.root}/.uranio/server/ && npx tsc -b`);
-        // util.sync_exec(`cd ${conf.root}/.uranio/client/ && npx nuxt generate -c ./nuxt.config.js`);
-        yield new Promise((resolve, reject) => {
-            util.spawn_cmd(`cd ${defaults_1.conf.root}/.uranio/server/ && npx tsc -b --verbose`, `tscb`, `Compiling Typescript server.`, resolve, reject);
-        });
-        output.done_log(`tscb`, `Compiled server.`);
-        yield new Promise((resolve, reject) => {
-            util.spawn_cmd(`cd ${defaults_1.conf.root}/.uranio/client/ && npx nuxt generate -c ./nuxt.config.js`, `nuxt`, `Generating nuxt file.`, resolve, reject);
-        });
-        output.done_log(`tscb`, `Compiled client.`);
-        output.end_log(`Build completed.`);
+        yield server_1.server.build.run(defaults_1.conf.root, cli_options);
+        yield client_1.client.build.run(defaults_1.conf.root, cli_options);
+        // output.end_log(`Building completed.`);
     })
 };
 //# sourceMappingURL=build.js.map

@@ -14,14 +14,14 @@ import * as util from '../util/';
 
 import * as common from './common';
 
-import {hooks} from './hooks';
-
-import {transpose} from './transpose';
-
 const cli_options = {
 	hide: false,
-	verbose: true,
+	verbose: false,
 };
+
+import {server} from './server';
+
+import {client} from './client';
 
 export const build = {
 	
@@ -41,43 +41,10 @@ export const build = {
 		
 		util.read_rc_file();
 		
-		transpose.run(conf.root, undefined, cli_options);
+		await server.build.run(conf.root, cli_options);
+		await client.build.run(conf.root, cli_options);
 		
-		if(conf.repo === 'trx'){
-			hooks.run(cli_options);
-		}
-		
-		conf.spinner = true;
-		
-		// util.sync_exec(`cd ${conf.root}/.uranio/server/ && npx tsc -b`);
-		
-		// util.sync_exec(`cd ${conf.root}/.uranio/client/ && npx nuxt generate -c ./nuxt.config.js`);
-		
-		await new Promise((resolve, reject) => {
-			util.spawn_cmd(
-				`cd ${conf.root}/.uranio/server/ && npx tsc -b --verbose`,
-				`tscb`,
-				`Compiling Typescript server.`,
-				resolve,
-				reject
-			);
-		});
-		
-		output.done_log(`tscb`, `Compiled server.`);
-		
-		await new Promise((resolve, reject) => {
-			util.spawn_cmd(
-				`cd ${conf.root}/.uranio/client/ && npx nuxt generate -c ./nuxt.config.js`,
-				`nuxt`,
-				`Generating nuxt file.`,
-				resolve,
-				reject
-			);
-		});
-		
-		output.done_log(`tscb`, `Compiled client.`);
-		
-		output.end_log(`Build completed.`);
+		// output.end_log(`Building completed.`);
 		
 	}
 	

@@ -120,6 +120,7 @@ async function _initialize()
 	}
 	
 	_update_package_aliases();
+	_update_package_scripts();
 	_create_urn_folder();
 	_ignore_urn_folder();
 	_create_rc_file();
@@ -453,7 +454,7 @@ function _update_package_aliases(){
 		package_data['_moduleAliases'] = {
 			'uranio': `./dist/${defaults.folder}/server/src/${defaults.repo_folder}/`,
 			'uranio-books': `./dist/${defaults.folder}/server/src/books/`,
-			'uranio-client': `./dist/${defaults.folder}/client/src/${defaults.repo_folder}/client`
+			// 'uranio-client': `./dist/${defaults.folder}/client/src/${defaults.repo_folder}/client`
 		};
 		switch(conf.repo){
 			case 'trx':{
@@ -472,6 +473,29 @@ function _update_package_aliases(){
 		try{
 			fs.writeFileSync(package_json_path, JSON.stringify(package_data, null, '\t'));
 			output.done_log('alia', `Updated package.json module aliases.`);
+		}catch(ex){
+			output.error_log('alia', `Cannot update ${package_json_path}.`);
+		}
+	}catch(ex){
+		output.error_log('alia', `Cannot parse ${package_json_path}.`);
+	}
+}
+
+function _update_package_scripts(){
+	output.start_loading('Updating scripts...');
+	const package_json_path = `${conf.root}/package.json`;
+	const data = fs.readFileSync(package_json_path, 'utf8');
+	try{
+		const package_data = urn_util.json.clean_parse(data);
+		package_data['scripts'] = {
+			'build': `uranio build`,
+			'dev': `uranio dev`,
+			'server:dev': `uranio server:dev`,
+			'client:dev': `uranio client:dev`
+		};
+		try{
+			fs.writeFileSync(package_json_path, JSON.stringify(package_data, null, '\t'));
+			output.done_log('alia', `Updated package.json scripts.`);
 		}catch(ex){
 			output.error_log('alia', `Cannot update ${package_json_path}.`);
 		}
