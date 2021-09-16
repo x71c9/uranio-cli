@@ -126,7 +126,8 @@ function _transpose_book() {
     util.copy_file('bkp', `${defaults_1.conf.root}/src/book.ts`, `${tmp_book_folder}/book.ts`);
     _manipulate_and_create_files(`${tmp_book_folder}/book.ts`);
     _generate_client_books();
-    _resolve_book_aliases();
+    _resolve_aliases_in_books();
+    _replace_imports_to_avoid_loops_in_books();
     util.remove_folder_if_exists('tmp', tmp_book_folder);
 }
 function _transpose_all() {
@@ -144,6 +145,16 @@ function _replace_import_to_avoid_loops() {
         _traverse_ts_avoid_import_loop(server_dir);
     }
     const client_dir = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/`;
+    if (fs_1.default.existsSync(client_dir)) {
+        _traverse_ts_avoid_import_loop(client_dir);
+    }
+}
+function _replace_imports_to_avoid_loops_in_books() {
+    const server_dir = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/books/`;
+    if (fs_1.default.existsSync(server_dir)) {
+        _traverse_ts_avoid_import_loop(server_dir);
+    }
+    const client_dir = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/books/`;
     if (fs_1.default.existsSync(client_dir)) {
         _traverse_ts_avoid_import_loop(client_dir);
     }
@@ -644,6 +655,18 @@ function _copy_imports(sourceFile) {
     output.verbose_log('book', `Copied import statements.`);
     return states;
 }
+// function _resolve_aliases_books(){
+//   output.start_loading(`Replacing aliases with relative paths in books folders...`);
+//   const base_folder = `${conf.root}/${defaults.folder}`;
+//   const books_dir_server = `${base_folder}/server/books/`;
+//   const tsconfig_server = `${base_folder}/server/tsconfig.json`;
+//   const aliases_server = alias.get_aliases(tsconfig_server);
+//   _traverse_ts_resolve_aliases(books_dir_server, aliases_server);
+//   const books_dir_client = `${base_folder}/client/books/`;
+//   const tsconfig_client = `${base_folder}/client/tsconfig.json`;
+//   const aliases_client = alias.get_aliases(tsconfig_client);
+//   _traverse_ts_resolve_aliases(books_dir_client, aliases_client);
+// }
 function _resolve_aliases() {
     output.start_loading(`Replacing aliases with relative paths...`);
     const base_folder = `${defaults_1.conf.root}/${defaults_1.defaults.folder}`;
@@ -658,7 +681,7 @@ function _resolve_aliases() {
     _traverse_ts_resolve_aliases(client_dir, aliases_client);
     output.done_log('alias', `Client aliases replaced.`);
 }
-function _resolve_book_aliases() {
+function _resolve_aliases_in_books() {
     output.start_loading(`Replacing book aliases...`);
     const base_folder = `${defaults_1.conf.root}/${defaults_1.defaults.folder}`;
     const books_dir_server = `${base_folder}/server/src/books`;
