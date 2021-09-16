@@ -443,10 +443,15 @@ function _create_bll_book(sourceFile, import_statements) {
     return _create_a_book(sourceFile, import_statements, 'bll', bll_book_required_properties, 'bll');
 }
 function _create_dock_book(sourceFile, import_statements) {
-    return _create_a_book(sourceFile, import_statements, 'dock', dock_book_required_properties, 'dock');
+    let source_file = _create_a_book(sourceFile, import_statements, 'dock', dock_book_required_properties, 'dock');
+    source_file = _fill_empty_docks(source_file);
+    const filepath = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/books/dock.ts`;
+    _create_a_book_file(filepath, source_file.getText());
+    return source_file;
 }
 function _create_routes_book(sourceFile, import_statements) {
     let source_file = _create_a_book(sourceFile, import_statements, 'routes', dock_book_required_properties, 'dock');
+    source_file = _fill_empty_docks(source_file);
     source_file = _remove_dock_route_call_implementation(source_file);
     const filepath = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/books/routes.ts`;
     _create_a_book_file(filepath, source_file.getText());
@@ -713,6 +718,32 @@ function _copy_routes_book() {
     const routes_client = `${base_folder}/client/src/books/routes.ts`;
     util.copy_file('rout', routes_server, routes_client);
     output.done_verbose_log('rout', `Copied [${routes_server}] to [${routes_client}]`);
+}
+function _fill_empty_docks(sourceFile) {
+    const syntax_list = sourceFile.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+    const variable_stats = syntax_list.getChildrenOfKind(tsm.SyntaxKind.VariableStatement);
+    for (const var_stat of variable_stats) {
+        const var_decl = var_stat.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
+        const identifier = var_decl.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
+        if (identifier.getText() === `dock_book` || identifier.getText() === `routes_book`) {
+            const obj_lit_ex = var_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.ObjectLiteralExpression);
+            const syntax_list = obj_lit_ex.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+            const atom_defs = syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+            for (const atom_def of atom_defs) {
+                const atom_syntax_list = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+                const text = atom_syntax_list.getText();
+                if (text === '') {
+                    const identif = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+                    const obj_lit_ex = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.ObjectLiteralExpression);
+                    const atom_name = identif.getText();
+                    const dock_def = `{dock: {url: '/${atom_name}s'}}`;
+                    obj_lit_ex.replaceWithText(dock_def);
+                }
+            }
+        }
+    }
+    output.done_log('clnt', `Filled empty docks in dock book.`);
+    return sourceFile;
 }
 function _remove_dock_route_call_implementation(sourceFile) {
     const syntax_list = sourceFile.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
