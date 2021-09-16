@@ -482,19 +482,19 @@ function _clean_chunk(chunk:string){
 	return plain_text;
 }
 
-export function spawn_log_command(command:string, context:string, color: string)
+export function spawn_log_command(command:string, context:string, color: string, callback?: () => void)
 		:cp.ChildProcessWithoutNullStreams{
-	return _spawn_log_command(command, context, color, false);
+	return _spawn_log_command(command, context, color, false, false, callback);
 }
 
-export function spawn_verbose_log_command(command:string, context:string, color:string)
+export function spawn_verbose_log_command(command:string, context:string, color:string, callback?: () => void)
 		:cp.ChildProcessWithoutNullStreams{
-	return _spawn_log_command(command, context, color);
+	return _spawn_log_command(command, context, color, true, false, callback);
 }
 
-export function spawn_native_log_command(command:string, context:string, color:string)
+export function spawn_native_log_command(command:string, context:string, color:string, callback?: () => void)
 		:cp.ChildProcessWithoutNullStreams{
-	return _spawn_log_command(command, context, color, true, true);
+	return _spawn_log_command(command, context, color, true, true, callback);
 }
 
 function _spawn_log_command(
@@ -502,7 +502,8 @@ function _spawn_log_command(
 	context:string,
 	color:string,
 	verbose=true,
-	native=false
+	native=false,
+	callback?: () => void
 ):cp.ChildProcessWithoutNullStreams{
 	
 	// const splitted_command = command.split(' ');
@@ -542,12 +543,16 @@ function _spawn_log_command(
 		spawned.stderr.on('data', (chunk) => {
 			const splitted_chunk = chunk.split('\n');
 			for(const split of splitted_chunk){
-				const plain_text = _clean_chunk(split);
-				if(plain_text !== ''){
-					output.error_log(context, plain_text);
+				if(native){
+					process.stderr.write(split + `\n`);
+				}else{
+					const plain_text = _clean_chunk(split);
+					if(plain_text !== ''){
+						output.error_log(context, plain_text);
+					}
+					// process.stdout.write(chunk);
+					// process.stderr.write(`[${context}] ${chunk}`);
 				}
-				// process.stdout.write(chunk);
-				// process.stderr.write(`[${context}] ${chunk}`);
 			}
 		});
 	}
@@ -555,12 +560,26 @@ function _spawn_log_command(
 	spawned.on('close', (code) => {
 		switch(code){
 			case 0:{
-				output.verbose_log(context, `Closed.`, color);
+				if(callback){
+					callback();
+				}else{
+					const done = `Done.`;
+					if(native){
+						process.stderr.write(done);
+					}else{
+						output.verbose_log(context, done, color);
+					}
+				}
 				break;
 			}
 			default:{
 				if(user_exit === false){
-					output.error_log(context, `Child process exited with code ${code}`);
+					const txt = `Child process exited with code ${code}`;
+					if(native){
+						process.stderr.write(txt);
+					}else{
+						output.error_log(context, txt);
+					}
 				}
 			}
 		}
@@ -568,7 +587,11 @@ function _spawn_log_command(
 	
 	spawned.on('error', (err) => {
 		if(user_exit === false){
-			output.error_log(context, `${err}`);
+			if(native){
+				process.stderr.write(`${err}`);
+			}else{
+				output.error_log(context, `${err}`);
+			}
 		}
 	});
 	

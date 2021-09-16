@@ -20,6 +20,6 @@ export * from './test';
 
 export * from './build';
 
-export * from './server_dev';
+export * from './server';
 
-export * from './client_dev';;
+export * from './client';

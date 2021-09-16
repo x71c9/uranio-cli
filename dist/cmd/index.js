@@ -23,7 +23,6 @@ __exportStar(require("./hooks"), exports);
 __exportStar(require("./dev"), exports);
 __exportStar(require("./test"), exports);
 __exportStar(require("./build"), exports);
-__exportStar(require("./server_dev"), exports);
-__exportStar(require("./client_dev"), exports);
-;
+__exportStar(require("./server"), exports);
+__exportStar(require("./client"), exports);
 //# sourceMappingURL=index.js.map

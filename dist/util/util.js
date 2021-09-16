@@ -448,19 +448,19 @@ function _clean_chunk(chunk) {
         .replace(/\r?\n|\r/g, ' ');
     return plain_text;
 }
-function spawn_log_command(command, context, color) {
-    return _spawn_log_command(command, context, color, false);
+function spawn_log_command(command, context, color, callback) {
+    return _spawn_log_command(command, context, color, false, false, callback);
 }
 exports.spawn_log_command = spawn_log_command;
-function spawn_verbose_log_command(command, context, color) {
-    return _spawn_log_command(command, context, color);
+function spawn_verbose_log_command(command, context, color, callback) {
+    return _spawn_log_command(command, context, color, true, false, callback);
 }
 exports.spawn_verbose_log_command = spawn_verbose_log_command;
-function spawn_native_log_command(command, context, color) {
-    return _spawn_log_command(command, context, color, true, true);
+function spawn_native_log_command(command, context, color, callback) {
+    return _spawn_log_command(command, context, color, true, true, callback);
 }
 exports.spawn_native_log_command = spawn_native_log_command;
-function _spawn_log_command(command, context, color, verbose = true, native = false) {
+function _spawn_log_command(command, context, color, verbose = true, native = false, callback) {
     // const splitted_command = command.split(' ');
     // const spawned = cp.spawn(
     //   splitted_command[0],
@@ -498,31 +498,58 @@ function _spawn_log_command(command, context, color, verbose = true, native = fa
         spawned.stderr.on('data', (chunk) => {
             const splitted_chunk = chunk.split('\n');
             for (const split of splitted_chunk) {
-                const plain_text = _clean_chunk(split);
-                if (plain_text !== '') {
-                    output.error_log(context, plain_text);
+                if (native) {
+                    process.stderr.write(split + `\n`);
                 }
-                // process.stdout.write(chunk);
-                // process.stderr.write(`[${context}] ${chunk}`);
+                else {
+                    const plain_text = _clean_chunk(split);
+                    if (plain_text !== '') {
+                        output.error_log(context, plain_text);
+                    }
+                    // process.stdout.write(chunk);
+                    // process.stderr.write(`[${context}] ${chunk}`);
+                }
             }
         });
     }
     spawned.on('close', (code) => {
         switch (code) {
             case 0: {
-                output.verbose_log(context, `Closed.`, color);
+                if (callback) {
+                    callback();
+                }
+                else {
+                    const done = `Done.`;
+                    if (native) {
+                        process.stderr.write(done);
+                    }
+                    else {
+                        output.verbose_log(context, done, color);
+                    }
+                }
                 break;
             }
             default: {
                 if (user_exit === false) {
-                    output.error_log(context, `Child process exited with code ${code}`);
+                    const txt = `Child process exited with code ${code}`;
+                    if (native) {
+                        process.stderr.write(txt);
+                    }
+                    else {
+                        output.error_log(context, txt);
+                    }
                 }
             }
         }
     });
     spawned.on('error', (err) => {
         if (user_exit === false) {
-            output.error_log(context, `${err}`);
+            if (native) {
+                process.stderr.write(`${err}`);
+            }
+            else {
+                output.error_log(context, `${err}`);
+            }
         }
     });
     exports.child_list.push(spawned);
