@@ -3,6 +3,5 @@ declare const _default: {
     transpose: (root: string, filepath?: string | undefined, options?: Partial<import("./types").Options> | undefined) => void;
     alias: (options?: Partial<import("./types").Options> | undefined) => void;
     hooks: (options?: Partial<import("./types").Options> | undefined) => void;
-    generate: (root: string, options?: Partial<import("./types").Options> | undefined) => Promise<void>;
 };
 export default _default;

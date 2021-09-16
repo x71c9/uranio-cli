@@ -16,7 +16,9 @@ import {
 	test,
 	alias,
 	hooks,
-	generate
+	build,
+	server_dev,
+	client_dev
 } from './cmd/';
 
 import {conf} from './conf/defaults';
@@ -164,10 +166,6 @@ function _switch_command(args:Arguments){
 			transpose.command(args);
 			break;
 		}
-		case 'generate':{
-			generate.command();
-			break;
-		}
 		case 'alias':{
 			alias.command();
 			break;
@@ -178,6 +176,18 @@ function _switch_command(args:Arguments){
 		}
 		case 'dev':{
 			dev.command();
+			break;
+		}
+		case 'build':{
+			build.command();
+			break;
+		}
+		case 'server:dev':{
+			server_dev.command();
+			break;
+		}
+		case 'client:dev':{
+			client_dev.command();
 			break;
 		}
 		case 'help':{
