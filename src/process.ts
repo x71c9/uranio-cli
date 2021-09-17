@@ -17,8 +17,6 @@ import {
 	alias,
 	hooks,
 	build,
-	server,
-	client
 } from './cmd/';
 
 import {conf} from './conf/defaults';
@@ -179,43 +177,37 @@ function _switch_command(args:Arguments){
 			break;
 		}
 		case 'dev':{
-			dev.command();
-			break;
-		}
-		case 'build':{
-			build.command();
-			break;
-		}
-		case 'server':{
 			switch(splitted_cmd[1]){
-				case 'dev':{
-					server.dev.command();
+				case 'server':{
+					dev.server();
 					break;
 				}
-				case 'build':{
-					server.build.command();
+				case 'client':{
+					dev.client();
 					break;
 				}
+				case '':
+				case undefined:
 				default:{
-					output.wrong_end_log('Command not found.');
-					process.exit(1);
+					dev.command();
 				}
 			}
 			break;
 		}
-		case 'client':{
+		case 'build':{
 			switch(splitted_cmd[1]){
-				case 'dev':{
-					client.dev.command(args);
+				case 'server':{
+					build.server();
 					break;
 				}
-				case 'build':{
-					client.build.command(args);
+				case 'client':{
+					build.client();
 					break;
 				}
+				case '':
+				case undefined:
 				default:{
-					output.wrong_end_log('Command not found.');
-					process.exit(1);
+					build.command();
 				}
 			}
 			break;

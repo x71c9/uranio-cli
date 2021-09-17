@@ -147,43 +147,37 @@ function _switch_command(args) {
             break;
         }
         case 'dev': {
-            cmd_1.dev.command();
-            break;
-        }
-        case 'build': {
-            cmd_1.build.command();
-            break;
-        }
-        case 'server': {
             switch (splitted_cmd[1]) {
-                case 'dev': {
-                    cmd_1.server.dev.command();
+                case 'server': {
+                    cmd_1.dev.server();
                     break;
                 }
-                case 'build': {
-                    cmd_1.server.build.command();
+                case 'client': {
+                    cmd_1.dev.client();
                     break;
                 }
+                case '':
+                case undefined:
                 default: {
-                    output.wrong_end_log('Command not found.');
-                    process.exit(1);
+                    cmd_1.dev.command();
                 }
             }
             break;
         }
-        case 'client': {
+        case 'build': {
             switch (splitted_cmd[1]) {
-                case 'dev': {
-                    cmd_1.client.dev.command(args);
+                case 'server': {
+                    cmd_1.build.server();
                     break;
                 }
-                case 'build': {
-                    cmd_1.client.build.command(args);
+                case 'client': {
+                    cmd_1.build.client();
                     break;
                 }
+                case '':
+                case undefined:
                 default: {
-                    output.wrong_end_log('Command not found.');
-                    process.exit(1);
+                    cmd_1.build.command();
                 }
             }
             break;

@@ -489,9 +489,11 @@ function _update_package_scripts(){
 		const package_data = urn_util.json.clean_parse(data);
 		package_data['scripts'] = {
 			'build': `uranio build`,
+			'build:server': `uranio build:client`,
+			'build:client': `uranio build:client`,
 			'dev': `uranio dev`,
-			'server:dev': `uranio server:dev`,
-			'client:dev': `uranio client:dev`
+			'dev:server': `uranio dev:server`,
+			'dev:client': `uranio dev:client`
 		};
 		try{
 			fs.writeFileSync(package_json_path, JSON.stringify(package_data, null, '\t'));
