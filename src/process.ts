@@ -183,7 +183,7 @@ function _switch_command(args:Arguments){
 					break;
 				}
 				case 'client':{
-					dev.client();
+					dev.client(args);
 					break;
 				}
 				case '':
