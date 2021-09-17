@@ -14,6 +14,8 @@ import * as util from '../util/';
 
 import * as common from './common';
 
+// import {transpose} from './transpose';
+
 import {done_building_server, building_server} from './server';
 
 const nuxt_color = '#677cc7';
@@ -74,6 +76,8 @@ export const client = {
 			conf.spinner = true;
 			
 			output.start_loading(`Building client...`);
+			
+			// transpose.run(conf.root, undefined, {verbose: true});
 			
 			util.read_rc_file();
 			

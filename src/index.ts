@@ -3,6 +3,7 @@ import {
 	transpose,
 	alias,
 	hooks,
+	build,
 } from './cmd/';
 
 export default {
@@ -10,4 +11,5 @@ export default {
 	transpose: transpose.run,
 	alias: alias.run,
 	hooks: hooks.run,
+	build: build.run,
 };

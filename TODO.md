@@ -18,3 +18,8 @@
 - watch
 - nuxt
 - netlify
+
+##### Better functions for creating books
+
+- Develop methods to remove and create properties in books
+- dock, plural, dock, url, call, ...
