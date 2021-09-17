@@ -38,6 +38,7 @@ const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const common = __importStar(require("./common"));
+// import {transpose} from './transpose';
 const server_1 = require("./server");
 const nuxt_color = '#677cc7';
 exports.done_building_client = false;
@@ -73,6 +74,7 @@ exports.client = {
             exports.building_client = true;
             defaults_1.conf.spinner = true;
             output.start_loading(`Building client...`);
+            // transpose.run(conf.root, undefined, {verbose: true});
             util.read_rc_file();
             const native = (args === null || args === void 0 ? void 0 : args.native) || false;
             const cd_cmd = `cd ${defaults_1.conf.root}/.uranio/client`;

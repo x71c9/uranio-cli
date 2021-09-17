@@ -24,8 +24,8 @@ import * as alias from './alias';
 
 type BookName = 'atom' | 'dock' | 'bll' | 'routes';
 
-const atom_book_required_properties = ['properties', 'security', 'connection', 'plural'];
-const dock_book_required_properties = ['dock'];
+const atom_book_required_properties = ['properties', 'plural', 'connection', 'security'];
+const dock_book_required_properties = ['dock', 'plural'];
 const bll_book_required_properties = ['bll'];
 
 const atom_book_required_client_first_props = ['properties', 'plural', 'connection'];
@@ -564,17 +564,35 @@ function _get_required_imports(import_statements:string[], text:string){
 
 function _create_atom_book(sourceFile:tsm.SourceFile, import_statements:string[])
 		:tsm.SourceFile{
-	return _create_a_book(sourceFile, import_statements, 'atom', atom_book_required_properties, 'atom');
+	return _create_a_book(
+		sourceFile,
+		import_statements,
+		'atom',
+		atom_book_required_properties,
+		'atom'
+	);
 }
 
 function _create_bll_book(sourceFile:tsm.SourceFile, import_statements:string[])
 		:tsm.SourceFile{
-	return _create_a_book(sourceFile, import_statements, 'bll', bll_book_required_properties, 'bll');
+	return _create_a_book(
+		sourceFile,
+		import_statements,
+		'bll',
+		bll_book_required_properties,
+		'bll'
+	);
 }
 
 function _create_dock_book(sourceFile:tsm.SourceFile, import_statements:string[])
 		:tsm.SourceFile{
-	let source_file = _create_a_book(sourceFile, import_statements, 'dock', dock_book_required_properties, 'dock');
+	let source_file = _create_a_book(
+		sourceFile,
+		import_statements,
+		'dock',
+		dock_book_required_properties,
+		'dock'
+	);
 	source_file = _fill_empty_docks(source_file);
 	
 	const filepath = `${conf.root}/${defaults.folder}/server/src/books/dock.ts`;
@@ -585,7 +603,13 @@ function _create_dock_book(sourceFile:tsm.SourceFile, import_statements:string[]
 
 function _create_routes_book(sourceFile:tsm.SourceFile, import_statements:string[])
 		:tsm.SourceFile{
-	let source_file = _create_a_book(sourceFile, import_statements, 'routes', dock_book_required_properties, 'dock');
+	let source_file = _create_a_book(
+		sourceFile,
+		import_statements,
+		'routes',
+		dock_book_required_properties,
+		'dock'
+	);
 	source_file = _fill_empty_docks(source_file);
 	source_file = _remove_dock_route_call_implementation(source_file);
 	
@@ -915,19 +939,50 @@ function _fill_empty_docks(sourceFile:tsm.SourceFile){
 	for(const var_stat of variable_stats){
 		const var_decl = var_stat.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.VariableDeclaration);
 		const identifier = var_decl.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
-		if(identifier.getText() === `dock_book` || identifier.getText() === `routes_book`){
+		const book_name = identifier.getText();
+		if(book_name === `dock_book` || book_name === `routes_book`){
 			const obj_lit_ex = var_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.ObjectLiteralExpression);
 			const syntax_list = obj_lit_ex.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
 			const atom_defs = syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
 			for(const atom_def of atom_defs){
 				const atom_syntax_list = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
 				const text = atom_syntax_list.getText();
+				const identif = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+				const obj_lit_ex = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.ObjectLiteralExpression);
+				const atom_name = identif.getText();
 				if(text === ''){
-					const identif = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
-					const obj_lit_ex = atom_def.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.ObjectLiteralExpression);
-					const atom_name = identif.getText();
-					const dock_def = `{dock: {url: '/${atom_name}s'}}`;
+					let dock_def = ``;
+					dock_def += `\t\t{\n`;
+					dock_def += `\t\t\tdock:{\n`;
+					dock_def += `\t\t\t\turl: '/${atom_name}s'\n`;
+					dock_def += `\t\t\t}\n`;
+					dock_def += `\t\t}`;
 					obj_lit_ex.replaceWithText(dock_def);
+				}else{
+					const atom_props = atom_syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
+					let plural = atom_name;
+					let has_dock = false;
+					for(const atom_prop of atom_props){
+						const prop_id = atom_prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+						const prop_name = prop_id.getText();
+						if(prop_name === 'plural'){
+							const plural_lit = atom_prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.StringLiteral);
+							const plural_lit_str = plural_lit.getText();
+							plural = plural_lit_str.substr(1, plural_lit_str.length - 2);
+						}else if(prop_name === 'dock'){
+							has_dock = true;
+						}
+					}
+					if(has_dock === false){
+						const current_syn_lis = obj_lit_ex.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
+						const syn_lis_str = current_syn_lis.getText();
+						const comma = (syn_lis_str[syn_lis_str.length - 1] === ',') ? '' : ',';
+						let new_syn_lis = syn_lis_str + `${comma}\n`;
+						new_syn_lis += `dock: {\n`;
+						new_syn_lis += `\turl: '/${plural}'\n`;
+						new_syn_lis += `}`;
+						current_syn_lis.replaceWithText(new_syn_lis);
+					}
 				}
 			}
 		}
@@ -1109,6 +1164,11 @@ function _keep_only_client_second_level_properties(sourceFile:tsm.SourceFile, bo
 				const atom_name_identif = atom_def.getFirstChildByKindOrThrow(tsm.SyntaxKind.Identifier);
 				const atom_name = atom_name_identif.getText();
 				for(const prop of atom_props){
+					const prop_id = prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+					const prop_name = prop_id.getText();
+					if(book_name === 'dock' && prop_name === 'plural'){
+						continue;
+					}
 					const second_syntax_list = prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.SyntaxList);
 					const second_prop_list = second_syntax_list.getChildrenOfKind(tsm.SyntaxKind.PropertyAssignment);
 					for(const sec_prop of second_prop_list){

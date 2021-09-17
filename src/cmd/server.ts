@@ -14,6 +14,8 @@ import * as util from '../util/';
 
 import * as common from './common';
 
+// import {transpose} from './transpose';
+
 import {done_building_client, building_client} from './client';
 
 const tscw_color = '#734de3';
@@ -71,6 +73,8 @@ export const server = {
 			output.start_loading(`Building server...`);
 			
 			util.read_rc_file();
+			
+			// transpose.run(conf.root, undefined, {verbose: true});
 			
 			const cd_cmd = `cd ${conf.root}/.uranio/server`;
 			// const ts_cmd = `npx tsc -b --verbose`;
