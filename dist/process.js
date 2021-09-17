@@ -153,7 +153,7 @@ function _switch_command(args) {
                     break;
                 }
                 case 'client': {
-                    cmd_1.dev.client();
+                    cmd_1.dev.client(args);
                     break;
                 }
                 case '':
