@@ -78,7 +78,7 @@ exports.dev = {
 // let watch_client_scanned = false;
 // let watch_server_scanned = false;
 // let watch_book_scanned = false;
-// let watch_lib_scanned = false;
+let watch_lib_scanned = false;
 let watch_src_scanned = false;
 const cli_options = {
     hide: false,
@@ -127,6 +127,18 @@ function _start_dev() {
                 const new_path_client = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/${relative_path}`;
                 util.delete_file_sync(new_path_server);
                 util.delete_file_sync(new_path_client);
+            }
+            _replace_netlify_function_file();
+        });
+        const lib_path = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/`;
+        output.log(`wtch`, `Watching uranio repo folder [${lib_path}] ...`, watc_color);
+        util.watch(lib_path, `watching uranio repo folder.`, () => {
+            output.done_log(`wtch`, `Initial scanner completed for [${lib_path}].`);
+            watch_lib_scanned = true;
+        }, (_event, _path) => {
+            output.verbose_log(`wtch`, `${_event} ${_path}`, watc_color);
+            if (!watch_lib_scanned) {
+                return false;
             }
             _replace_netlify_function_file();
         });
