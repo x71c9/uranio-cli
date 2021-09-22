@@ -195,13 +195,19 @@ function _avoid_import_loop(filepath) {
         const module_name = str_lit.getText();
         const repo_length = defaults_1.defaults.repo_folder.length;
         let is_importing_uranio = false;
-        if (module_name.substr(-1 * (repo_length + 3)) === `/${defaults_1.defaults.repo_folder}/"`) {
+        const module_with_slash = module_name.substr(-1 * (repo_length + 3));
+        const module_with_no_slash = module_name.substr(-1 * (repo_length + 2));
+        const module_with_client = module_name.substr(-1 * (repo_length + 9));
+        if (module_with_slash === `/${defaults_1.defaults.repo_folder}/"` ||
+            module_with_slash === `/${defaults_1.defaults.repo_folder}/'`) {
             is_importing_uranio = true;
         }
-        if (module_name.substr(-1 * (repo_length + 2)) === `/${defaults_1.defaults.repo_folder}"`) {
+        if (module_with_no_slash === `/${defaults_1.defaults.repo_folder}"` ||
+            module_with_no_slash === `/${defaults_1.defaults.repo_folder}'`) {
             is_importing_uranio = true;
         }
-        if (module_name.substr(-1 * (repo_length + 9)) === `/${defaults_1.defaults.repo_folder}/client"`) {
+        if (module_with_client === `/${defaults_1.defaults.repo_folder}/client"` ||
+            module_with_client === `/${defaults_1.defaults.repo_folder}/client'`) {
             is_importing_uranio = true;
         }
         if (is_importing_uranio) {
@@ -261,7 +267,7 @@ function _avoid_import_loop(filepath) {
                 const submod_tree = _resolve_path_tree(submodule_name);
                 relative_path = `${relative_root}/${submod_tree}${module_name}`;
             }
-            const import_state = `import * as ${_generate_variable_name(module_name)} from '${relative_path}'`;
+            const import_state = `import * as ${_generate_variable_name(module_name)} from '${relative_path}';`;
             import_states.push(import_state);
         }
     }
@@ -399,7 +405,7 @@ function _create_a_book(sourceFile, import_statements, book_name, keep_propertie
         }
         const required_imports = _get_required_imports(import_statements, cloned_book_source.getText());
         const filepath = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/books/${book_name}.ts`;
-        const text = required_imports.join('\n') + cloned_book_source.getText();
+        const text = `\n` + required_imports.join('\n') + cloned_book_source.getText();
         _create_a_book_file(filepath, text);
         output.done_log(book_name, `Generated server book [${book_name}].`);
         cloned_book_source.replaceWithText(text);
@@ -742,7 +748,7 @@ function _fill_empty_docks(sourceFile) {
                     dock_def += `\t\t\tdock:{\n`;
                     dock_def += `\t\t\t\turl: '/${atom_name}s'\n`;
                     dock_def += `\t\t\t}\n`;
-                    dock_def += `\t\t}`;
+                    dock_def += `\t\t}\n`;
                     obj_lit_ex.replaceWithText(dock_def);
                 }
                 else {
@@ -768,7 +774,7 @@ function _fill_empty_docks(sourceFile) {
                         let new_syn_lis = syn_lis_str + `${comma}\n`;
                         new_syn_lis += `dock: {\n`;
                         new_syn_lis += `\turl: '/${plural}'\n`;
-                        new_syn_lis += `}`;
+                        new_syn_lis += `}\n`;
                         current_syn_lis.replaceWithText(new_syn_lis);
                     }
                 }
