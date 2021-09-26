@@ -74,10 +74,10 @@ exports.build = {
         // const ts_cmd = `npx tsc -b --verbose`;
         const ts_cmd = `npx tsc -b`;
         const cmd = `${cd_cmd} && ${ts_cmd}`;
-        output.log(`srv`, cmd);
+        output.log(cmd, 'srv');
         util.spawn_log_command(cmd, 'tscb', tscw_color, () => {
             if (building_client) {
-                output.done_log(`tscb`, `Building server completed.`);
+                output.done_log(`Building server completed.`, 'tscb');
                 done_building_server = true;
                 if (done_building_client === true) {
                     output.end_log(`Building completed.`);
@@ -99,10 +99,10 @@ exports.build = {
         const cd_cmd = `cd ${defaults_1.conf.root}/.uranio/client`;
         const nu_cmd = `npx nuxt generate -c ./nuxt.config.js`;
         const cmd = `${cd_cmd} && ${nu_cmd}`;
-        output.log(`clnt`, cmd);
+        output.log(cmd, 'clnt');
         const callback = () => {
             if (building_server) {
-                output.done_log(`gnrt`, `Building client completed.`);
+                output.done_log(`Building client completed.`, 'gnrt');
                 done_building_client = true;
                 if (done_building_server === true) {
                     output.end_log(`Building completed.`);

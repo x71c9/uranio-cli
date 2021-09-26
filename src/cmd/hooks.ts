@@ -50,7 +50,7 @@ export const hooks = {
 		
 		conf.hide = is_hidden;
 		
-		output.done_log('hooks', `TRX Hooks generated.`);
+		output.done_log(`TRX Hooks generated.`, 'hooks');
 		
 	},
 	
@@ -64,7 +64,7 @@ export const hooks = {
 		
 		_save_to_file(text);
 		
-		output.done_log(`end`, `TRX Hooks generated.`);
+		output.done_log(`TRX Hooks generated.`, 'hooks');
 		
 	},
 	
@@ -297,7 +297,7 @@ function _generate_text(){
 		text += `\t},\n`;
 	}
 	text += `} as const;\n`;
-	output.done_verbose_log(`hooks`, `Generated hooks text.`);
+	output.done_verbose_log(`Generated hooks text.`, 'hooks');
 	return text;
 }
 
@@ -306,12 +306,12 @@ function _save_to_file(text:string){
 	const filepath_server = `${conf.root}/${defaults.folder}/server/src/${defaults.repo_folder}/hooks/index.ts`;
 	fs.writeFileSync(filepath_server, text);
 	util.pretty(filepath_server);
-	output.done_verbose_log(`hooks`, `Created hooks file [${filepath_server}].`);
+	output.done_verbose_log(`Created hooks file [${filepath_server}].`, 'hooks');
 	
 	const filepath_client = `${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}/hooks/index.ts`;
 	fs.writeFileSync(filepath_client, text);
 	util.pretty(filepath_client);
-	output.done_verbose_log(`hooks`, `Created hooks file [${filepath_client}].`);
+	output.done_verbose_log(`Created hooks file [${filepath_client}].`, 'hooks');
 	
 }
 

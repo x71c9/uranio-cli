@@ -28,6 +28,6 @@
 - dock, plural, dock, url, call, ...
 
 
-##### Removing prettier when transposing boook
+##### Removing prettier when transposing book
 
 - For increasing speed.

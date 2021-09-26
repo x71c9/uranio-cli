@@ -106,17 +106,17 @@ async function _initialize()
 	output.start_loading('Initialization...');
 	
 	if(conf.pacman === 'yarn' && !fs.existsSync(`${conf.root}/yarn.lock`)){
-		output.log('yarn', `Yarn is not initalized. Yarn initialization started.`);
+		output.log(`Yarn is not initalized. Yarn initialization started.`, 'yarn');
 		await new Promise((resolve, reject) => {
 			util.spawn_cmd(`yarn install`, 'yarn', 'Yarn install', resolve, reject);
 		});
 	}
 	
-	output.verbose_log('root', `$URNROOT$Project root: [${conf.root}]`);
-	output.verbose_log('repo', `Selected repo: [${conf.repo}]`);
+	output.verbose_log(`$URNROOT$Project root: [${conf.root}]`, 'root');
+	output.verbose_log(`Selected repo: [${conf.repo}]`, 'repo');
 	
 	if(conf.repo === 'api'){
-		output.verbose_log('dply', `Selected deploy: [${conf.deploy}]`);
+		output.verbose_log(`Selected deploy: [${conf.deploy}]`, 'dply');
 	}
 	
 	_update_package_aliases();
@@ -279,13 +279,13 @@ function _ignore_urn_folder(){
 	}
 	fs.writeFileSync(gitignore, content);
 	const log_msg = `Added ${defaults.folder} and ${defaults.log_filepath} to .gitignore.`;
-	output.done_log('.git', log_msg);
+	output.done_log(log_msg, '.git');
 }
 
 function _remove_tmp(){
 	output.start_loading(`Removing tmp folder [${defaults.tmp_folder}]...`);
 	util.remove_folder_if_exists('dot', defaults.tmp_folder);
-	output.done_verbose_log('tmp', `Removed tmp folder [${defaults.tmp_folder}].`);
+	output.done_verbose_log(`Removed tmp folder [${defaults.tmp_folder}].`, 'tmp');
 }
 
 async function _install_dep(repo:Repo)
@@ -399,7 +399,7 @@ function _create_rc_file(){
 	content += `}`;
 	fs.writeFileSync(`${conf.root}/${jsonfile_path}`, content);
 	util.pretty(`${conf.root}/${jsonfile_path}`, 'json');
-	output.done_log('rcfl', `Created file ${jsonfile_path}.`);
+	output.done_log(`Created file ${jsonfile_path}.`, 'rcfl');
 }
 
 async function _clone_and_install_repo(branch='master'){
@@ -418,19 +418,19 @@ async function _clone_and_install_repo(branch='master'){
 			break;
 		}
 		default:{
-			output.log('init', `Selected repo is not valid. [${conf.repo}]`);
+			output.log(`Selected repo is not valid. [${conf.repo}]`, 'init');
 			process.exit(1);
 		}
 	}
 	await _install_dep(conf.repo);
-	output.done_log('repo', `Cloned and installed repo [${conf.repo}].`);
+	output.done_log(`Cloned and installed repo [${conf.repo}].`, 'repo');
 }
 
 function _create_urn_folder(){
 	output.start_loading(`Creating ${defaults.folder} folder...`);
 	util.remove_folder_if_exists('init', `${conf.root}/${defaults.folder}`);
 	util.create_folder_if_doesnt_exists('init', `${conf.root}/${defaults.folder}`);
-	output.done_log('init', `Created folder ${defaults.folder}.`);
+	output.done_log(`Created folder ${defaults.folder}.`, 'init');
 }
 
 function _create_client_server_folders(){
@@ -472,12 +472,12 @@ function _update_package_aliases(){
 		}
 		try{
 			fs.writeFileSync(package_json_path, JSON.stringify(package_data, null, '\t'));
-			output.done_log('alia', `Updated package.json module aliases.`);
+			output.done_log(`Updated package.json module aliases.`, 'alias');
 		}catch(ex){
-			output.error_log('alia', `Cannot update ${package_json_path}.`);
+			output.error_log(`Cannot update ${package_json_path}.`, 'alias');
 		}
 	}catch(ex){
-		output.error_log('alia', `Cannot parse ${package_json_path}.`);
+		output.error_log(`Cannot parse ${package_json_path}.`, 'alias');
 	}
 }
 
@@ -497,12 +497,12 @@ function _update_package_scripts(){
 		};
 		try{
 			fs.writeFileSync(package_json_path, JSON.stringify(package_data, null, '\t'));
-			output.done_log('alia', `Updated package.json scripts.`);
+			output.done_log(`Updated package.json scripts.`, 'alias');
 		}catch(ex){
-			output.error_log('alia', `Cannot update ${package_json_path}.`);
+			output.error_log(`Cannot update ${package_json_path}.`, 'alias');
 		}
 	}catch(ex){
-		output.error_log('alia', `Cannot parse ${package_json_path}.`);
+		output.error_log(`Cannot parse ${package_json_path}.`, 'alias');
 	}
 }
 
@@ -510,7 +510,7 @@ async function _install_core_dep(){
 	output.start_loading(`Installing core dep...`);
 	await util.install_dep(defaults.core_dep_repo, 'core');
 	await util.install_dep_dev(defaults.core_dep_dev_repo, 'core');
-	output.done_log('core', `Installed core dependencies.`);
+	output.done_log(`Installed core dependencies.`, 'core');
 	return true;
 }
 
@@ -518,7 +518,7 @@ async function _install_api_dep(){
 	output.start_loading(`Installing api dep...`);
 	await util.install_dep(defaults.api_dep_repo, 'api');
 	await util.install_dep_dev(defaults.api_dep_dev_repo, 'api');
-	output.done_log('api', `Installed api dependencies.`);
+	output.done_log(`Installed api dependencies.`, 'api');
 	return true;
 }
 
@@ -526,7 +526,7 @@ async function _install_trx_dep(){
 	output.start_loading(`Installing trx dep...`);
 	await util.install_dep(defaults.trx_dep_repo, 'trx');
 	await util.install_dep_dev(defaults.trx_dep_dev_repo, 'trx');
-	output.done_log('trx', `Installed trx dependencies.`);
+	output.done_log(`Installed trx dependencies.`, 'trx');
 	return true;
 }
 
@@ -534,7 +534,7 @@ async function _install_trx_dep(){
 //   output.start_loading(`Installing ntl dep...`);
 //   await util.install_dep(defaults.ntl_dep_repo, 'ntl');
 //   await util.install_dep_dev(defaults.ntl_dep_dev_repo, 'ntl');
-//   output.done_log('ntl', `Installed ntl dependencies.`);
+//   output.done_log(`Installed ntl dependencies.`, 'ntl');
 //   return true;
 // }
 
@@ -548,7 +548,7 @@ async function _uninstall_dep(repo:string, context:string){
 		const dep_dev_folder = `${conf.root}/node_modules/${short_repo}`;
 		util.remove_folder_if_exists(context, dep_dev_folder);
 		await util.uninstall_dep(`${short_repo}`, context);
-		output.done_log(context, `Uninstalled ${short_repo} dependencies.`);
+		output.done_log(`Uninstalled ${short_repo} dependencies.`, context);
 		return true;
 	}
 }
@@ -560,7 +560,7 @@ async function _uninstall_core_dep(){
 	// const dep_dev_folder = `${conf.root}/node_modules/${defaults.core_dep_dev_repo}`;
 	// util.remove_folder_if_exists('core', dep_dev_folder);
 	// await util.uninstall_dep(`${defaults.core_dep_repo.split('/').slice(-1)[0]} ${defaults.core_dep_dev_repo.split('/').slice(-1)[0]}`, 'core');
-	// output.done_log('core', `Uninstalled core dependencies.`);
+	// output.done_log(`Uninstalled core dependencies.`, 'core');
 	// return true;
 	await _uninstall_dep(defaults.core_dep_repo, 'core');
 	await _uninstall_dep(defaults.core_dep_dev_repo, 'core');
@@ -574,7 +574,7 @@ async function _uninstall_api_dep(){
 	// const dep_dev_folder = `${conf.root}/node_modules/${defaults.api_dep_dev_repo}`;
 	// util.remove_folder_if_exists('api', dep_dev_folder);
 	// await util.uninstall_dep(`${defaults.api_dep_repo.split('/').slice(-1)[0]} ${defaults.api_dep_dev_repo.split('/').slice(-1)[0]}`, 'api');
-	// output.done_log('api', `Uninstalled api dependencies.`);
+	// output.done_log(`Uninstalled api dependencies.`, 'api');
 	// return true;
 	await _uninstall_dep(defaults.api_dep_repo, 'api');
 	await _uninstall_dep(defaults.api_dep_dev_repo, 'api');
@@ -588,7 +588,7 @@ async function _uninstall_trx_dep(){
 	// const dep_dev_folder = `${conf.root}/node_modules/${defaults.api_dep_dev_repo}`;
 	// util.remove_folder_if_exists('api', dep_dev_folder);
 	// await util.uninstall_dep(`${defaults.api_dep_repo.split('/').slice(-1)[0]} ${defaults.api_dep_dev_repo.split('/').slice(-1)[0]}`, 'api');
-	// output.done_log('api', `Uninstalled api dependencies.`);
+	// output.done_log(`Uninstalled api dependencies.`, 'api');
 	// return true;
 	await _uninstall_dep(defaults.trx_dep_repo, 'trx');
 	await _uninstall_dep(defaults.trx_dep_dev_repo, 'trx');
@@ -601,7 +601,7 @@ async function _uninstall_trx_dep(){
 //   // const dep_dev_folder = `${conf.root}/node_modules/${defaults.ntl_dep_dev_repo}`;
 //   // util.remove_folder_if_exists('ntl_', dep_dev_folder);
 //   // await util.uninstall_dep(`${defaults.ntl_dep_repo.split('/').slice(-1)[0]} ${defaults.ntl_dep_dev_repo.split('/').slice(-1)[0]}`, 'ntl_');
-//   // output.done_log('ntl', `Uninstalled ntl dependencies.`);
+//   // output.done_log(`Uninstalled ntl dependencies.`, 'ntl');
 //   // return true;
 //   // await _uninstall_dep(defaults.ntl_dep_repo, 'ntl');
 //   // await _uninstall_dep(defaults.ntl_dep_dev_repo, 'ntl');
@@ -618,7 +618,7 @@ async function _clone_dot(branch='master'){
 		`${conf.root}/${defaults.tmp_folder}/urn-dot`,
 		branch
 	);
-	output.done_log('dot', `Cloned dot repo.`);
+	output.done_log(`Cloned dot repo.`, 'dot');
 }
 
 async function _clone_core(branch='master'){
@@ -635,7 +635,7 @@ async function _clone_core(branch='master'){
 		`${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
 		branch
 	);
-	output.done_log('core', `Cloned core repo.`);
+	output.done_log(`Cloned core repo.`, 'core');
 }
 
 async function _clone_api(branch='master'){
@@ -652,7 +652,7 @@ async function _clone_api(branch='master'){
 		`${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
 		branch
 	);
-	output.done_log('api', `Cloned api repo.`);
+	output.done_log(`Cloned api repo.`, 'api');
 }
 
 async function _clone_trx(branch='master'){
@@ -669,7 +669,7 @@ async function _clone_trx(branch='master'){
 		`${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
 		branch
 	);
-	output.done_log('trx', `Cloned trx repo.`);
+	output.done_log(`Cloned trx repo.`, 'trx');
 }
 
 function _remove_git_files(){
@@ -678,7 +678,7 @@ function _remove_git_files(){
 	util.sync_exec(`( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`);
 	const cloned_client_repo_path = `${conf.root}/${defaults.folder}/client/src/${defaults.repo_folder}`;
 	util.sync_exec(`( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`);
-	output.done_log('.git', `Removed uranio .git files.`);
+	output.done_log(`Removed uranio .git files.`, '.git');
 }
 
 function _replace_aliases(){

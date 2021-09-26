@@ -48,22 +48,22 @@ function _go_previous() {
     spinner_texts.pop();
     spinner_text(spinner_texts[spinner_texts.length - 1]);
 }
-function done_log(context, text) {
+function done_log(text, context = 'done') {
     _go_previous();
-    log(context, `${defaults_1.defaults.check_char} ${text}`);
+    log(`${defaults_1.defaults.check_char} ${text}`, context);
 }
 exports.done_log = done_log;
-function done_verbose_log(context, text) {
+function done_verbose_log(text, context = 'vdne') {
     _go_previous();
-    verbose_log(context, `${text}`);
+    verbose_log(`${text}`, context);
 }
 exports.done_verbose_log = done_verbose_log;
-function error_log(context, text) {
+function error_log(text, context = 'errr') {
     stop_loading();
     // const error_text = `${chalk.bgHex(`#4a3030`).hex(`#8b6666`)(`[ERROR] ${text}`)}`;
     // const error_text = `${chalk.hex(`#922424`)(`[ERROR] ${text}`)}`;
     const error_text = `${chalk_1.default.hex(`#874040`)(`[ERROR] ${text}`)}`;
-    log(context, error_text);
+    log(error_text, context);
 }
 exports.error_log = error_log;
 function end_log(text) {
@@ -78,18 +78,18 @@ function wrong_end_log(text) {
     log('end', (!defaults_1.conf.blank) ? chalk_1.default.red(end_text) : end_text);
 }
 exports.wrong_end_log = wrong_end_log;
-function verbose_log(context, text, color = '#668899') {
+function verbose_log(text, context = 'vlog', color = '#668899') {
     const color_text = (!defaults_1.conf.blank) ? chalk_1.default.hex(color)(text) : text;
-    _log(context, color_text, (defaults_1.conf.verbose === true));
+    _log(color_text, context, (defaults_1.conf.verbose === true));
 }
 exports.verbose_log = verbose_log;
-function log(context, text, color = '#859900') {
+function log(text, context = 'log', color = '#859900') {
     const color_text = (!defaults_1.conf.blank) ? chalk_1.default.hex(color)(text) : text;
-    _log(context, color_text, true);
+    _log(color_text, context, true);
 }
 exports.log = log;
-function _log(context, text, out = false) {
-    const output_text = _format_text(context, text);
+function _log(text, context = 'log', out = false) {
+    const output_text = _format_text(text, context);
     if (defaults_1.conf.filelog) {
         _log_to_file(output_text);
     }
@@ -107,7 +107,7 @@ function _log(context, text, out = false) {
         }
     }
 }
-function _format_text(context, text) {
+function _format_text(text, context = 'frmt') {
     let time = dateformat_1.default(new Date(), defaults_1.defaults.time_format);
     if (context.length < 4) {
         context = context.padEnd(4, '_');

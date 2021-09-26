@@ -56,6 +56,6 @@ function init_run(options) {
 }
 exports.init_run = init_run;
 function _log_options() {
-    output.verbose_log('opts', JSON.stringify(defaults_1.conf));
+    output.verbose_log(JSON.stringify(defaults_1.conf), 'opts');
 }
 //# sourceMappingURL=common.js.map

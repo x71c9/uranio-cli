@@ -55,14 +55,14 @@ exports.hooks = {
         defaults_1.conf.hide = true;
         exports.hooks.command();
         defaults_1.conf.hide = is_hidden;
-        output.done_log('hooks', `TRX Hooks generated.`);
+        output.done_log(`TRX Hooks generated.`, 'hooks');
     },
     command: () => {
         output.start_loading('Generating TRX Hooks...');
         util.read_rc_file();
         const text = _generate_text();
         _save_to_file(text);
-        output.done_log(`end`, `TRX Hooks generated.`);
+        output.done_log(`TRX Hooks generated.`, 'hooks');
     },
 };
 const _project_option = {
@@ -274,17 +274,17 @@ function _generate_text() {
         text += `\t},\n`;
     }
     text += `} as const;\n`;
-    output.done_verbose_log(`hooks`, `Generated hooks text.`);
+    output.done_verbose_log(`Generated hooks text.`, 'hooks');
     return text;
 }
 function _save_to_file(text) {
     const filepath_server = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/hooks/index.ts`;
     fs_1.default.writeFileSync(filepath_server, text);
     util.pretty(filepath_server);
-    output.done_verbose_log(`hooks`, `Created hooks file [${filepath_server}].`);
+    output.done_verbose_log(`Created hooks file [${filepath_server}].`, 'hooks');
     const filepath_client = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}/hooks/index.ts`;
     fs_1.default.writeFileSync(filepath_client, text);
     util.pretty(filepath_client);
-    output.done_verbose_log(`hooks`, `Created hooks file [${filepath_client}].`);
+    output.done_verbose_log(`Created hooks file [${filepath_client}].`, 'hooks');
 }
 //# sourceMappingURL=hooks.js.map

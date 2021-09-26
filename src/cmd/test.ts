@@ -16,7 +16,7 @@ export const test = {
 		
 		util.read_rc_file();
 		
-		output.verbose_log('TTTT','TEST URANIO LOG');
+		output.verbose_log('TEST URANIO LOG');
 		
 	}
 	

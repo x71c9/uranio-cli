@@ -55,25 +55,25 @@ function _go_previous(){
 	spinner_text(spinner_texts[spinner_texts.length - 1]);
 }
 
-export function done_log(context:string, text:string)
+export function done_log(text:string, context='done')
 		:void{
 	_go_previous();
-	log(context, `${defaults.check_char} ${text}`);
+	log(`${defaults.check_char} ${text}`, context);
 }
 
-export function done_verbose_log(context:string, text:string)
+export function done_verbose_log(text:string, context='vdne')
 		:void{
 	_go_previous();
-	verbose_log(context, `${text}`);
+	verbose_log(`${text}`, context);
 }
 
-export function error_log(context:string, text:string)
+export function error_log(text:string, context='errr')
 		:void{
 	stop_loading();
 	// const error_text = `${chalk.bgHex(`#4a3030`).hex(`#8b6666`)(`[ERROR] ${text}`)}`;
 	// const error_text = `${chalk.hex(`#922424`)(`[ERROR] ${text}`)}`;
 	const error_text = `${chalk.hex(`#874040`)(`[ERROR] ${text}`)}`;
-	log(context, error_text);
+	log(error_text, context);
 }
 
 export function end_log(text:string)
@@ -90,20 +90,20 @@ export function wrong_end_log(text:string)
 	log('end', (!conf.blank) ? chalk.red(end_text) : end_text);
 }
 
-export function verbose_log(context:string, text:string, color='#668899')
+export function verbose_log(text:string, context='vlog', color='#668899')
 		:void{
 	const color_text = (!conf.blank) ? chalk.hex(color)(text) : text;
-	_log(context, color_text, (conf.verbose === true));
+	_log(color_text, context, (conf.verbose === true));
 }
 
-export function log(context:string, text:string, color='#859900')
+export function log(text:string, context='log', color='#859900')
 		:void{
 	const color_text = (!conf.blank) ? chalk.hex(color)(text) : text;
-	_log(context, color_text, true);
+	_log(color_text, context, true);
 }
 
-function _log(context:string, text:string, out=false){
-	const output_text = _format_text(context, text);
+function _log(text:string, context='log', out=false){
+	const output_text = _format_text(text, context);
 	if(conf.filelog){
 		_log_to_file(output_text);
 	}
@@ -122,7 +122,7 @@ function _log(context:string, text:string, out=false){
 	}
 }
 
-function _format_text(context:string, text:string)
+function _format_text(text:string, context='frmt')
 		:string{
 	
 	let time = dateFormat(new Date(), defaults.time_format);

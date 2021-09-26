@@ -43,7 +43,7 @@ export function urn_process(args:Arguments)
 }
 
 function _log_arguments(args:Arguments){
-	output.verbose_log('args', JSON.stringify(args));
+	output.verbose_log(JSON.stringify(args), 'args');
 }
 
 function _set_conf(args:Arguments){
@@ -129,7 +129,7 @@ function _set_conf(args:Arguments){
 		}else{
 			conf.root = root;
 			common.init_log();
-			output.done_verbose_log('root', `$URNROOT$Project root set to [${conf.root}]`);
+			output.done_verbose_log(`$URNROOT$Project root set to [${conf.root}]`, 'root');
 		}
 	}else{
 		util.auto_set_project_root();
