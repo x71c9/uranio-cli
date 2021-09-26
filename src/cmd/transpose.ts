@@ -122,11 +122,11 @@ function _transpose_file(file_path:string){
 				alias.replace_file_aliases(new_path_client, alias.get_aliases(`${base_folder}/client/tsconfig.json`));
 				_avoid_import_loop(new_path_server);
 				_avoid_import_loop(new_path_client);
-				output.done_verbose_log('trsp', `Transposed file [${file_path}].`);
+				output.done_verbose_log(`Transposed file [${file_path}].`, 'trsp');
 			}
 			
 		}else{
-			output.error_log(`trsp`, `Invalid file path [${file_path}]. File must be in [${conf.root}/src/].`);
+			output.error_log(`Invalid file path [${file_path}]. File must be in [${conf.root}/src/].`, 'trsp');
 		}
 		
 	}
@@ -182,7 +182,7 @@ function _transpose_all(){
 	// output.end_log(`Transpose completed.`);
 	
 	output.stop_loading();
-	output.done_log(`end`,`Transpose completed.`);
+	output.done_log(`Transpose completed.`, 'end');
 }
 
 function _replace_import_to_avoid_loops(){
@@ -434,7 +434,7 @@ function _manipulate_and_create_files(filepath:string){
 	
 	output.start_loading(`${action[0].toUpperCase()}${action.substr(1)}...`);
 	
-	output.verbose_log(`mnpl`, `Started ${action}.`);
+	output.verbose_log(`Started ${action}.`, 'mnpl');
 	
 	// let sourceFile = _project.addSourceFileAtPath(`${conf.root}/src/book.ts`);
 	
@@ -537,7 +537,7 @@ function _create_a_book(
 		const filepath = `${conf.root}/${defaults.folder}/server/src/books/${book_name}.ts`;
 		const text = `\n` + required_imports.join('\n') + cloned_book_source.getText();
 		_create_a_book_file(filepath, text);
-		output.done_log(book_name, `Generated server book [${book_name}].`);
+		output.done_log(`Generated server book [${book_name}].`, book_name);
 		cloned_book_source.replaceWithText(text);
 		return cloned_book_source;
 	}
@@ -652,7 +652,7 @@ function _clean_all_but(but:string[], var_decl:tsm.VariableDeclaration)
 			}
 		}
 	}
-	output.done_verbose_log('props', `Removed all properties but [${but}].`);
+	output.done_verbose_log(`Removed all properties but [${but}].`, 'props');
 	return var_decl;
 }
 
@@ -769,7 +769,7 @@ function _append_required_book(book_decl:tsm.VariableDeclaration, required_book_
 		}
 	}
 	_add_core_books(book_decl, required_book_name);
-	output.done_verbose_log(`requ`, `Added required books.`);
+	output.done_verbose_log(`Added required books.`, 'requ');
 	return book_decl;
 }
 
@@ -787,7 +787,7 @@ function _append_required_book(book_decl:tsm.VariableDeclaration, required_book_
 function _add_as_const(book_decl:tsm.VariableDeclaration){
 	output.start_loading(`Adding as const...`);
 	book_decl.replaceWithText(book_decl.getText() + ' as const');
-	output.done_verbose_log(`asco`, `Added as const.`);
+	output.done_verbose_log(`Added as const.`, 'asco');
 	return book_decl;
 }
 
@@ -800,7 +800,7 @@ function _add_as_const(book_decl:tsm.VariableDeclaration){
 //     if(text.includes('./')){
 //       const replace = text.replace('./','../../');
 //       str_lit.replaceWithText(replace);
-//       output.verbose_log(`impo`, `Changed [${text}] to [${replace}].`);
+//       output.verbose_log(`Changed [${text}] to [${replace}].`, 'impo');
 //     }
 //   }
 //   return node;
@@ -812,7 +812,7 @@ function _remove_type_reference(book_decl:tsm.VariableDeclaration){
 	if(type_ref){
 		book_decl.removeType();
 	}
-	output.done_verbose_log('type', `Type reference removed.`);
+	output.done_verbose_log(`Type reference removed.`, 'type');
 	return book_decl;
 }
 
@@ -832,13 +832,13 @@ function _find_book_statement(sourceFile:tsm.SourceFile, book_name:string)
 			if(var_decl){
 				const name = var_decl.getName();
 				if(name === book_name){
-					output.verbose_log(`book`, `Statement of ${book_name} found.`);
+					output.verbose_log(`Statement of ${book_name} found.`, 'book');
 					return state;
 				}
 			}
 		}
 	}
-	output.verbose_log('book', `Cannot find ${book_name}`);
+	output.verbose_log(`Cannot find ${book_name}`, 'book');
 	return undefined;
 }
 
@@ -855,7 +855,7 @@ function _create_a_book_file(filepath:string, text:string){
 	const content = comment + text;
 	fs.writeFileSync(filepath, content);
 	util.pretty(filepath);
-	output.done_verbose_log(`book`, `Created book file [${filepath}].`);
+	output.done_verbose_log(`Created book file [${filepath}].`, 'book');
 }
 
 function _copy_imports(sourceFile:tsm.SourceFile){
@@ -865,7 +865,7 @@ function _copy_imports(sourceFile:tsm.SourceFile){
 	for(const state of import_states){
 		states.push(state.getText());
 	}
-	output.verbose_log('book', `Copied import statements.`);
+	output.verbose_log(`Copied import statements.`, 'cpim');
 	return states;
 }
 
@@ -892,13 +892,13 @@ function _resolve_aliases(){
 	const aliases_server = alias.get_aliases(tsconfig_server);
 	const server_dir = `${conf.root}/${defaults.folder}/server/src/`;
 	_traverse_ts_resolve_aliases(server_dir, aliases_server);
-	output.done_log('alias', `Server aliases replaced.`);
+	output.done_log(`Server aliases replaced.`, 'alias');
 	
 	const tsconfig_client = `${base_folder}/client/tsconfig.json`;
 	const aliases_client = alias.get_aliases(tsconfig_client);
 	const client_dir = `${conf.root}/${defaults.folder}/client/src/`;
 	_traverse_ts_resolve_aliases(client_dir, aliases_client);
-	output.done_log('alias', `Client aliases replaced.`);
+	output.done_log(`Client aliases replaced.`, 'alias');
 }
 
 function _resolve_aliases_in_books(){
@@ -912,7 +912,7 @@ function _resolve_aliases_in_books(){
 	alias.replace_file_aliases(`${books_dir_server}/dock.ts`,aliases_server);
 	alias.replace_file_aliases(`${books_dir_server}/routes.ts`,aliases_server);
 	alias.replace_file_aliases(`${books_dir_server}/bll.ts`,aliases_server);
-	output.done_log('alias', `Server books aliases replaced.`);
+	output.done_log(`Server books aliases replaced.`, 'alias');
 	
 	const books_dir_client = `${base_folder}/client/src/books`;
 	const tsconfig_client = `${base_folder}/client/tsconfig.json`;
@@ -920,7 +920,7 @@ function _resolve_aliases_in_books(){
 	alias.replace_file_aliases(`${books_dir_client}/atom.ts`,aliases_client);
 	alias.replace_file_aliases(`${books_dir_client}/dock.ts`,aliases_client);
 	alias.replace_file_aliases(`${books_dir_client}/routes.ts`,aliases_client);
-	output.done_log('alias', `Client books aliases replaced.`);
+	output.done_log(`Client books aliases replaced.`, 'alias');
 	
 }
 
@@ -932,7 +932,7 @@ function _generate_client_books(){
 	
 	_copy_routes_book();
 	
-	// output.done_log('client', `Client books generated.`);
+	// output.done_log(`Client books generated.`, 'client');
 }
 
 function _copy_routes_book(){
@@ -944,7 +944,7 @@ function _copy_routes_book(){
 		routes_server,
 		routes_client
 	);
-	output.done_verbose_log('rout', `Copied [${routes_server}] to [${routes_client}]`);
+	output.done_verbose_log(`Copied [${routes_server}] to [${routes_client}]`, 'rout');
 }
 
 function _fill_empty_docks(sourceFile:tsm.SourceFile){
@@ -1002,7 +1002,7 @@ function _fill_empty_docks(sourceFile:tsm.SourceFile){
 		}
 	}
 	
-	output.done_log('clnt', `Filled empty docks in dock book.`);
+	output.done_log(`Filled empty docks in dock book.`, 'clnt');
 	
 	return sourceFile;
 }
@@ -1042,7 +1042,7 @@ function _remove_dock_route_call_implementation(sourceFile:tsm.SourceFile){
 											comma.replaceWithText('');
 										}
 										prop.replaceWithText('');
-										output.verbose_log('clnt', `Removed route implementation [${atom_name}][${prop_id_name}]`);
+										output.verbose_log(`Removed route implementation [${atom_name}][${prop_id_name}]`, 'clnt');
 										break;
 									}
 								}
@@ -1054,7 +1054,7 @@ function _remove_dock_route_call_implementation(sourceFile:tsm.SourceFile){
 		}
 	}
 	
-	output.done_log('clnt', `Removed call implementation in dock book.`);
+	output.done_log(`Removed call implementation in dock book.`, 'clnt');
 	
 	return sourceFile;
 }
@@ -1096,11 +1096,11 @@ function _generate_client_book(book_name:BookName, required_props:string[]){
 		const filepath = `${client_books_dir}/${book_name}.ts`;
 		fs.writeFileSync(filepath, text);
 		util.pretty(filepath);
-		output.done_log('clnt', `Generated client book [${book_name}].`);
+		output.done_log(`Generated client book [${book_name}].`, 'clnt');
 	
 	}else{
 		
-		output.error_log(`err`, `Cannot find client book statements for [${book_name}]`);
+		output.error_log(`Cannot find client book statements for [${book_name}]`, 'err');
 		
 	}
 }
@@ -1123,7 +1123,7 @@ function _replace_uranio_client_dependecy(sourceFile:tsm.SourceFile){
 			const slash = (module_name[module_name.length - 2] === '/') ? '' : '/';
 			const replace_with = `"${module_name.substr(1, module_name.length -2)}${slash}client"`;
 			str_lit.replaceWithText(replace_with);
-			output.verbose_log('clnt', `Replaced [${module_name}] to [${replace_with}]`);
+			output.verbose_log(`Replaced [${module_name}] to [${replace_with}]`, 'clnt');
 		}
 	}
 	return sourceFile;
@@ -1153,7 +1153,7 @@ function _keep_only_client_first_level_properties(sourceFile:tsm.SourceFile, boo
 							comma.replaceWithText('');
 						}
 						prop.replaceWithText('');
-						output.verbose_log('clnt', `Removed property [${atom_name}][${ide_text}]`);
+						output.verbose_log(`Removed property [${atom_name}][${ide_text}]`, 'clnt');
 					}
 				}
 			}
@@ -1194,7 +1194,7 @@ function _keep_only_client_second_level_properties(sourceFile:tsm.SourceFile, bo
 								comma.replaceWithText('');
 							}
 							sec_prop.replaceWithText('');
-							output.verbose_log('clnt', `Removed property [${atom_name}][${ide_text}]`);
+							output.verbose_log(`Removed property [${atom_name}][${ide_text}]`, 'clnt');
 						}
 					}
 				}

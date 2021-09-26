@@ -60,7 +60,7 @@ export const alias = {
 		
 		conf.hide = is_hidden;
 		
-		output.done_log('alias', `Aliases updated.`);
+		output.done_log(`Aliases updated.`, 'alias');
 		
 	}
 	
@@ -92,7 +92,7 @@ export function get_aliases(tsconfig_path:string):Aliases{
 function _replace_modified_file(text:string, filename:string){
 	output.start_loading(`Writing manipulated file...`);
 	fs.writeFileSync(filename, text);
-	output.done_verbose_log(`alias`, `File replaced [${filename}].`);
+	output.done_verbose_log(`File replaced [${filename}].`, 'alias');
 }
 
 function _replace_aliases_server(aliases:Aliases){
@@ -170,7 +170,7 @@ function _change_to_relative(node:tsm.Node, aliases:Aliases)
 			const prepend = (relative_path.charAt(0) !== '.') ? './' : '';
 			const replace = `${prepend}${relative_path}${module_append}${append}`;
 			str_lit.replaceWithText(`'${replace}'`);
-			output.verbose_log(`alias`, `Changed [${full_module_name}] to [${replace}].`);
+			output.verbose_log(`Changed [${full_module_name}] to [${replace}].`, 'alias');
 		}
 	}
 	return found;

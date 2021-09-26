@@ -40,7 +40,7 @@ exports.test = {
     command: () => __awaiter(void 0, void 0, void 0, function* () {
         output.stop_loading();
         util.read_rc_file();
-        output.verbose_log('TTTT', 'TEST URANIO LOG');
+        output.verbose_log('TEST URANIO LOG');
     })
 };
 //# sourceMappingURL=test.js.map

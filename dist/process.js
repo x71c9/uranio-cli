@@ -40,7 +40,7 @@ function urn_process(args) {
 }
 exports.urn_process = urn_process;
 function _log_arguments(args) {
-    output.verbose_log('args', JSON.stringify(args));
+    output.verbose_log(JSON.stringify(args), 'args');
 }
 function _set_conf(args) {
     const force = args.f || args.force;
@@ -106,7 +106,7 @@ function _set_conf(args) {
         else {
             defaults_1.conf.root = root;
             common.init_log();
-            output.done_verbose_log('root', `$URNROOT$Project root set to [${defaults_1.conf.root}]`);
+            output.done_verbose_log(`$URNROOT$Project root set to [${defaults_1.conf.root}]`, 'root');
         }
     }
     else {

@@ -43,7 +43,7 @@ export const dev = {
 		const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
 		
 		const cmd = `${cd_cmd} && ${ts_cmd}`;
-		output.verbose_log('dev', cmd);
+		output.verbose_log(cmd, 'dev');
 		
 		util.spawn_log_command(cmd, 'tscw', tscw_color);
 		
@@ -61,7 +61,7 @@ export const dev = {
 		const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
 		
 		const cmd = `${cd_cmd} && ${nu_cmd}`;
-		output.verbose_log(`dev`, cmd);
+		output.verbose_log(cmd, 'dev');
 		
 		if(native === true){
 			util.spawn_native_log_command(cmd, 'nuxt', nuxt_color);
@@ -111,17 +111,17 @@ async function _start_dev()
 	util.spawn_log_command(tscw_cmd, 'tscw', tscw_color);
 	
 	const src_path = `${conf.root}/src/`;
-	output.log(`wtch`, `Watching \`src\` folder [${src_path}] ...`, watc_color);
+	output.log(`Watching \`src\` folder [${src_path}] ...`, 'wtch', watc_color);
 	
 	util.watch(
 		src_path,
 		`watching \`src\` folder.`,
 		() => {
-			output.done_log(`wtch`, `Initial scanner completed for [${src_path}].`);
+			output.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
 			watch_src_scanned = true;
 		},
 		(_event, _path) => {
-			output.verbose_log(`wtch`, `${_event} ${_path}`, watc_color);
+			output.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
 			if(!watch_src_scanned){
 				return false;
 			}
@@ -134,7 +134,7 @@ async function _start_dev()
 					hooks.run(cli_options);
 				}
 				
-				output.done_log(`wtch`, `[Book watch] Transposed [${_path}].`);
+				output.done_log(`[Book watch] Transposed [${_path}].`, 'wtch');
 			
 			}else{
 				const relative_path = _path.replace(`${conf.root}/src/`, '');
@@ -148,17 +148,17 @@ async function _start_dev()
 	);
 
 	const lib_path = `${conf.root}/${defaults.folder}/server/src/${defaults.repo_folder}/`;
-	output.log(`wtch`, `Watching uranio repo folder [${lib_path}] ...`, watc_color);
+	output.log(`Watching uranio repo folder [${lib_path}] ...`, 'wtch', watc_color);
 	
 	util.watch(
 		lib_path,
 		`watching uranio repo folder.`,
 		() => {
-			output.done_log(`wtch`, `Initial scanner completed for [${lib_path}].`);
+			output.done_log(`Initial scanner completed for [${lib_path}].`, 'wtch');
 			watch_lib_scanned = true;
 		},
 		(_event, _path) => {
-			output.verbose_log(`wtch`, `${_event} ${_path}`, watc_color);
+			output.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
 			if(!watch_lib_scanned){
 				return false;
 			}
@@ -185,6 +185,6 @@ function _replace_netlify_function_file(){
 		new_content += `\n// ${update_number + 1}`;
 	}
 	fs.writeFileSync(api_file_path, new_content, 'utf8');
-	output.verbose_log('less', `Replacing Netlify serverless function file.`);
+	output.verbose_log(`Replacing Netlify serverless function file.`, 'less');
 }
 

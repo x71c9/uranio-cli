@@ -48,6 +48,6 @@ export function init_run(options?:Partial<Options>)
 }
 
 function _log_options(){
-	output.verbose_log('opts', JSON.stringify(conf));
+	output.verbose_log(JSON.stringify(conf), 'opts');
 }
 
