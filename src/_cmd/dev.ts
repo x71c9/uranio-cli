@@ -11,6 +11,7 @@ import * as output from '../output/';
 import * as util from '../util/';
 
 import {conf, defaults} from '../conf/defaults';
+// import {conf} from '../conf/defaults';
 
 import {Arguments} from '../types';
 

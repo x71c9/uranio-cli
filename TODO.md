@@ -1,5 +1,18 @@
 #### TODO
 
+##### Module functions
+
+- uranio init
+- uranio dev
+- uranio dev:server
+- uranio dev:client
+- uranio build
+- uranio build:server
+- uranio build:client
+- uranio transpose
+- uranio alias
+- uranio hooks
+
 
 ##### Refactor and make clearer functions for executing commands:
 
