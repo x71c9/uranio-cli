@@ -1,5 +1,5 @@
 /**
- * Log module
+ * Output class
  *
  * @packageDocumentation
  */
@@ -13,6 +13,8 @@ import chalk from 'chalk';
 import fs from 'fs';
 
 import {defaults} from '../conf/defaults';
+
+import {OutputParams} from './types';
 
 class Output {
 	
@@ -110,22 +112,23 @@ class Output {
 	}
 	
 	private _log(text:string, context='log', out=false){
-		const output_text = this._format_text(text, context);
+		const output_text = (!this.native) ?
+			this._format_text(text, context) : text;
 		if(this.filelog){
 			_log_to_file(output_text);
 		}
 		if(out){
-			// let was_spinning = false;
-			// if(spinner.isSpinning){
-			//   was_spinning = true;
-			//   stop_loading();
-			// }
+			let was_spinning = false;
+			if(this.spinner.isSpinning){
+				was_spinning = true;
+				this.stop_loading();
+			}
 			if(this.hide === false){
 				process.stdout.write(output_text);
 			}
-			// if(this.spin === true && was_spinning){
-			//   spinner.start();
-			// }
+			if(this.spin === true && was_spinning){
+				this.spinner.start();
+			}
 		}
 	}
 	
@@ -228,18 +231,6 @@ function _log_to_file(text:string)
 }
 
 export type OutputInstance = InstanceType<typeof Output>;
-
-type OutputParams = {
-	root: string,
-	native: boolean,
-	blank: boolean,
-	hide: boolean,
-	spin: boolean,
-	verbose: boolean,
-	fullwidth: boolean,
-	filelog: boolean,
-	prefix: string
-}
 
 const default_params:OutputParams = {
 	root: '.',

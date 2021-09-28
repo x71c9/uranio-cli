@@ -16,9 +16,9 @@ import {
 
 import {defaults, jsonfile_path} from '../conf/defaults';
 
-import * as output from '../output/';
+import * as out from '../output/';
 
-import * as util from '../util/';
+import * as utl from '../util/';
 
 import {alias} from './alias';
 
@@ -38,24 +38,29 @@ const init_params:InitParams = {
 	branch: 'master'
 };
 
-export async function init(
-	root:string,
-	repo: Repo,
-	deploy: Deploy,
-	pacman: PacMan,
-	branch:string
-):Promise<void>{
+let output:out.OutputInstance;
+let util:util.UtilInstance;
+
+export async function init(params:InitParams, output_params:out.OutputParams)
+		:Promise<void>{
 	
-	init_params.root = root;
-	init_params.repo = repo;
-	init_params.deploy = deploy;
-	init_params.pacman = pacman;
-	init_params.branch = branch;
+	if(!output_params.root){
+		output_params.root = params.root;
+	}
+	output = out.create(output_params);
 	
-	output.verbose_log(`$URNROOT$Project root: [${root}]`, 'root');
-	output.verbose_log(`Selected repo: [${repo}]`, 'repo');
+	util = utl.create(output);
+	
+	init_params.root = params.root;
+	init_params.repo = params.repo;
+	init_params.deploy = params.deploy;
+	init_params.pacman = params.pacman;
+	init_params.branch = params.branch;
+	
+	output.verbose_log(`$URNROOT$Project root: [${init_params.root}]`, 'root');
+	output.verbose_log(`Selected repo: [${init_params.repo}]`, 'repo');
 	if(init_params.repo === 'api'){
-		output.verbose_log(`Selected deploy: [${deploy}]`, 'dply');
+		output.verbose_log(`Selected deploy: [${init_params.deploy}]`, 'dply');
 	}
 	
 	_update_package_aliases();

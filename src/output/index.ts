@@ -4,4 +4,6 @@
  * @packageDocumentation
  */
 
-export * from './output';
+export * from './class';
+
+export * from './types';
