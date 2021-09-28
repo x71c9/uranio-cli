@@ -6,7 +6,19 @@
 
 // import * as cp from 'child_process';
 
-// import * as output from '../output/';
+import * as out from '../output/';
+
+class Spawn {
+	
+	constructor(public output:out.OutputInstance){}
+	
+}
+
+export type SpawnInstance = InstanceType<typeof Spawn>;
+
+export function create(output:out.OutputInstance):SpawnInstance{
+	return new Spawn(output);
+}
 
 // export function sync_exec(command:string)
 //     :void{
