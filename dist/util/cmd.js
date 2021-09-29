@@ -36,14 +36,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = void 0;
 // import fs from 'fs';
 const urn_lib_1 = require("urn-lib");
+// DO NO CANCEL IT
 // import * as common from '../cmd/common';
 const fs = __importStar(require("./fs"));
+const spawn = __importStar(require("./spawn"));
 const types_1 = require("../types");
 const defaults_1 = require("../conf/defaults");
 class CMD {
     constructor(output) {
         this.output = output;
         this.fs = fs.create(output);
+        this.spawn = spawn.create(output);
     }
     // public merge_options(options:Partial<Options>):void{
     //   let k:keyof Options;
@@ -94,7 +97,7 @@ class CMD {
                 process.exit(1);
             }
         }
-        common.init_log();
+        // common.init_log();
         this.output.done_verbose_log(`$URNROOT$Project root found [${defaults_1.conf.root}]`, 'root');
     }
     set_repo(repo) {
@@ -150,7 +153,7 @@ class CMD {
             const action = `installing dependencies [${repo}]`;
             this.output.verbose_log(`Started ${action}`, context);
             return new Promise((resolve, reject) => {
-                spawn_cmd(_pacman_commands.install[defaults_1.conf.pacman](repo), context, action, resolve, reject);
+                this.spawn.spin(_pacman_commands.install[defaults_1.conf.pacman](repo), context, action, resolve, reject);
             });
         });
     }
@@ -159,7 +162,7 @@ class CMD {
             const action = `installing dev dependencies [${repo}]`;
             this.output.verbose_log(`Started ${action}`, context);
             return new Promise((resolve, reject) => {
-                spawn_cmd(_pacman_commands.install_dev[defaults_1.conf.pacman](repo), context, action, resolve, reject);
+                this.spawn.spin(_pacman_commands.install_dev[defaults_1.conf.pacman](repo), context, action, resolve, reject);
             });
         });
     }
@@ -168,7 +171,7 @@ class CMD {
             const action = `uninstalling dependencies [${repo}]`;
             this.output.verbose_log(`Started ${action}`, context);
             return new Promise((resolve, reject) => {
-                spawn_cmd(_pacman_commands.uninstall[defaults_1.conf.pacman](repo), context, action, resolve, reject);
+                this.spawn.spin(_pacman_commands.uninstall[defaults_1.conf.pacman](repo), context, action, resolve, reject);
             });
         });
     }
@@ -206,7 +209,7 @@ class CMD {
                     `-b ${branch} ` : '';
                 let cmd = `git clone ${branch_str}${address} ${dest_folder} --progress`;
                 cmd += (recursive === true) ? ` --recurse-submodules` : '';
-                spawn_cmd(cmd, context, action, resolve, reject);
+                this.spawn.spin(cmd, context, action, resolve, reject);
             });
         });
     }

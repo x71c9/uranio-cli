@@ -86,7 +86,7 @@ function _add_admin_files(){
 	output.start_loading(`Adding admin files...`);
 	const fix_file_nuxt_types = `${init_params.root}/node_modules/@nuxt/types/node_modules/index.d.ts`;
 	if(!fs.existsSync(fix_file_nuxt_types)){
-		util.sync_exec(`touch ${fix_file_nuxt_types}`);
+		util.spawn.exec_sync(`touch ${fix_file_nuxt_types}`);
 	}
 }
 
@@ -130,9 +130,9 @@ async function _clone_dot(){
 function _remove_git_files(){
 	output.start_loading(`Removing git files...`);
 	const cloned_server_repo_path = `${init_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}`;
-	util.sync_exec(`( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`);
+	util.spawn.exec_sync(`( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`);
 	const cloned_client_repo_path = `${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`;
-	util.sync_exec(`( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`);
+	util.spawn.exec_sync(`( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`);
 	output.done_log(`Removed uranio .git files.`, '.git');
 }
 

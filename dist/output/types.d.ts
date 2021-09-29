@@ -13,4 +13,6 @@ export declare type OutputParams = {
     fullwidth: boolean;
     filelog: boolean;
     prefix: string;
+    color: string;
+    color_verbose: string;
 };

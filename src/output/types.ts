@@ -13,5 +13,7 @@ export type OutputParams = {
 	verbose: boolean,
 	fullwidth: boolean,
 	filelog: boolean,
-	prefix: string
+	prefix: string,
+	color: string,
+	color_verbose: string
 }

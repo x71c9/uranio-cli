@@ -10,9 +10,12 @@ import {urn_util} from 'urn-lib';
 
 import * as out from '../output/';
 
+// DO NO CANCEL IT
 // import * as common from '../cmd/common';
 
 import * as fs from './fs';
+
+import * as spawn from './spawn';
 
 import {
 	abstract_repos,
@@ -32,9 +35,11 @@ import {conf, jsonfile_path} from '../conf/defaults';
 class CMD {
 	
 	public fs:fs.FSInstance;
+	public spawn:spawn.SpawnInstance;
 	
 	constructor(public output:out.OutputInstance){
 		this.fs = fs.create(output);
+		this.spawn = spawn.create(output);
 	}
 	
 	// public merge_options(options:Partial<Options>):void{
@@ -90,7 +95,7 @@ class CMD {
 				process.exit(1);
 			}
 		}
-		common.init_log();
+		// common.init_log();
 		this.output.done_verbose_log(`$URNROOT$Project root found [${conf.root}]`, 'root');
 	}
 
@@ -156,7 +161,7 @@ class CMD {
 		const action = `installing dependencies [${repo}]`;
 		this.output.verbose_log(`Started ${action}`, context);
 		return new Promise((resolve, reject) => {
-			spawn_cmd(_pacman_commands.install[conf.pacman](repo), context, action, resolve, reject);
+			this.spawn.spin(_pacman_commands.install[conf.pacman](repo), context, action, resolve, reject);
 		});
 	}
 
@@ -165,7 +170,7 @@ class CMD {
 		const action = `installing dev dependencies [${repo}]`;
 		this.output.verbose_log(`Started ${action}`, context);
 		return new Promise((resolve, reject) => {
-			spawn_cmd(_pacman_commands.install_dev[conf.pacman](repo), context, action, resolve, reject);
+			this.spawn.spin(_pacman_commands.install_dev[conf.pacman](repo), context, action, resolve, reject);
 		});
 	}
 
@@ -174,7 +179,7 @@ class CMD {
 		const action = `uninstalling dependencies [${repo}]`;
 		this.output.verbose_log(`Started ${action}`, context);
 		return new Promise((resolve, reject) => {
-			spawn_cmd(_pacman_commands.uninstall[conf.pacman](repo), context, action, resolve, reject);
+			this.spawn.spin(_pacman_commands.uninstall[conf.pacman](repo), context, action, resolve, reject);
 		});
 	}
 	
@@ -220,7 +225,7 @@ class CMD {
 				`-b ${branch} ` : '';
 			let cmd = `git clone ${branch_str}${address} ${dest_folder} --progress`;
 			cmd += (recursive === true) ? ` --recurse-submodules` : '';
-			spawn_cmd(cmd, context, action, resolve, reject);
+			this.spawn.spin(cmd, context, action, resolve, reject);
 		});
 	}
 	

@@ -31,7 +31,9 @@ class Output {
 		public verbose=false,
 		public fullwidth=false,
 		public filelog=true,
-		public prefix=''
+		public prefix='',
+		public color='#859900',
+		public color_verbose='#668899'
 	){
 		
 		this.spinner = ora({text: 'Loading...', color: 'magenta', interval: 40});
@@ -39,15 +41,17 @@ class Output {
 		
 	}
 	
-	public log(text:string, context='log', color='#859900')
+	public log(text:string, context='log', color?:string)
 			:void{
-		const colored_text = (!this.blank) ? chalk.hex(color)(text) : text;
+		const final_color = (typeof color === 'string') ? color : this.color;
+		const colored_text = (!this.blank) ? chalk.hex(final_color)(text) : text;
 		this._log(colored_text, context, true);
 	}
 	
-	public verbose_log(text:string, context='vlog', color='#668899')
+	public verbose_log(text:string, context='vlog', color?:string)
 			:void{
-		const colored_text = (!this.blank) ? chalk.hex(color)(text) : text;
+		const final_color = (typeof color === 'string') ? color : this.color_verbose;
+		const colored_text = (!this.blank) ? chalk.hex(final_color)(text) : text;
 		this._log(colored_text, context, (this.verbose === true));
 	}
 	
@@ -113,7 +117,7 @@ class Output {
 	
 	private _log(text:string, context='log', out=false){
 		const output_text = (!this.native) ?
-			this._format_text(text, context) : text;
+			this._format_text(text, context) : text + '\n';
 		if(this.filelog){
 			_log_to_file(output_text);
 		}
@@ -241,7 +245,9 @@ const default_params:OutputParams = {
 	verbose: false,
 	fullwidth: false,
 	filelog: true,
-	prefix: ''
+	prefix: '',
+	color: '#859900',
+	color_verbose: '#668899'
 };
 
 export function create(params: Partial<OutputParams>)
@@ -259,7 +265,9 @@ export function create(params: Partial<OutputParams>)
 		merged_params.verbose,
 		merged_params.fullwidth,
 		merged_params.filelog,
-		merged_params.prefix
+		merged_params.prefix,
+		merged_params.color,
+		merged_params.color_verbose
 	);
 }
 

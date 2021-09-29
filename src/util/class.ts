@@ -18,6 +18,18 @@ import * as cmd from './cmd';
 
 import {WatchProcessObject, OnReadyCallback, OnAllCallback} from './types';
 
+const watch_child_list:WatchProcessObject[] = [];
+
+process.on('SIGINT', function() {
+	process.stdout.write("\r--- Caught interrupt signal [watch] ---\n");
+	for(let i = 0; i < watch_child_list.length; i++){
+		const watch_child_object = watch_child_list[i];
+		watch_child_object.child.close().then(() => {
+			process.stdout.write(`Stopped ${watch_child_object.text}\n`);
+		});
+	}
+});
+
 class Util {
 	
 	public fs:fs.FSInstance;
@@ -25,8 +37,6 @@ class Util {
 	public cmd:cmd.CMDInstance;
 	
 	public spawn:spawn.SpawnInstance;
-	
-	public watch_child_list:WatchProcessObject[] = [];
 	
 	constructor(public output:out.OutputInstance){
 		this.fs = fs.create(output);
@@ -41,7 +51,7 @@ class Util {
 		on_all: OnAllCallback
 	):void{
 		const watch_child = chokidar.watch(watch_path).on('ready', on_ready).on('all', on_all);
-		this.watch_child_list.push({
+		watch_child_list.push({
 			child: watch_child,
 			context: `wtch`,
 			text: watch_text

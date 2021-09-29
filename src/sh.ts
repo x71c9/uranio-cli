@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import {parser} from './args/';
+// import {parser} from './args/';
 
-import {urn_process} from './process';
+// import {urn_process} from './process';
 
-const args = parser(process.argv.slice(2));
+// const args = parser(process.argv.slice(2));
 
-urn_process(args);
+// urn_process(args);

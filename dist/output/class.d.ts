@@ -15,9 +15,11 @@ declare class Output {
     fullwidth: boolean;
     filelog: boolean;
     prefix: string;
+    color: string;
+    color_verbose: string;
     spinner: ora.Ora;
     spinner_texts: string[];
-    constructor(root: string, native?: boolean, blank?: boolean, hide?: boolean, spin?: boolean, verbose?: boolean, fullwidth?: boolean, filelog?: boolean, prefix?: string);
+    constructor(root: string, native?: boolean, blank?: boolean, hide?: boolean, spin?: boolean, verbose?: boolean, fullwidth?: boolean, filelog?: boolean, prefix?: string, color?: string, color_verbose?: string);
     log(text: string, context?: string, color?: string): void;
     verbose_log(text: string, context?: string, color?: string): void;
     done_log(text: string, context?: string): void;
