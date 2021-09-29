@@ -15,14 +15,11 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./help"), exports);
 __exportStar(require("./init"), exports);
-__exportStar(require("./transpose"), exports);
-__exportStar(require("./alias"), exports);
-__exportStar(require("./hooks"), exports);
-__exportStar(require("./dev"), exports);
-__exportStar(require("./test"), exports);
-__exportStar(require("./build"), exports);
-// export * from './server';
-// export * from './client';
+// export * from './dev';
+// export * from './build';
+// export * from './transpose';
+// export * from './alias';
+// export * from './hooks';
+// export * from './test';
 //# sourceMappingURL=index.js.map

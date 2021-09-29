@@ -4,8 +4,17 @@
  *
  * @packageDocumentation
  */
-// import * as cp from 'child_process';
-// import * as output from '../output/';
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.create = void 0;
+class Spawn {
+    constructor(output) {
+        this.output = output;
+    }
+}
+function create(output) {
+    return new Spawn(output);
+}
+exports.create = create;
 // export function sync_exec(command:string)
 //     :void{
 //   output.verbose_log(`Executing ${command}`, 'exec');

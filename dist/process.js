@@ -29,7 +29,7 @@ const util = __importStar(require("./util/"));
 const cmd_1 = require("./cmd/");
 const defaults_1 = require("./conf/defaults");
 const output = __importStar(require("./output/"));
-const common = __importStar(require("./cmd/common"));
+// import * as common from './cmd/common';
 function urn_process(args) {
     _set_conf(args);
     process.chdir(defaults_1.conf.root);
@@ -135,31 +135,31 @@ function _switch_command(args) {
             break;
         }
         case 'transpose': {
-            cmd_1.transpose.command(args);
+            transpose.command(args);
             break;
         }
         case 'alias': {
-            cmd_1.alias.command();
+            alias.command();
             break;
         }
         case 'hooks': {
-            cmd_1.hooks.command();
+            hooks.command();
             break;
         }
         case 'dev': {
             switch (splitted_cmd[1]) {
                 case 'server': {
-                    cmd_1.dev.server();
+                    dev.server();
                     break;
                 }
                 case 'client': {
-                    cmd_1.dev.client(args);
+                    dev.client(args);
                     break;
                 }
                 case '':
                 case undefined:
                 default: {
-                    cmd_1.dev.command();
+                    dev.command();
                 }
             }
             break;
@@ -167,27 +167,27 @@ function _switch_command(args) {
         case 'build': {
             switch (splitted_cmd[1]) {
                 case 'server': {
-                    cmd_1.build.server();
+                    build.server();
                     break;
                 }
                 case 'client': {
-                    cmd_1.build.client();
+                    build.client();
                     break;
                 }
                 case '':
                 case undefined:
                 default: {
-                    cmd_1.build.command();
+                    build.command();
                 }
             }
             break;
         }
         case 'help': {
-            cmd_1.help.command();
+            help.command();
             break;
         }
         case 'test': {
-            cmd_1.test.command();
+            test.command();
             break;
         }
         default: {

@@ -1,5 +1,5 @@
 /**
- * Util Watch
+ * Misc
  *
  * @packageDocumentation
  */

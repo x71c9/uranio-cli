@@ -20,7 +20,7 @@ import * as out from '../output/';
 
 import * as utl from '../util/';
 
-import {alias} from './alias';
+// import {alias} from './alias';
 
 type InitParams = {
 	root: string
@@ -39,7 +39,7 @@ const init_params:InitParams = {
 };
 
 let output:out.OutputInstance;
-let util:util.UtilInstance;
+let util:utl.UtilInstance;
 
 export async function init(params:InitParams, output_params:out.OutputParams)
 		:Promise<void>{
@@ -92,12 +92,12 @@ function _add_admin_files(){
 
 function _replace_aliases(){
 	output.start_loading(`Updating relative paths aliases...`);
-	alias.include(init_params.root, init_params.repo);
+	// alias.include(init_params.root, init_params.repo);
 }
 
 function _remove_tmp(){
 	output.start_loading(`Removing tmp folder [${defaults.tmp_folder}]...`);
-	util.remove_folder_if_exists('dot', `${init_params.root}/${defaults.tmp_folder}`);
+	util.fs.remove_directory(`${init_params.root}/${defaults.tmp_folder}`, 'tmp');
 	output.done_verbose_log(`Removed tmp folder [${defaults.tmp_folder}].`, 'tmp');
 }
 
@@ -116,12 +116,12 @@ function _copy_dot_files(){
 
 async function _clone_dot(){
 	output.start_loading(`Cloning dot...`);
-	util.remove_folder_if_exists('dot', defaults.tmp_folder);
-	util.create_folder_if_doesnt_exists('dot', defaults.tmp_folder);
-	await util.clone_repo(
-		'dot',
+	util.fs.remove_directory(defaults.tmp_folder, 'dot');
+	util.fs.create_directory(defaults.tmp_folder, 'dot');
+	await util.cmd.clone_repo(
 		defaults.dot_repo,
 		`${init_params.root}/${defaults.tmp_folder}/urn-dot`,
+		'dot',
 		init_params.branch
 	);
 	output.done_log(`Cloned dot repo.`, 'dot');
@@ -162,14 +162,14 @@ async function _clone_and_install_repo(){
 
 function _create_client_server_folders(){
 	output.start_loading(`Creating server folder...`);
-	util.create_folder_if_doesnt_exists('init', `${init_params.root}/${defaults.folder}/server`);
-	util.create_folder_if_doesnt_exists('init', `${init_params.root}/${defaults.folder}/server/src`);
-	util.create_folder_if_doesnt_exists('init', `${init_params.root}/${defaults.folder}/server/src/books`);
+	util.fs.create_directory(`${init_params.root}/${defaults.folder}/server`, 'init');
+	util.fs.create_directory(`${init_params.root}/${defaults.folder}/server/src`, 'init');
+	util.fs.create_directory(`${init_params.root}/${defaults.folder}/server/src/books`, 'init');
 	output.start_loading(`Creating client folder...`);
-	util.create_folder_if_doesnt_exists('init', `${init_params.root}/${defaults.folder}/client`);
-	util.create_folder_if_doesnt_exists('init', `${init_params.root}/${defaults.folder}/client/src`);
-	util.create_folder_if_doesnt_exists('init', `${init_params.root}/${defaults.folder}/client/src/books`);
-	output.done_log('init', `Created client server folders.`);
+	util.fs.create_directory(`${init_params.root}/${defaults.folder}/client`, 'init');
+	util.fs.create_directory(`${init_params.root}/${defaults.folder}/client/src`, 'init');
+	util.fs.create_directory(`${init_params.root}/${defaults.folder}/client/src/books`, 'init');
+	output.done_log(`Created client server folders.`, 'init');
 }
 
 function _create_rc_file(){
@@ -189,7 +189,7 @@ function _ignore_urn_folder(){
 	output.start_loading(`Adding ${defaults.folder} to .gitignore...`);
 	const gitignore = `${init_params.root}/.gitignore`;
 	if(!fs.existsSync(gitignore)){
-		util.sync_exec(`touch ${gitignore}`);
+		util.fs.create_file(gitignore, 'giti');
 	}
 	let content = fs.readFileSync(gitignore, 'utf8');
 	if(content.indexOf(defaults.folder+'/') === -1){
@@ -205,8 +205,8 @@ function _ignore_urn_folder(){
 
 function _create_urn_folder(){
 	output.start_loading(`Creating ${defaults.folder} folder...`);
-	util.remove_folder_if_exists('init', `${init_params.root}/${defaults.folder}`);
-	util.create_folder_if_doesnt_exists('init', `${init_params.root}/${defaults.folder}`);
+	util.fs.remove_directory(`${init_params.root}/${defaults.folder}`, 'init');
+	util.fs.create_directory(`${init_params.root}/${defaults.folder}`, 'init');
 	output.done_log(`Created folder ${defaults.folder}.`, 'init');
 }
 
@@ -277,27 +277,27 @@ function _update_package_aliases(){
 function _copy_dot_src_folder(){
 	const dot_src_folder = `${init_params.root}/${defaults.tmp_folder}/urn-dot/src`;
 	const dest = `${init_params.root}/`;
-	util.copy_folder('dot', dot_src_folder, dest);
+	util.fs.copy_directory(dot_src_folder, dest, 'dot');
 }
 
 function _copy_dot_tsconfigs(){
 	const dot_tsc_file = `${init_params.root}/${defaults.tmp_folder}/urn-dot/tsconfig.json`;
 	const dest = `${init_params.root}/`;
-	util.copy_file('dot', dot_tsc_file, dest);
+	util.fs.copy_file(dot_tsc_file, dest, 'tsco');
 	
 	const dot_tsc_file_server = `${init_params.root}/${defaults.tmp_folder}/urn-dot/.uranio/server/tsconfig.json`;
 	const dest_server = `${init_params.root}/.uranio/server/`;
-	util.copy_file('dot', dot_tsc_file_server, dest_server);
+	util.fs.copy_file(dot_tsc_file_server, dest_server, 'tscs');
 	
 	const dot_tsc_file_client = `${init_params.root}/${defaults.tmp_folder}/urn-dot/.uranio/client/tsconfig.json`;
 	const dest_client = `${init_params.root}/.uranio/client/`;
-	util.copy_file('dot', dot_tsc_file_client, dest_client);
+	util.fs.copy_file(dot_tsc_file_client, dest_client, 'tscc');
 }
 
 function _copy_dot_eslint_files(){
 	const dot_eslint_files = `${init_params.root}/${defaults.tmp_folder}/urn-dot/.eslint*`;
 	const dest = `${init_params.root}/`;
-	util.copy_files('dot', dot_eslint_files, dest);
+	util.fs.copy_file(dot_eslint_files, dest, 'esln');
 }
 
 function _copy_netlify_files(){
@@ -305,7 +305,7 @@ function _copy_netlify_files(){
 	
 	const toml_file = `${dot_deploy_folder}/netlify/netlify.toml`;
 	const toml_dest = `${init_params.root}/`;
-	util.copy_file('dot', toml_file, toml_dest);
+	util.fs.copy_file(toml_file, toml_dest, 'ntlf');
 	
 	const function_folder = `${init_params.root}/${defaults.folder}/server/src/functions`;
 	if(!fs.existsSync(function_folder)){
@@ -317,7 +317,7 @@ function _copy_netlify_files(){
 	}
 	const functions_file = `${dot_deploy_folder}/netlify/functions/${api_file}`;
 	const functions_dest = `${function_folder}/api.ts`;
-	util.copy_file('dot', functions_file, functions_dest);
+	util.fs.copy_file(functions_file, functions_dest, 'dot');
 }
 
 function _copy_express_files(){
@@ -328,21 +328,21 @@ function _copy_express_files(){
 	}
 	const index_file = `${dot_deploy_folder}/express/index.txt`;
 	const index_dest = `${src_folder}/index.ts`;
-	util.copy_file('dot', index_file, index_dest);
+	util.fs.copy_file(index_file, index_dest, 'xprs');
 }
 
 async function _clone_core(){
 	output.start_loading(`Cloning core...`);
-	await util.clone_repo(
-		'core',
+	await util.cmd.clone_repo(
 		defaults.core_repo,
 		`${init_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}`,
+		'core',
 		init_params.branch
 	);
-	await util.clone_repo(
-		'core',
+	await util.cmd.clone_repo(
 		defaults.core_repo,
 		`${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
+		'core',
 		init_params.branch
 	);
 	output.done_log(`Cloned core repo.`, 'core');
@@ -350,16 +350,16 @@ async function _clone_core(){
 
 async function _clone_api(){
 	output.start_loading(`Cloning api...`);
-	await util.clone_repo_recursive(
-		'api',
+	await util.cmd.clone_repo_recursive(
 		defaults.api_repo,
 		`${init_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}`,
+		'api',
 		init_params.branch
 	);
-	await util.clone_repo_recursive(
-		'api',
+	await util.cmd.clone_repo_recursive(
 		defaults.api_repo,
 		`${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
+		'api',
 		init_params.branch
 	);
 	output.done_log(`Cloned api repo.`, 'api');
@@ -367,16 +367,16 @@ async function _clone_api(){
 
 async function _clone_trx(){
 	output.start_loading(`Cloning trx...`);
-	await util.clone_repo_recursive(
-		'trx',
+	await util.cmd.clone_repo_recursive(
 		defaults.trx_repo,
 		`${init_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}`,
+		'trx',
 		init_params.branch
 	);
-	await util.clone_repo_recursive(
-		'trx',
+	await util.cmd.clone_repo_recursive(
 		defaults.trx_repo,
 		`${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
+		'trx',
 		init_params.branch
 	);
 	output.done_log(`Cloned trx repo.`, 'trx');
@@ -432,13 +432,13 @@ async function _uninstall_trx_dep(){
 async function _uninstall_dep(repo:string, context:string){
 	const short_repo = (repo.substr(0,3) === 'ssh' || repo.substr(0,7) === 'git+ssh') ?
 		repo.split('/').slice(-1)[0] : repo;
-	if(util.dependency_exists(short_repo)){
+	if(util.cmd.dependency_exists(short_repo)){
 		output.start_loading(`Uninstalling ${short_repo} dep...`);
 		const dep_folder = `${init_params.root}/node_modules/${short_repo}`;
-		util.remove_folder_if_exists(context, dep_folder);
+		util.fs.remove_directory(dep_folder, context);
 		const dep_dev_folder = `${init_params.root}/node_modules/${short_repo}`;
-		util.remove_folder_if_exists(context, dep_dev_folder);
-		await util.uninstall_dep(`${short_repo}`, context);
+		util.fs.remove_directory(dep_dev_folder, context);
+		await util.cmd.uninstall_dep(`${short_repo}`, context);
 		output.done_log(`Uninstalled ${short_repo} dependencies.`, context);
 		return true;
 	}
@@ -446,24 +446,24 @@ async function _uninstall_dep(repo:string, context:string){
 
 async function _install_core_dep(){
 	output.start_loading(`Installing core dep...`);
-	await util.install_dep(defaults.core_dep_repo, 'core');
-	await util.install_dep_dev(defaults.core_dep_dev_repo, 'core');
+	await util.cmd.install_dep(defaults.core_dep_repo, 'core');
+	await util.cmd.install_dep_dev(defaults.core_dep_dev_repo, 'core');
 	output.done_log(`Installed core dependencies.`, 'core');
 	return true;
 }
 
 async function _install_api_dep(){
 	output.start_loading(`Installing api dep...`);
-	await util.install_dep(defaults.api_dep_repo, 'api');
-	await util.install_dep_dev(defaults.api_dep_dev_repo, 'api');
+	await util.cmd.install_dep(defaults.api_dep_repo, 'api');
+	await util.cmd.install_dep_dev(defaults.api_dep_dev_repo, 'api');
 	output.done_log(`Installed api dependencies.`, 'api');
 	return true;
 }
 
 async function _install_trx_dep(){
 	output.start_loading(`Installing trx dep...`);
-	await util.install_dep(defaults.trx_dep_repo, 'trx');
-	await util.install_dep_dev(defaults.trx_dep_dev_repo, 'trx');
+	await util.cmd.install_dep(defaults.trx_dep_repo, 'trx');
+	await util.cmd.install_dep_dev(defaults.trx_dep_dev_repo, 'trx');
 	output.done_log(`Installed trx dependencies.`, 'trx');
 	return true;
 }

@@ -10,7 +10,7 @@ import {urn_util} from 'urn-lib';
 
 import * as out from '../output/';
 
-import * as common from '../cmd/common';
+// import * as common from '../cmd/common';
 
 import * as fs from './fs';
 
@@ -178,14 +178,14 @@ class CMD {
 		});
 	}
 	
-	public async clone_repo(context: string, address:string, dest_folder:string, branch='master')
+	public async clone_repo(address:string, dest_folder:string, context='clrp', branch='master')
 			:Promise<any>{
-		return await this._clone_repo(context, address, dest_folder, branch);
+		return await this._clone_repo(address, dest_folder, context, branch);
 	}
 	
-	public async clone_repo_recursive(context: string, address:string, dest_folder:string, branch='master')
+	public async clone_repo_recursive(address:string, dest_folder:string, context='clrr', branch='master')
 			:Promise<any>{
-		return await this._clone_repo(context, address, dest_folder, branch, true);
+		return await this._clone_repo(address, dest_folder, context, branch, true);
 	}
 	
 	public dependency_exists(repo:string)
@@ -207,9 +207,9 @@ class CMD {
 	}
 	
 	private async _clone_repo(
-		context: string,
 		address:string,
 		dest_folder:string,
+		context='_clr',
 		branch='master',
 		recursive=false
 	){

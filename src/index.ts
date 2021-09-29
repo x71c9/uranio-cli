@@ -1,15 +1,16 @@
 import {
 	init,
-	transpose,
-	alias,
-	hooks,
-	build,
+	// transpose,
+	// alias,
+	// hooks,
+	// build,
 } from './cmd/';
 
 export default {
-	init: init.run,
-	transpose: transpose.run,
-	alias: alias.run,
-	hooks: hooks.run,
-	build: build.run,
+	init: init
+	// init: init.run,
+	// transpose: transpose.run,
+	// alias: alias.run,
+	// hooks: hooks.run,
+	// build: build.run,
 };
