@@ -15,7 +15,7 @@ const chalk_1 = __importDefault(require("chalk"));
 const fs_1 = __importDefault(require("fs"));
 const defaults_1 = require("../conf/defaults");
 class Output {
-    constructor(root, native = false, blank = false, hide = false, spin = false, verbose = false, fullwidth = false, filelog = true, prefix = '') {
+    constructor(root, native = false, blank = false, hide = false, spin = false, verbose = false, fullwidth = false, filelog = true, prefix = '', color = '#859900', color_verbose = '#668899') {
         this.root = root;
         this.native = native;
         this.blank = blank;
@@ -25,15 +25,19 @@ class Output {
         this.fullwidth = fullwidth;
         this.filelog = filelog;
         this.prefix = prefix;
+        this.color = color;
+        this.color_verbose = color_verbose;
         this.spinner = ora_1.default({ text: 'Loading...', color: 'magenta', interval: 40 });
         this.spinner_texts = [];
     }
-    log(text, context = 'log', color = '#859900') {
-        const colored_text = (!this.blank) ? chalk_1.default.hex(color)(text) : text;
+    log(text, context = 'log', color) {
+        const final_color = (typeof color === 'string') ? color : this.color;
+        const colored_text = (!this.blank) ? chalk_1.default.hex(final_color)(text) : text;
         this._log(colored_text, context, true);
     }
-    verbose_log(text, context = 'vlog', color = '#668899') {
-        const colored_text = (!this.blank) ? chalk_1.default.hex(color)(text) : text;
+    verbose_log(text, context = 'vlog', color) {
+        const final_color = (typeof color === 'string') ? color : this.color_verbose;
+        const colored_text = (!this.blank) ? chalk_1.default.hex(final_color)(text) : text;
         this._log(colored_text, context, (this.verbose === true));
     }
     done_log(text, context = 'done') {
@@ -82,7 +86,7 @@ class Output {
     }
     _log(text, context = 'log', out = false) {
         const output_text = (!this.native) ?
-            this._format_text(text, context) : text;
+            this._format_text(text, context) : text + '\n';
         if (this.filelog) {
             _log_to_file(output_text);
         }
@@ -203,11 +207,13 @@ const default_params = {
     verbose: false,
     fullwidth: false,
     filelog: true,
-    prefix: ''
+    prefix: '',
+    color: '#859900',
+    color_verbose: '#668899'
 };
 function create(params) {
     const merged_params = Object.assign(Object.assign({}, default_params), params);
-    return new Output(merged_params.root, merged_params.native, merged_params.blank, merged_params.hide, merged_params.spin, merged_params.verbose, merged_params.fullwidth, merged_params.filelog, merged_params.prefix);
+    return new Output(merged_params.root, merged_params.native, merged_params.blank, merged_params.hide, merged_params.spin, merged_params.verbose, merged_params.fullwidth, merged_params.filelog, merged_params.prefix, merged_params.color, merged_params.color_verbose);
 }
 exports.create = create;
 //# sourceMappingURL=class.js.map

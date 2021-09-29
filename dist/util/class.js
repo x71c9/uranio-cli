@@ -33,17 +33,26 @@ const prettier_1 = __importDefault(require("prettier"));
 const fs = __importStar(require("./fs"));
 const spawn = __importStar(require("./spawn"));
 const cmd = __importStar(require("./cmd"));
+const watch_child_list = [];
+process.on('SIGINT', function () {
+    process.stdout.write("\r--- Caught interrupt signal [watch] ---\n");
+    for (let i = 0; i < watch_child_list.length; i++) {
+        const watch_child_object = watch_child_list[i];
+        watch_child_object.child.close().then(() => {
+            process.stdout.write(`Stopped ${watch_child_object.text}\n`);
+        });
+    }
+});
 class Util {
     constructor(output) {
         this.output = output;
-        this.watch_child_list = [];
         this.fs = fs.create(output);
         this.cmd = cmd.create(output);
         this.spawn = spawn.create(output);
     }
     watch(watch_path, watch_text, on_ready, on_all) {
         const watch_child = chokidar_1.default.watch(watch_path).on('ready', on_ready).on('all', on_all);
-        this.watch_child_list.push({
+        watch_child_list.push({
             child: watch_child,
             context: `wtch`,
             text: watch_text

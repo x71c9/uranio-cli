@@ -5,9 +5,11 @@
  */
 import * as out from '../output/';
 import * as fs from './fs';
+import * as spawn from './spawn';
 declare class CMD {
     output: out.OutputInstance;
     fs: fs.FSInstance;
+    spawn: spawn.SpawnInstance;
     constructor(output: out.OutputInstance);
     read_rc_file(): void;
     is_initialized(): boolean;
