@@ -44,8 +44,4 @@ function valid_deploy() {
     return vals;
 }
 exports.valid_deploy = valid_deploy;
-// export type Conf = Options & {
-// root: string,
-// repo: Repo
-// }
 //# sourceMappingURL=types.js.map

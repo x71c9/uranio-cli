@@ -14,6 +14,11 @@ class FS {
     constructor(output) {
         this.output = output;
     }
+    is_directory(path, context) {
+        const is = fs_extra_1.default.statSync(path).isDirectory();
+        this.output.verbose_log(`Is directory [${path}] [${is}]`, context);
+        return is;
+    }
     exists_sync(path, context = 'exst') {
         const exists = fs_extra_1.default.existsSync(path);
         this.output.verbose_log(`Exists [${path}]`, context);

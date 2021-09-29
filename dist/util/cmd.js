@@ -43,16 +43,17 @@ const spawn = __importStar(require("./spawn"));
 const types_1 = require("../types");
 const defaults_1 = require("../conf/defaults");
 class CMD {
-    constructor(output) {
+    constructor(params, output) {
+        this.params = params;
         this.output = output;
         this.fs = fs.create(output);
         this.spawn = spawn.create(output);
     }
     // public merge_options(options:Partial<Options>):void{
     //   let k:keyof Options;
-    //   for(k in conf){
+    //   for(k in this.params){
     //     if(typeof k !== typeof undefined && urn_util.object.has_key(options,k)){
-    //       (conf as any)[k] = options[k]; // TODO FIX THIS
+    //       (this.params as any)[k] = options[k]; // TODO FIX THIS
     //     }
     //   }
     // }
@@ -64,14 +65,14 @@ class CMD {
             process.exit(1);
         }
         else {
-            const rcfile_path = `${defaults_1.conf.root}/${defaults_1.jsonfile_path}`;
+            const rcfile_path = `${this.params.root}/${defaults_1.jsonfile_path}`;
             try {
                 const rc_content = this.fs.read_file_sync(rcfile_path, 'utf8');
                 const rc_obj = urn_lib_1.urn_util.json.clean_parse(rc_content);
                 this.set_repo(rc_obj.repo);
-                defaults_1.conf.repo = rc_obj.repo;
-                defaults_1.conf.pacman = rc_obj.pacman;
-                defaults_1.conf.deploy = rc_obj.deploy;
+                this.params.repo = rc_obj.repo;
+                this.params.pacman = rc_obj.pacman;
+                this.params.deploy = rc_obj.deploy;
             }
             catch (ex) {
                 this.output.wrong_end_log(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
@@ -80,7 +81,7 @@ class CMD {
         }
     }
     is_initialized() {
-        return (this.fs.exists_sync(`${defaults_1.conf.root}/${defaults_1.jsonfile_path}`));
+        return (this.fs.exists_sync(`${this.params.root}/${defaults_1.jsonfile_path}`));
     }
     auto_set_project_root() {
         // this.output.start_loading('Getting project root...');
@@ -90,7 +91,7 @@ class CMD {
             arr_folder.pop();
             folder_path = arr_folder.join('/');
             if (folder_path === '/' || arr_folder.length === 2) {
-                defaults_1.conf.filelog = false;
+                this.output.filelog = false;
                 let err_msg = `Cannot find project root.`;
                 err_msg += ' Be sure to run `uranio` inside an NPM project.';
                 this.output.wrong_end_log(err_msg);
@@ -98,11 +99,11 @@ class CMD {
             }
         }
         // common.init_log();
-        this.output.done_verbose_log(`$URNROOT$Project root found [${defaults_1.conf.root}]`, 'root');
+        this.output.done_verbose_log(`$URNROOT$Project root found [${this.params.root}]`, 'root');
     }
     set_repo(repo) {
         if (this.check_repo(repo)) {
-            defaults_1.conf.repo = repo;
+            this.params.repo = repo;
         }
         else {
             const valid_repos_str = types_1.valid_repos().join(', ');
@@ -115,7 +116,7 @@ class CMD {
     }
     set_pacman(pacman) {
         if (this.check_pacman(pacman)) {
-            defaults_1.conf.pacman = pacman;
+            this.params.pacman = pacman;
         }
         else {
             const valid_pacman_str = types_1.valid_pacman().join(', ');
@@ -128,7 +129,7 @@ class CMD {
     }
     set_deploy(deploy) {
         if (this.check_deploy(deploy)) {
-            defaults_1.conf.deploy = deploy;
+            this.params.deploy = deploy;
         }
         else {
             const valid_deploy_str = types_1.valid_deploy().join(', ');
@@ -153,7 +154,7 @@ class CMD {
             const action = `installing dependencies [${repo}]`;
             this.output.verbose_log(`Started ${action}`, context);
             return new Promise((resolve, reject) => {
-                this.spawn.spin(_pacman_commands.install[defaults_1.conf.pacman](repo), context, action, resolve, reject);
+                this.spawn.spin(_pacman_commands.install[this.params.pacman](repo), context, action, resolve, reject);
             });
         });
     }
@@ -162,7 +163,7 @@ class CMD {
             const action = `installing dev dependencies [${repo}]`;
             this.output.verbose_log(`Started ${action}`, context);
             return new Promise((resolve, reject) => {
-                this.spawn.spin(_pacman_commands.install_dev[defaults_1.conf.pacman](repo), context, action, resolve, reject);
+                this.spawn.spin(_pacman_commands.install_dev[this.params.pacman](repo), context, action, resolve, reject);
             });
         });
     }
@@ -171,7 +172,7 @@ class CMD {
             const action = `uninstalling dependencies [${repo}]`;
             this.output.verbose_log(`Started ${action}`, context);
             return new Promise((resolve, reject) => {
-                this.spawn.spin(_pacman_commands.uninstall[defaults_1.conf.pacman](repo), context, action, resolve, reject);
+                this.spawn.spin(_pacman_commands.uninstall[this.params.pacman](repo), context, action, resolve, reject);
             });
         });
     }
@@ -186,7 +187,7 @@ class CMD {
         });
     }
     dependency_exists(repo) {
-        const package_json_path = `${defaults_1.conf.root}/package.json`;
+        const package_json_path = `${this.params.root}/package.json`;
         try {
             const data = this.fs.read_file_sync(package_json_path, 'utf8');
             const package_data = urn_lib_1.urn_util.json.clean_parse(data);
@@ -229,10 +230,10 @@ class CMD {
                         if (!this.fs.exists_sync(bld_path)) {
                             return false;
                         }
-                        defaults_1.conf.root = bld_path;
+                        this.params.root = bld_path;
                         return true;
                     }
-                    defaults_1.conf.root = folder_path;
+                    this.params.root = folder_path;
                     return true;
                 }
                 catch (ex) {
@@ -244,8 +245,8 @@ class CMD {
         return false;
     }
 }
-function create(output) {
-    return new CMD(output);
+function create(params, output) {
+    return new CMD(params, output);
 }
 exports.create = create;
 const _pacman_commands = {

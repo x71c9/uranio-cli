@@ -8,6 +8,7 @@ import * as out from '../output/';
 declare class FS {
     output: out.OutputInstance;
     constructor(output: out.OutputInstance);
+    is_directory(path: string, context?: string): boolean;
     exists_sync(path: string, context?: string): boolean;
     read_file_sync(file_path: string, encoding?: BufferEncoding, context?: string): string;
     read_dir_sync(dir_path: string, context?: string): string[];

@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import {Options} from '../types';
+import {Params} from '../types';
 
 const cloud_address = 'ssh://git@bitbucket.org/nbl7/';
 
@@ -52,30 +52,33 @@ export const defaults = {
 
 export const jsonfile_path = `${defaults.folder}/${defaults.json_filename}`;
 
-export const conf:Options = {
-	
-	verbose: false,
-	
-	blank: false,
-	
-	hide: false,
-	
-	spinner: true,
-	
-	fullwidth: false,
-	
+// export const conf:Options = {
+//   verbose: false,
+//   blank: false,
+//   hide: false,
+//   spinner: true,
+//   fullwidth: false,
+//   root: '.',
+//   repo: defaults.default_repo,
+//   prefix: '',
+//   pacman: 'yarn',
+//   force: false,
+//   filelog: true,
+//   deploy: 'netlify',
+// };
+
+export const default_params:Params = {
 	root: '.',
-	
 	repo: defaults.default_repo,
-	
-	prefix: '',
-	
-	pacman: 'yarn',
-	
-	force: false,
-	
-	filelog: true,
-	
 	deploy: 'netlify',
-	
+	pacman: 'yarn',
+	branch: 'master',
+	verbose: false,
+	blank: false,
+	hide: false,
+	spinner: true,
+	fullwidth: false,
+	prefix: '',
+	force: false,
+	filelog: true,
 };

@@ -4,13 +4,15 @@
  * @packageDocumentation
  */
 import * as out from '../output/';
+import { UtilParams } from '../types';
 import * as fs from './fs';
 import * as spawn from './spawn';
 declare class CMD {
+    params: UtilParams;
     output: out.OutputInstance;
     fs: fs.FSInstance;
     spawn: spawn.SpawnInstance;
-    constructor(output: out.OutputInstance);
+    constructor(params: UtilParams, output: out.OutputInstance);
     read_rc_file(): void;
     is_initialized(): boolean;
     auto_set_project_root(): void;
@@ -30,5 +32,5 @@ declare class CMD {
     private _check_folder;
 }
 export declare type CMDInstance = InstanceType<typeof CMD>;
-export declare function create(output: out.OutputInstance): CMDInstance;
+export declare function create(params: UtilParams, output: out.OutputInstance): CMDInstance;
 export {};

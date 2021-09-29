@@ -10,6 +10,8 @@ import prettier from 'prettier';
 
 import * as out from '../output/';
 
+import {UtilParams} from '../types';
+
 import * as fs from './fs';
 
 import * as spawn from './spawn';
@@ -38,10 +40,10 @@ class Util {
 	
 	public spawn:spawn.SpawnInstance;
 	
-	constructor(public output:out.OutputInstance){
+	constructor(public params:UtilParams, public output:out.OutputInstance){
 		this.fs = fs.create(output);
-		this.cmd = cmd.create(output);
 		this.spawn = spawn.create(output);
+		this.cmd = cmd.create(params, output);
 	}
 	
 	public watch(
@@ -87,8 +89,8 @@ class Util {
 
 export type UtilInstance = InstanceType<typeof Util>;
 
-export function create(output:out.OutputInstance)
+export function create(params:UtilParams, output:out.OutputInstance)
 		:UtilInstance{
-	return new Util(output);
+	return new Util(params, output);
 }
 

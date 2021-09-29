@@ -115,12 +115,13 @@ class Spawn {
 		}
 		
 		child.on('close', (code) => {
+			this.output.stop_loading();
 			switch(code){
 				case 0:{
 					if(log){
 						this.output.done_log(`Done ${action}`, context);
 					}
-					if(verbose){
+					if(verbose || spin){
 						this.output.done_verbose_log(`Done ${action}`, context);
 					}
 					return resolve(true);

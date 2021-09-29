@@ -3,7 +3,7 @@
  *
  * @packageDocumentation
  */
-import { Options } from '../types';
+import { Params } from '../types';
 export declare const defaults: {
     readonly default_repo: "trx";
     readonly folder: ".uranio";
@@ -26,4 +26,4 @@ export declare const defaults: {
     readonly wrong_char: "✗";
 };
 export declare const jsonfile_path: string;
-export declare const conf: Options;
+export declare const default_params: Params;

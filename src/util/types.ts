@@ -6,6 +6,8 @@
 
 import chokidar from 'chokidar';
 
+// import {Repo, Deploy, PacMan} from '../types';
+
 export type OnReadyCallback = () => void;
 
 export type OnAllCallback = (event:WatchEvent, path:string) => void;
@@ -17,4 +19,3 @@ export type WatchProcessObject = {
 }
 
 export type WatchEvent = 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir';
-
