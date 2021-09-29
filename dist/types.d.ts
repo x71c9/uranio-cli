@@ -26,17 +26,24 @@ export declare function valid_deploy(): string[];
 export declare type Repo = keyof typeof abstract_repos;
 export declare type PacMan = keyof typeof abstract_pacman;
 export declare type Deploy = keyof typeof abstract_deploy;
-export declare type Options = {
+export declare type Params = {
+    root: string;
+    repo: Repo;
+    deploy: Deploy;
+    pacman: PacMan;
+    branch: string;
     verbose: boolean;
     blank: boolean;
     hide: boolean;
     spinner: boolean;
     fullwidth: boolean;
     prefix: string;
-    root: string;
-    repo: Repo;
-    pacman: PacMan;
     force: boolean;
     filelog: boolean;
+};
+export declare type UtilParams = {
+    root: string;
+    repo: Repo;
     deploy: Deploy;
+    pacman: PacMan;
 };

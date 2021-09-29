@@ -16,7 +16,7 @@ import * as out from './output/';
 
 const output = out.create({
 	verbose: true,
-	spin: false,
+	spin: true,
 	native: false,
 	blank: false,
 	hide: false,
@@ -32,15 +32,15 @@ const cmd = 'git clone ssh+git://git@bitbucket.org/nbl7/urn-dot.git /home/nbl7/t
 
 function run(){
 	return new Promise((res, rej) => {
-		spa.verbose_log(cmd, 'tst', 'action', res, rej);
+		spa.spin(cmd, 'tst', 'action', res, rej);
 	});
 }
 
 run().then(() => {
-	output.stop_loading();
-	console.log('DONE');
+	// output.stop_loading();
+	// console.log('DONE');
 }).catch((err) => {
-	output.stop_loading();
+	// output.stop_loading();
 	console.log('ERROR', err);
 });
 

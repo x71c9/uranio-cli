@@ -4,3 +4,4 @@
  * @packageDocumentation
  */
 export * from './init';
+export * from './alias';

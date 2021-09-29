@@ -3,14 +3,8 @@
  *
  * @packageDocumentation
  */
-import { Options } from '../types';
-export declare const alias: {
-    run: (options?: Partial<Options> | undefined) => void;
-    command: () => void;
-    include: () => void;
-};
-export declare type Aliases = {
-    [key: string]: string[];
-};
+import * as output from '../output/';
+import { AliasParams, Aliases } from './types';
+export declare function alias(params: AliasParams, output_params?: Partial<output.OutputParams>): Promise<void>;
 export declare function get_aliases(tsconfig_path: string): Aliases;
 export declare function replace_file_aliases(filepath: string, aliases: Aliases): void;

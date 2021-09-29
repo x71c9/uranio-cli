@@ -10,6 +10,8 @@ import {urn_util} from 'urn-lib';
 
 import * as out from '../output/';
 
+import {UtilParams} from '../types';
+
 // DO NO CANCEL IT
 // import * as common from '../cmd/common';
 
@@ -30,23 +32,23 @@ import {
 	// Options
 } from '../types';
 
-import {conf, jsonfile_path} from '../conf/defaults';
+import {jsonfile_path} from '../conf/defaults';
 
 class CMD {
 	
 	public fs:fs.FSInstance;
 	public spawn:spawn.SpawnInstance;
 	
-	constructor(public output:out.OutputInstance){
+	constructor(public params:UtilParams, public output:out.OutputInstance){
 		this.fs = fs.create(output);
 		this.spawn = spawn.create(output);
 	}
 	
 	// public merge_options(options:Partial<Options>):void{
 	//   let k:keyof Options;
-	//   for(k in conf){
+	//   for(k in this.params){
 	//     if(typeof k !== typeof undefined && urn_util.object.has_key(options,k)){
-	//       (conf as any)[k] = options[k]; // TODO FIX THIS
+	//       (this.params as any)[k] = options[k]; // TODO FIX THIS
 	//     }
 	//   }
 	// }
@@ -59,14 +61,14 @@ class CMD {
 			this.output.error_log(err, 'init');
 			process.exit(1);
 		}else{
-			const rcfile_path = `${conf.root}/${jsonfile_path}`;
+			const rcfile_path = `${this.params.root}/${jsonfile_path}`;
 			try{
 				const rc_content = this.fs.read_file_sync(rcfile_path, 'utf8');
 				const rc_obj = urn_util.json.clean_parse(rc_content);
 				this.set_repo(rc_obj.repo);
-				conf.repo = rc_obj.repo;
-				conf.pacman = rc_obj.pacman;
-				conf.deploy = rc_obj.deploy;
+				this.params.repo = rc_obj.repo;
+				this.params.pacman = rc_obj.pacman;
+				this.params.deploy = rc_obj.deploy;
 			}catch(ex){
 				this.output.wrong_end_log(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
 				process.exit(1);
@@ -76,7 +78,7 @@ class CMD {
 	
 	public is_initialized()
 			:boolean{
-		return (this.fs.exists_sync(`${conf.root}/${jsonfile_path}`));
+		return (this.fs.exists_sync(`${this.params.root}/${jsonfile_path}`));
 	}
 	
 	public auto_set_project_root()
@@ -88,7 +90,7 @@ class CMD {
 			arr_folder.pop();
 			folder_path = arr_folder.join('/');
 			if(folder_path === '/' || arr_folder.length === 2){
-				conf.filelog = false;
+				this.output.filelog = false;
 				let err_msg = `Cannot find project root.`;
 				err_msg += ' Be sure to run `uranio` inside an NPM project.';
 				this.output.wrong_end_log(err_msg);
@@ -96,13 +98,13 @@ class CMD {
 			}
 		}
 		// common.init_log();
-		this.output.done_verbose_log(`$URNROOT$Project root found [${conf.root}]`, 'root');
+		this.output.done_verbose_log(`$URNROOT$Project root found [${this.params.root}]`, 'root');
 	}
 
 	public set_repo(repo:string)
 			:void{
 		if(this.check_repo(repo)){
-			conf.repo = repo as Repo;
+			this.params.repo = repo as Repo;
 		}else{
 			const valid_repos_str = valid_repos().join(', ');
 			let end_log = '';
@@ -116,7 +118,7 @@ class CMD {
 	public set_pacman(pacman:string)
 			:void{
 		if(this.check_pacman(pacman)){
-			conf.pacman = pacman as PacMan;
+			this.params.pacman = pacman as PacMan;
 		}else{
 			const valid_pacman_str = valid_pacman().join(', ');
 			let end_log = '';
@@ -130,7 +132,7 @@ class CMD {
 	public set_deploy(deploy:string)
 			:void{
 		if(this.check_deploy(deploy)){
-			conf.deploy = deploy as Deploy;
+			this.params.deploy = deploy as Deploy;
 		}else{
 			const valid_deploy_str = valid_deploy().join(', ');
 			let end_log = '';
@@ -161,7 +163,7 @@ class CMD {
 		const action = `installing dependencies [${repo}]`;
 		this.output.verbose_log(`Started ${action}`, context);
 		return new Promise((resolve, reject) => {
-			this.spawn.spin(_pacman_commands.install[conf.pacman](repo), context, action, resolve, reject);
+			this.spawn.spin(_pacman_commands.install[this.params.pacman](repo), context, action, resolve, reject);
 		});
 	}
 
@@ -170,7 +172,7 @@ class CMD {
 		const action = `installing dev dependencies [${repo}]`;
 		this.output.verbose_log(`Started ${action}`, context);
 		return new Promise((resolve, reject) => {
-			this.spawn.spin(_pacman_commands.install_dev[conf.pacman](repo), context, action, resolve, reject);
+			this.spawn.spin(_pacman_commands.install_dev[this.params.pacman](repo), context, action, resolve, reject);
 		});
 	}
 
@@ -179,7 +181,7 @@ class CMD {
 		const action = `uninstalling dependencies [${repo}]`;
 		this.output.verbose_log(`Started ${action}`, context);
 		return new Promise((resolve, reject) => {
-			this.spawn.spin(_pacman_commands.uninstall[conf.pacman](repo), context, action, resolve, reject);
+			this.spawn.spin(_pacman_commands.uninstall[this.params.pacman](repo), context, action, resolve, reject);
 		});
 	}
 	
@@ -195,7 +197,7 @@ class CMD {
 	
 	public dependency_exists(repo:string)
 			:boolean{
-		const package_json_path = `${conf.root}/package.json`;
+		const package_json_path = `${this.params.root}/package.json`;
 		try{
 			const data = this.fs.read_file_sync(package_json_path, 'utf8');
 			const package_data = urn_util.json.clean_parse(data);
@@ -244,10 +246,10 @@ class CMD {
 						if(!this.fs.exists_sync(bld_path)){
 							return false;
 						}
-						conf.root = bld_path;
+						this.params.root = bld_path;
 						return true;
 					}
-					conf.root = folder_path;
+					this.params.root = folder_path;
 					return true;
 				}catch(ex){
 					this.output.error_log(`Invalid ${package_json_path}. ${ex.message}`, 'root');
@@ -261,8 +263,9 @@ class CMD {
 
 export type CMDInstance = InstanceType<typeof CMD>;
 
-export function create(output:out.OutputInstance):CMDInstance{
-	return new CMD(output);
+export function create(params:UtilParams, output:out.OutputInstance)
+		:CMDInstance{
+	return new CMD(params, output);
 }
 
 const _pacman_commands = {

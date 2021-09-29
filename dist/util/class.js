@@ -44,11 +44,12 @@ process.on('SIGINT', function () {
     }
 });
 class Util {
-    constructor(output) {
+    constructor(params, output) {
+        this.params = params;
         this.output = output;
         this.fs = fs.create(output);
-        this.cmd = cmd.create(output);
         this.spawn = spawn.create(output);
+        this.cmd = cmd.create(params, output);
     }
     watch(watch_path, watch_text, on_ready, on_all) {
         const watch_child = chokidar_1.default.watch(watch_path).on('ready', on_ready).on('all', on_all);
@@ -66,8 +67,8 @@ class Util {
         this.output.done_verbose_log(`Prettier [${filepath}] done.`, 'prtt');
     }
 }
-function create(output) {
-    return new Util(output);
+function create(params, output) {
+    return new Util(params, output);
 }
 exports.create = create;
 //# sourceMappingURL=class.js.map

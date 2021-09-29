@@ -23,43 +23,30 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.replace_file_aliases = exports.get_aliases = exports.alias = void 0;
-const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const tsm = __importStar(require("ts-morph"));
 const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
-const common = __importStar(require("./common"));
-exports.alias = {
-    run: (options) => {
-        common.init_run(options);
-        exports.alias.command();
-    },
-    command: () => {
-        output.start_loading('Updating aliases...');
-        util.read_rc_file();
-        const tsconfig_path_server = `${defaults_1.conf.root}/.uranio/server/tsconfig.json`;
-        const tsconfig_path_client = `${defaults_1.conf.root}/.uranio/client/tsconfig.json`;
-        const aliases_server = get_aliases(tsconfig_path_server);
-        const aliases_client = get_aliases(tsconfig_path_client);
-        _replace_aliases_server(aliases_server);
-        _replace_aliases_client(aliases_client);
-        output.end_log(`Aliases updated.`);
-    },
-    include: () => {
-        const is_hidden = defaults_1.conf.hide;
-        defaults_1.conf.hide = true;
-        exports.alias.command();
-        defaults_1.conf.hide = is_hidden;
-        output.done_log(`Aliases updated.`, 'alias');
-    }
-};
+// import * as common from './common';
+let output_instance;
+let util_instance;
+let alias_params = defaults_1.default_params;
 const _project_option = {
     manipulationSettings: {
         indentationText: tsm.IndentationText.Tab,
@@ -67,28 +54,56 @@ const _project_option = {
         newLineKind: tsm.NewLineKind.LineFeed
     }
 };
+function alias(params, output_params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!output_params) {
+            output_params = {};
+        }
+        if (!output_params.root) {
+            output_params.root = params.root;
+        }
+        output_instance = output.create(output_params);
+        alias_params = Object.assign(Object.assign({}, alias_params), params);
+        const util_params = Object.assign({}, alias_params);
+        util_instance = util.create(util_params, output_instance);
+        const tsconfig_path_server = `${alias_params.root}/${defaults_1.defaults.folder}/server/tsconfig.json`;
+        const tsconfig_path_client = `${alias_params.root}/${defaults_1.defaults.folder}/client/tsconfig.json`;
+        const aliases_server = get_aliases(tsconfig_path_server);
+        const aliases_client = get_aliases(tsconfig_path_client);
+        _replace_aliases_server(aliases_server);
+        _replace_aliases_client(aliases_client);
+        output_instance.end_log(`Aliases updated.`);
+    });
+}
+exports.alias = alias;
 function get_aliases(tsconfig_path) {
-    const data = fs_1.default.readFileSync(tsconfig_path, 'utf8');
+    const data = util_instance.fs.read_file_sync(tsconfig_path, 'utf8');
     try {
         const tsconf_data = urn_lib_1.urn_util.json.clean_parse(data);
         return tsconf_data['compilerOptions']['paths'];
     }
     catch (ex) {
-        output.wrong_end_log(`Error parsing ${tsconfig_path}. ${ex.message}`);
+        output_instance.wrong_end_log(`Error parsing ${tsconfig_path}. ${ex.message}`);
         process.exit(1);
     }
 }
 exports.get_aliases = get_aliases;
-function _replace_modified_file(text, filename) {
-    output.start_loading(`Writing manipulated file...`);
-    fs_1.default.writeFileSync(filename, text);
-    output.done_verbose_log(`File replaced [${filename}].`, 'alias');
-}
 function _replace_aliases_server(aliases) {
-    _traverse_ts_aliases(`${defaults_1.conf.root}/.uranio/server/src/`, aliases);
+    _traverse_ts_aliases(`${alias_params.root}/${defaults_1.defaults.folder}/server/src/`, aliases);
 }
 function _replace_aliases_client(aliases) {
-    _traverse_ts_aliases(`${defaults_1.conf.root}/.uranio/client/src/`, aliases);
+    _traverse_ts_aliases(`${alias_params.root}/${defaults_1.defaults.folder}/client/src/`, aliases);
+}
+function _traverse_ts_aliases(directory, aliases) {
+    util_instance.fs.read_dir_sync(directory).forEach((filename) => {
+        const full_path = path_1.default.resolve(directory, filename);
+        if (util_instance.fs.is_directory(full_path) && filename != '.git') {
+            return _traverse_ts_aliases(full_path, aliases);
+        }
+        else if (filename.split('.').pop() === 'ts') {
+            replace_file_aliases(full_path, aliases);
+        }
+    });
 }
 function replace_file_aliases(filepath, aliases) {
     const _project = new tsm.Project(_project_option);
@@ -98,7 +113,7 @@ function replace_file_aliases(filepath, aliases) {
     if (found === true) {
         const modified = sourceFile.print();
         _replace_modified_file(modified, filepath);
-        util.pretty(filepath);
+        util_instance.pretty(filepath);
     }
 }
 exports.replace_file_aliases = replace_file_aliases;
@@ -128,11 +143,11 @@ function _change_to_relative(node, aliases) {
         const splitted_module = module_name.split('/');
         if (module_name in aliases || splitted_module[0] in aliases) {
             found = true;
-            output.start_loading(`Changing relative imports...`);
+            output_instance.start_loading(`Changing relative imports...`);
             const node_file_path = node.getSourceFile().getFilePath();
             const node_file_dir = path_1.default.parse(node_file_path).dir;
             let parent_folder = 'server';
-            if (node_file_dir.includes(`${defaults_1.conf.root}/${defaults_1.defaults.folder}/client`)) {
+            if (node_file_dir.includes(`${alias_params.root}/${defaults_1.defaults.folder}/client`)) {
                 parent_folder = 'client';
             }
             let module_append = '';
@@ -141,7 +156,7 @@ function _change_to_relative(node, aliases) {
                 module_name = splitted_module[0];
             }
             const alias = aliases[module_name][0];
-            let relative_path = path_1.default.relative(node_file_dir, `${defaults_1.conf.root}/${defaults_1.defaults.folder}/${parent_folder}/${alias}`);
+            let relative_path = path_1.default.relative(node_file_dir, `${alias_params.root}/${defaults_1.defaults.folder}/${parent_folder}/${alias}`);
             if (relative_path === '') {
                 relative_path = './index';
             }
@@ -149,20 +164,38 @@ function _change_to_relative(node, aliases) {
             const prepend = (relative_path.charAt(0) !== '.') ? './' : '';
             const replace = `${prepend}${relative_path}${module_append}${append}`;
             str_lit.replaceWithText(`'${replace}'`);
-            output.verbose_log(`Changed [${full_module_name}] to [${replace}].`, 'alias');
+            output_instance.verbose_log(`Changed [${full_module_name}] to [${replace}].`, 'alias');
         }
     }
     return found;
 }
-function _traverse_ts_aliases(directory, aliases) {
-    fs_1.default.readdirSync(directory).forEach((filename) => {
-        const full_path = path_1.default.resolve(directory, filename);
-        if (fs_1.default.statSync(full_path).isDirectory() && filename != '.git') {
-            return _traverse_ts_aliases(full_path, aliases);
-        }
-        else if (filename.split('.').pop() === 'ts') {
-            replace_file_aliases(full_path, aliases);
-        }
-    });
+function _replace_modified_file(text, filename) {
+    output_instance.start_loading(`Writing manipulated file...`);
+    util_instance.fs.write_file_sync(filename, text);
+    output_instance.done_verbose_log(`File replaced [${filename}].`, 'alias');
 }
+// export const alias = {
+//   run: (options?:Partial<Options>):void => {
+//     common.init_run(options);
+//     alias.command();
+//   },
+//   command: ():void => {
+//     output_instance.start_loading('Updating aliases...');
+//     util.read_rc_file();
+//     const tsconfig_path_server = `${conf.root}/.uranio/server/tsconfig.json`;
+//     const tsconfig_path_client = `${conf.root}/.uranio/client/tsconfig.json`;
+//     const aliases_server = get_aliases(tsconfig_path_server);
+//     const aliases_client = get_aliases(tsconfig_path_client);
+//     _replace_aliases_server(aliases_server);
+//     _replace_aliases_client(aliases_client);
+//     output_instance.end_log(`Aliases updated.`);
+//   },
+//   include: ():void => {
+//     const is_hidden = conf.hide;
+//     conf.hide = true;
+//     alias.command();
+//     conf.hide = is_hidden;
+//     output_instance.done_log(`Aliases updated.`, 'alias');
+//   }
+// };
 //# sourceMappingURL=alias.js.map
