@@ -139,8 +139,8 @@ function _watch(output_params?:Partial<output.OutputParams>){
 				const relative_path = path.replace(`${dev_params.root}/src/`, '');
 				const new_path_server = `${dev_params.root}/${defaults.folder}/server/src/${relative_path}`;
 				const new_path_client = `${dev_params.root}/${defaults.folder}/client/src/${relative_path}`;
-				util_instance.fs.remove_file_sync(new_path_server);
-				util_instance.fs.remove_file_sync(new_path_client);
+				util_instance.fs.remove_file(new_path_server);
+				util_instance.fs.remove_file(new_path_client);
 			}
 			_replace_netlify_function_file();
 		}
@@ -166,7 +166,7 @@ function _watch(output_params?:Partial<output.OutputParams>){
 
 function _replace_netlify_function_file(){
 	const api_file_path = `${dev_params.root}/.uranio/server/src/functions/api.ts`;
-	const result = util_instance.fs.read_file_sync(api_file_path);
+	const result = util_instance.fs.read_file(api_file_path);
 	let new_content = result.toString();
 	const splitted = new_content.split(`\n`);
 	const comment = '// uranio autoupdate';
@@ -180,7 +180,7 @@ function _replace_netlify_function_file(){
 		new_content = splitted.join('\n');
 		new_content += `\n// ${update_number + 1}`;
 	}
-	util_instance.fs.write_file_sync(api_file_path, new_content, 'utf8');
+	util_instance.fs.write_file(api_file_path, new_content, 'utf8');
 	output_instance.verbose_log(`Replacing Netlify serverless function file.`, 'less');
 }
 

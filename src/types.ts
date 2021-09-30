@@ -86,7 +86,7 @@ export type Params = {
 	verbose: boolean,
 	blank: boolean,
 	hide: boolean,
-	spinner: boolean,
+	spin: boolean,
 	fullwidth: boolean,
 	prefix: string,
 	force: boolean,

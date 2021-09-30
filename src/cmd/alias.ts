@@ -42,7 +42,7 @@ export async function alias(params:AliasParams, output_params?:Partial<output.Ou
 		:Promise<void>{
 	
 	if(!output_params){
-		output_params = {};
+		output_params = params;
 	}
 	if(!output_params.root){
 		output_params.root = params.root;
@@ -71,7 +71,7 @@ export async function alias(params:AliasParams, output_params?:Partial<output.Ou
 
 export function get_aliases(tsconfig_path:string)
 		:Aliases{
-	const data = util_instance.fs.read_file_sync(tsconfig_path, 'utf8');
+	const data = util_instance.fs.read_file(tsconfig_path, 'utf8');
 	try{
 		const tsconf_data = urn_util.json.clean_parse(data);
 		return tsconf_data['compilerOptions']['paths'];
@@ -90,7 +90,7 @@ function _replace_aliases_client(aliases:Aliases){
 }
 
 function _traverse_ts_aliases(directory:string, aliases:Aliases) {
-	util_instance.fs.read_dir_sync(directory).forEach((filename) => {
+	util_instance.fs.read_dir(directory).forEach((filename) => {
 		const full_path = path.resolve(directory, filename);
 		if (util_instance.fs.is_directory(full_path) && filename != '.git') {
 			return _traverse_ts_aliases(full_path, aliases);
@@ -175,7 +175,7 @@ function _change_to_relative(node:tsm.Node, aliases:Aliases)
 
 function _replace_modified_file(text:string, filename:string){
 	output_instance.start_loading(`Writing manipulated file...`);
-	util_instance.fs.write_file_sync(filename, text);
+	util_instance.fs.write_file(filename, text);
 	output_instance.done_verbose_log(`File replaced [${filename}].`, 'alias');
 }
 

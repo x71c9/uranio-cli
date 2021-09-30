@@ -295,12 +295,12 @@ function _text_lines_in_args_params(url:string){
 function _save_to_file(text:string){
 	
 	const filepath_server = `${hooks_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}/hooks/index.ts`;
-	util_instance.fs.write_file_sync(filepath_server, text);
+	util_instance.fs.write_file(filepath_server, text);
 	util_instance.pretty(filepath_server);
 	output_instance.done_verbose_log(`Created hooks file [${filepath_server}].`, 'hooks');
 	
 	const filepath_client = `${hooks_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}/hooks/index.ts`;
-	util_instance.fs.write_file_sync(filepath_client, text);
+	util_instance.fs.write_file(filepath_client, text);
 	util_instance.pretty(filepath_client);
 	output_instance.done_verbose_log(`Created hooks file [${filepath_client}].`, 'hooks');
 	

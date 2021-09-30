@@ -45,6 +45,7 @@ function help() {
         console.log(`  -w --fullwidth ..... log in full width.`);
         console.log(`  -x --prefix ........ set a log prefix.`);
         console.log(`  -l --filelog ....... save log on file.`);
+        console.log(`  -i --spin .......... log with spinner.`);
         console.log(``);
         console.log(``);
         process.exit(0);

@@ -58,7 +58,7 @@ const _project_option = {
 function alias(params, output_params) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!output_params) {
-            output_params = {};
+            output_params = params;
         }
         if (!output_params.root) {
             output_params.root = params.root;
@@ -78,7 +78,7 @@ function alias(params, output_params) {
 }
 exports.alias = alias;
 function get_aliases(tsconfig_path) {
-    const data = util_instance.fs.read_file_sync(tsconfig_path, 'utf8');
+    const data = util_instance.fs.read_file(tsconfig_path, 'utf8');
     try {
         const tsconf_data = urn_lib_1.urn_util.json.clean_parse(data);
         return tsconf_data['compilerOptions']['paths'];
@@ -96,7 +96,7 @@ function _replace_aliases_client(aliases) {
     _traverse_ts_aliases(`${alias_params.root}/${defaults_1.defaults.folder}/client/src/`, aliases);
 }
 function _traverse_ts_aliases(directory, aliases) {
-    util_instance.fs.read_dir_sync(directory).forEach((filename) => {
+    util_instance.fs.read_dir(directory).forEach((filename) => {
         const full_path = path_1.default.resolve(directory, filename);
         if (util_instance.fs.is_directory(full_path) && filename != '.git') {
             return _traverse_ts_aliases(full_path, aliases);
@@ -172,7 +172,7 @@ function _change_to_relative(node, aliases) {
 }
 function _replace_modified_file(text, filename) {
     output_instance.start_loading(`Writing manipulated file...`);
-    util_instance.fs.write_file_sync(filename, text);
+    util_instance.fs.write_file(filename, text);
     output_instance.done_verbose_log(`File replaced [${filename}].`, 'alias');
 }
 // export const alias = {

@@ -52,7 +52,7 @@ let init_params = defaults_1.default_params;
 function init(params, output_params) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!output_params) {
-            output_params = {};
+            output_params = params;
         }
         if (!output_params.root) {
             output_params.root = params.root;
@@ -85,18 +85,14 @@ function init(params, output_params) {
     });
 }
 exports.init = init;
-function prompt_init(args, params, output_params) {
+function prompt_init(args, params) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!output_params) {
-            output_params = {};
-        }
-        if (!output_params.root) {
-            output_params.root = params.root;
-        }
-        output_instance = output.create(output_params);
+        output_instance = output.create(params);
         init_params = common_1.merge_params(params);
+        util_instance = util.create(init_params, output_instance);
         console.clear();
         title_1.title();
+        // output_instance.verbose_log(urn_util.json.safe_stringify(init_params), 'init');
         if (_is_already_initialized() && init_params.force === false) {
             // output.stop_loading();
             let confirm_msg = '';
@@ -127,7 +123,10 @@ function prompt_init(args, params, output_params) {
 }
 exports.prompt_init = prompt_init;
 function _is_already_initialized() {
-    return (util_instance.fs.exists_sync(`${init_params.root}/${defaults_1.jsonfile_path}`));
+    util_instance.output.hide = true;
+    const is = (util_instance.fs.exists(`${init_params.root}/${defaults_1.jsonfile_path}`));
+    util_instance.output.hide = false;
+    return is;
 }
 function _ask_for_pacman(args) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -207,7 +206,7 @@ function _ask_for_deploy(args) {
 function _add_admin_files() {
     output_instance.start_loading(`Adding admin files...`);
     const fix_file_nuxt_types = `${init_params.root}/node_modules/@nuxt/types/node_modules/index.d.ts`;
-    if (!util_instance.fs.exists_sync(fix_file_nuxt_types)) {
+    if (!util_instance.fs.exists(fix_file_nuxt_types)) {
         util_instance.spawn.exec_sync(`touch ${fix_file_nuxt_types}`);
     }
 }
@@ -221,7 +220,7 @@ function _remove_tmp() {
     output_instance.done_verbose_log(`Removed tmp folder [${defaults_1.defaults.tmp_folder}].`, 'tmp');
 }
 function _copy_dot_files() {
-    if (util_instance.fs.exists_sync(`${init_params.root}/src`) === false) {
+    if (util_instance.fs.exists(`${init_params.root}/src`) === false) {
         _copy_dot_src_folder();
     }
     _copy_dot_tsconfigs();
@@ -294,24 +293,24 @@ function _create_rc_file() {
     content += `\t"pacman": "${init_params.pacman}",\n`;
     content += `\t"deploy": "${init_params.deploy}"\n`;
     content += `}`;
-    util_instance.fs.write_file_sync(`${init_params.root}/${defaults_1.jsonfile_path}`, content);
+    util_instance.fs.write_file(`${init_params.root}/${defaults_1.jsonfile_path}`, content);
     util_instance.pretty(`${init_params.root}/${defaults_1.jsonfile_path}`, 'json');
     output_instance.done_log(`Created file ${defaults_1.jsonfile_path}.`, 'rcfl');
 }
 function _ignore_urn_folder() {
     output_instance.start_loading(`Adding ${defaults_1.defaults.folder} to .gitignore...`);
     const gitignore = `${init_params.root}/.gitignore`;
-    if (!util_instance.fs.exists_sync(gitignore)) {
+    if (!util_instance.fs.exists(gitignore)) {
         util_instance.fs.create_file(gitignore, 'giti');
     }
-    let content = util_instance.fs.read_file_sync(gitignore, 'utf8');
+    let content = util_instance.fs.read_file(gitignore, 'utf8');
     if (content.indexOf(defaults_1.defaults.folder + '/') === -1) {
         content += `\n${defaults_1.defaults.folder}/`;
     }
     if (content.indexOf(defaults_1.defaults.log_filepath + '/') === -1) {
         content += `\n${defaults_1.defaults.log_filepath}`;
     }
-    util_instance.fs.write_file_sync(gitignore, content);
+    util_instance.fs.write_file(gitignore, content);
     const log_msg = `Added ${defaults_1.defaults.folder} and ${defaults_1.defaults.log_filepath} to .gitignore.`;
     output_instance.done_log(log_msg, '.git');
 }
@@ -324,12 +323,12 @@ function _create_urn_folder() {
 function _update_package_scripts() {
     output_instance.start_loading('Updating scripts...');
     const package_json_path = `${init_params.root}/package.json`;
-    const data = util_instance.fs.read_file_sync(package_json_path, 'utf8');
+    const data = util_instance.fs.read_file(package_json_path, 'utf8');
     try {
         const package_data = urn_lib_1.urn_util.json.clean_parse(data);
         package_data['scripts'] = Object.assign(Object.assign({}, package_data['scripts']), { 'build': `uranio build`, 'build:server': `uranio build:client`, 'build:client': `uranio build:client`, 'dev': `uranio dev`, 'dev:server': `uranio dev:server`, 'dev:client': `uranio dev:client` });
         try {
-            util_instance.fs.write_file_sync(package_json_path, JSON.stringify(package_data, null, '\t'));
+            util_instance.fs.write_file(package_json_path, JSON.stringify(package_data, null, '\t'));
             output_instance.done_log(`Updated package.json scripts.`, 'alias');
         }
         catch (ex) {
@@ -343,7 +342,7 @@ function _update_package_scripts() {
 function _update_package_aliases() {
     output_instance.start_loading('Updating aliases...');
     const package_json_path = `${init_params.root}/package.json`;
-    const data = util_instance.fs.read_file_sync(package_json_path, 'utf8');
+    const data = util_instance.fs.read_file(package_json_path, 'utf8');
     try {
         const package_data = urn_lib_1.urn_util.json.clean_parse(data);
         package_data['_moduleAliases'] = {
@@ -368,7 +367,7 @@ function _update_package_aliases() {
             }
         }
         try {
-            util_instance.fs.write_file_sync(package_json_path, JSON.stringify(package_data, null, '\t'));
+            util_instance.fs.write_file(package_json_path, JSON.stringify(package_data, null, '\t'));
             output_instance.done_log(`Updated package.json module aliases.`, 'alias');
         }
         catch (ex) {
@@ -386,28 +385,29 @@ function _copy_dot_src_folder() {
 }
 function _copy_dot_tsconfigs() {
     const dot_tsc_file = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/tsconfig.json`;
-    const dest = `${init_params.root}/`;
+    const dest = `${init_params.root}/tsconfig.json`;
     util_instance.fs.copy_file(dot_tsc_file, dest, 'tsco');
     const dot_tsc_file_server = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/.uranio/server/tsconfig.json`;
-    const dest_server = `${init_params.root}/.uranio/server/`;
+    const dest_server = `${init_params.root}/.uranio/server/tsconfig.json`;
     util_instance.fs.copy_file(dot_tsc_file_server, dest_server, 'tscs');
     const dot_tsc_file_client = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/.uranio/client/tsconfig.json`;
-    const dest_client = `${init_params.root}/.uranio/client/`;
+    const dest_client = `${init_params.root}/.uranio/client/tsconfig.json`;
     util_instance.fs.copy_file(dot_tsc_file_client, dest_client, 'tscc');
 }
 function _copy_dot_eslint_files() {
-    const dot_eslint_files = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/.eslint*`;
-    const dest = `${init_params.root}/`;
-    util_instance.fs.copy_file(dot_eslint_files, dest, 'esln');
+    const dot_folder = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot`;
+    const dest_folder = `${init_params.root}`;
+    util_instance.fs.copy_file(`${dot_folder}/.eslintignore`, `${dest_folder}/.eslintignore`, 'esln');
+    util_instance.fs.copy_file(`${dot_folder}/.eslintrc.js`, `${dest_folder}/.eslintrc.js`, 'esln');
 }
 function _copy_netlify_files() {
     const dot_deploy_folder = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/deploy`;
     const toml_file = `${dot_deploy_folder}/netlify/netlify.toml`;
-    const toml_dest = `${init_params.root}/`;
+    const toml_dest = `${init_params.root}/netlify.toml`;
     util_instance.fs.copy_file(toml_file, toml_dest, 'ntlf');
     const function_folder = `${init_params.root}/${defaults_1.defaults.folder}/server/src/functions`;
-    if (!util_instance.fs.exists_sync(function_folder)) {
-        util_instance.fs.create_directory_sync(function_folder);
+    if (!util_instance.fs.exists(function_folder)) {
+        util_instance.fs.create_directory(function_folder);
     }
     let api_file = `trx-api.txt`;
     if (init_params.repo === 'api') {
@@ -420,8 +420,8 @@ function _copy_netlify_files() {
 function _copy_express_files() {
     const dot_deploy_folder = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/deploy`;
     const src_folder = `${init_params.root}/src`;
-    if (!util_instance.fs.exists_sync(src_folder)) {
-        util_instance.fs.create_directory_sync(src_folder);
+    if (!util_instance.fs.exists(src_folder)) {
+        util_instance.fs.create_directory(src_folder);
     }
     const index_file = `${dot_deploy_folder}/express/index.txt`;
     const index_dest = `${src_folder}/index.ts`;
