@@ -30,3 +30,7 @@ export type TransposeParams = {
 export type BuildParams = {
 	root: string
 }
+
+export type DevParams = {
+	root: string
+}

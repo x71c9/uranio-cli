@@ -1,6 +1,6 @@
 "use strict";
 /**
- * Init command module
+ * Dev command module
  *
  * @packageDocumentation
  */
@@ -32,121 +32,129 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dev = void 0;
-const fs_1 = __importDefault(require("fs"));
+exports.dev_client = exports.dev_server = exports.dev = void 0;
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const defaults_1 = require("../conf/defaults");
 const transpose_1 = require("./transpose");
-const hooks_1 = require("./hooks");
-exports.dev = {
-    command: () => __awaiter(void 0, void 0, void 0, function* () {
-        output.stop_loading();
-        util.read_rc_file();
-        defaults_1.conf.filelog = false;
-        _start_dev();
-    }),
-    server: () => {
-        output.stop_loading();
-        util.read_rc_file();
-        const cd_cmd = `cd ${defaults_1.conf.root}/.uranio/server`;
-        const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
-        const cmd = `${cd_cmd} && ${ts_cmd}`;
-        output.verbose_log(cmd, 'dev');
-        util.spawn_log_command(cmd, 'tscw', tscw_color);
-    },
-    client: (args) => {
-        output.stop_loading();
-        util.read_rc_file();
-        const native = (args === null || args === void 0 ? void 0 : args.native) || false;
-        const cd_cmd = `cd ${defaults_1.conf.root}/.uranio/client`;
-        const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
-        const cmd = `${cd_cmd} && ${nu_cmd}`;
-        output.verbose_log(cmd, 'dev');
-        if (native === true) {
-            util.spawn_native_log_command(cmd, 'nuxt', nuxt_color);
-        }
-        else {
-            util.spawn_log_command(cmd, 'nuxt', nuxt_color);
-        }
-    }
-};
+// import {hooks} from './hooks';
+const common_1 = require("./common");
+let output_instance;
+let util_instance;
+let dev_params = defaults_1.default_params;
 // let watch_client_scanned = false;
 // let watch_server_scanned = false;
 // let watch_book_scanned = false;
 let watch_lib_scanned = false;
 let watch_src_scanned = false;
-const cli_options = {
-    hide: false,
-    verbose: true,
-};
-const nuxt_color = '#677cc7';
-const tscw_color = '#734de3';
-const watc_color = '#687a6a';
-function _start_dev() {
+// const cli_options = {
+//   hide: false,
+//   verbose: true,
+// };
+// const nuxt_color = '#677cc7';
+// const tscw_color = '#734de3';
+// const watc_color = '#687a6a';
+function dev(params, output_params) {
     return __awaiter(this, void 0, void 0, function* () {
-        cli_options.verbose = defaults_1.conf.verbose;
-        transpose_1.transpose.run(defaults_1.conf.root, undefined, cli_options);
-        if (defaults_1.conf.repo === 'trx') {
-            hooks_1.hooks.run(cli_options);
+        _init_dev(params, output_params);
+        output_instance.start_loading(`Developing...`);
+        yield _dev_server();
+        yield _dev_client();
+    });
+}
+exports.dev = dev;
+function dev_server(params, output_params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        _init_dev(params, output_params);
+        yield _dev_server();
+    });
+}
+exports.dev_server = dev_server;
+function dev_client(params, output_params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        _init_dev(params, output_params);
+        output_instance.start_loading(`Developing client...`);
+        yield _dev_client();
+    });
+}
+exports.dev_client = dev_client;
+function _dev_server() {
+    return __awaiter(this, void 0, void 0, function* () {
+        output_instance.start_loading(`Developing server...`);
+        const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/server`;
+        const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
+        const cmd = `${cd_cmd} && ${ts_cmd}`;
+        output_instance.verbose_log(cmd, 'dev');
+        util_instance.spawn.log(cmd, 'tscw', 'developing server');
+    });
+}
+function _dev_client() {
+    return __awaiter(this, void 0, void 0, function* () {
+        output_instance.start_loading(`Developing client...`);
+        const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/client`;
+        const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
+        const cmd = `${cd_cmd} && ${nu_cmd}`;
+        output_instance.verbose_log(cmd, 'dev');
+        util_instance.spawn.log(cmd, 'nuxt', 'developing client');
+    });
+}
+function _init_dev(params, output_params) {
+    if (!output_params) {
+        output_params = {};
+    }
+    if (!output_params.root) {
+        output_params.root = params.root;
+    }
+    output_instance = output.create(output_params);
+    dev_params = common_1.merge_params(params);
+    const util_params = Object.assign({}, dev_params);
+    util_instance = util.create(util_params, output_instance);
+    _watch(output_params);
+}
+function _watch(output_params) {
+    const src_path = `${dev_params.root}/src/`;
+    output_instance.log(`Watching \`src\` folder [${src_path}] ...`, 'wtch');
+    util_instance.watch(src_path, `watching \`src\` folder.`, () => {
+        output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
+        watch_src_scanned = true;
+    }, (event, path) => {
+        output_instance.verbose_log(`${event} ${path}`, 'wtch');
+        if (!watch_src_scanned) {
+            return false;
         }
-        if (defaults_1.conf.deploy === 'netlify') {
-            const ntl_cmd = `npx ntl dev`;
-            util.spawn_log_command(ntl_cmd, 'ntlf', nuxt_color);
+        if (event !== 'unlink') {
+            transpose_1.transpose(Object.assign(Object.assign({}, dev_params), { file: path }), output_params);
+            // if(dev_params.repo === 'trx'){
+            //   hooks.run(cli_options);
+            // }
+            output_instance.done_log(`[Book watch] Transposed [${path}].`, 'wtch');
         }
         else {
-            const nuxt_cmd = `cd ${defaults_1.conf.root}/.uranio/client && npx nuxt dev -c ./nuxt.config.js`;
-            util.spawn_log_command(nuxt_cmd, 'nuxt', nuxt_color);
+            const relative_path = path.replace(`${dev_params.root}/src/`, '');
+            const new_path_server = `${dev_params.root}/${defaults_1.defaults.folder}/server/src/${relative_path}`;
+            const new_path_client = `${dev_params.root}/${defaults_1.defaults.folder}/client/src/${relative_path}`;
+            util_instance.fs.remove_file_sync(new_path_server);
+            util_instance.fs.remove_file_sync(new_path_client);
         }
-        const tscw_cmd = `cd ${defaults_1.conf.root}/.uranio/server && npx tsc -w --project ./tsconfig.json`;
-        util.spawn_log_command(tscw_cmd, 'tscw', tscw_color);
-        const src_path = `${defaults_1.conf.root}/src/`;
-        output.log(`Watching \`src\` folder [${src_path}] ...`, 'wtch', watc_color);
-        util.watch(src_path, `watching \`src\` folder.`, () => {
-            output.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
-            watch_src_scanned = true;
-        }, (_event, _path) => {
-            output.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
-            if (!watch_src_scanned) {
-                return false;
-            }
-            if (_event !== 'unlink') {
-                transpose_1.transpose.run(defaults_1.conf.root, _path, cli_options);
-                if (defaults_1.conf.repo === 'trx') {
-                    hooks_1.hooks.run(cli_options);
-                }
-                output.done_log(`[Book watch] Transposed [${_path}].`, 'wtch');
-            }
-            else {
-                const relative_path = _path.replace(`${defaults_1.conf.root}/src/`, '');
-                const new_path_server = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/${relative_path}`;
-                const new_path_client = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/client/src/${relative_path}`;
-                util.delete_file_sync(new_path_server);
-                util.delete_file_sync(new_path_client);
-            }
-            _replace_netlify_function_file();
-        });
-        const lib_path = `${defaults_1.conf.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/`;
-        output.log(`Watching uranio repo folder [${lib_path}] ...`, 'wtch', watc_color);
-        util.watch(lib_path, `watching uranio repo folder.`, () => {
-            output.done_log(`Initial scanner completed for [${lib_path}].`, 'wtch');
-            watch_lib_scanned = true;
-        }, (_event, _path) => {
-            output.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
-            if (!watch_lib_scanned) {
-                return false;
-            }
-            _replace_netlify_function_file();
-        });
+        _replace_netlify_function_file();
+    });
+    const lib_path = `${dev_params.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/`;
+    output_instance.log(`Watching uranio repo folder [${lib_path}] ...`, 'wtch');
+    util_instance.watch(lib_path, `watching uranio repo folder.`, () => {
+        output_instance.done_log(`Initial scanner completed for [${lib_path}].`, 'wtch');
+        watch_lib_scanned = true;
+    }, (event, path) => {
+        output_instance.verbose_log(`${event} ${path}`, 'wtch');
+        if (!watch_lib_scanned) {
+            return false;
+        }
+        _replace_netlify_function_file();
     });
 }
 function _replace_netlify_function_file() {
-    const api_file_path = `${defaults_1.conf.root}/.uranio/server/src/functions/api.ts`;
-    const result = fs_1.default.readFileSync(api_file_path);
+    const api_file_path = `${dev_params.root}/.uranio/server/src/functions/api.ts`;
+    const result = util_instance.fs.read_file_sync(api_file_path);
     let new_content = result.toString();
     const splitted = new_content.split(`\n`);
     const comment = '// uranio autoupdate';
@@ -161,7 +169,133 @@ function _replace_netlify_function_file() {
         new_content = splitted.join('\n');
         new_content += `\n// ${update_number + 1}`;
     }
-    fs_1.default.writeFileSync(api_file_path, new_content, 'utf8');
-    output.verbose_log(`Replacing Netlify serverless function file.`, 'less');
+    util_instance.fs.write_file_sync(api_file_path, new_content, 'utf8');
+    output_instance.verbose_log(`Replacing Netlify serverless function file.`, 'less');
 }
+// export const dev = {
+//   command: async ():Promise<void> => {
+//     output_instance.stop_loading();
+//     util_instance.read_rc_file();
+//     dev_params.filelog = false;
+//     _start_dev();
+//   },
+//   server: ():void => {
+//     output_instance.stop_loading();
+//     util_instance.read_rc_file();
+//     const cd_cmd = `cd ${dev_params.root}/.uranio/server`;
+//     const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
+//     const cmd = `${cd_cmd} && ${ts_cmd}`;
+//     output_instance.verbose_log(cmd, 'dev');
+//     util_instance.spawn_log_command(cmd, 'tscw', tscw_color);
+//   },
+//   client: (args?:Arguments):void => {
+//     output_instance.stop_loading();
+//     util_instance.read_rc_file();
+//     const native = args?.native || false;
+//     const cd_cmd = `cd ${dev_params.root}/.uranio/client`;
+//     const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
+//     const cmd = `${cd_cmd} && ${nu_cmd}`;
+//     output_instance.verbose_log(cmd, 'dev');
+//     if(native === true){
+//       util_instance.spawn_native_log_command(cmd, 'nuxt', nuxt_color);
+//     }else{
+//       util_instance.spawn_log_command(cmd, 'nuxt', nuxt_color);
+//     }
+//   }
+// };
+// }
+// async function _start_dev(params:DevParams, output_params?:Partial<output_instance.OutputParams>)
+//     :Promise<any>{
+//   transpose(params, output_params);
+//   // if(dev_params.repo === 'trx'){
+//   //   hooks.run(cli_options);
+//   // }
+//   if(dev_params.deploy === 'netlify'){
+//     const ntl_cmd = `npx ntl dev`;
+//     util_instance.spawn.log(ntl_cmd, 'ntlf', 'developing netlify');
+//   }else{
+//     const nuxt_cmd = `cd ${dev_params.root}/.uranio/client && npx nuxt dev -c ./nuxt.config.js`;
+//     util_instance.spawn.log(nuxt_cmd, 'nuxt', 'developing nuxt');
+//   }
+//   const tscw_cmd = `cd ${dev_params.root}/.uranio/server && npx tsc -w --project ./tsconfig.json`;
+//   util_instance.spawn_log_command(tscw_cmd, 'tscw', tscw_color);
+//   const src_path = `${dev_params.root}/src/`;
+//   output_instance.log(`Watching \`src\` folder [${src_path}] ...`, 'wtch', watc_color);
+//   util_instance.watch(
+//     src_path,
+//     `watching \`src\` folder.`,
+//     () => {
+//       output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
+//       watch_src_scanned = true;
+//     },
+//     (event, path) => {
+//       output_instance.verbose_log(`${event} ${path}`, 'wtch', watc_color);
+//       if(!watch_src_scanned){
+//         return false;
+//       }
+//       if(event !== 'unlink'){
+//         transpose.run(dev_params.root, path, cli_options);
+//         if(dev_params.repo === 'trx'){
+//           hooks.run(cli_options);
+//         }
+//         output_instance.done_log(`[Book watch] Transposed [${path}].`, 'wtch');
+//       }else{
+//         const relative_path = path.replace(`${dev_params.root}/src/`, '');
+//         const new_path_server = `${dev_params.root}/${defaults.folder}/server/src/${relative_path}`;
+//         const new_path_client = `${dev_params.root}/${defaults.folder}/client/src/${relative_path}`;
+//         util_instance.delete_file_sync(new_path_server);
+//         util_instance.delete_file_sync(new_path_client);
+//       }
+//       _replace_netlify_function_file();
+//     }
+//   );
+//   const lib_path = `${dev_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}/`;
+//   output_instance.log(`Watching uranio repo folder [${lib_path}] ...`, 'wtch', watc_color);
+//   util_instance.watch(
+//     lib_path,
+//     `watching uranio repo folder.`,
+//     () => {
+//       output_instance.done_log(`Initial scanner completed for [${lib_path}].`, 'wtch');
+//       watch_lib_scanned = true;
+//     },
+//     (event, path) => {
+//       output_instance.verbose_log(`${event} ${path}`, 'wtch', watc_color);
+//       if(!watch_lib_scanned){
+//         return false;
+//       }
+//       _replace_netlify_function_file();
+//     }
+//   );
+// }
+// export const dev = {
+//   command: async ():Promise<void> => {
+//     output_instance.stop_loading();
+//     util_instance.read_rc_file();
+//     dev_params.filelog = false;
+//     _start_dev();
+//   },
+//   server: ():void => {
+//     output_instance.stop_loading();
+//     util_instance.read_rc_file();
+//     const cd_cmd = `cd ${dev_params.root}/.uranio/server`;
+//     const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
+//     const cmd = `${cd_cmd} && ${ts_cmd}`;
+//     output_instance.verbose_log(cmd, 'dev');
+//     util_instance.spawn_log_command(cmd, 'tscw', tscw_color);
+//   },
+//   client: (args?:Arguments):void => {
+//     output_instance.stop_loading();
+//     util_instance.read_rc_file();
+//     const native = args?.native || false;
+//     const cd_cmd = `cd ${dev_params.root}/.uranio/client`;
+//     const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
+//     const cmd = `${cd_cmd} && ${nu_cmd}`;
+//     output_instance.verbose_log(cmd, 'dev');
+//     if(native === true){
+//       util_instance.spawn_native_log_command(cmd, 'nuxt', nuxt_color);
+//     }else{
+//       util_instance.spawn_log_command(cmd, 'nuxt', nuxt_color);
+//     }
+//   }
+// };
 //# sourceMappingURL=dev.js.map

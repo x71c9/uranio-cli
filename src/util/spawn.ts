@@ -32,35 +32,35 @@ class Spawn {
 		cp.execSync(command);
 	}
 	
-	public spin(command:string, context:string, action:string, resolve:Resolve, reject:Reject){
-		return this._spawn(command, context, action, resolve, reject, true, false, false);
+	public spin(command:string, context:string, action:string, resolve?:Resolve, reject?:Reject){
+		return this._spawn(command, context, action, true, false, false, resolve, reject);
 	}
 	
-	public log(command:string, context:string, action:string, resolve:Resolve, reject:Reject){
-		return this._spawn(command, context, action, resolve, reject, false, true, false);
+	public log(command:string, context:string, action:string, resolve?:Resolve, reject?:Reject){
+		return this._spawn(command, context, action, false, true, false, resolve, reject);
 	}
 	
-	public verbose_log(command:string, context:string, action:string, resolve:Resolve, reject:Reject){
-		return this._spawn(command, context, action, resolve, reject, false, false, true);
+	public verbose_log(command:string, context:string, action:string, resolve?:Resolve, reject?:Reject){
+		return this._spawn(command, context, action, false, false, true, resolve, reject);
 	}
 	
-	public spin_and_log(command:string, context:string, action:string, resolve:Resolve, reject:Reject){
-		return this._spawn(command, context, action, resolve, reject, true, true, false);
+	public spin_and_log(command:string, context:string, action:string, resolve?:Resolve, reject?:Reject){
+		return this._spawn(command, context, action, true, true, false, resolve, reject);
 	}
 	
-	public spin_and_verbose_log(command:string, context:string, action:string, resolve:Resolve, reject:Reject){
-		return this._spawn(command, context, action, resolve, reject, true, false, true);
+	public spin_and_verbose_log(command:string, context:string, action:string, resolve?:Resolve, reject?:Reject){
+		return this._spawn(command, context, action, true, false, true, resolve, reject);
 	}
 	
 	private _spawn(
 		command:string,
 		context:string,
 		action:string,
-		resolve:Resolve,
-		reject:Reject,
 		spin:boolean,
 		log:boolean,
-		verbose:boolean
+		verbose:boolean,
+		resolve?:Resolve,
+		reject?:Reject
 	){
 		if(spin){
 			this.output.start_loading(command);
@@ -133,18 +133,18 @@ class Spawn {
 					if(verbose || spin){
 						this.output.done_verbose_log(`Done ${action}`, context);
 					}
-					return resolve(true);
+					return (resolve) ? resolve(true) : true;
 				}
 				default:{
 					this.output.error_log(`Child process exited with code ${code}`, context);
-					return reject();
+					return (reject) ? reject() : false;
 				}
 			}
 		});
 		
 		child.on('error', (err) => {
 			this.output.error_log(`${err}`, context);
-			return reject();
+			return (reject) ? reject() : false;
 		});
 		
 		child_list.push(child);

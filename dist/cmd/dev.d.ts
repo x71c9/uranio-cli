@@ -1,11 +1,10 @@
 /**
- * Init command module
+ * Dev command module
  *
  * @packageDocumentation
  */
-/// <reference types="minimist" />
-export declare const dev: {
-    command: () => Promise<void>;
-    server: () => void;
-    client: (args?: import("minimist").ParsedArgs | undefined) => void;
-};
+import * as output from '../output/';
+import { DevParams } from './types';
+export declare function dev(params: DevParams, output_params?: Partial<output.OutputParams>): Promise<void>;
+export declare function dev_server(params: DevParams, output_params?: Partial<output.OutputParams>): Promise<void>;
+export declare function dev_client(params: DevParams, output_params?: Partial<output.OutputParams>): Promise<void>;
