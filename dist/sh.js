@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 "use strict";
-// import {parser} from './args/';
-// import {urn_process} from './process';
-// const args = parser(process.argv.slice(2));
-// urn_process(args);
+Object.defineProperty(exports, "__esModule", { value: true });
+const args_1 = require("./args/");
+const process_1 = require("./process");
+const args = args_1.parser(process.argv.slice(2));
+process_1.uranio_process(args);
 //# sourceMappingURL=sh.js.map
