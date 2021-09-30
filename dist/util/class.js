@@ -30,6 +30,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = void 0;
 const chokidar_1 = __importDefault(require("chokidar"));
 const prettier_1 = __importDefault(require("prettier"));
+// import {UtilParams} from './types';
+const common_1 = require("../cmd/common");
 const fs = __importStar(require("./fs"));
 const spawn = __importStar(require("./spawn"));
 const cmd = __importStar(require("./cmd"));
@@ -68,6 +70,7 @@ class Util {
     }
 }
 function create(params, output) {
+    params = common_1.merge_params(params);
     return new Util(params, output);
 }
 exports.create = create;

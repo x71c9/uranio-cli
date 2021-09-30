@@ -41,6 +41,7 @@ const util = __importStar(require("../util/"));
 const hooks_1 = require("./hooks");
 const transpose_1 = require("./transpose");
 const common_1 = require("./common");
+// import {BuildParams} from './types';
 // import * as common from './common';
 // // const cli_options = {
 // //   hide: false,
@@ -57,33 +58,33 @@ const common_1 = require("./common");
 let output_instance;
 let util_instance;
 let build_params = defaults_1.default_params;
-function build(params, output_params) {
+function build(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_build(params, output_params);
+        _init_build(params);
         output_instance.start_loading(`Building...`);
-        transpose_1.transpose(build_params, output_params);
-        hooks_1.hooks(build_params, output_params);
+        transpose_1.transpose(build_params);
+        hooks_1.hooks(build_params);
         yield _build_server();
         yield _build_client();
     });
 }
 exports.build = build;
-function build_server(params, output_params) {
+function build_server(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_build(params, output_params);
+        _init_build(params);
         output_instance.start_loading(`Building server...`);
-        transpose_1.transpose(build_params, output_params);
-        hooks_1.hooks(build_params, output_params);
+        transpose_1.transpose(build_params);
+        hooks_1.hooks(build_params);
         yield _build_server();
     });
 }
 exports.build_server = build_server;
-function build_client(params, output_params) {
+function build_client(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_build(params, output_params);
+        _init_build(params);
         output_instance.start_loading(`Building client...`);
-        transpose_1.transpose(build_params, output_params);
-        hooks_1.hooks(build_params, output_params);
+        transpose_1.transpose(build_params);
+        hooks_1.hooks(build_params);
         yield _build_client();
     });
 }
@@ -126,17 +127,10 @@ function _build_client() {
         util_instance.spawn.spin_and_log(cmd, 'nuxt', 'building client', callback, reject);
     });
 }
-function _init_build(params, output_params) {
-    if (!output_params) {
-        output_params = {};
-    }
-    if (!output_params.root) {
-        output_params.root = params.root;
-    }
-    output_instance = output.create(output_params);
+function _init_build(params) {
+    output_instance = output.create(params);
     build_params = common_1.merge_params(params);
-    const util_params = Object.assign({}, build_params);
-    util_instance = util.create(util_params, output_instance);
+    util_instance = util.create(params, output_instance);
 }
 // export const build = {
 //   run: async (root:string, options?:Partial<Options>):Promise<void> => {

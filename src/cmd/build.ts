@@ -20,7 +20,7 @@ import {transpose} from './transpose';
 
 import {merge_params} from './common';
 
-import {BuildParams} from './types';
+// import {BuildParams} from './types';
 
 // import * as common from './common';
 
@@ -46,49 +46,49 @@ let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
 
-let build_params = default_params as Params & BuildParams;
+let build_params = default_params as Params;
 
-export async function build(params:BuildParams, output_params?:Partial<output.OutputParams>)
+export async function build(params:Params)
 		:Promise<void>{
 	
-	_init_build(params, output_params);
+	_init_build(params);
 	
 	output_instance.start_loading(`Building...`);
 	
-	transpose(build_params, output_params);
+	transpose(build_params);
 	
-	hooks(build_params, output_params);
+	hooks(build_params);
 	
 	await _build_server();
 	await _build_client();
 	
 }
 
-export async function build_server(params:BuildParams, output_params?:Partial<output.OutputParams>)
+export async function build_server(params:Partial<Params>)
 		:Promise<void>{
 	
-	_init_build(params, output_params);
+	_init_build(params);
 	
 	output_instance.start_loading(`Building server...`);
 	
-	transpose(build_params, output_params);
+	transpose(build_params);
 	
-	hooks(build_params, output_params);
+	hooks(build_params);
 	
 	await _build_server();
 	
 }
 
-export async function build_client(params:BuildParams, output_params?:Partial<output.OutputParams>)
+export async function build_client(params:Partial<Params>)
 		:Promise<void>{
 	
-	_init_build(params, output_params);
+	_init_build(params);
 	
 	output_instance.start_loading(`Building client...`);
 	
-	transpose(build_params, output_params);
+	transpose(build_params);
 	
-	hooks(build_params, output_params);
+	hooks(build_params);
 	
 	await _build_client();
 	
@@ -144,21 +144,14 @@ async function _build_client(){
 	
 }
 
-function _init_build(params:BuildParams, output_params?:Partial<output.OutputParams>)
+function _init_build(params:Partial<Params>)
 		:void{
-	if(!output_params){
-		output_params = {};
-	}
-	if(!output_params.root){
-		output_params.root = params.root;
-	}
-	output_instance = output.create(output_params);
+	
+	output_instance = output.create(params);
 	
 	build_params = merge_params(params);
-	const util_params = {
-		...build_params
-	};
-	util_instance = util.create(util_params, output_instance);
+	
+	util_instance = util.create(params, output_instance);
 }
 
 

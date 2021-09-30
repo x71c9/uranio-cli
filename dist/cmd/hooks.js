@@ -41,6 +41,7 @@ const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const common_1 = require("./common");
+// import {HooksParams} from './types';
 const default_routes = {
     count: { url: '/count' },
     find: { url: '/' },
@@ -60,18 +61,11 @@ const _project_option = {
 let output_instance;
 let util_instance;
 let hooks_params = defaults_1.default_params;
-function hooks(params, output_params) {
+function hooks(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!output_params) {
-            output_params = {};
-        }
-        if (!output_params.root) {
-            output_params.root = params.root;
-        }
-        output_instance = output.create(output_params);
+        output_instance = output.create(params);
         hooks_params = common_1.merge_params(params);
-        const util_params = Object.assign({}, hooks_params);
-        util_instance = util.create(util_params, output_instance);
+        util_instance = util.create(params, output_instance);
         output_instance.start_loading('Generating TRX Hooks...');
         const text = _generate_text();
         _save_to_file(text);

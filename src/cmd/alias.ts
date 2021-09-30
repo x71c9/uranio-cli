@@ -18,7 +18,7 @@ import * as util from '../util/';
 
 import {Params} from '../types';
 
-import {AliasParams, Aliases} from './types';
+import {Aliases} from './types';
 
 // import * as common from './common';
 
@@ -28,7 +28,7 @@ let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
 
-let alias_params = default_params as Params & AliasParams;
+let alias_params = default_params as Params;
 
 const _project_option = {
 	manipulationSettings: {
@@ -38,24 +38,14 @@ const _project_option = {
 	}
 };
 
-export async function alias(params:AliasParams, output_params?:Partial<output.OutputParams>)
+export async function alias(params:Partial<Params>)
 		:Promise<void>{
 	
-	if(!output_params){
-		output_params = params;
-	}
-	if(!output_params.root){
-		output_params.root = params.root;
-	}
-	output_instance = output.create(output_params);
+	output_instance = output.create(params);
 	
 	alias_params = merge_params(params);
 	
-	const util_params = {
-		...alias_params
-	};
-	
-	util_instance = util.create(util_params, output_instance);
+	util_instance = util.create(params, output_instance);
 	
 	const tsconfig_path_server = `${alias_params.root}/${defaults.folder}/server/tsconfig.json`;
 	const tsconfig_path_client = `${alias_params.root}/${defaults.folder}/client/tsconfig.json`;

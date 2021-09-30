@@ -40,4 +40,7 @@ export declare type Params = {
     prefix: string;
     force: boolean;
     filelog: boolean;
+    color: string;
+    color_verbose: string;
+    native: boolean;
 };

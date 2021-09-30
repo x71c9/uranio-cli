@@ -4,22 +4,12 @@
  * @packageDocumentation
  */
 import ora from 'ora';
-import { OutputParams } from './types';
+import { Params } from '../types';
 declare class Output {
-    root: string;
-    native: boolean;
-    blank: boolean;
-    hide: boolean;
-    spin: boolean;
-    verbose: boolean;
-    fullwidth: boolean;
-    filelog: boolean;
-    prefix: string;
-    color: string;
-    color_verbose: string;
+    params: Params;
     spinner: ora.Ora;
     spinner_texts: string[];
-    constructor(root: string, native?: boolean, blank?: boolean, hide?: boolean, spin?: boolean, verbose?: boolean, fullwidth?: boolean, filelog?: boolean, prefix?: string, color?: string, color_verbose?: string);
+    constructor(params: Params);
     log(text: string, context?: string, color?: string): void;
     verbose_log(text: string, context?: string, color?: string): void;
     done_log(text: string, context?: string): void;
@@ -37,5 +27,5 @@ declare class Output {
     private _go_previous;
 }
 export declare type OutputInstance = InstanceType<typeof Output>;
-export declare function create(params: Partial<OutputParams>): OutputInstance;
+export declare function create(params: Partial<Params>): OutputInstance;
 export {};

@@ -59,22 +59,15 @@ const _project_option = {
         quoteKind: tsm.QuoteKind.Single,
     }
 };
-function transpose(params, output_params) {
+function transpose(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!output_params) {
-            output_params = {};
-        }
-        if (!output_params.root) {
-            output_params.root = params.root;
-        }
-        output_instance = output.create(output_params);
+        output_instance = output.create(params);
         transpose_params = common_1.merge_params(params);
-        const util_params = Object.assign({}, transpose_params);
-        util_instance = util.create(util_params, output_instance);
-        if (typeof transpose_params.file === 'string') {
-            const parsed_path = path_1.default.parse(transpose_params.file);
+        util_instance = util.create(params, output_instance);
+        if (typeof params.file === 'string') {
+            const parsed_path = path_1.default.parse(params.file);
             if (typeof parsed_path.ext === 'string' && parsed_path.ext !== '') {
-                _transpose_file();
+                _transpose_file(params.file);
             }
             else {
                 _transpose_folder();
@@ -96,7 +89,8 @@ function _transpose_all() {
     // output_instance.done_log(`Transpose completed.`, 'end');
 }
 function _transpose_file(file_path) {
-    const filepath = (!file_path) ? transpose_params.file : file_path;
+    // const filepath = (!file_path) ? transpose_params.file : file_path;
+    const filepath = file_path;
     if (filepath === `${transpose_params.root}/src/book.ts`) {
         _transpose_book();
     }
@@ -122,7 +116,8 @@ function _transpose_file(file_path) {
     }
 }
 function _transpose_folder(dir_path) {
-    const dirpath = (!dir_path) ? transpose_params.file : dir_path;
+    // const dirpath = (!dir_path) ? transpose_params.file : dir_path;
+    const dirpath = dir_path;
     if (!dirpath) {
         return;
     }

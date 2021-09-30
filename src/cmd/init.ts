@@ -39,26 +39,16 @@ let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
 
-let init_params = default_params as Params & InitParams;
+let init_params = default_params;
 
-export async function init(params:InitParams, output_params?:Partial<output.OutputParams>)
+export async function init(params:Partial<Params>)
 		:Promise<void>{
 	
-	if(!output_params){
-		output_params = params;
-	}
-	if(!output_params.root){
-		output_params.root = params.root;
-	}
-	
-	output_instance = output.create(output_params);
 	init_params = merge_params(params);
 	
-	const util_params = {
-		...init_params
-	};
+	output_instance = output.create(params);
 	
-	util_instance = util.create(util_params, output_instance);
+	util_instance = util.create(params, output_instance);
 	
 	output_instance.verbose_log(`$URNROOT$Project root: [${init_params.root}]`, 'root');
 	output_instance.verbose_log(`Selected repo: [${init_params.repo}]`, 'repo');
