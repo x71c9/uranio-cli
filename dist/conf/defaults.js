@@ -52,7 +52,7 @@ exports.default_params = {
     verbose: false,
     blank: false,
     hide: false,
-    spinner: true,
+    spin: true,
     fullwidth: false,
     prefix: '',
     force: false,

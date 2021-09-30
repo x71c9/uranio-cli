@@ -76,7 +76,7 @@ export const default_params:Params = {
 	verbose: false,
 	blank: false,
 	hide: false,
-	spinner: true,
+	spin: true,
 	fullwidth: false,
 	prefix: '',
 	force: false,

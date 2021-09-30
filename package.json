@@ -6,9 +6,9 @@
 	"types": "dist/index.d.ts",
 	"scripts": {
 		"build": "tsc -b",
-		"init": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js init -fvw -r api -p [CL]\"",
-		"transpose": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js transpose -wv -p [TRA]\"",
-		"help": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -h -p\"",
+		"init": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js init -fvw -r api -x [CL]\"",
+		"transpose": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js transpose -wv -x [TRA]\"",
+		"help": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -h -x\"",
 		"test": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js test -vbwf --noblank\"",
 		"version": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v\"",
 		"dev": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js dev\"",

@@ -40,6 +40,7 @@ let output_instance;
 let util_instance;
 let process_params = defaults_1.default_params;
 function uranio_process(args) {
+    process_params.spin = true;
     process_params = _set_params(args);
     process.chdir(process_params.root);
     output_instance = output.create(process_params);
@@ -50,8 +51,8 @@ function uranio_process(args) {
 exports.uranio_process = uranio_process;
 function _init_log() {
     const log_file_path = `${process_params.root}/${defaults_1.defaults.log_filepath}`;
-    if (!util_instance.fs.exists_sync(log_file_path)) {
-        util_instance.fs.create_file_sync(log_file_path);
+    if (!util_instance.fs.exists(log_file_path)) {
+        util_instance.fs.create_file(log_file_path);
     }
     _log_arguments(process_params);
     _log_root();
@@ -102,6 +103,13 @@ function _set_params(args) {
     }
     if (typeof args.nofilelog === 'boolean' && !!args.nofilelog !== !params.filelog) {
         params.filelog = !args.nofilelog;
+    }
+    const spin = args.i || args.spin;
+    if (spin == true) {
+        params.filelog = true;
+    }
+    if (typeof args.spin === 'boolean' && !!args.spin !== !params.spin) {
+        params.spin = !args.spin;
     }
     const prefix = args.x || args.prefix;
     if (typeof prefix === 'string' && prefix !== '') {

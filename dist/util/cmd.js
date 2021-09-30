@@ -68,7 +68,7 @@ class CMD {
     //   }else{
     //     const rcfile_path = `${this.params.root}/${jsonfile_path}`;
     //     try{
-    //       const rc_content = this.fs.read_file_sync(rcfile_path, 'utf8');
+    //       const rc_content = this.fs.read_file(rcfile_path, 'utf8');
     //       const rc_obj = urn_util.json.clean_parse(rc_content);
     //       this.set_repo(rc_obj.repo);
     //       this.params.repo = rc_obj.repo;
@@ -81,7 +81,7 @@ class CMD {
     //   }
     // }
     is_initialized() {
-        return (this.fs.exists_sync(`${this.params.root}/${defaults_1.jsonfile_path}`));
+        return (this.fs.exists(`${this.params.root}/${defaults_1.jsonfile_path}`));
     }
     install_dep(repo, context) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -123,7 +123,7 @@ class CMD {
     dependency_exists(repo) {
         const package_json_path = `${this.params.root}/package.json`;
         try {
-            const data = this.fs.read_file_sync(package_json_path, 'utf8');
+            const data = this.fs.read_file(package_json_path, 'utf8');
             const package_data = urn_lib_1.urn_util.json.clean_parse(data);
             const packdata_dep = package_data['dependencies'];
             const packdata_dep_dev = package_data['devDependencies'];

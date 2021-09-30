@@ -58,12 +58,12 @@ class Output {
     end_log(text) {
         this.stop_loading();
         const end_text = `${defaults_1.defaults.check_char} ${text}`;
-        this.log('end', (!this.blank) ? chalk_1.default.yellow(end_text) : end_text);
+        this.log((!this.blank) ? chalk_1.default.yellow(end_text) : end_text, 'end');
     }
     wrong_end_log(text) {
         this.stop_loading();
         const end_text = `${defaults_1.defaults.wrong_char} ${text}`;
-        this.log('end', (!this.blank) ? chalk_1.default.red(end_text) : end_text);
+        this.log((!this.blank) ? chalk_1.default.red(end_text) : end_text, 'end');
     }
     start_loading(text) {
         if (this.hide === true) {

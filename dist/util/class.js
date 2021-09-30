@@ -61,9 +61,9 @@ class Util {
     }
     pretty(filepath, parser = 'typescript') {
         this.output.start_loading(`Prettier [${filepath}]...`);
-        const content = this.fs.read_file_sync(filepath, 'utf8');
+        const content = this.fs.read_file(filepath, 'utf8');
         const pretty_string = prettier_1.default.format(content, { useTabs: true, tabWidth: 2, parser: parser });
-        this.fs.write_file_sync(filepath, pretty_string);
+        this.fs.write_file(filepath, pretty_string);
         this.output.done_verbose_log(`Prettier [${filepath}] done.`, 'prtt');
     }
 }

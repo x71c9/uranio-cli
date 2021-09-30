@@ -51,7 +51,7 @@ class CMD {
 	//   }else{
 	//     const rcfile_path = `${this.params.root}/${jsonfile_path}`;
 	//     try{
-	//       const rc_content = this.fs.read_file_sync(rcfile_path, 'utf8');
+	//       const rc_content = this.fs.read_file(rcfile_path, 'utf8');
 	//       const rc_obj = urn_util.json.clean_parse(rc_content);
 	//       this.set_repo(rc_obj.repo);
 	//       this.params.repo = rc_obj.repo;
@@ -66,7 +66,7 @@ class CMD {
 	
 	public is_initialized()
 			:boolean{
-		return (this.fs.exists_sync(`${this.params.root}/${jsonfile_path}`));
+		return (this.fs.exists(`${this.params.root}/${jsonfile_path}`));
 	}
 	
 	public async install_dep(repo:string, context:string)
@@ -110,7 +110,7 @@ class CMD {
 			:boolean{
 		const package_json_path = `${this.params.root}/package.json`;
 		try{
-			const data = this.fs.read_file_sync(package_json_path, 'utf8');
+			const data = this.fs.read_file(package_json_path, 'utf8');
 			const package_data = urn_util.json.clean_parse(data);
 			const packdata_dep = package_data['dependencies'];
 			const packdata_dep_dev = package_data['devDependencies'];
@@ -148,13 +148,13 @@ class CMD {
 	//     if(file === 'package.json'){
 	//       const package_json_path = `${folder_path}/${file}`;
 	//       try{
-	//         const content = this.fs.read_file_sync(package_json_path,'utf8');
+	//         const content = this.fs.read_file(package_json_path,'utf8');
 	//         const pack = urn_util.json.clean_parse(content);
 	//         if(pack.name === 'urn-cli'){
 	//           return false;
 	//         }else if(pack.name === 'uranio'){
 	//           const bld_path = `${folder_path}/urn-bld`;
-	//           if(!this.fs.exists_sync(bld_path)){
+	//           if(!this.fs.exists(bld_path)){
 	//             return false;
 	//           }
 	//           this.params.root = bld_path;

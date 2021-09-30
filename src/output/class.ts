@@ -80,14 +80,14 @@ class Output {
 			:void{
 		this.stop_loading();
 		const end_text = `${defaults.check_char} ${text}`;
-		this.log('end', (!this.blank) ? chalk.yellow(end_text) : end_text);
+		this.log((!this.blank) ? chalk.yellow(end_text) : end_text, 'end');
 	}
 	
 	public wrong_end_log(text:string)
 			:void{
 		this.stop_loading();
 		const end_text = `${defaults.wrong_char} ${text}`;
-		this.log('end', (!this.blank) ? chalk.red(end_text) : end_text);
+		this.log((!this.blank) ? chalk.red(end_text) : end_text, 'end');
 	}
 	
 	public start_loading(text:string)
