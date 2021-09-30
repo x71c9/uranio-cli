@@ -57,5 +57,8 @@ exports.default_params = {
     prefix: '',
     force: false,
     filelog: true,
+    color: '#859900',
+    color_verbose: '#668899',
+    native: false
 };
 //# sourceMappingURL=defaults.js.map

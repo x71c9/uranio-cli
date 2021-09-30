@@ -20,7 +20,7 @@ import * as alias from './alias';
 
 import {merge_params} from './common';
 
-import {TransposeParams, Aliases} from './types';
+import {Aliases} from './types';
 
 type BookName = 'atom' | 'dock' | 'bll' | 'routes';
 
@@ -37,7 +37,7 @@ let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
 
-let transpose_params = default_params as Params & TransposeParams;
+let transpose_params = default_params as Params;
 
 const _project_option = {
 	manipulationSettings: {
@@ -46,31 +46,21 @@ const _project_option = {
 	}
 };
 
-export async function transpose(params:TransposeParams, output_params?:Partial<output.OutputParams>)
+export async function transpose(params:Partial<Params> & {file: string})
 		:Promise<void>{
 
-	if(!output_params){
-		output_params = {};
-	}
-	if(!output_params.root){
-		output_params.root = params.root;
-	}
-	output_instance = output.create(output_params);
+	output_instance = output.create(params);
 	
 	transpose_params = merge_params(params);
 	
-	const util_params = {
-		...transpose_params
-	};
+	util_instance = util.create(params, output_instance);
 	
-	util_instance = util.create(util_params, output_instance);
-	
-	if(typeof transpose_params.file === 'string'){
+	if(typeof params.file === 'string'){
 		
-		const parsed_path = path.parse(transpose_params.file);
+		const parsed_path = path.parse(params.file);
 		if(typeof parsed_path.ext === 'string' && parsed_path.ext !== ''){
 			
-			_transpose_file();
+			_transpose_file(params.file);
 			
 		}else{
 			
@@ -101,9 +91,10 @@ function _transpose_all(){
 	// output_instance.done_log(`Transpose completed.`, 'end');
 }
 
-function _transpose_file(file_path?:string){
+function _transpose_file(file_path:string){
 	
-	const filepath = (!file_path) ? transpose_params.file : file_path;
+	// const filepath = (!file_path) ? transpose_params.file : file_path;
+	const filepath = file_path;
 	
 	if(filepath === `${transpose_params.root}/src/book.ts`){
 		
@@ -138,7 +129,8 @@ function _transpose_file(file_path?:string){
 }
 
 function _transpose_folder(dir_path?:string){
-	const dirpath = (!dir_path) ? transpose_params.file : dir_path;
+	// const dirpath = (!dir_path) ? transpose_params.file : dir_path;
+	const dirpath = dir_path;
 	if(!dirpath){
 		return;
 	}

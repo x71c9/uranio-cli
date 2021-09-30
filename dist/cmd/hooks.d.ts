@@ -5,6 +5,5 @@
  *
  * @packageDocumentation
  */
-import * as output from '../output/';
-import { HooksParams } from './types';
-export declare function hooks(params: HooksParams, output_params?: Partial<output.OutputParams>): Promise<void>;
+import { Params } from '../types';
+export declare function hooks(params: Partial<Params>): Promise<void>;

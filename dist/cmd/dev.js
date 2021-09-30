@@ -40,6 +40,7 @@ const defaults_1 = require("../conf/defaults");
 const transpose_1 = require("./transpose");
 const hooks_1 = require("./hooks");
 const common_1 = require("./common");
+// import {DevParams} from './types';
 let output_instance;
 let util_instance;
 let dev_params = defaults_1.default_params;
@@ -55,25 +56,25 @@ let watch_src_scanned = false;
 // const nuxt_color = '#677cc7';
 // const tscw_color = '#734de3';
 // const watc_color = '#687a6a';
-function dev(params, output_params) {
+function dev(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_dev(params, output_params);
+        _init_dev(params);
         output_instance.start_loading(`Developing...`);
         yield _dev_server();
         yield _dev_client();
     });
 }
 exports.dev = dev;
-function dev_server(params, output_params) {
+function dev_server(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_dev(params, output_params);
+        _init_dev(params);
         yield _dev_server();
     });
 }
 exports.dev_server = dev_server;
-function dev_client(params, output_params) {
+function dev_client(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_dev(params, output_params);
+        _init_dev(params);
         output_instance.start_loading(`Developing client...`);
         yield _dev_client();
     });
@@ -99,20 +100,13 @@ function _dev_client() {
         util_instance.spawn.log(cmd, 'nuxt', 'developing client');
     });
 }
-function _init_dev(params, output_params) {
-    if (!output_params) {
-        output_params = {};
-    }
-    if (!output_params.root) {
-        output_params.root = params.root;
-    }
-    output_instance = output.create(output_params);
+function _init_dev(params) {
+    output_instance = output.create(params);
     dev_params = common_1.merge_params(params);
-    const util_params = Object.assign({}, dev_params);
-    util_instance = util.create(util_params, output_instance);
-    _watch(output_params);
+    util_instance = util.create(params, output_instance);
+    _watch();
 }
-function _watch(output_params) {
+function _watch() {
     const src_path = `${dev_params.root}/src/`;
     output_instance.log(`Watching \`src\` folder [${src_path}] ...`, 'wtch');
     util_instance.watch(src_path, `watching \`src\` folder.`, () => {
@@ -124,9 +118,9 @@ function _watch(output_params) {
             return false;
         }
         if (event !== 'unlink') {
-            transpose_1.transpose(Object.assign(Object.assign({}, dev_params), { file: path }), output_params);
+            transpose_1.transpose(Object.assign(Object.assign({}, dev_params), { file: path }));
             if (dev_params.repo === 'trx') {
-                hooks_1.hooks(dev_params, output_params);
+                hooks_1.hooks(dev_params);
             }
             output_instance.done_log(`[Book watch] Transposed [${path}].`, 'wtch');
         }

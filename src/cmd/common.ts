@@ -29,8 +29,8 @@ import {
 } from '../types';
 
 
-export function merge_params<A>(params:A):Params & A{
-	const merged_params = default_params as Params & A;
+export function merge_params(params:Partial<Params>):Params{
+	const merged_params = default_params as Params;
 	for(const k in default_params){
 		if(urn_util.object.has_key(params, k)){
 			(merged_params as any)[k] = params[k];
@@ -38,7 +38,7 @@ export function merge_params<A>(params:A):Params & A{
 	}
 	for(const l in params){
 		if(!urn_util.object.has_key(merge_params, l)){
-			(merged_params as any)[l] = params[l];
+			(merged_params as any)[l] = (params as any)[l];
 		}
 	}
 	return merged_params;

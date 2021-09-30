@@ -14,31 +14,35 @@ const ora_1 = __importDefault(require("ora"));
 const chalk_1 = __importDefault(require("chalk"));
 const fs_1 = __importDefault(require("fs"));
 const defaults_1 = require("../conf/defaults");
+const common_1 = require("../cmd/common");
+// import {OutputParams} from './types';
 class Output {
-    constructor(root, native = false, blank = false, hide = false, spin = false, verbose = false, fullwidth = false, filelog = true, prefix = '', color = '#859900', color_verbose = '#668899') {
-        this.root = root;
-        this.native = native;
-        this.blank = blank;
-        this.hide = hide;
-        this.spin = spin;
-        this.verbose = verbose;
-        this.fullwidth = fullwidth;
-        this.filelog = filelog;
-        this.prefix = prefix;
-        this.color = color;
-        this.color_verbose = color_verbose;
+    constructor(params) {
+        //   public root:string,
+        //   public native=false,
+        //   public blank=false,
+        //   public hide=false,
+        //   public spin=false,
+        //   public verbose=false,
+        //   public fullwidth=false,
+        //   public filelog=true,
+        //   public prefix='',
+        //   public color='#859900',
+        //   public color_verbose='#668899'
+        // ){
+        this.params = params;
         this.spinner = ora_1.default({ text: 'Loading...', color: 'magenta', interval: 40 });
         this.spinner_texts = [];
     }
     log(text, context = 'log', color) {
-        const final_color = (typeof color === 'string') ? color : this.color;
-        const colored_text = (!this.blank) ? chalk_1.default.hex(final_color)(text) : text;
+        const final_color = (typeof color === 'string') ? color : this.params.color;
+        const colored_text = (!this.params.blank) ? chalk_1.default.hex(final_color)(text) : text;
         this._log(colored_text, context, true);
     }
     verbose_log(text, context = 'vlog', color) {
-        const final_color = (typeof color === 'string') ? color : this.color_verbose;
-        const colored_text = (!this.blank) ? chalk_1.default.hex(final_color)(text) : text;
-        this._log(colored_text, context, (this.verbose === true));
+        const final_color = (typeof color === 'string') ? color : this.params.color_verbose;
+        const colored_text = (!this.params.blank) ? chalk_1.default.hex(final_color)(text) : text;
+        this._log(colored_text, context, (this.params.verbose === true));
     }
     done_log(text, context = 'done') {
         this._go_previous();
@@ -58,23 +62,23 @@ class Output {
     end_log(text) {
         this.stop_loading();
         const end_text = `${defaults_1.defaults.check_char} ${text}`;
-        this.log((!this.blank) ? chalk_1.default.yellow(end_text) : end_text, 'end');
+        this.log((!this.params.blank) ? chalk_1.default.yellow(end_text) : end_text, 'end');
     }
     wrong_end_log(text) {
         this.stop_loading();
         const end_text = `${defaults_1.defaults.wrong_char} ${text}`;
-        this.log((!this.blank) ? chalk_1.default.red(end_text) : end_text, 'end');
+        this.log((!this.params.blank) ? chalk_1.default.red(end_text) : end_text, 'end');
     }
     start_loading(text) {
-        if (this.hide === true) {
+        if (this.params.hide === true) {
             return;
         }
-        if (this.blank === true) {
+        if (this.params.blank === true) {
             this.spinner.color = 'white';
         }
         this.spinner_texts.push(text);
         this.spinner_text(text);
-        if (this.spin === true && !this.spinner.isSpinning) {
+        if (this.params.spin === true && !this.spinner.isSpinning) {
             this.spinner.start();
         }
     }
@@ -85,9 +89,9 @@ class Output {
         this.spinner.text = this._spinner_text_color(text);
     }
     _log(text, context = 'log', out = false) {
-        const output_text = (!this.native) ?
+        const output_text = (!this.params.native) ?
             this._format_text(text, context) : text + '\n';
-        if (this.filelog) {
+        if (this.params.filelog) {
             _log_to_file(output_text);
         }
         if (out) {
@@ -96,10 +100,10 @@ class Output {
                 was_spinning = true;
                 this.stop_loading();
             }
-            if (this.hide === false) {
+            if (this.params.hide === false) {
                 process.stdout.write(output_text);
             }
-            if (this.spin === true && was_spinning) {
+            if (this.params.spin === true && was_spinning) {
                 this.spinner.start();
             }
         }
@@ -113,7 +117,7 @@ class Output {
             context = context.substr(0, 4);
         }
         text = this._replace_root_string(text);
-        const prefix = this.prefix;
+        const prefix = this.params.prefix;
         context = `[${context}]`;
         time = `[${time}]`;
         let text_lenght = 0;
@@ -126,7 +130,7 @@ class Output {
         text_lenght += count_tabs * 7;
         text_lenght += time.length;
         text_lenght += 4;
-        if (this.fullwidth === true) {
+        if (this.params.fullwidth === true) {
             const gap_lenght = process.stdout.columns - text_lenght;
             if (gap_lenght < 0 && gap_lenght > -9) {
                 time = time.replace(dateformat_1.default(new Date, "yy-mm-dd'T'"), '');
@@ -139,25 +143,25 @@ class Output {
             else if (gap_lenght <= -21) {
                 time = '';
                 let remain = process.stdout.columns + 2;
-                if (this.blank === true) {
+                if (this.params.blank === true) {
                     remain -= 19;
                 }
                 text = text.substr(0, remain) + '...';
                 text_lenght = remain + 4;
-                if (this.blank === true) {
+                if (this.params.blank === true) {
                     text_lenght += 19;
                 }
             }
         }
         let output_text = prefix;
         let dot = '.';
-        if (this.blank === false) {
+        if (this.params.blank === false) {
             context = chalk_1.default.grey(context);
             text = chalk_1.default.green(text);
             dot = chalk_1.default.gray('.');
             time = chalk_1.default.blue(time);
         }
-        if (this.fullwidth === true) {
+        if (this.params.fullwidth === true) {
             output_text += context + ' ';
             output_text += text + ' ';
             for (let i = 0; i < process.stdout.columns - text_lenght; i++) {
@@ -178,17 +182,17 @@ class Output {
         if (str.indexOf('$URNROOT$') !== -1) {
             return str.replace('$URNROOT$', '');
         }
-        if (this.root == '.') {
+        if (this.params.root == '.') {
             return str;
         }
-        const regex = new RegExp(`${this.root}`, 'g');
+        const regex = new RegExp(`${this.params.root}`, 'g');
         return str.replace(regex, 'ROOT');
     }
     _spinner_text_color(text) {
         if (!text) {
             return '';
         }
-        return (this.blank === false) ? chalk_1.default.magenta(text) : text;
+        return (this.params.blank === false) ? chalk_1.default.magenta(text) : text;
     }
     _go_previous() {
         this.spinner_texts.pop();
@@ -198,22 +202,38 @@ class Output {
 function _log_to_file(text) {
     fs_1.default.appendFileSync(defaults_1.defaults.log_filepath, text);
 }
-const default_params = {
-    root: '.',
-    native: false,
-    blank: false,
-    hide: false,
-    spin: false,
-    verbose: false,
-    fullwidth: false,
-    filelog: true,
-    prefix: '',
-    color: '#859900',
-    color_verbose: '#668899'
-};
+// const default_params:OutputParams = {
+//   root: '.',
+//   native: false,
+//   blank: false,
+//   hide: false,
+//   spin: false,
+//   verbose: false,
+//   fullwidth: false,
+//   filelog: true,
+//   prefix: '',
+//   color: '#859900',
+//   color_verbose: '#668899'
+// };
 function create(params) {
-    const merged_params = Object.assign(Object.assign({}, default_params), params);
-    return new Output(merged_params.root, merged_params.native, merged_params.blank, merged_params.hide, merged_params.spin, merged_params.verbose, merged_params.fullwidth, merged_params.filelog, merged_params.prefix, merged_params.color, merged_params.color_verbose);
+    // const merged_params = {
+    //   ...default_params,
+    //   ...params
+    // };
+    params = common_1.merge_params(params);
+    return new Output(params);
+    //   merged_params.root,
+    //   merged_params.native,
+    //   merged_params.blank,
+    //   merged_params.hide,
+    //   merged_params.spin,
+    //   merged_params.verbose,
+    //   merged_params.fullwidth,
+    //   merged_params.filelog,
+    //   merged_params.prefix,
+    //   merged_params.color,
+    //   merged_params.color_verbose
+    // );
 }
 exports.create = create;
 //# sourceMappingURL=class.js.map

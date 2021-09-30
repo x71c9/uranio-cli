@@ -57,26 +57,6 @@ export type Repo = keyof typeof abstract_repos;
 export type PacMan = keyof typeof abstract_pacman;
 export type Deploy = keyof typeof abstract_deploy;
 
-// export type Options = {
-//   verbose: boolean
-//   blank: boolean
-//   hide: boolean
-//   spinner: boolean
-//   fullwidth: boolean
-//   prefix: string
-//   root: string
-//   repo: Repo
-//   pacman: PacMan
-//   force: boolean
-//   filelog: boolean
-//   deploy: Deploy
-// }
-
-// export type Conf = Options & {
-// root: string,
-// repo: Repo
-// }
-
 export type Params = {
 	root: string
 	repo: Repo
@@ -91,4 +71,7 @@ export type Params = {
 	prefix: string,
 	force: boolean,
 	filelog: boolean,
+	color: string,
+	color_verbose: string,
+	native: boolean
 }

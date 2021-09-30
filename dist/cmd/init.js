@@ -49,18 +49,11 @@ const common_1 = require("./common");
 let output_instance;
 let util_instance;
 let init_params = defaults_1.default_params;
-function init(params, output_params) {
+function init(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!output_params) {
-            output_params = params;
-        }
-        if (!output_params.root) {
-            output_params.root = params.root;
-        }
-        output_instance = output.create(output_params);
         init_params = common_1.merge_params(params);
-        const util_params = Object.assign({}, init_params);
-        util_instance = util.create(util_params, output_instance);
+        output_instance = output.create(params);
+        util_instance = util.create(params, output_instance);
         output_instance.verbose_log(`$URNROOT$Project root: [${init_params.root}]`, 'root');
         output_instance.verbose_log(`Selected repo: [${init_params.repo}]`, 'repo');
         if (init_params.repo === 'api') {

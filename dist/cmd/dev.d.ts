@@ -3,8 +3,7 @@
  *
  * @packageDocumentation
  */
-import * as output from '../output/';
-import { DevParams } from './types';
-export declare function dev(params: DevParams, output_params?: Partial<output.OutputParams>): Promise<void>;
-export declare function dev_server(params: DevParams, output_params?: Partial<output.OutputParams>): Promise<void>;
-export declare function dev_client(params: DevParams, output_params?: Partial<output.OutputParams>): Promise<void>;
+import { Params } from '../types';
+export declare function dev(params: Partial<Params>): Promise<void>;
+export declare function dev_server(params: Partial<Params>): Promise<void>;
+export declare function dev_client(params: Partial<Params>): Promise<void>;

@@ -4,9 +4,9 @@
  * @packageDocumentation
  */
 
-import {Repo, Deploy, PacMan} from '../types';
+import {Params, Repo, Deploy, PacMan} from '../types';
 
-export type InitParams = {
+export type InitParams = Partial<Params> & {
 	root: string
 	repo?: Repo
 	deploy?: Deploy
@@ -18,23 +18,23 @@ export type Aliases = {
 	[key:string]: string[]
 }
 
-export type AliasParams = {
-	root: string
-}
+// export type AliasParams = {
+//   root: string
+// }
 
-export type TransposeParams = {
-	root: string
-	file?: string
-}
+// export type TransposeParams = {
+//   root: string
+//   file?: string
+// }
 
-export type BuildParams = {
-	root: string
-}
+// export type BuildParams = {
+//   root: string
+// }
 
-export type DevParams = {
-	root: string
-}
+// export type DevParams = {
+//   root: string
+// }
 
-export type HooksParams = {
-	root: string
-}
+// export type HooksParams = {
+//   root: string
+// }

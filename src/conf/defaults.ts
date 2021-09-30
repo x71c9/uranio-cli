@@ -81,4 +81,7 @@ export const default_params:Params = {
 	prefix: '',
 	force: false,
 	filelog: true,
+	color: '#859900',
+	color_verbose: '#668899',
+	native: false
 };

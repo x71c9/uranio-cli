@@ -8,9 +8,9 @@ export * from './init';
 
 export * from './alias';
 
-export * from './dev';
-
 export * from './build';
+
+export * from './dev';
 
 export * from './transpose';
 

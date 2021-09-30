@@ -55,18 +55,11 @@ const _project_option = {
         newLineKind: tsm.NewLineKind.LineFeed
     }
 };
-function alias(params, output_params) {
+function alias(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!output_params) {
-            output_params = params;
-        }
-        if (!output_params.root) {
-            output_params.root = params.root;
-        }
-        output_instance = output.create(output_params);
+        output_instance = output.create(params);
         alias_params = common_1.merge_params(params);
-        const util_params = Object.assign({}, alias_params);
-        util_instance = util.create(util_params, output_instance);
+        util_instance = util.create(params, output_instance);
         const tsconfig_path_server = `${alias_params.root}/${defaults_1.defaults.folder}/server/tsconfig.json`;
         const tsconfig_path_client = `${alias_params.root}/${defaults_1.defaults.folder}/client/tsconfig.json`;
         const aliases_server = get_aliases(tsconfig_path_server);

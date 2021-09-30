@@ -18,13 +18,13 @@ import {hooks} from './hooks';
 
 import {merge_params} from './common';
 
-import {DevParams} from './types';
+// import {DevParams} from './types';
 
 let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
 
-let dev_params = default_params as Params & DevParams;
+let dev_params = default_params as Params;
 
 // let watch_client_scanned = false;
 // let watch_server_scanned = false;
@@ -41,9 +41,9 @@ let watch_src_scanned = false;
 // const tscw_color = '#734de3';
 // const watc_color = '#687a6a';
 
-export async function dev(params:DevParams, output_params?:Partial<output.OutputParams>):Promise<void>{
+export async function dev(params:Partial<Params>):Promise<void>{
 	
-	_init_dev(params, output_params);
+	_init_dev(params);
 	
 	output_instance.start_loading(`Developing...`);
 	
@@ -52,13 +52,13 @@ export async function dev(params:DevParams, output_params?:Partial<output.Output
 	
 }
 
-export async function dev_server(params:DevParams, output_params?:Partial<output.OutputParams>):Promise<void>{
-	_init_dev(params, output_params);
+export async function dev_server(params:Partial<Params>):Promise<void>{
+	_init_dev(params);
 	await _dev_server();
 }
 
-export async function dev_client(params:DevParams, output_params?:Partial<output.OutputParams>):Promise<void>{
-	_init_dev(params, output_params);
+export async function dev_client(params:Partial<Params>):Promise<void>{
+	_init_dev(params);
 	output_instance.start_loading(`Developing client...`);
 	await _dev_client();
 }
@@ -91,27 +91,20 @@ async function _dev_client(){
 	
 }
 
-function _init_dev(params:DevParams, output_params?:Partial<output.OutputParams>)
+function _init_dev(params:Partial<Params>)
 		:void{
-	if(!output_params){
-		output_params = {};
-	}
-	if(!output_params.root){
-		output_params.root = params.root;
-	}
-	output_instance = output.create(output_params);
+	
+	output_instance = output.create(params);
 	
 	dev_params = merge_params(params);
-	const util_params = {
-		...dev_params
-	};
-	util_instance = util.create(util_params, output_instance);
 	
-	_watch(output_params);
+	util_instance = util.create(params, output_instance);
+	
+	_watch();
 	
 }
 
-function _watch(output_params?:Partial<output.OutputParams>){
+function _watch(){
 	
 	const src_path = `${dev_params.root}/src/`;
 	
@@ -130,9 +123,9 @@ function _watch(output_params?:Partial<output.OutputParams>){
 				return false;
 			}
 			if(event !== 'unlink'){
-				transpose({...dev_params, file: path}, output_params);
+				transpose({...dev_params, file: path});
 				if(dev_params.repo === 'trx'){
-					hooks(dev_params, output_params);
+					hooks(dev_params);
 				}
 				output_instance.done_log(`[Book watch] Transposed [${path}].`, 'wtch');
 			}else{

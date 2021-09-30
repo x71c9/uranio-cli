@@ -8,9 +8,13 @@ import chokidar from 'chokidar';
 
 import prettier from 'prettier';
 
+import {Params} from '../types';
+
 import * as out from '../output/';
 
-import {UtilParams} from './types';
+// import {UtilParams} from './types';
+
+import {merge_params} from '../cmd/common';
 
 import * as fs from './fs';
 
@@ -40,7 +44,7 @@ class Util {
 	
 	public spawn:spawn.SpawnInstance;
 	
-	constructor(public params:UtilParams, public output:out.OutputInstance){
+	constructor(public params:Params, public output:out.OutputInstance){
 		this.fs = fs.create(output);
 		this.spawn = spawn.create(output);
 		this.cmd = cmd.create(params, output);
@@ -90,8 +94,9 @@ class Util {
 
 export type UtilInstance = InstanceType<typeof Util>;
 
-export function create(params:UtilParams, output:out.OutputInstance)
+export function create(params:Partial<Params>, output:out.OutputInstance)
 		:UtilInstance{
+	params = merge_params(params);
 	return new Util(params, output);
 }
 

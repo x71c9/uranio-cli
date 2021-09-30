@@ -18,7 +18,7 @@ import * as util from '../util/';
 
 import {merge_params} from './common';
 
-import {HooksParams} from './types';
+// import {HooksParams} from './types';
 
 const default_routes = {
 	count: {url: '/count'},
@@ -42,25 +42,16 @@ let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
 
-let hooks_params = default_params as Params & HooksParams;
+let hooks_params = default_params as Params;
 
-export async function hooks(params:HooksParams, output_params?:Partial<output.OutputParams>):Promise<void>{
+export async function hooks(params:Partial<Params>)
+		:Promise<void>{
 	
-	if(!output_params){
-		output_params = {};
-	}
-	if(!output_params.root){
-		output_params.root = params.root;
-	}
-	output_instance = output.create(output_params);
+	output_instance = output.create(params);
 	
 	hooks_params = merge_params(params);
 	
-	const util_params = {
-		...hooks_params
-	};
-	
-	util_instance = util.create(util_params, output_instance);
+	util_instance = util.create(params, output_instance);
 	
 	output_instance.start_loading('Generating TRX Hooks...');
 	
