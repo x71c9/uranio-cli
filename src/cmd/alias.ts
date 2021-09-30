@@ -16,15 +16,19 @@ import * as output from '../output/';
 
 import * as util from '../util/';
 
+import {Params} from '../types';
+
 import {AliasParams, Aliases} from './types';
 
 // import * as common from './common';
+
+import {merge_params} from './common';
 
 let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
 
-let alias_params = default_params;
+let alias_params = default_params as Params & AliasParams;
 
 const _project_option = {
 	manipulationSettings: {
@@ -45,10 +49,7 @@ export async function alias(params:AliasParams, output_params?:Partial<output.Ou
 	}
 	output_instance = output.create(output_params);
 	
-	alias_params = {
-		...alias_params,
-		...params
-	};
+	alias_params = merge_params(params);
 	
 	const util_params = {
 		...alias_params

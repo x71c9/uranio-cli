@@ -10,7 +10,7 @@ import prettier from 'prettier';
 
 import * as out from '../output/';
 
-import {UtilParams} from '../types';
+import {UtilParams} from './types';
 
 import * as fs from './fs';
 

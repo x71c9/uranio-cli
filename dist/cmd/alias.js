@@ -44,6 +44,7 @@ const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 // import * as common from './common';
+const common_1 = require("./common");
 let output_instance;
 let util_instance;
 let alias_params = defaults_1.default_params;
@@ -63,7 +64,7 @@ function alias(params, output_params) {
             output_params.root = params.root;
         }
         output_instance = output.create(output_params);
-        alias_params = Object.assign(Object.assign({}, alias_params), params);
+        alias_params = common_1.merge_params(params);
         const util_params = Object.assign({}, alias_params);
         util_instance = util.create(util_params, output_instance);
         const tsconfig_path_server = `${alias_params.root}/${defaults_1.defaults.folder}/server/tsconfig.json`;

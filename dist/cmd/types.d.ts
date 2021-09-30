@@ -17,3 +17,10 @@ export declare type Aliases = {
 export declare type AliasParams = {
     root: string;
 };
+export declare type TransposeParams = {
+    root: string;
+    file?: string;
+};
+export declare type BuildParams = {
+    root: string;
+};

@@ -19,7 +19,7 @@ __exportStar(require("./init"), exports);
 __exportStar(require("./alias"), exports);
 // export * from './dev';
 // export * from './build';
-// export * from './transpose';
+__exportStar(require("./transpose"), exports);
 // export * from './hooks';
 // export * from './test';
 //# sourceMappingURL=index.js.map

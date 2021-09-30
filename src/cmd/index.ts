@@ -12,7 +12,7 @@ export * from './alias';
 
 // export * from './build';
 
-// export * from './transpose';
+export * from './transpose';
 
 // export * from './hooks';
 

@@ -4,13 +4,11 @@
  * @packageDocumentation
  */
 
-// import fs from 'fs';
-
 import {urn_util} from 'urn-lib';
 
 import * as out from '../output/';
 
-import {UtilParams} from '../types';
+import {UtilParams} from './types';
 
 // DO NO CANCEL IT
 // import * as common from '../cmd/common';
@@ -29,7 +27,6 @@ import {
 	abstract_deploy,
 	valid_deploy,
 	Deploy,
-	// Options
 } from '../types';
 
 import {jsonfile_path} from '../conf/defaults';
@@ -44,15 +41,6 @@ class CMD {
 		this.spawn = spawn.create(output);
 	}
 	
-	// public merge_options(options:Partial<Options>):void{
-	//   let k:keyof Options;
-	//   for(k in this.params){
-	//     if(typeof k !== typeof undefined && urn_util.object.has_key(options,k)){
-	//       (this.params as any)[k] = options[k]; // TODO FIX THIS
-	//     }
-	//   }
-	// }
-
 	public read_rc_file()
 			:void{
 		if(!this.is_initialized()){

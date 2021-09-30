@@ -92,11 +92,3 @@ export type Params = {
 	force: boolean,
 	filelog: boolean,
 }
-
-export type UtilParams = {
-	root: string
-	repo: Repo
-	deploy: Deploy
-	pacman: PacMan
-}
-

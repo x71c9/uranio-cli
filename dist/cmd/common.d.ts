@@ -3,6 +3,5 @@
  *
  * @packageDocumentation
  */
-import { Options } from '../types';
-export declare function init_log(): void;
-export declare function init_run(options?: Partial<Options>): void;
+import { Params } from '../types';
+export declare function merge_params<A>(params: A): Params & A;
