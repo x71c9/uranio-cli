@@ -3,3 +3,6 @@ config/*
 !config/example.env
 .urn
 .urnlog
+
+.uranio/
+.urnlog
