@@ -4,6 +4,8 @@
  * @packageDocumentation
  */
 
+import inquirer from 'inquirer';
+
 import {urn_util} from 'urn-lib';
 
 import {defaults, default_params, jsonfile_path} from '../conf/defaults';
@@ -12,11 +14,24 @@ import * as output from '../output/';
 
 import * as util from '../util/';
 
-import {Params} from '../types';
+import {
+	Arguments,
+	Params,
+	abstract_repos,
+	abstract_pacman,
+	abstract_deploy
+} from '../types';
 
 import {alias} from './alias';
 
-import {merge_params} from './common';
+import {title} from './title';
+
+import {
+	merge_params,
+	check_repo,
+	check_deploy,
+	check_pacman
+} from './common';
 
 import {InitParams} from './types';
 
@@ -68,6 +83,164 @@ export async function init(params:InitParams, output_params?:Partial<output.Outp
 	}
 	
 	output_instance.end_log(`Initialization completed.`);
+}
+
+export async function prompt_init(args:Arguments, params:InitParams, output_params?:Partial<output.OutputParams>)
+		:Promise<void>{
+	
+	if(!output_params){
+		output_params = {};
+	}
+	if(!output_params.root){
+		output_params.root = params.root;
+	}
+	output_instance = output.create(output_params);
+	
+	init_params = merge_params(params);
+	
+	console.clear();
+	
+	title();
+	
+	if(_is_already_initialized() && init_params.force === false){
+		
+		// output.stop_loading();
+		
+		let confirm_msg = '';
+		confirm_msg += `It appears the repo is already initialized.\n`;
+		confirm_msg += `? Are you sure you want to proceed?\n`;
+		
+		const suffix = `? All data will be lost and replaced.`;
+		
+		inquirer.
+			prompt([
+				{
+					type: 'confirm',
+					name: 'proceed',
+					message: confirm_msg,
+					suffix: suffix
+				}
+			]).then(async (answer) => {
+				if(answer.proceed && answer.proceed === true){
+					
+					await _ask_for_pacman(args);
+					
+				}else{
+					process.exit(0);
+				}
+			});
+	}else{
+		
+		await _ask_for_pacman(args);
+		
+	}
+	
+}
+
+function _is_already_initialized(){
+	return (util_instance.fs.exists_sync(`${init_params.root}/${jsonfile_path}`));
+}
+
+async function _ask_for_pacman(args:Arguments){
+	
+	const pacman = args.p || args.pacman;
+	
+	if(!pacman && init_params.force === false){
+			
+		// output.stop_loading();
+		
+		inquirer.
+			prompt([
+				{
+					type: 'list',
+					name: 'pacman',
+					message: 'Select which package manager you want to use:',
+					choices: Object.keys(abstract_pacman)
+				}
+			]).then(async (answers) => {
+				
+				check_pacman(answers.pacman);
+				init_params.pacman = answers.pacman;
+				
+				await _ask_for_repo(args);
+				
+			});
+		
+	}else{
+		
+		await _ask_for_repo(args);
+		
+	}
+}
+
+async function _ask_for_repo(args:Arguments){
+	
+	const repo = args.r || args.repo;
+	
+	if(!repo && init_params.force === false){
+			
+		// output.stop_loading();
+		
+		inquirer.
+			prompt([
+				{
+					type: 'list',
+					name: 'repo',
+					message: 'Select which URANIO repo you want to use:',
+					choices: Object.keys(abstract_repos)
+				}
+			]).then(async (answers) => {
+				
+				check_repo(answers.repo);
+				
+				if(answers.repo !== 'core'){
+					
+					await _ask_for_deploy(args);
+					
+				}else{
+					
+					await init(init_params);
+					
+				}
+				
+			});
+		
+	}else{
+		
+		await _ask_for_deploy(args);
+		
+	}
+}
+
+async function _ask_for_deploy(args:Arguments){
+	
+	const deploy = args.d || args.deploy;
+	
+	if(!deploy && init_params.force === false){
+			
+		// output.stop_loading();
+		
+		inquirer.
+			prompt([
+				{
+					type: 'list',
+					name: 'deploy',
+					message: 'How you want to deploy?',
+					choices: Object.keys(abstract_deploy)
+				}
+			]).then(async (answers) => {
+				
+				check_deploy(answers.deploy);
+				
+				await init(init_params);
+				
+			});
+		
+	}else{
+		
+		await init(init_params);
+		
+	}
 }
 
 function _add_admin_files(){
@@ -206,6 +379,7 @@ function _update_package_scripts(){
 	try{
 		const package_data = urn_util.json.clean_parse(data);
 		package_data['scripts'] = {
+			...package_data['scripts'],
 			'build': `uranio build`,
 			'build:server': `uranio build:client`,
 			'build:client': `uranio build:client`,

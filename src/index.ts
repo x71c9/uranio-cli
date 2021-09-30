@@ -4,6 +4,7 @@ import {
 	build,
 	transpose,
 	hooks,
+	help
 } from './cmd/';
 
 export default {
@@ -12,4 +13,5 @@ export default {
 	build,
 	transpose,
 	hooks,
+	help
 };

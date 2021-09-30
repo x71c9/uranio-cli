@@ -16,4 +16,4 @@ export * from './transpose';
 
 export * from './hooks';
 
-// export * from './test';
+export * from './help';

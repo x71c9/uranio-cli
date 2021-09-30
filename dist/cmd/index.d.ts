@@ -9,3 +9,4 @@ export * from './dev';
 export * from './build';
 export * from './transpose';
 export * from './hooks';
+export * from './help';
