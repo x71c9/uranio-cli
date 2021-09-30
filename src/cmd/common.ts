@@ -19,6 +19,15 @@ import {Params} from '../types';
 // import {default_params, defaults} from '../conf/defaults';
 import {default_params} from '../conf/defaults';
 
+import {
+	abstract_repos,
+	valid_repos,
+	abstract_pacman,
+	valid_pacman,
+	abstract_deploy,
+	valid_deploy,
+} from '../types';
+
 
 export function merge_params<A>(params:A):Params & A{
 	const merged_params = default_params as Params & A;
@@ -33,6 +42,42 @@ export function merge_params<A>(params:A):Params & A{
 		}
 	}
 	return merged_params;
+}
+
+export function check_repo(repo:string)
+		:void{
+	if(!urn_util.object.has_key(abstract_repos, repo)){
+		const valid_repos_str = valid_repos().join(', ');
+		let end_log = '';
+		end_log += `Wrong repo. `;
+		end_log += `Repo must be one of the following [${valid_repos_str}]`;
+		process.stderr.write(end_log);
+		process.exit(1);
+	}
+}
+
+export function check_pacman(pacman:string)
+		:void{
+	if(!urn_util.object.has_key(abstract_pacman, pacman)){
+		const valid_pacman_str = valid_pacman().join(', ');
+		let end_log = '';
+		end_log += `Wrong package manager. `;
+		end_log += `Package manager must be one of the following [${valid_pacman_str}]`;
+		process.stderr.write(end_log);
+		process.exit(1);
+	}
+}
+
+export function check_deploy(deploy:string)
+		:void{
+	if(!urn_util.object.has_key(abstract_deploy, deploy)){
+		const valid_deploy_str = valid_deploy().join(', ');
+		let end_log = '';
+		end_log += `Wrong deploy value. `;
+		end_log += `Deploy value must be one of the following [${valid_deploy_str}]`;
+		process.stderr.write(end_log);
+		process.exit(1);
+	}
 }
 
 

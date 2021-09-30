@@ -21,5 +21,5 @@ __exportStar(require("./dev"), exports);
 __exportStar(require("./build"), exports);
 __exportStar(require("./transpose"), exports);
 __exportStar(require("./hooks"), exports);
-// export * from './test';
+__exportStar(require("./help"), exports);
 //# sourceMappingURL=index.js.map

@@ -4,14 +4,20 @@
  * @packageDocumentation
  */
 
+import fs from 'fs';
+
+import path from 'path';
+
+import {urn_util} from 'urn-lib';
+
 import {Arguments, Repo, PacMan, Deploy, Params} from './types';
 
-// import * as output from './output/';
+import * as output from './output/';
 
-// import * as util from './util/';
+import * as util from './util/';
 
 import {
-	init,
+	prompt_init,
 	dev,
 	dev_server,
 	dev_client,
@@ -21,17 +27,17 @@ import {
 	build_client,
 	alias,
 	hooks,
-	// help,
+	help,
 	// test,
 } from './cmd/';
 
-import {default_params} from './conf/defaults';
+import {default_params, defaults} from './conf/defaults';
 
-// // import * as common from './cmd/common';
+import {check_repo, check_deploy, check_pacman} from './cmd/common';
 
-// let output_instance:output.OutputInstance;
+let output_instance:output.OutputInstance;
 
-// let util_instance:util.UtilInstance;
+let util_instance:util.UtilInstance;
 
 let process_params = default_params as Params;
 
@@ -40,27 +46,39 @@ export function uranio_process(args:Arguments)
 	
 	process_params = _set_params(args);
 	
-	// output_instance = output.create(params);
+	process.chdir(process_params.root);
 	
-	// util_instance = util.create(params, output_instance);
+	output_instance = output.create(process_params);
+	util_instance = util.create(process_params, output_instance);
 	
-	// console.log(process_params);
-	
-	// process.chdir(conf.root);
-	
-	// // common.init_log();
-	
-	// _log_arguments(args);
+	_init_log();
 	
 	_switch_command(args);
 	
-	// process.exit(1);
+}
+
+function _init_log(){
+	
+	const log_file_path = `${process_params.root}/${defaults.log_filepath}`;
+	if(!util_instance.fs.exists_sync(log_file_path)){
+		util_instance.fs.create_file_sync(log_file_path);
+	}
+	
+	_log_arguments(process_params);
+	_log_root();
 	
 }
 
-// function _log_arguments(args:Arguments){
-//   output_instance.verbose_log(JSON.stringify(args), 'args');
-// }
+function _log_arguments(params:Params){
+	output_instance.verbose_log(JSON.stringify(params), 'args');
+}
+
+function _log_root(){
+	output_instance.verbose_log(
+		`$URNROOT$Project root [${process_params.root}]`,
+		'root'
+	);
+}
 
 function _set_params(args:Arguments){
 	
@@ -117,53 +135,160 @@ function _set_params(args:Arguments){
 		params.filelog = !args.nofilelog;
 	}
 	
-	const prefix = args.p || args.prefix;
+	const prefix = args.x || args.prefix;
 	
 	if(typeof prefix === 'string' && prefix !== ''){
 		params.prefix = prefix;
 	}
 	
-	const pacman = args.pacman;
+	const branch = args.g || args.branch;
+	
+	if(typeof branch === 'string' && branch !== ''){
+		params.branch = branch;
+	}
+	
+	const pacman = args.p || args.pacman;
 	
 	if(typeof pacman === 'string' && pacman != ''){
-		// util_instance.cmd.set_pacman(pacman);
+		check_pacman(pacman);
 		params.pacman = pacman as PacMan;
 	}
 	
 	const repo = args.r || args.repo;
 	
 	if(typeof repo === 'string' && repo != ''){
-		// util_instance.cmd.set_repo(repo);
+		check_repo(repo);
 		params.repo = repo as Repo;
 	}
 	
 	const deploy = args.d || args.deploy;
 	
 	if(typeof deploy === 'string' && deploy != ''){
-		// util_instance.cmd.set_repo(repo);
+		check_deploy(deploy);
 		params.deploy = deploy as Deploy;
 	}
 	
-	// let root = args.s || args.root;
+	let root = args.s || args.root;
 	
-	// if(typeof root === 'string' && root !== ''){
-	//   root = util_instance.relative_to_absolute_path(root);
-	//   if(!util_instance.check_folder(root)){
-	//     let end_log = '';
-	//     end_log += `Invalid project root.`;
-	//     output_instance.wrong_end_log(end_log);
-	//     process.exit(1);
-	//   }else{
-	//     params.root = root;
-	//     // common.init_log();
-	//     output_instance.done_verbose_log(`$URNROOT$Project root set to [${params.root}]`, 'root');
-	//   }
-	// }else{
-	//   util_instance.auto_set_project_root();
-	// }
+	if(typeof root === 'string' && root !== ''){
+		if(root[0] !== '/'){
+			root = path.resolve(process.cwd(), root);
+		}
+		if(!_check_folder(root)){
+			let end_log = '';
+			end_log += `\nInvalid project root.\n`;
+			process.stderr.write(end_log);
+			process.exit(1);
+		}else{
+			params.root = root;
+		}
+	}else{
+		params.root = _get_project_root();
+	}
 		
 	return params;
 	
+}
+
+function _get_project_root()
+		:string{
+	let folder_path = process.cwd();
+	while(!_folder_is_valid(folder_path)){
+		if(_folder_is_uranio(folder_path)){
+			folder_path = `${folder_path}/urn-bld`;
+			break;
+		}
+		const arr_folder = folder_path.split('/');
+		arr_folder.pop();
+		folder_path = arr_folder.join('/');
+		if(folder_path === '/' || arr_folder.length === 2){
+			let err_msg = `Cannot find project root.`;
+			err_msg += ' Be sure to run `uranio` inside an NPM project.';
+			process.stderr.write(err_msg);
+			process.exit(1);
+		}
+	}
+	return folder_path;
+}
+
+function _folder_is_valid(folder_path:string){
+	const data = fs.readdirSync(folder_path);
+	if(!data){
+		return false;
+	}
+	for(const file of data){
+		if(file === 'package.json'){
+			const package_json_path = `${folder_path}/${file}`;
+			try{
+				const content = fs.readFileSync(package_json_path,'utf8');
+				const pack = urn_util.json.clean_parse(content);
+				if(pack.name === 'urn-cli' || (pack.name === 'uranio' && pack.uranio == true)){
+					return false;
+				}
+				return true;
+			}catch(ex){
+				process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
+				return false;
+			}
+		}
+	}
+	return false;
+}
+
+function _folder_is_uranio(folder_path:string){
+	const data = fs.readdirSync(folder_path);
+	if(!data){
+		return false;
+	}
+	for(const file of data){
+		if(file === 'package.json'){
+			const package_json_path = `${folder_path}/${file}`;
+			try{
+				const content = fs.readFileSync(package_json_path,'utf8');
+				const pack = urn_util.json.clean_parse(content);
+				if(pack.name === 'uranio'){
+					return true;
+				}
+				return false;
+			}catch(ex){
+				process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
+				return false;
+			}
+		}
+	}
+	return false;
+}
+
+function _check_folder(folder_path:string){
+	const data = fs.readdirSync(folder_path);
+	if(!data){
+		return false;
+	}
+	for(const file of data){
+		if(file === 'package.json'){
+			const package_json_path = `${folder_path}/${file}`;
+			try{
+				const content = fs.readFileSync(package_json_path,'utf8');
+				const pack = urn_util.json.clean_parse(content);
+				if(pack.name === 'urn-cli'){
+					return false;
+				}else if(pack.name === 'uranio'){
+					const bld_path = `${folder_path}/urn-bld`;
+					if(!fs.existsSync(bld_path)){
+						return false;
+					}
+					folder_path = bld_path;
+					return true;
+				}
+				return true;
+			}catch(ex){
+				// this.output.error_log(`Invalid ${package_json_path}. ${ex.message}`, 'root');
+				process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
+				return false;
+			}
+		}
+	}
+	return false;
 }
 
 function _switch_command(args:Arguments){
@@ -177,36 +302,36 @@ function _switch_command(args:Arguments){
 		cmd = 'help';
 	}
 	switch(cmd){
-		// case '':
-		// case 'version':{
-		//   output_instance.stop_loading();
-		//   console.log('v0.0.1');
-		//   break;
-		// }
+		case '':
+		case 'version':{
+			output_instance.stop_loading();
+			output_instance.log('v0.0.1');
+			break;
+		}
 		case 'init':{
-			init(process_params, process_params);
+			prompt_init(args, process_params);
 			break;
 		}
 		case 'transpose':{
-			transpose(process_params, process_params);
+			transpose(process_params);
 			break;
 		}
 		case 'alias':{
-			alias(process_params, process_params);
+			alias(process_params);
 			break;
 		}
 		case 'hooks':{
-			hooks(process_params, process_params);
+			hooks(process_params);
 			break;
 		}
 		case 'dev':{
 			switch(splitted_cmd[1]){
 				case 'server':{
-					dev_server(process_params, process_params);
+					dev_server(process_params);
 					break;
 				}
 				case 'client':{
-					dev_client(process_params, process_params);
+					dev_client(process_params);
 					break;
 				}
 				case '':
@@ -236,7 +361,7 @@ function _switch_command(args:Arguments){
 			break;
 		}
 		case 'help':{
-			// help.command();
+			help();
 			break;
 		}
 		case 'test':{
@@ -249,4 +374,18 @@ function _switch_command(args:Arguments){
 		}
 	}
 }
+
+// function _relative_to_absolute_path(path:string)
+//     :string{
+//   if(path[path.length-1] === '/'){
+//     path = path.substr(0,path.length-1);
+//   }
+//   if(path[0] !== '/'){
+//     if(path.substr(0,2) === './'){
+//       path = path.substr(2);
+//     }
+//     path = `${conf.root}/${path}`;
+//   }
+//   return path;
+// }
 

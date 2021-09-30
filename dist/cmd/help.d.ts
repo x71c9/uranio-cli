@@ -3,6 +3,4 @@
  *
  * @packageDocumentation
  */
-export declare const help: {
-    command: () => void;
-};
+export declare function help(): Promise<void>;

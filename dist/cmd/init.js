@@ -32,13 +32,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.init = void 0;
+exports.prompt_init = exports.init = void 0;
+const inquirer_1 = __importDefault(require("inquirer"));
 const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
+const types_1 = require("../types");
 const alias_1 = require("./alias");
+const title_1 = require("./title");
 const common_1 = require("./common");
 let output_instance;
 let util_instance;
@@ -79,6 +85,125 @@ function init(params, output_params) {
     });
 }
 exports.init = init;
+function prompt_init(args, params, output_params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!output_params) {
+            output_params = {};
+        }
+        if (!output_params.root) {
+            output_params.root = params.root;
+        }
+        output_instance = output.create(output_params);
+        init_params = common_1.merge_params(params);
+        console.clear();
+        title_1.title();
+        if (_is_already_initialized() && init_params.force === false) {
+            // output.stop_loading();
+            let confirm_msg = '';
+            confirm_msg += `It appears the repo is already initialized.\n`;
+            confirm_msg += `? Are you sure you want to proceed?\n`;
+            const suffix = `? All data will be lost and replaced.`;
+            inquirer_1.default.
+                prompt([
+                {
+                    type: 'confirm',
+                    name: 'proceed',
+                    message: confirm_msg,
+                    suffix: suffix
+                }
+            ]).then((answer) => __awaiter(this, void 0, void 0, function* () {
+                if (answer.proceed && answer.proceed === true) {
+                    yield _ask_for_pacman(args);
+                }
+                else {
+                    process.exit(0);
+                }
+            }));
+        }
+        else {
+            yield _ask_for_pacman(args);
+        }
+    });
+}
+exports.prompt_init = prompt_init;
+function _is_already_initialized() {
+    return (util_instance.fs.exists_sync(`${init_params.root}/${defaults_1.jsonfile_path}`));
+}
+function _ask_for_pacman(args) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pacman = args.p || args.pacman;
+        if (!pacman && init_params.force === false) {
+            // output.stop_loading();
+            inquirer_1.default.
+                prompt([
+                {
+                    type: 'list',
+                    name: 'pacman',
+                    message: 'Select which package manager you want to use:',
+                    choices: Object.keys(types_1.abstract_pacman)
+                }
+            ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
+                common_1.check_pacman(answers.pacman);
+                init_params.pacman = answers.pacman;
+                yield _ask_for_repo(args);
+            }));
+        }
+        else {
+            yield _ask_for_repo(args);
+        }
+    });
+}
+function _ask_for_repo(args) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const repo = args.r || args.repo;
+        if (!repo && init_params.force === false) {
+            // output.stop_loading();
+            inquirer_1.default.
+                prompt([
+                {
+                    type: 'list',
+                    name: 'repo',
+                    message: 'Select which URANIO repo you want to use:',
+                    choices: Object.keys(types_1.abstract_repos)
+                }
+            ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
+                common_1.check_repo(answers.repo);
+                if (answers.repo !== 'core') {
+                    yield _ask_for_deploy(args);
+                }
+                else {
+                    yield init(init_params);
+                }
+            }));
+        }
+        else {
+            yield _ask_for_deploy(args);
+        }
+    });
+}
+function _ask_for_deploy(args) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const deploy = args.d || args.deploy;
+        if (!deploy && init_params.force === false) {
+            // output.stop_loading();
+            inquirer_1.default.
+                prompt([
+                {
+                    type: 'list',
+                    name: 'deploy',
+                    message: 'How you want to deploy?',
+                    choices: Object.keys(types_1.abstract_deploy)
+                }
+            ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
+                common_1.check_deploy(answers.deploy);
+                yield init(init_params);
+            }));
+        }
+        else {
+            yield init(init_params);
+        }
+    });
+}
 function _add_admin_files() {
     output_instance.start_loading(`Adding admin files...`);
     const fix_file_nuxt_types = `${init_params.root}/node_modules/@nuxt/types/node_modules/index.d.ts`;
@@ -202,14 +327,7 @@ function _update_package_scripts() {
     const data = util_instance.fs.read_file_sync(package_json_path, 'utf8');
     try {
         const package_data = urn_lib_1.urn_util.json.clean_parse(data);
-        package_data['scripts'] = {
-            'build': `uranio build`,
-            'build:server': `uranio build:client`,
-            'build:client': `uranio build:client`,
-            'dev': `uranio dev`,
-            'dev:server': `uranio dev:server`,
-            'dev:client': `uranio dev:client`
-        };
+        package_data['scripts'] = Object.assign(Object.assign({}, package_data['scripts']), { 'build': `uranio build`, 'build:server': `uranio build:client`, 'build:client': `uranio build:client`, 'dev': `uranio dev`, 'dev:server': `uranio dev:server`, 'dev:client': `uranio dev:client` });
         try {
             util_instance.fs.write_file_sync(package_json_path, JSON.stringify(package_data, null, '\t'));
             output_instance.done_log(`Updated package.json scripts.`, 'alias');

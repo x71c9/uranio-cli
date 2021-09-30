@@ -39,7 +39,17 @@ const urn_lib_1 = require("urn-lib");
 // import * as common from '../cmd/common';
 const fs = __importStar(require("./fs"));
 const spawn = __importStar(require("./spawn"));
-const types_1 = require("../types");
+// import {
+//   abstract_repos,
+//   valid_repos,
+//   Repo,
+//   abstract_pacman,
+//   valid_pacman,
+//   PacMan,
+//   abstract_deploy,
+//   valid_deploy,
+//   Deploy,
+// } from '../types';
 const defaults_1 = require("../conf/defaults");
 class CMD {
     constructor(params, output) {
@@ -48,97 +58,30 @@ class CMD {
         this.fs = fs.create(output);
         this.spawn = spawn.create(output);
     }
-    read_rc_file() {
-        if (!this.is_initialized()) {
-            let err = `URANIO was not initialized yet.`;
-            err += ` Please run "uranio init" in order to initialize the repo.`;
-            this.output.error_log(err, 'init');
-            process.exit(1);
-        }
-        else {
-            const rcfile_path = `${this.params.root}/${defaults_1.jsonfile_path}`;
-            try {
-                const rc_content = this.fs.read_file_sync(rcfile_path, 'utf8');
-                const rc_obj = urn_lib_1.urn_util.json.clean_parse(rc_content);
-                this.set_repo(rc_obj.repo);
-                this.params.repo = rc_obj.repo;
-                this.params.pacman = rc_obj.pacman;
-                this.params.deploy = rc_obj.deploy;
-            }
-            catch (ex) {
-                this.output.wrong_end_log(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
-                process.exit(1);
-            }
-        }
-    }
+    // public read_rc_file()
+    //     :void{
+    //   if(!this.is_initialized()){
+    //     let err =  `URANIO was not initialized yet.`;
+    //     err += ` Please run "uranio init" in order to initialize the repo.`;
+    //     this.output.error_log(err, 'init');
+    //     process.exit(1);
+    //   }else{
+    //     const rcfile_path = `${this.params.root}/${jsonfile_path}`;
+    //     try{
+    //       const rc_content = this.fs.read_file_sync(rcfile_path, 'utf8');
+    //       const rc_obj = urn_util.json.clean_parse(rc_content);
+    //       this.set_repo(rc_obj.repo);
+    //       this.params.repo = rc_obj.repo;
+    //       this.params.pacman = rc_obj.pacman;
+    //       this.params.deploy = rc_obj.deploy;
+    //     }catch(ex){
+    //       this.output.wrong_end_log(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
+    //       process.exit(1);
+    //     }
+    //   }
+    // }
     is_initialized() {
         return (this.fs.exists_sync(`${this.params.root}/${defaults_1.jsonfile_path}`));
-    }
-    auto_set_project_root() {
-        // this.output.start_loading('Getting project root...');
-        let folder_path = process.cwd();
-        while (!this._check_folder(folder_path)) {
-            const arr_folder = folder_path.split('/');
-            arr_folder.pop();
-            folder_path = arr_folder.join('/');
-            if (folder_path === '/' || arr_folder.length === 2) {
-                this.output.filelog = false;
-                let err_msg = `Cannot find project root.`;
-                err_msg += ' Be sure to run `uranio` inside an NPM project.';
-                this.output.wrong_end_log(err_msg);
-                process.exit(1);
-            }
-        }
-        // common.init_log();
-        this.output.done_verbose_log(`$URNROOT$Project root found [${this.params.root}]`, 'root');
-    }
-    set_repo(repo) {
-        if (this.check_repo(repo)) {
-            this.params.repo = repo;
-        }
-        else {
-            const valid_repos_str = types_1.valid_repos().join(', ');
-            let end_log = '';
-            end_log += `Wrong repo. `;
-            end_log += `Repo must be one of the following [${valid_repos_str}]`;
-            this.output.wrong_end_log(end_log);
-            process.exit(1);
-        }
-    }
-    set_pacman(pacman) {
-        if (this.check_pacman(pacman)) {
-            this.params.pacman = pacman;
-        }
-        else {
-            const valid_pacman_str = types_1.valid_pacman().join(', ');
-            let end_log = '';
-            end_log += `Wrong package manager. `;
-            end_log += `Package manager must be one of the following [${valid_pacman_str}]`;
-            this.output.wrong_end_log(end_log);
-            process.exit(1);
-        }
-    }
-    set_deploy(deploy) {
-        if (this.check_deploy(deploy)) {
-            this.params.deploy = deploy;
-        }
-        else {
-            const valid_deploy_str = types_1.valid_deploy().join(', ');
-            let end_log = '';
-            end_log += `Wrong deploy value. `;
-            end_log += `Deploy value must be one of the following [${valid_deploy_str}]`;
-            this.output.wrong_end_log(end_log);
-            process.exit(1);
-        }
-    }
-    check_repo(repo) {
-        return urn_lib_1.urn_util.object.has_key(types_1.abstract_repos, repo);
-    }
-    check_pacman(pacman) {
-        return urn_lib_1.urn_util.object.has_key(types_1.abstract_pacman, pacman);
-    }
-    check_deploy(deploy) {
-        return urn_lib_1.urn_util.object.has_key(types_1.abstract_deploy, deploy);
     }
     install_dep(repo, context) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -204,36 +147,6 @@ class CMD {
                 this.spawn.spin(cmd, context, action, resolve, reject);
             });
         });
-    }
-    _check_folder(folder_path) {
-        const data = this.fs.read_dir_sync(folder_path);
-        for (const file of data) {
-            if (file === 'package.json') {
-                const package_json_path = `${folder_path}/${file}`;
-                try {
-                    const content = this.fs.read_file_sync(package_json_path, 'utf8');
-                    const pack = urn_lib_1.urn_util.json.clean_parse(content);
-                    if (pack.name === 'urn-cli') {
-                        return false;
-                    }
-                    else if (pack.name === 'uranio') {
-                        const bld_path = `${folder_path}/urn-bld`;
-                        if (!this.fs.exists_sync(bld_path)) {
-                            return false;
-                        }
-                        this.params.root = bld_path;
-                        return true;
-                    }
-                    this.params.root = folder_path;
-                    return true;
-                }
-                catch (ex) {
-                    this.output.error_log(`Invalid ${package_json_path}. ${ex.message}`, 'root');
-                    return false;
-                }
-            }
-        }
-        return false;
     }
 }
 function create(params, output) {

@@ -7,5 +7,6 @@ exports.default = {
     build: cmd_1.build,
     transpose: cmd_1.transpose,
     hooks: cmd_1.hooks,
+    help: cmd_1.help
 };
 //# sourceMappingURL=index.js.map

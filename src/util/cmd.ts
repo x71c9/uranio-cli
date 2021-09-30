@@ -17,17 +17,17 @@ import * as fs from './fs';
 
 import * as spawn from './spawn';
 
-import {
-	abstract_repos,
-	valid_repos,
-	Repo,
-	abstract_pacman,
-	valid_pacman,
-	PacMan,
-	abstract_deploy,
-	valid_deploy,
-	Deploy,
-} from '../types';
+// import {
+//   abstract_repos,
+//   valid_repos,
+//   Repo,
+//   abstract_pacman,
+//   valid_pacman,
+//   PacMan,
+//   abstract_deploy,
+//   valid_deploy,
+//   Deploy,
+// } from '../types';
 
 import {jsonfile_path} from '../conf/defaults';
 
@@ -41,111 +41,34 @@ class CMD {
 		this.spawn = spawn.create(output);
 	}
 	
-	public read_rc_file()
-			:void{
-		if(!this.is_initialized()){
-			let err =  `URANIO was not initialized yet.`;
-			err += ` Please run "uranio init" in order to initialize the repo.`;
-			this.output.error_log(err, 'init');
-			process.exit(1);
-		}else{
-			const rcfile_path = `${this.params.root}/${jsonfile_path}`;
-			try{
-				const rc_content = this.fs.read_file_sync(rcfile_path, 'utf8');
-				const rc_obj = urn_util.json.clean_parse(rc_content);
-				this.set_repo(rc_obj.repo);
-				this.params.repo = rc_obj.repo;
-				this.params.pacman = rc_obj.pacman;
-				this.params.deploy = rc_obj.deploy;
-			}catch(ex){
-				this.output.wrong_end_log(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
-				process.exit(1);
-			}
-		}
-	}
+	// public read_rc_file()
+	//     :void{
+	//   if(!this.is_initialized()){
+	//     let err =  `URANIO was not initialized yet.`;
+	//     err += ` Please run "uranio init" in order to initialize the repo.`;
+	//     this.output.error_log(err, 'init');
+	//     process.exit(1);
+	//   }else{
+	//     const rcfile_path = `${this.params.root}/${jsonfile_path}`;
+	//     try{
+	//       const rc_content = this.fs.read_file_sync(rcfile_path, 'utf8');
+	//       const rc_obj = urn_util.json.clean_parse(rc_content);
+	//       this.set_repo(rc_obj.repo);
+	//       this.params.repo = rc_obj.repo;
+	//       this.params.pacman = rc_obj.pacman;
+	//       this.params.deploy = rc_obj.deploy;
+	//     }catch(ex){
+	//       this.output.wrong_end_log(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
+	//       process.exit(1);
+	//     }
+	//   }
+	// }
 	
 	public is_initialized()
 			:boolean{
 		return (this.fs.exists_sync(`${this.params.root}/${jsonfile_path}`));
 	}
 	
-	public auto_set_project_root()
-			:void{
-		// this.output.start_loading('Getting project root...');
-		let folder_path = process.cwd();
-		while(!this._check_folder(folder_path)){
-			const arr_folder = folder_path.split('/');
-			arr_folder.pop();
-			folder_path = arr_folder.join('/');
-			if(folder_path === '/' || arr_folder.length === 2){
-				this.output.filelog = false;
-				let err_msg = `Cannot find project root.`;
-				err_msg += ' Be sure to run `uranio` inside an NPM project.';
-				this.output.wrong_end_log(err_msg);
-				process.exit(1);
-			}
-		}
-		// common.init_log();
-		this.output.done_verbose_log(`$URNROOT$Project root found [${this.params.root}]`, 'root');
-	}
-
-	public set_repo(repo:string)
-			:void{
-		if(this.check_repo(repo)){
-			this.params.repo = repo as Repo;
-		}else{
-			const valid_repos_str = valid_repos().join(', ');
-			let end_log = '';
-			end_log += `Wrong repo. `;
-			end_log += `Repo must be one of the following [${valid_repos_str}]`;
-			this.output.wrong_end_log(end_log);
-			process.exit(1);
-		}
-	}
-
-	public set_pacman(pacman:string)
-			:void{
-		if(this.check_pacman(pacman)){
-			this.params.pacman = pacman as PacMan;
-		}else{
-			const valid_pacman_str = valid_pacman().join(', ');
-			let end_log = '';
-			end_log += `Wrong package manager. `;
-			end_log += `Package manager must be one of the following [${valid_pacman_str}]`;
-			this.output.wrong_end_log(end_log);
-			process.exit(1);
-		}
-	}
-
-	public set_deploy(deploy:string)
-			:void{
-		if(this.check_deploy(deploy)){
-			this.params.deploy = deploy as Deploy;
-		}else{
-			const valid_deploy_str = valid_deploy().join(', ');
-			let end_log = '';
-			end_log += `Wrong deploy value. `;
-			end_log += `Deploy value must be one of the following [${valid_deploy_str}]`;
-			this.output.wrong_end_log(end_log);
-			process.exit(1);
-		}
-	}
-
-	public check_repo(repo:string)
-			:boolean{
-		return urn_util.object.has_key(abstract_repos, repo);
-	}
-
-	public check_pacman(pacman:string)
-			:boolean{
-		return urn_util.object.has_key(abstract_pacman, pacman);
-	}
-
-	public check_deploy(deploy:string)
-			:boolean{
-		return urn_util.object.has_key(abstract_deploy, deploy);
-	}
-
 	public async install_dep(repo:string, context:string)
 			:Promise<any>{
 		const action = `installing dependencies [${repo}]`;
@@ -219,34 +142,34 @@ class CMD {
 		});
 	}
 	
-	private _check_folder(folder_path:string){
-		const data = this.fs.read_dir_sync(folder_path);
-		for(const file of data){
-			if(file === 'package.json'){
-				const package_json_path = `${folder_path}/${file}`;
-				try{
-					const content = this.fs.read_file_sync(package_json_path,'utf8');
-					const pack = urn_util.json.clean_parse(content);
-					if(pack.name === 'urn-cli'){
-						return false;
-					}else if(pack.name === 'uranio'){
-						const bld_path = `${folder_path}/urn-bld`;
-						if(!this.fs.exists_sync(bld_path)){
-							return false;
-						}
-						this.params.root = bld_path;
-						return true;
-					}
-					this.params.root = folder_path;
-					return true;
-				}catch(ex){
-					this.output.error_log(`Invalid ${package_json_path}. ${ex.message}`, 'root');
-					return false;
-				}
-			}
-		}
-		return false;
-	}
+	// private _check_folder(folder_path:string){
+	//   const data = this.fs.read_dir_sync(folder_path);
+	//   for(const file of data){
+	//     if(file === 'package.json'){
+	//       const package_json_path = `${folder_path}/${file}`;
+	//       try{
+	//         const content = this.fs.read_file_sync(package_json_path,'utf8');
+	//         const pack = urn_util.json.clean_parse(content);
+	//         if(pack.name === 'urn-cli'){
+	//           return false;
+	//         }else if(pack.name === 'uranio'){
+	//           const bld_path = `${folder_path}/urn-bld`;
+	//           if(!this.fs.exists_sync(bld_path)){
+	//             return false;
+	//           }
+	//           this.params.root = bld_path;
+	//           return true;
+	//         }
+	//         this.params.root = folder_path;
+	//         return true;
+	//       }catch(ex){
+	//         this.output.error_log(`Invalid ${package_json_path}. ${ex.message}`, 'root');
+	//         return false;
+	//       }
+	//     }
+	//   }
+	//   return false;
+	// }
 }
 
 export type CMDInstance = InstanceType<typeof CMD>;
