@@ -27,3 +27,6 @@ export declare type BuildParams = {
 export declare type DevParams = {
     root: string;
 };
+export declare type HooksParams = {
+    root: string;
+};

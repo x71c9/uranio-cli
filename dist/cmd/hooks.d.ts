@@ -5,9 +5,6 @@
  *
  * @packageDocumentation
  */
-import { Options } from '../types';
-export declare const hooks: {
-    run: (options?: Partial<Options> | undefined) => void;
-    include: () => void;
-    command: () => void;
-};
+import * as output from '../output/';
+import { HooksParams } from './types';
+export declare function hooks(params: HooksParams, output_params?: Partial<output.OutputParams>): Promise<void>;

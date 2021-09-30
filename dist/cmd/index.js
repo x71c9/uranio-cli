@@ -20,6 +20,6 @@ __exportStar(require("./alias"), exports);
 __exportStar(require("./dev"), exports);
 __exportStar(require("./build"), exports);
 __exportStar(require("./transpose"), exports);
-// export * from './hooks';
+__exportStar(require("./hooks"), exports);
 // export * from './test';
 //# sourceMappingURL=index.js.map

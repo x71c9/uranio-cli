@@ -14,6 +14,8 @@ import * as util from '../util/';
 
 import {Params} from '../types';
 
+import {hooks} from './hooks';
+
 import {transpose} from './transpose';
 
 import {merge_params} from './common';
@@ -55,6 +57,8 @@ export async function build(params:BuildParams, output_params?:Partial<output.Ou
 	
 	transpose(build_params, output_params);
 	
+	hooks(build_params, output_params);
+	
 	await _build_server();
 	await _build_client();
 	
@@ -69,6 +73,8 @@ export async function build_server(params:BuildParams, output_params?:Partial<ou
 	
 	transpose(build_params, output_params);
 	
+	hooks(build_params, output_params);
+	
 	await _build_server();
 	
 }
@@ -81,6 +87,8 @@ export async function build_client(params:BuildParams, output_params?:Partial<ou
 	output_instance.start_loading(`Building client...`);
 	
 	transpose(build_params, output_params);
+	
+	hooks(build_params, output_params);
 	
 	await _build_client();
 	

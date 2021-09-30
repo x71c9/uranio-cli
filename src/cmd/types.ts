@@ -34,3 +34,7 @@ export type BuildParams = {
 export type DevParams = {
 	root: string
 }
+
+export type HooksParams = {
+	root: string
+}

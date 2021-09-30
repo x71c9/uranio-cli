@@ -14,7 +14,7 @@ import {Params} from '../types';
 
 import {transpose} from './transpose';
 
-// import {hooks} from './hooks';
+import {hooks} from './hooks';
 
 import {merge_params} from './common';
 
@@ -131,9 +131,9 @@ function _watch(output_params?:Partial<output.OutputParams>){
 			}
 			if(event !== 'unlink'){
 				transpose({...dev_params, file: path}, output_params);
-				// if(dev_params.repo === 'trx'){
-				//   hooks.run(cli_options);
-				// }
+				if(dev_params.repo === 'trx'){
+					hooks(dev_params, output_params);
+				}
 				output_instance.done_log(`[Book watch] Transposed [${path}].`, 'wtch');
 			}else{
 				const relative_path = path.replace(`${dev_params.root}/src/`, '');
