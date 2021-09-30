@@ -1,7 +1,7 @@
 import {
 	init,
 	alias,
-	// build,
+	build,
 	transpose,
 	// hooks,
 } from './cmd/';
@@ -9,7 +9,7 @@ import {
 export default {
 	init,
 	alias,
-	// build: build.run,
+	build,
 	transpose,
 	// hooks: hooks.run,
 };

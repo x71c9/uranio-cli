@@ -24,3 +24,6 @@ export declare type TransposeParams = {
 export declare type BuildParams = {
     root: string;
 };
+export declare type DevParams = {
+    root: string;
+};

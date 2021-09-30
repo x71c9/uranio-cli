@@ -45,21 +45,21 @@ class Spawn {
         cp.execSync(command);
     }
     spin(command, context, action, resolve, reject) {
-        return this._spawn(command, context, action, resolve, reject, true, false, false);
+        return this._spawn(command, context, action, true, false, false, resolve, reject);
     }
     log(command, context, action, resolve, reject) {
-        return this._spawn(command, context, action, resolve, reject, false, true, false);
+        return this._spawn(command, context, action, false, true, false, resolve, reject);
     }
     verbose_log(command, context, action, resolve, reject) {
-        return this._spawn(command, context, action, resolve, reject, false, false, true);
+        return this._spawn(command, context, action, false, false, true, resolve, reject);
     }
     spin_and_log(command, context, action, resolve, reject) {
-        return this._spawn(command, context, action, resolve, reject, true, true, false);
+        return this._spawn(command, context, action, true, true, false, resolve, reject);
     }
     spin_and_verbose_log(command, context, action, resolve, reject) {
-        return this._spawn(command, context, action, resolve, reject, true, false, true);
+        return this._spawn(command, context, action, true, false, true, resolve, reject);
     }
-    _spawn(command, context, action, resolve, reject, spin, log, verbose) {
+    _spawn(command, context, action, spin, log, verbose, resolve, reject) {
         if (spin) {
             this.output.start_loading(command);
         }
@@ -127,17 +127,17 @@ class Spawn {
                     if (verbose || spin) {
                         this.output.done_verbose_log(`Done ${action}`, context);
                     }
-                    return resolve(true);
+                    return (resolve) ? resolve(true) : true;
                 }
                 default: {
                     this.output.error_log(`Child process exited with code ${code}`, context);
-                    return reject();
+                    return (reject) ? reject() : false;
                 }
             }
         });
         child.on('error', (err) => {
             this.output.error_log(`${err}`, context);
-            return reject();
+            return (reject) ? reject() : false;
         });
         child_list.push(child);
         return child;
