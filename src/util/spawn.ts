@@ -8,7 +8,8 @@ import * as cp from 'child_process';
 
 import * as out from '../output/';
 
-type PF = (v?:unknown) => void;
+type Resolve = (v?:unknown) => void;
+type Reject = (err?:Error) => void;
 
 const child_list:cp.ChildProcessWithoutNullStreams[] = [];
 
@@ -31,24 +32,32 @@ class Spawn {
 		cp.execSync(command);
 	}
 	
-	public spin(command:string, context:string, action:string, resolve:PF, reject:PF){
+	public spin(command:string, context:string, action:string, resolve:Resolve, reject:Reject){
 		return this._spawn(command, context, action, resolve, reject, true, false, false);
 	}
 	
-	public log(command:string, context:string, action:string, resolve:PF, reject:PF){
+	public log(command:string, context:string, action:string, resolve:Resolve, reject:Reject){
 		return this._spawn(command, context, action, resolve, reject, false, true, false);
 	}
 	
-	public verbose_log(command:string, context:string, action:string, resolve:PF, reject:PF){
+	public verbose_log(command:string, context:string, action:string, resolve:Resolve, reject:Reject){
 		return this._spawn(command, context, action, resolve, reject, false, false, true);
+	}
+	
+	public spin_and_log(command:string, context:string, action:string, resolve:Resolve, reject:Reject){
+		return this._spawn(command, context, action, resolve, reject, true, true, false);
+	}
+	
+	public spin_and_verbose_log(command:string, context:string, action:string, resolve:Resolve, reject:Reject){
+		return this._spawn(command, context, action, resolve, reject, true, false, true);
 	}
 	
 	private _spawn(
 		command:string,
 		context:string,
 		action:string,
-		resolve:PF,
-		reject:PF,
+		resolve:Resolve,
+		reject:Reject,
 		spin:boolean,
 		log:boolean,
 		verbose:boolean
@@ -128,14 +137,14 @@ class Spawn {
 				}
 				default:{
 					this.output.error_log(`Child process exited with code ${code}`, context);
-					return reject(false);
+					return reject();
 				}
 			}
 		});
 		
 		child.on('error', (err) => {
 			this.output.error_log(`${err}`, context);
-			return reject(false);
+			return reject();
 		});
 		
 		child_list.push(child);

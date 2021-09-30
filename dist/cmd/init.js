@@ -43,6 +43,7 @@ const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const alias_1 = require("./alias");
+const common_1 = require("./common");
 let output_instance;
 let util_instance;
 let init_params = defaults_1.default_params;
@@ -55,7 +56,7 @@ function init(params, output_params) {
             output_params.root = params.root;
         }
         output_instance = output.create(output_params);
-        init_params = Object.assign(Object.assign({}, init_params), params);
+        init_params = common_1.merge_params(params);
         const util_params = Object.assign({}, init_params);
         util_instance = util.create(util_params, output_instance);
         output_instance.verbose_log(`$URNROOT$Project root: [${init_params.root}]`, 'root');

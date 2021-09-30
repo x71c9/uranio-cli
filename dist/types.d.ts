@@ -41,9 +41,3 @@ export declare type Params = {
     force: boolean;
     filelog: boolean;
 };
-export declare type UtilParams = {
-    root: string;
-    repo: Repo;
-    deploy: Deploy;
-    pacman: PacMan;
-};

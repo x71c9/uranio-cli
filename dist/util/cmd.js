@@ -34,7 +34,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = void 0;
-// import fs from 'fs';
 const urn_lib_1 = require("urn-lib");
 // DO NO CANCEL IT
 // import * as common from '../cmd/common';
@@ -49,14 +48,6 @@ class CMD {
         this.fs = fs.create(output);
         this.spawn = spawn.create(output);
     }
-    // public merge_options(options:Partial<Options>):void{
-    //   let k:keyof Options;
-    //   for(k in this.params){
-    //     if(typeof k !== typeof undefined && urn_util.object.has_key(options,k)){
-    //       (this.params as any)[k] = options[k]; // TODO FIX THIS
-    //     }
-    //   }
-    // }
     read_rc_file() {
         if (!this.is_initialized()) {
             let err = `URANIO was not initialized yet.`;

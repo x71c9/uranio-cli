@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 import * as out from '../output/';
-import { UtilParams } from '../types';
+import { UtilParams } from './types';
 import * as fs from './fs';
 import * as spawn from './spawn';
 import * as cmd from './cmd';

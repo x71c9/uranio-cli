@@ -6,7 +6,7 @@
 
 import chokidar from 'chokidar';
 
-// import {Repo, Deploy, PacMan} from '../types';
+import {Repo, Deploy, PacMan} from '../types';
 
 export type OnReadyCallback = () => void;
 
@@ -19,3 +19,10 @@ export type WatchProcessObject = {
 }
 
 export type WatchEvent = 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir';
+
+export type UtilParams = {
+	root: string
+	repo: Repo
+	deploy: Deploy
+	pacman: PacMan
+}

@@ -5,7 +5,7 @@ exports.default = {
     init: cmd_1.init,
     alias: cmd_1.alias,
     // build: build.run,
-    // transpose: transpose.run,
+    transpose: cmd_1.transpose,
     // hooks: hooks.run,
 };
 //# sourceMappingURL=index.js.map

@@ -5,3 +5,4 @@
  */
 export * from './init';
 export * from './alias';
+export * from './transpose';

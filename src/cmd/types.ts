@@ -20,8 +20,13 @@ export type Aliases = {
 
 export type AliasParams = {
 	root: string
-	// repo?: Repo
-	// deploy?: Deploy
-	// pacman?: PacMan
-	// branch?: string
+}
+
+export type TransposeParams = {
+	root: string
+	file?: string
+}
+
+export type BuildParams = {
+	root: string
 }

@@ -14,7 +14,11 @@ import * as output from '../output/';
 
 import * as util from '../util/';
 
+import {Params} from '../types';
+
 import {alias} from './alias';
+
+import {merge_params} from './common';
 
 import {InitParams} from './types';
 
@@ -22,7 +26,7 @@ let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
 
-let init_params = default_params;
+let init_params = default_params as Params & InitParams;
 
 export async function init(params:InitParams, output_params?:Partial<output.OutputParams>)
 		:Promise<void>{
@@ -35,10 +39,7 @@ export async function init(params:InitParams, output_params?:Partial<output.Outp
 	}
 	output_instance = output.create(output_params);
 	
-	init_params = {
-		...init_params,
-		...params
-	};
+	init_params = merge_params(params);
 	
 	const util_params = {
 		...init_params
