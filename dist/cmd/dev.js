@@ -38,7 +38,7 @@ const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const defaults_1 = require("../conf/defaults");
 const transpose_1 = require("./transpose");
-// import {hooks} from './hooks';
+const hooks_1 = require("./hooks");
 const common_1 = require("./common");
 let output_instance;
 let util_instance;
@@ -125,9 +125,9 @@ function _watch(output_params) {
         }
         if (event !== 'unlink') {
             transpose_1.transpose(Object.assign(Object.assign({}, dev_params), { file: path }), output_params);
-            // if(dev_params.repo === 'trx'){
-            //   hooks.run(cli_options);
-            // }
+            if (dev_params.repo === 'trx') {
+                hooks_1.hooks(dev_params, output_params);
+            }
             output_instance.done_log(`[Book watch] Transposed [${path}].`, 'wtch');
         }
         else {

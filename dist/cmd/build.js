@@ -38,6 +38,7 @@ exports.build_client = exports.build_server = exports.build = void 0;
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
+const hooks_1 = require("./hooks");
 const transpose_1 = require("./transpose");
 const common_1 = require("./common");
 // import * as common from './common';
@@ -61,6 +62,7 @@ function build(params, output_params) {
         _init_build(params, output_params);
         output_instance.start_loading(`Building...`);
         transpose_1.transpose(build_params, output_params);
+        hooks_1.hooks(build_params, output_params);
         yield _build_server();
         yield _build_client();
     });
@@ -71,6 +73,7 @@ function build_server(params, output_params) {
         _init_build(params, output_params);
         output_instance.start_loading(`Building server...`);
         transpose_1.transpose(build_params, output_params);
+        hooks_1.hooks(build_params, output_params);
         yield _build_server();
     });
 }
@@ -80,6 +83,7 @@ function build_client(params, output_params) {
         _init_build(params, output_params);
         output_instance.start_loading(`Building client...`);
         transpose_1.transpose(build_params, output_params);
+        hooks_1.hooks(build_params, output_params);
         yield _build_client();
     });
 }

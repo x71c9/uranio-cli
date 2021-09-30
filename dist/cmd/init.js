@@ -32,12 +32,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.init = void 0;
-const fs_1 = __importDefault(require("fs"));
 const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
@@ -86,7 +82,7 @@ exports.init = init;
 function _add_admin_files() {
     output_instance.start_loading(`Adding admin files...`);
     const fix_file_nuxt_types = `${init_params.root}/node_modules/@nuxt/types/node_modules/index.d.ts`;
-    if (!fs_1.default.existsSync(fix_file_nuxt_types)) {
+    if (!util_instance.fs.exists_sync(fix_file_nuxt_types)) {
         util_instance.spawn.exec_sync(`touch ${fix_file_nuxt_types}`);
     }
 }
@@ -100,7 +96,7 @@ function _remove_tmp() {
     output_instance.done_verbose_log(`Removed tmp folder [${defaults_1.defaults.tmp_folder}].`, 'tmp');
 }
 function _copy_dot_files() {
-    if (fs_1.default.existsSync(`${init_params.root}/src`) === false) {
+    if (util_instance.fs.exists_sync(`${init_params.root}/src`) === false) {
         _copy_dot_src_folder();
     }
     _copy_dot_tsconfigs();
@@ -173,24 +169,24 @@ function _create_rc_file() {
     content += `\t"pacman": "${init_params.pacman}",\n`;
     content += `\t"deploy": "${init_params.deploy}"\n`;
     content += `}`;
-    fs_1.default.writeFileSync(`${init_params.root}/${defaults_1.jsonfile_path}`, content);
+    util_instance.fs.write_file_sync(`${init_params.root}/${defaults_1.jsonfile_path}`, content);
     util_instance.pretty(`${init_params.root}/${defaults_1.jsonfile_path}`, 'json');
     output_instance.done_log(`Created file ${defaults_1.jsonfile_path}.`, 'rcfl');
 }
 function _ignore_urn_folder() {
     output_instance.start_loading(`Adding ${defaults_1.defaults.folder} to .gitignore...`);
     const gitignore = `${init_params.root}/.gitignore`;
-    if (!fs_1.default.existsSync(gitignore)) {
+    if (!util_instance.fs.exists_sync(gitignore)) {
         util_instance.fs.create_file(gitignore, 'giti');
     }
-    let content = fs_1.default.readFileSync(gitignore, 'utf8');
+    let content = util_instance.fs.read_file_sync(gitignore, 'utf8');
     if (content.indexOf(defaults_1.defaults.folder + '/') === -1) {
         content += `\n${defaults_1.defaults.folder}/`;
     }
     if (content.indexOf(defaults_1.defaults.log_filepath + '/') === -1) {
         content += `\n${defaults_1.defaults.log_filepath}`;
     }
-    fs_1.default.writeFileSync(gitignore, content);
+    util_instance.fs.write_file_sync(gitignore, content);
     const log_msg = `Added ${defaults_1.defaults.folder} and ${defaults_1.defaults.log_filepath} to .gitignore.`;
     output_instance.done_log(log_msg, '.git');
 }
@@ -203,7 +199,7 @@ function _create_urn_folder() {
 function _update_package_scripts() {
     output_instance.start_loading('Updating scripts...');
     const package_json_path = `${init_params.root}/package.json`;
-    const data = fs_1.default.readFileSync(package_json_path, 'utf8');
+    const data = util_instance.fs.read_file_sync(package_json_path, 'utf8');
     try {
         const package_data = urn_lib_1.urn_util.json.clean_parse(data);
         package_data['scripts'] = {
@@ -215,7 +211,7 @@ function _update_package_scripts() {
             'dev:client': `uranio dev:client`
         };
         try {
-            fs_1.default.writeFileSync(package_json_path, JSON.stringify(package_data, null, '\t'));
+            util_instance.fs.write_file_sync(package_json_path, JSON.stringify(package_data, null, '\t'));
             output_instance.done_log(`Updated package.json scripts.`, 'alias');
         }
         catch (ex) {
@@ -229,7 +225,7 @@ function _update_package_scripts() {
 function _update_package_aliases() {
     output_instance.start_loading('Updating aliases...');
     const package_json_path = `${init_params.root}/package.json`;
-    const data = fs_1.default.readFileSync(package_json_path, 'utf8');
+    const data = util_instance.fs.read_file_sync(package_json_path, 'utf8');
     try {
         const package_data = urn_lib_1.urn_util.json.clean_parse(data);
         package_data['_moduleAliases'] = {
@@ -254,7 +250,7 @@ function _update_package_aliases() {
             }
         }
         try {
-            fs_1.default.writeFileSync(package_json_path, JSON.stringify(package_data, null, '\t'));
+            util_instance.fs.write_file_sync(package_json_path, JSON.stringify(package_data, null, '\t'));
             output_instance.done_log(`Updated package.json module aliases.`, 'alias');
         }
         catch (ex) {
@@ -292,8 +288,8 @@ function _copy_netlify_files() {
     const toml_dest = `${init_params.root}/`;
     util_instance.fs.copy_file(toml_file, toml_dest, 'ntlf');
     const function_folder = `${init_params.root}/${defaults_1.defaults.folder}/server/src/functions`;
-    if (!fs_1.default.existsSync(function_folder)) {
-        fs_1.default.mkdirSync(function_folder);
+    if (!util_instance.fs.exists_sync(function_folder)) {
+        util_instance.fs.create_directory_sync(function_folder);
     }
     let api_file = `trx-api.txt`;
     if (init_params.repo === 'api') {
@@ -306,8 +302,8 @@ function _copy_netlify_files() {
 function _copy_express_files() {
     const dot_deploy_folder = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/deploy`;
     const src_folder = `${init_params.root}/src`;
-    if (!fs_1.default.existsSync(src_folder)) {
-        fs_1.default.mkdirSync(src_folder);
+    if (!util_instance.fs.exists_sync(src_folder)) {
+        util_instance.fs.create_directory_sync(src_folder);
     }
     const index_file = `${dot_deploy_folder}/express/index.txt`;
     const index_dest = `${src_folder}/index.ts`;
