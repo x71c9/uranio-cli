@@ -126,9 +126,9 @@ function _watch(){
 				return false;
 			}
 			if(event !== 'unlink'){
-				transpose({...dev_params, file: path});
+				transpose({...dev_params, file: path}, true);
 				if(dev_params.repo === 'trx'){
-					hooks(dev_params);
+					hooks(dev_params, true);
 				}
 				output_instance.done_log(`[Book watch] Transposed [${path}].`, 'wtch');
 			}else{
