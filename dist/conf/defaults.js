@@ -5,10 +5,29 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default_params = exports.jsonfile_path = exports.defaults = void 0;
+exports.jsonfile_path = exports.defaults = exports.default_params = void 0;
+exports.default_params = {
+    force: false,
+    verbose: false,
+    debug: false,
+    hide: false,
+    blank: false,
+    fullwidth: false,
+    native: false,
+    filelog: true,
+    spin: true,
+    prefix: '',
+    branch: 'master',
+    repo: 'trx',
+    pacman: 'yarn',
+    deploy: 'netlify',
+    color: '#859900',
+    color_verbose: '#668899',
+    color_debug: '#557685',
+    root: '.',
+};
 const cloud_address = 'ssh://git@bitbucket.org/nbl7/';
 exports.defaults = {
-    default_repo: 'trx',
     folder: '.uranio',
     repo_folder: 'uranio',
     tmp_folder: '.tmp',
@@ -29,36 +48,4 @@ exports.defaults = {
     wrong_char: '✗',
 };
 exports.jsonfile_path = `${exports.defaults.folder}/${exports.defaults.json_filename}`;
-// export const conf:Options = {
-//   verbose: false,
-//   blank: false,
-//   hide: false,
-//   spinner: true,
-//   fullwidth: false,
-//   root: '.',
-//   repo: defaults.default_repo,
-//   prefix: '',
-//   pacman: 'yarn',
-//   force: false,
-//   filelog: true,
-//   deploy: 'netlify',
-// };
-exports.default_params = {
-    root: '.',
-    repo: exports.defaults.default_repo,
-    deploy: 'netlify',
-    pacman: 'yarn',
-    branch: 'master',
-    verbose: false,
-    blank: false,
-    hide: false,
-    spin: true,
-    fullwidth: false,
-    prefix: '',
-    force: false,
-    filelog: true,
-    color: '#859900',
-    color_verbose: '#668899',
-    native: false
-};
 //# sourceMappingURL=defaults.js.map

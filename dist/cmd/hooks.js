@@ -61,15 +61,21 @@ const _project_option = {
 let output_instance;
 let util_instance;
 let hooks_params = defaults_1.default_params;
-function hooks(params) {
+function hooks(params, included = false) {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance = output.create(params);
         hooks_params = common_1.merge_params(params);
         util_instance = util.create(params, output_instance);
+        util_instance.must_be_initialized();
         output_instance.start_loading('Generating TRX Hooks...');
         const text = _generate_text();
         _save_to_file(text);
-        output_instance.done_log(`TRX Hooks generated.`, 'hooks');
+        if (included) {
+            output_instance.done_log(`TRX Hooks generated.`, 'hooks');
+        }
+        else {
+            output_instance.end_log(`TRX Hooks generated.`);
+        }
     });
 }
 exports.hooks = hooks;

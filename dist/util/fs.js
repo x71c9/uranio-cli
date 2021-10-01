@@ -16,22 +16,22 @@ class FS {
     }
     is_directory(path, context) {
         const is = fs_extra_1.default.statSync(path).isDirectory();
-        this.output.verbose_log(`Is directory sync [${path}] [${is}]`, context);
+        this.output.debug_log(`Is directory sync [${path}] [${is}]`, context);
         return is;
     }
     exists(path, context = 'exst') {
         const exists = fs_extra_1.default.existsSync(path);
-        this.output.verbose_log(`Exists sync [${path}]`, context);
+        this.output.debug_log(`Exists sync [${path}]`, context);
         return exists;
     }
     read_file(file_path, encoding, context = 'rdfl') {
         const read_file = fs_extra_1.default.readFileSync(file_path, { encoding: encoding || 'utf8' });
-        this.output.verbose_log(`Opened file sync [${file_path}]`, context);
+        this.output.debug_log(`Opened file sync [${file_path}]`, context);
         return read_file;
     }
     read_dir(dir_path, context = 'rddi') {
         const read_dir = fs_extra_1.default.readdirSync(dir_path);
-        this.output.verbose_log(`Read directory sync [${dir_path}]`, context);
+        this.output.debug_log(`Read directory sync [${dir_path}]`, context);
         return read_dir;
     }
     write_file(file_path, content, encoding, context = 'wrfl') {
@@ -57,10 +57,10 @@ class FS {
         fs_extra_1.default.mkdirSync(dir_path);
         this.output.verbose_log(`Created directory sync [${dir_path}]`, context);
     }
-    // public copy(dir_src:string, dir_dest:string, filter:(src:string, dest?:string) => boolean, context='cpp'){
-    //   fs.copy(dir_src, dir_dest, {filter: filter});
-    //   this.output.verbose_log(`Copied file sync with filter [${dir_src}] to [${dir_dest}]`, context);
-    // }
+    copy(dir_src, dir_dest, context = 'cpp') {
+        fs_extra_1.default.copy(dir_src, dir_dest);
+        this.output.verbose_log(`Copied "fs-extra" sync [${dir_src}] to [${dir_dest}]`, context);
+    }
     copy_file_async(src, dest, context = 'cp_f') {
         fs_extra_1.default.copyFile(src, dest, () => {
             this.output.verbose_log(`Copied file async [${src}] to [${dest}]`, context);

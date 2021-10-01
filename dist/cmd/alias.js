@@ -43,7 +43,6 @@ const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
-// import * as common from './common';
 const common_1 = require("./common");
 let output_instance;
 let util_instance;
@@ -55,22 +54,28 @@ const _project_option = {
         newLineKind: tsm.NewLineKind.LineFeed
     }
 };
-function alias(params) {
+function alias(params, included = false) {
     return __awaiter(this, void 0, void 0, function* () {
-        output_instance = output.create(params);
-        alias_params = common_1.merge_params(params);
-        util_instance = util.create(params, output_instance);
+        _init_alias(params);
         const tsconfig_path_server = `${alias_params.root}/${defaults_1.defaults.folder}/server/tsconfig.json`;
         const tsconfig_path_client = `${alias_params.root}/${defaults_1.defaults.folder}/client/tsconfig.json`;
         const aliases_server = get_aliases(tsconfig_path_server);
         const aliases_client = get_aliases(tsconfig_path_client);
         _replace_aliases_server(aliases_server);
         _replace_aliases_client(aliases_client);
-        output_instance.end_log(`Aliases updated.`);
+        if (!included) {
+            output_instance.end_log(`Aliases updated.`);
+        }
+        else {
+            output_instance.done_log(`Alias updated.`, 'alis');
+        }
     });
 }
 exports.alias = alias;
-function get_aliases(tsconfig_path) {
+function get_aliases(tsconfig_path, params) {
+    if (typeof params !== 'undefined') {
+        _init_alias(params);
+    }
     const data = util_instance.fs.read_file(tsconfig_path, 'utf8');
     try {
         const tsconf_data = urn_lib_1.urn_util.json.clean_parse(data);
@@ -82,6 +87,28 @@ function get_aliases(tsconfig_path) {
     }
 }
 exports.get_aliases = get_aliases;
+function replace_file_aliases(filepath, aliases, params) {
+    if (typeof params !== 'undefined') {
+        _init_alias(params);
+    }
+    const _project = new tsm.Project(_project_option);
+    let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
+    // const {found, source} = _change_to_relative_statements(sourceFile, aliases);
+    const { source } = _change_to_relative_statements(sourceFile, aliases);
+    sourceFile = source;
+    // if(found === true){
+    //   const modified = sourceFile.print();
+    //   _replace_modified_file(modified, filepath);
+    //   util_instance.pretty(filepath);
+    // }
+}
+exports.replace_file_aliases = replace_file_aliases;
+function _init_alias(params) {
+    alias_params = common_1.merge_params(params);
+    output_instance = output.create(params);
+    util_instance = util.create(params, output_instance);
+    util_instance.must_be_initialized();
+}
 function _replace_aliases_server(aliases) {
     _traverse_ts_aliases(`${alias_params.root}/${defaults_1.defaults.folder}/server/src/`, aliases);
 }
@@ -99,18 +126,6 @@ function _traverse_ts_aliases(directory, aliases) {
         }
     });
 }
-function replace_file_aliases(filepath, aliases) {
-    const _project = new tsm.Project(_project_option);
-    let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
-    const { found, source } = _change_to_relative_statements(sourceFile, aliases);
-    sourceFile = source;
-    if (found === true) {
-        const modified = sourceFile.print();
-        _replace_modified_file(modified, filepath);
-        util_instance.pretty(filepath);
-    }
-}
-exports.replace_file_aliases = replace_file_aliases;
 function _change_to_relative_statements(sourceFile, aliases) {
     let found = false;
     const import_decls = sourceFile.getChildrenOfKind(tsm.ts.SyntaxKind.ImportDeclaration);
@@ -137,7 +152,7 @@ function _change_to_relative(node, aliases) {
         const splitted_module = module_name.split('/');
         if (module_name in aliases || splitted_module[0] in aliases) {
             found = true;
-            output_instance.start_loading(`Changing relative imports...`);
+            // output_instance.start_loading(`Changing relative imports...`);
             const node_file_path = node.getSourceFile().getFilePath();
             const node_file_dir = path_1.default.parse(node_file_path).dir;
             let parent_folder = 'server';
@@ -158,16 +173,16 @@ function _change_to_relative(node, aliases) {
             const prepend = (relative_path.charAt(0) !== '.') ? './' : '';
             const replace = `${prepend}${relative_path}${module_append}${append}`;
             str_lit.replaceWithText(`'${replace}'`);
-            output_instance.verbose_log(`Changed [${full_module_name}] to [${replace}].`, 'alias');
+            output_instance.done_verbose_log(`Changed [${full_module_name}] to [${replace}].`, 'alias');
         }
     }
     return found;
 }
-function _replace_modified_file(text, filename) {
-    output_instance.start_loading(`Writing manipulated file...`);
-    util_instance.fs.write_file(filename, text);
-    output_instance.done_verbose_log(`File replaced [${filename}].`, 'alias');
-}
+// function _replace_modified_file(text:string, filename:string){
+//   output_instance.start_loading(`Writing manipulated file...`);
+//   util_instance.fs.write_file(filename, text);
+//   output_instance.done_verbose_log(`File replaced [${filename}].`, 'alias');
+// }
 // export const alias = {
 //   run: (options?:Partial<Options>):void => {
 //     common.init_run(options);

@@ -30,6 +30,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = void 0;
 const chokidar_1 = __importDefault(require("chokidar"));
 const prettier_1 = __importDefault(require("prettier"));
+const defaults_1 = require("../conf/defaults");
 // import {UtilParams} from './types';
 const common_1 = require("../cmd/common");
 const fs = __importStar(require("./fs"));
@@ -61,6 +62,25 @@ class Util {
             text: watch_text
         });
     }
+    is_initialized() {
+        const is = (this.fs.exists(`${this.params.root}/${defaults_1.jsonfile_path}`));
+        if (is) {
+            this.output.verbose_log(`Uranio is initialized`);
+        }
+        else {
+            this.output.verbose_log(`Uranio is not initialized`);
+        }
+        return is;
+    }
+    must_be_initialized() {
+        if (!this.is_initialized()) {
+            let err_msg = '';
+            err_msg += 'URANIO must be initialized first.';
+            err_msg += ` Please run \`uranio init\` in order to initialize the repo.`;
+            this.output.wrong_end_log(err_msg);
+            process.exit(1);
+        }
+    }
     pretty(filepath, parser = 'typescript') {
         this.output.start_loading(`Prettier [${filepath}]...`);
         const content = this.fs.read_file(filepath, 'utf8');
@@ -70,8 +90,8 @@ class Util {
     }
 }
 function create(params, output) {
-    params = common_1.merge_params(params);
-    return new Util(params, output);
+    const full_params = common_1.merge_params(params);
+    return new Util(full_params, output);
 }
 exports.create = create;
 //# sourceMappingURL=class.js.map

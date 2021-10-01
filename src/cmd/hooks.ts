@@ -44,7 +44,7 @@ let util_instance:util.UtilInstance;
 
 let hooks_params = default_params as Params;
 
-export async function hooks(params:Partial<Params>)
+export async function hooks(params:Partial<Params>, included=false)
 		:Promise<void>{
 	
 	output_instance = output.create(params);
@@ -53,13 +53,19 @@ export async function hooks(params:Partial<Params>)
 	
 	util_instance = util.create(params, output_instance);
 	
+	util_instance.must_be_initialized();
+	
 	output_instance.start_loading('Generating TRX Hooks...');
 	
 	const text = _generate_text();
 	
 	_save_to_file(text);
 	
-	output_instance.done_log(`TRX Hooks generated.`, 'hooks');
+	if(included){
+		output_instance.done_log(`TRX Hooks generated.`, 'hooks');
+	}else{
+		output_instance.end_log(`TRX Hooks generated.`);
+	}
 	
 }
 

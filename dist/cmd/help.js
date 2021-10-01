@@ -40,12 +40,17 @@ function help() {
         console.log(``);
         console.log(`list of output options`);
         console.log(`  -v --verbose ....... log in verbose mode.`);
+        console.log(`  -u --debug ......... log in debug mode.`);
         console.log(`  -n --hide .......... do not output log.`);
         console.log(`  -b --blank ......... log with no colors.`);
         console.log(`  -w --fullwidth ..... log in full width.`);
         console.log(`  -x --prefix ........ set a log prefix.`);
         console.log(`  -l --filelog ....... save log on file.`);
         console.log(`  -i --spin .......... log with spinner.`);
+        console.log(`  -e --native ........ log in native mode.`);
+        console.log(`  -c --color ......... log color.`);
+        console.log(`  -o --color_verbose . verbose log color.`);
+        console.log(`  -o --color_debug ... debug log color.`);
         console.log(``);
         console.log(``);
         process.exit(0);

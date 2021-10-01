@@ -46,6 +46,7 @@ const types_1 = require("../types");
 const alias_1 = require("./alias");
 const title_1 = require("./title");
 const common_1 = require("./common");
+// import {InitParams} from './types';
 let output_instance;
 let util_instance;
 let init_params = defaults_1.default_params;
@@ -54,11 +55,7 @@ function init(params) {
         init_params = common_1.merge_params(params);
         output_instance = output.create(params);
         util_instance = util.create(params, output_instance);
-        output_instance.verbose_log(`$URNROOT$Project root: [${init_params.root}]`, 'root');
-        output_instance.verbose_log(`Selected repo: [${init_params.repo}]`, 'repo');
-        if (init_params.repo === 'api') {
-            output_instance.verbose_log(`Selected deploy: [${init_params.deploy}]`, 'dply');
-        }
+        _log_important_params();
         _update_package_aliases();
         _update_package_scripts();
         _create_urn_folder();
@@ -70,7 +67,7 @@ function init(params) {
         yield _clone_dot();
         _copy_dot_files();
         _remove_tmp();
-        _replace_aliases();
+        yield _replace_aliases();
         if (init_params.repo === 'adm') {
             _add_admin_files();
         }
@@ -78,16 +75,14 @@ function init(params) {
     });
 }
 exports.init = init;
-function prompt_init(args, params) {
+function prompt_init(params, args) {
     return __awaiter(this, void 0, void 0, function* () {
+        init_params = params;
         output_instance = output.create(params);
-        init_params = common_1.merge_params(params);
         util_instance = util.create(init_params, output_instance);
         console.clear();
         title_1.title();
-        // output_instance.verbose_log(urn_util.json.safe_stringify(init_params), 'init');
-        if (_is_already_initialized() && init_params.force === false) {
-            // output.stop_loading();
+        if (util_instance.is_initialized() && init_params.force === false) {
             let confirm_msg = '';
             confirm_msg += `It appears the repo is already initialized.\n`;
             confirm_msg += `? Are you sure you want to proceed?\n`;
@@ -115,11 +110,13 @@ function prompt_init(args, params) {
     });
 }
 exports.prompt_init = prompt_init;
-function _is_already_initialized() {
-    util_instance.output.hide = true;
-    const is = (util_instance.fs.exists(`${init_params.root}/${defaults_1.jsonfile_path}`));
-    util_instance.output.hide = false;
-    return is;
+function _log_important_params() {
+    output_instance.verbose_log(`$URNROOT$Project root: [${init_params.root}]`, 'root');
+    output_instance.verbose_log(`Selected repo: [${init_params.repo}]`, 'repo');
+    output_instance.verbose_log(`Selected pacman: [${init_params.pacman}]`, 'repo');
+    if (init_params.repo === 'api' || init_params.repo === 'trx') {
+        output_instance.verbose_log(`Selected deploy: [${init_params.deploy}]`, 'dply');
+    }
 }
 function _ask_for_pacman(args) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -160,6 +157,7 @@ function _ask_for_repo(args) {
                 }
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
                 common_1.check_repo(answers.repo);
+                init_params.repo = answers.repo;
                 if (answers.repo !== 'core') {
                     yield _ask_for_deploy(args);
                 }
@@ -188,6 +186,7 @@ function _ask_for_deploy(args) {
                 }
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
                 common_1.check_deploy(answers.deploy);
+                init_params.deploy = answers.deploy;
                 yield init(init_params);
             }));
         }
@@ -202,10 +201,14 @@ function _add_admin_files() {
     if (!util_instance.fs.exists(fix_file_nuxt_types)) {
         util_instance.spawn.exec_sync(`touch ${fix_file_nuxt_types}`);
     }
+    output_instance.done_verbose_log('Added admin files.', 'adm');
 }
 function _replace_aliases() {
-    output_instance.start_loading(`Updating relative paths aliases...`);
-    alias_1.alias(init_params);
+    return __awaiter(this, void 0, void 0, function* () {
+        output_instance.start_loading(`Updating relative paths aliases...`);
+        yield alias_1.alias(init_params, true);
+        output_instance.done_verbose_log('Updated relative paths aliases.', 'alias');
+    });
 }
 function _remove_tmp() {
     output_instance.start_loading(`Removing tmp folder [${defaults_1.defaults.tmp_folder}]...`);
@@ -259,7 +262,7 @@ function _clone_and_install_repo() {
                 break;
             }
             default: {
-                output_instance.log(`Selected repo is not valid. [${init_params.repo}]`, 'init');
+                output_instance.error_log(`Selected repo is not valid. [${init_params.repo}]`, 'init');
                 process.exit(1);
             }
         }
@@ -272,11 +275,12 @@ function _create_client_server_folders() {
     util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}/server`, 'init');
     util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}/server/src`, 'init');
     util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}/server/src/books`, 'init');
+    output_instance.done_verbose_log(`Created server folders.`, 'init');
     output_instance.start_loading(`Creating client folder...`);
     util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}/client`, 'init');
     util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}/client/src`, 'init');
     util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}/client/src/books`, 'init');
-    output_instance.done_log(`Created client server folders.`, 'init');
+    output_instance.done_verbose_log(`Created client folders.`, 'init');
 }
 function _create_rc_file() {
     output_instance.start_loading('Creating rc file...');
@@ -333,7 +337,7 @@ function _update_package_scripts() {
     }
 }
 function _update_package_aliases() {
-    output_instance.start_loading('Updating aliases...');
+    output_instance.start_loading('Updating package.json aliases...');
     const package_json_path = `${init_params.root}/package.json`;
     const data = util_instance.fs.read_file(package_json_path, 'utf8');
     try {
@@ -446,9 +450,10 @@ function _clone_trx() {
 }
 function _install_dep() {
     return __awaiter(this, void 0, void 0, function* () {
-        yield _uninstall_core_dep();
-        yield _uninstall_api_dep();
-        yield _uninstall_trx_dep();
+        const pack_data = util_instance.cmd.get_package_data(`${init_params.root}/package.json`);
+        yield _uninstall_core_dep(pack_data);
+        yield _uninstall_api_dep(pack_data);
+        yield _uninstall_trx_dep(pack_data);
         switch (init_params.repo) {
             case 'core': {
                 yield _install_core_dep();
@@ -467,38 +472,38 @@ function _install_dep() {
                 return true;
             }
             default: {
-                output_instance.log('init', `Selected repo is not valid. [${init_params.repo}]`);
+                output_instance.log(`Selected repo is not valid. [${init_params.repo}]`, 'init');
                 process.exit(1);
             }
         }
     });
 }
-function _uninstall_core_dep() {
+function _uninstall_core_dep(pack_data) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield _uninstall_dep(defaults_1.defaults.core_dep_repo, 'core');
-        yield _uninstall_dep(defaults_1.defaults.core_dep_dev_repo, 'core');
+        yield _uninstall_dep(defaults_1.defaults.core_dep_repo, 'core', pack_data);
+        yield _uninstall_dep(defaults_1.defaults.core_dep_dev_repo, 'core', pack_data);
         return true;
     });
 }
-function _uninstall_api_dep() {
+function _uninstall_api_dep(pack_data) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield _uninstall_dep(defaults_1.defaults.api_dep_repo, 'api');
-        yield _uninstall_dep(defaults_1.defaults.api_dep_dev_repo, 'api');
+        yield _uninstall_dep(defaults_1.defaults.api_dep_repo, 'api', pack_data);
+        yield _uninstall_dep(defaults_1.defaults.api_dep_dev_repo, 'api', pack_data);
         return true;
     });
 }
-function _uninstall_trx_dep() {
+function _uninstall_trx_dep(pack_data) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield _uninstall_dep(defaults_1.defaults.trx_dep_repo, 'trx');
-        yield _uninstall_dep(defaults_1.defaults.trx_dep_dev_repo, 'trx');
+        yield _uninstall_dep(defaults_1.defaults.trx_dep_repo, 'trx', pack_data);
+        yield _uninstall_dep(defaults_1.defaults.trx_dep_dev_repo, 'trx', pack_data);
         return true;
     });
 }
-function _uninstall_dep(repo, context) {
+function _uninstall_dep(repo, context, pack_data) {
     return __awaiter(this, void 0, void 0, function* () {
         const short_repo = (repo.substr(0, 3) === 'ssh' || repo.substr(0, 7) === 'git+ssh') ?
             repo.split('/').slice(-1)[0] : repo;
-        if (util_instance.cmd.dependency_exists(short_repo)) {
+        if (util_instance.cmd.dependency_exists(short_repo, pack_data)) {
             output_instance.start_loading(`Uninstalling ${short_repo} dep...`);
             const dep_folder = `${init_params.root}/node_modules/${short_repo}`;
             util_instance.fs.remove_directory(dep_folder, context);

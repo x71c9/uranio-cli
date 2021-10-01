@@ -8,6 +8,8 @@ import chokidar from 'chokidar';
 
 import prettier from 'prettier';
 
+import {jsonfile_path} from '../conf/defaults';
+
 import {Params} from '../types';
 
 import * as out from '../output/';
@@ -63,7 +65,27 @@ class Util {
 			text: watch_text
 		});
 	}
-
+	
+	public is_initialized(){
+		const is = (this.fs.exists(`${this.params.root}/${jsonfile_path}`));
+		if(is){
+			this.output.verbose_log(`Uranio is initialized`);
+		}else{
+			this.output.verbose_log(`Uranio is not initialized`);
+		}
+		return is;
+	}
+	
+	public must_be_initialized(){
+		if(!this.is_initialized()){
+			let err_msg = '';
+			err_msg += 'URANIO must be initialized first.';
+			err_msg += ` Please run \`uranio init\` in order to initialize the repo.`;
+			this.output.wrong_end_log(err_msg);
+			process.exit(1);
+		}
+	}
+	
 	public pretty(filepath:string, parser='typescript')
 		:void{
 		this.output.start_loading(`Prettier [${filepath}]...`);
@@ -96,7 +118,7 @@ export type UtilInstance = InstanceType<typeof Util>;
 
 export function create(params:Partial<Params>, output:out.OutputInstance)
 		:UtilInstance{
-	params = merge_params(params);
-	return new Util(params, output);
+	const full_params = merge_params(params);
+	return new Util(full_params, output);
 }
 

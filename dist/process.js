@@ -58,16 +58,20 @@ function _init_log() {
     _log_root();
 }
 function _log_arguments(params) {
-    output_instance.verbose_log(JSON.stringify(params), 'args');
+    output_instance.debug_log(JSON.stringify(params), 'args');
 }
 function _log_root() {
     output_instance.verbose_log(`$URNROOT$Project root [${process_params.root}]`, 'root');
 }
 function _set_params(args) {
     const params = defaults_1.default_params;
+    // Paramters with default value = false
     const force = args.f || args.force;
     if (force == true) {
         params.force = true;
+    }
+    if (typeof args.noforce === 'boolean' && !!args.noforce !== !params.force) {
+        params.force = !args.noforce;
     }
     const verbose = args.v || args.verbose;
     if (verbose == true) {
@@ -75,6 +79,13 @@ function _set_params(args) {
     }
     if (typeof args.noverbose === 'boolean' && !!args.noverbose !== !params.verbose) {
         params.verbose = !args.noverbose;
+    }
+    const debug = args.u || args.debug;
+    if (debug == true) {
+        params.debug = true;
+    }
+    if (typeof args.nodebug === 'boolean' && !!args.nodebug !== !params.debug) {
+        params.debug = !args.nodebug;
     }
     const hide = args.n || args.hide;
     if (hide == true) {
@@ -97,20 +108,29 @@ function _set_params(args) {
     if (typeof args.nofullwidth === 'boolean' && !!args.nofullwidth !== !params.fullwidth) {
         params.fullwidth = !args.nofullwidth;
     }
+    const native = args.e || args.native;
+    if (native == true) {
+        params.native = true;
+    }
+    if (typeof args.nonative === 'boolean' && !!args.nonative !== !params.native) {
+        params.native = !args.nonative;
+    }
+    // Paramteters with default value = true
     const filelog = args.l || args.filelog;
-    if (filelog == true) {
-        params.filelog = true;
+    if (filelog == false) {
+        params.filelog = false;
     }
     if (typeof args.nofilelog === 'boolean' && !!args.nofilelog !== !params.filelog) {
         params.filelog = !args.nofilelog;
     }
     const spin = args.i || args.spin;
-    if (spin == true) {
-        params.filelog = true;
+    if (spin == false) {
+        params.filelog = false;
     }
-    if (typeof args.spin === 'boolean' && !!args.spin !== !params.spin) {
-        params.spin = !args.spin;
+    if (typeof args.nospin === 'boolean' && !!args.nospin !== !params.spin) {
+        params.spin = !args.nospin;
     }
+    // Parameters with default value type = string
     const prefix = args.x || args.prefix;
     if (typeof prefix === 'string' && prefix !== '') {
         params.prefix = prefix;
@@ -134,6 +154,19 @@ function _set_params(args) {
         common_1.check_deploy(deploy);
         params.deploy = deploy;
     }
+    const color = args.c || args.color;
+    if (typeof color === 'string' && color != '') {
+        params.color = color;
+    }
+    const color_verbose = args.o || args.color_verbose;
+    if (typeof color_verbose === 'string' && color_verbose != '') {
+        params.color_verbose = color_verbose;
+    }
+    const color_debug = args.o || args.color_debug;
+    if (typeof color_debug === 'string' && color_debug != '') {
+        params.color_debug = color_debug;
+    }
+    // Root parameter
     let root = args.s || args.root;
     if (typeof root === 'string' && root !== '') {
         if (root[0] !== '/') {
@@ -272,11 +305,16 @@ function _switch_command(args) {
             break;
         }
         case 'init': {
-            cmd_1.prompt_init(args, process_params);
+            cmd_1.prompt_init(process_params, args);
             break;
         }
         case 'transpose': {
-            cmd_1.transpose(process_params);
+            if (args._.length > 1 && typeof args._[1] === 'string') {
+                cmd_1.transpose(Object.assign(Object.assign({}, process_params), { file: args._[1] }));
+            }
+            else {
+                cmd_1.transpose(process_params);
+            }
             break;
         }
         case 'alias': {
@@ -300,7 +338,7 @@ function _switch_command(args) {
                 case '':
                 case undefined:
                 default: {
-                    cmd_1.dev(process_params, process_params);
+                    cmd_1.dev(process_params);
                 }
             }
             break;
@@ -308,17 +346,17 @@ function _switch_command(args) {
         case 'build': {
             switch (splitted_cmd[1]) {
                 case 'server': {
-                    cmd_1.build_server(process_params, process_params);
+                    cmd_1.build_server(process_params);
                     break;
                 }
                 case 'client': {
-                    cmd_1.build_client(process_params, process_params);
+                    cmd_1.build_client(process_params);
                     break;
                 }
                 case '':
                 case undefined:
                 default: {
-                    cmd_1.build(process_params, process_params);
+                    cmd_1.build(process_params);
                 }
             }
             break;

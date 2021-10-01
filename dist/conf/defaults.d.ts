@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 import { Params } from '../types';
+export declare const default_params: Params;
 export declare const defaults: {
-    readonly default_repo: "trx";
     readonly folder: ".uranio";
     readonly repo_folder: "uranio";
     readonly tmp_folder: ".tmp";
@@ -26,4 +26,3 @@ export declare const defaults: {
     readonly wrong_char: "✗";
 };
 export declare const jsonfile_path: string;
-export declare const default_params: Params;

@@ -4,9 +4,12 @@
  *
  * @packageDocumentation
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_params = void 0;
-// import fs from 'fs';
+exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_params = exports.read_rc_file = void 0;
+const fs_1 = __importDefault(require("fs"));
 // import * as cp from 'child_process';
 const urn_lib_1 = require("urn-lib");
 // import * as util from '../util/';
@@ -14,8 +17,28 @@ const urn_lib_1 = require("urn-lib");
 // import {default_params, defaults} from '../conf/defaults';
 const defaults_1 = require("../conf/defaults");
 const types_1 = require("../types");
+function read_rc_file(params) {
+    const rcfile_path = `${params.root}/${defaults_1.jsonfile_path}`;
+    if (!fs_1.default.existsSync(rcfile_path)) {
+        return params;
+    }
+    try {
+        const rc_content = fs_1.default.readFileSync(rcfile_path, 'utf8');
+        const rc_obj = urn_lib_1.urn_util.json.clean_parse(rc_content);
+        params.repo = rc_obj.repo;
+        params.pacman = rc_obj.pacman;
+        params.deploy = rc_obj.deploy;
+    }
+    catch (ex) {
+        process.stderr.write(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
+        process.exit(1);
+    }
+    return params;
+}
+exports.read_rc_file = read_rc_file;
 function merge_params(params) {
-    const merged_params = defaults_1.default_params;
+    let merged_params = defaults_1.default_params;
+    merged_params = read_rc_file(params);
     for (const k in defaults_1.default_params) {
         if (urn_lib_1.urn_util.object.has_key(params, k)) {
             merged_params[k] = params[k];

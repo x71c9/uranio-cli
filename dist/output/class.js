@@ -10,29 +10,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = void 0;
 const dateformat_1 = __importDefault(require("dateformat"));
-const ora_1 = __importDefault(require("ora"));
+// import ora from 'ora';
 const chalk_1 = __importDefault(require("chalk"));
 const fs_1 = __importDefault(require("fs"));
 const defaults_1 = require("../conf/defaults");
 const common_1 = require("../cmd/common");
+const spinner_1 = require("./spinner");
 // import {OutputParams} from './types';
 class Output {
+    // public spinner:ora.Ora
+    // public spinner_texts:string[]
     constructor(params) {
-        //   public root:string,
-        //   public native=false,
-        //   public blank=false,
-        //   public hide=false,
-        //   public spin=false,
-        //   public verbose=false,
-        //   public fullwidth=false,
-        //   public filelog=true,
-        //   public prefix='',
-        //   public color='#859900',
-        //   public color_verbose='#668899'
-        // ){
+        // this.spinner = ora({text: 'Loading...', color: 'magenta', interval: 40});
+        // this.spinner_texts = [];
         this.params = params;
-        this.spinner = ora_1.default({ text: 'Loading...', color: 'magenta', interval: 40 });
-        this.spinner_texts = [];
     }
     log(text, context = 'log', color) {
         const final_color = (typeof color === 'string') ? color : this.params.color;
@@ -43,6 +34,11 @@ class Output {
         const final_color = (typeof color === 'string') ? color : this.params.color_verbose;
         const colored_text = (!this.params.blank) ? chalk_1.default.hex(final_color)(text) : text;
         this._log(colored_text, context, (this.params.verbose === true));
+    }
+    debug_log(text, context = 'dlog', color) {
+        const final_color = (typeof color === 'string') ? color : this.params.color_debug;
+        const colored_text = (!this.params.blank) ? chalk_1.default.hex(final_color)(text) : text;
+        this._log(colored_text, context, (this.params.debug === true));
     }
     done_log(text, context = 'done') {
         this._go_previous();
@@ -74,19 +70,19 @@ class Output {
             return;
         }
         if (this.params.blank === true) {
-            this.spinner.color = 'white';
+            spinner_1.spinner.color = 'white';
         }
-        this.spinner_texts.push(text);
+        spinner_1.spinner_texts.push(text);
         this.spinner_text(text);
-        if (this.params.spin === true && !this.spinner.isSpinning) {
-            this.spinner.start();
+        if (this.params.spin === true && !spinner_1.spinner.isSpinning) {
+            spinner_1.spinner.start();
         }
     }
     stop_loading() {
-        this.spinner.stop();
+        spinner_1.spinner.stop();
     }
     spinner_text(text) {
-        this.spinner.text = this._spinner_text_color(text);
+        spinner_1.spinner.text = this._spinner_text_color(text);
     }
     _log(text, context = 'log', out = false) {
         const output_text = (!this.params.native) ?
@@ -96,7 +92,7 @@ class Output {
         }
         if (out) {
             let was_spinning = false;
-            if (this.spinner.isSpinning) {
+            if (spinner_1.spinner.isSpinning) {
                 was_spinning = true;
                 this.stop_loading();
             }
@@ -104,7 +100,7 @@ class Output {
                 process.stdout.write(output_text);
             }
             if (this.params.spin === true && was_spinning) {
-                this.spinner.start();
+                spinner_1.spinner.start();
             }
         }
     }
@@ -195,45 +191,18 @@ class Output {
         return (this.params.blank === false) ? chalk_1.default.magenta(text) : text;
     }
     _go_previous() {
-        this.spinner_texts.pop();
-        this.spinner_text(this.spinner_texts[this.spinner_texts.length - 1]);
+        spinner_1.spinner_texts.pop();
+        if (spinner_1.spinner_texts.length > 0) {
+            this.spinner_text(spinner_1.spinner_texts[spinner_1.spinner_texts.length - 1]);
+        }
     }
 }
 function _log_to_file(text) {
     fs_1.default.appendFileSync(defaults_1.defaults.log_filepath, text);
 }
-// const default_params:OutputParams = {
-//   root: '.',
-//   native: false,
-//   blank: false,
-//   hide: false,
-//   spin: false,
-//   verbose: false,
-//   fullwidth: false,
-//   filelog: true,
-//   prefix: '',
-//   color: '#859900',
-//   color_verbose: '#668899'
-// };
 function create(params) {
-    // const merged_params = {
-    //   ...default_params,
-    //   ...params
-    // };
-    params = common_1.merge_params(params);
-    return new Output(params);
-    //   merged_params.root,
-    //   merged_params.native,
-    //   merged_params.blank,
-    //   merged_params.hide,
-    //   merged_params.spin,
-    //   merged_params.verbose,
-    //   merged_params.fullwidth,
-    //   merged_params.filelog,
-    //   merged_params.prefix,
-    //   merged_params.color,
-    //   merged_params.color_verbose
-    // );
+    const full_params = common_1.merge_params(params);
+    return new Output(full_params);
 }
 exports.create = create;
 //# sourceMappingURL=class.js.map

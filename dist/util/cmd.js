@@ -35,6 +35,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = void 0;
 const urn_lib_1 = require("urn-lib");
+const common_1 = require("../cmd/common");
+// import {UtilParams} from './types';
 // DO NO CANCEL IT
 // import * as common from '../cmd/common';
 const fs = __importStar(require("./fs"));
@@ -88,7 +90,7 @@ class CMD {
             const action = `installing dependencies [${repo}]`;
             this.output.verbose_log(`Started ${action}`, context);
             return new Promise((resolve, reject) => {
-                this.spawn.spin(_pacman_commands.install[this.params.pacman](repo), context, action, resolve, reject);
+                this.spawn.spin(_pacman_commands.install[this.params.pacman](repo), context, action, undefined, resolve, reject);
             });
         });
     }
@@ -97,7 +99,7 @@ class CMD {
             const action = `installing dev dependencies [${repo}]`;
             this.output.verbose_log(`Started ${action}`, context);
             return new Promise((resolve, reject) => {
-                this.spawn.spin(_pacman_commands.install_dev[this.params.pacman](repo), context, action, resolve, reject);
+                this.spawn.spin(_pacman_commands.install_dev[this.params.pacman](repo), context, action, undefined, resolve, reject);
             });
         });
     }
@@ -106,7 +108,7 @@ class CMD {
             const action = `uninstalling dependencies [${repo}]`;
             this.output.verbose_log(`Started ${action}`, context);
             return new Promise((resolve, reject) => {
-                this.spawn.spin(_pacman_commands.uninstall[this.params.pacman](repo), context, action, resolve, reject);
+                this.spawn.spin(_pacman_commands.uninstall[this.params.pacman](repo), context, action, undefined, resolve, reject);
             });
         });
     }
@@ -120,20 +122,27 @@ class CMD {
             return yield this._clone_repo(address, dest_folder, context, branch, true);
         });
     }
-    dependency_exists(repo) {
-        const package_json_path = `${this.params.root}/package.json`;
+    get_package_data(package_json_path) {
         try {
             const data = this.fs.read_file(package_json_path, 'utf8');
-            const package_data = urn_lib_1.urn_util.json.clean_parse(data);
-            const packdata_dep = package_data['dependencies'];
-            const packdata_dep_dev = package_data['devDependencies'];
-            return ((packdata_dep && typeof packdata_dep[repo] === 'string') ||
-                (packdata_dep_dev && typeof packdata_dep_dev[repo] === 'string'));
+            const pack_data = urn_lib_1.urn_util.json.clean_parse(data);
+            return pack_data;
         }
         catch (ex) {
             this.output.wrong_end_log(`Invalid ${package_json_path}. ${ex.message}`);
             process.exit(1);
         }
+    }
+    dependency_exists(repo, package_data) {
+        let pack_data = package_data;
+        if (!package_data) {
+            const package_json_path = `${this.params.root}/package.json`;
+            pack_data = this.get_package_data(package_json_path);
+        }
+        const packdata_dep = pack_data['dependencies'];
+        const packdata_dep_dev = pack_data['devDependencies'];
+        return ((packdata_dep && typeof packdata_dep[repo] === 'string') ||
+            (packdata_dep_dev && typeof packdata_dep_dev[repo] === 'string'));
     }
     _clone_repo(address, dest_folder, context = '_clr', branch = 'master', recursive = false) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -144,13 +153,14 @@ class CMD {
                     `-b ${branch} ` : '';
                 let cmd = `git clone ${branch_str}${address} ${dest_folder} --progress`;
                 cmd += (recursive === true) ? ` --recurse-submodules` : '';
-                this.spawn.spin(cmd, context, action, resolve, reject);
+                this.spawn.spin(cmd, context, action, undefined, resolve, reject);
             });
         });
     }
 }
 function create(params, output) {
-    return new CMD(params, output);
+    const full_params = common_1.merge_params(params);
+    return new CMD(full_params, output);
 }
 exports.create = create;
 const _pacman_commands = {

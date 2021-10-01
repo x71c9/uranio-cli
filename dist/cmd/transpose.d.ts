@@ -5,5 +5,5 @@
  */
 import { Params } from '../types';
 export declare function transpose(params: Partial<Params> & {
-    file: string;
-}): Promise<void>;
+    file?: string;
+}, included?: boolean): Promise<void>;

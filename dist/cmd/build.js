@@ -49,10 +49,10 @@ const common_1 = require("./common");
 // // };
 // // import {server} from './server';
 // // import {client} from './client';
-// let done_building_server = false;
-// let building_server = false;
-// let done_building_client = false;
-// let building_client = false;
+let done_building_server = false;
+let building_server = false;
+let done_building_client = false;
+let building_client = false;
 // const tscw_color = '#734de3';
 // const nuxt_color = '#677cc7';
 let output_instance;
@@ -62,8 +62,8 @@ function build(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_build(params);
         output_instance.start_loading(`Building...`);
-        transpose_1.transpose(build_params);
-        hooks_1.hooks(build_params);
+        yield transpose_1.transpose(build_params, true);
+        yield hooks_1.hooks(build_params, true);
         yield _build_server();
         yield _build_client();
     });
@@ -73,9 +73,10 @@ function build_server(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_build(params);
         output_instance.start_loading(`Building server...`);
-        transpose_1.transpose(build_params);
-        hooks_1.hooks(build_params);
+        yield transpose_1.transpose(build_params, true);
+        yield hooks_1.hooks(build_params, true);
         yield _build_server();
+        // output_instance.end_log('Build server completed.');
     });
 }
 exports.build_server = build_server;
@@ -83,54 +84,76 @@ function build_client(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_build(params);
         output_instance.start_loading(`Building client...`);
-        transpose_1.transpose(build_params);
-        hooks_1.hooks(build_params);
+        yield transpose_1.transpose(build_params, true);
+        yield hooks_1.hooks(build_params, true);
         yield _build_client();
+        // output_instance.end_log('Build client completed.');
     });
 }
 exports.build_client = build_client;
 function _build_server() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Building server...`);
+        building_server = true;
         const cd_cmd = `cd ${build_params.root}/.uranio/server`;
         const ts_cmd = `npx tsc -b`;
         const cmd = `${cd_cmd} && ${ts_cmd}`;
-        output_instance.log(cmd, 'srv');
         const callback = () => {
-            output_instance.done_log(`Building client completed.`, 'gnrt');
+            done_building_server = true;
+            if (building_client) {
+                output_instance.done_log(`Building server completed.`, 'tscb');
+                if (done_building_client === true) {
+                    output_instance.end_log(`Building completed.`);
+                }
+            }
+            else {
+                output_instance.end_log(`Building server completed.`);
+            }
         };
         const reject = (err) => {
+            done_building_server = true;
             output_instance.error_log(`Building server failed.`, 'tscb');
             if (err) {
                 output_instance.error_log(err.message, 'tscb');
             }
         };
-        util_instance.spawn.spin_and_log(cmd, 'tscb', 'building server', callback, reject);
+        util_instance.spawn.spin_and_verbose_log(cmd, 'tscb', 'building server', undefined, callback, reject);
     });
 }
 function _build_client() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Building client...`);
+        building_client = true;
         const cd_cmd = `cd ${build_params.root}/.uranio/client`;
         const nu_cmd = `npx nuxt generate -c ./nuxt.config.js`;
         const cmd = `${cd_cmd} && ${nu_cmd}`;
-        output_instance.log(cmd, 'clnt');
         const callback = () => {
-            output_instance.done_log(`Building client completed.`, 'gnrt');
+            done_building_client = true;
+            if (building_server) {
+                output_instance.done_log(`Building client completed.`, 'nugn');
+                if (done_building_server === true) {
+                    output_instance.end_log(`Building completed.`);
+                }
+            }
+            else {
+                output_instance.end_log(`Building client completed.`);
+            }
         };
         const reject = (err) => {
+            done_building_client = true;
             output_instance.error_log(`Building server failed.`, 'tscb');
             if (err) {
                 output_instance.error_log(err.message, 'tscb');
             }
         };
-        util_instance.spawn.spin_and_log(cmd, 'nuxt', 'building client', callback, reject);
+        util_instance.spawn.spin_and_verbose_log(cmd, 'nuxt', 'building client', undefined, callback, reject);
     });
 }
 function _init_build(params) {
     output_instance = output.create(params);
     build_params = common_1.merge_params(params);
     util_instance = util.create(params, output_instance);
+    util_instance.must_be_initialized();
 }
 // export const build = {
 //   run: async (root:string, options?:Partial<Options>):Promise<void> => {

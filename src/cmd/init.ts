@@ -33,7 +33,7 @@ import {
 	check_pacman
 } from './common';
 
-import {InitParams} from './types';
+// import {InitParams} from './types';
 
 let output_instance:output.OutputInstance;
 
@@ -49,12 +49,8 @@ export async function init(params:Partial<Params>)
 	output_instance = output.create(params);
 	
 	util_instance = util.create(params, output_instance);
-	
-	output_instance.verbose_log(`$URNROOT$Project root: [${init_params.root}]`, 'root');
-	output_instance.verbose_log(`Selected repo: [${init_params.repo}]`, 'repo');
-	if(init_params.repo === 'api'){
-		output_instance.verbose_log(`Selected deploy: [${init_params.deploy}]`, 'dply');
-	}
+
+	_log_important_params();
 	
 	_update_package_aliases();
 	_update_package_scripts();
@@ -67,7 +63,7 @@ export async function init(params:Partial<Params>)
 	await _clone_dot();
 	_copy_dot_files();
 	_remove_tmp();
-	_replace_aliases();
+	await _replace_aliases();
 	if(init_params.repo === 'adm'){
 		_add_admin_files();
 	}
@@ -75,12 +71,12 @@ export async function init(params:Partial<Params>)
 	output_instance.end_log(`Initialization completed.`);
 }
 
-export async function prompt_init(args:Arguments, params:InitParams)
+export async function prompt_init(params:Params, args:Arguments)
 		:Promise<void>{
 	
-	output_instance = output.create(params);
+	init_params = params;
 	
-	init_params = merge_params(params);
+	output_instance = output.create(params);
 	
 	util_instance = util.create(init_params, output_instance);
 	
@@ -88,11 +84,7 @@ export async function prompt_init(args:Arguments, params:InitParams)
 	
 	title();
 	
-	// output_instance.verbose_log(urn_util.json.safe_stringify(init_params), 'init');
-	
-	if(_is_already_initialized() && init_params.force === false){
-		
-		// output.stop_loading();
+	if(util_instance.is_initialized() && init_params.force === false){
 		
 		let confirm_msg = '';
 		confirm_msg += `It appears the repo is already initialized.\n`;
@@ -125,11 +117,25 @@ export async function prompt_init(args:Arguments, params:InitParams)
 	
 }
 
-function _is_already_initialized(){
-	util_instance.output.hide = true;
-	const is = (util_instance.fs.exists(`${init_params.root}/${jsonfile_path}`));
-	util_instance.output.hide = false;
-	return is;
+function _log_important_params(){
+	output_instance.verbose_log(
+		`$URNROOT$Project root: [${init_params.root}]`,
+		'root'
+	);
+	output_instance.verbose_log(
+		`Selected repo: [${init_params.repo}]`,
+		'repo'
+	);
+	output_instance.verbose_log(
+		`Selected pacman: [${init_params.pacman}]`,
+		'repo'
+	);
+	if(init_params.repo === 'api' || init_params.repo === 'trx'){
+		output_instance.verbose_log(
+			`Selected deploy: [${init_params.deploy}]`,
+			'dply'
+		);
+	}
 }
 
 async function _ask_for_pacman(args:Arguments){
@@ -183,6 +189,7 @@ async function _ask_for_repo(args:Arguments){
 			]).then(async (answers) => {
 				
 				check_repo(answers.repo);
+				init_params.repo = answers.repo;
 				
 				if(answers.repo !== 'core'){
 					
@@ -222,6 +229,7 @@ async function _ask_for_deploy(args:Arguments){
 			]).then(async (answers) => {
 				
 				check_deploy(answers.deploy);
+				init_params.deploy = answers.deploy;
 				
 				await init(init_params);
 				
@@ -236,21 +244,32 @@ async function _ask_for_deploy(args:Arguments){
 
 function _add_admin_files(){
 	output_instance.start_loading(`Adding admin files...`);
-	const fix_file_nuxt_types = `${init_params.root}/node_modules/@nuxt/types/node_modules/index.d.ts`;
+	const fix_file_nuxt_types =
+		`${init_params.root}/node_modules/@nuxt/types/node_modules/index.d.ts`;
 	if(!util_instance.fs.exists(fix_file_nuxt_types)){
 		util_instance.spawn.exec_sync(`touch ${fix_file_nuxt_types}`);
 	}
+	output_instance.done_verbose_log('Added admin files.', 'adm');
 }
 
-function _replace_aliases(){
+async function _replace_aliases(){
 	output_instance.start_loading(`Updating relative paths aliases...`);
-	alias(init_params);
+	await alias(init_params, true);
+	output_instance.done_verbose_log('Updated relative paths aliases.', 'alias');
 }
 
 function _remove_tmp(){
-	output_instance.start_loading(`Removing tmp folder [${defaults.tmp_folder}]...`);
-	util_instance.fs.remove_directory(`${init_params.root}/${defaults.tmp_folder}`, 'tmp');
-	output_instance.done_verbose_log(`Removed tmp folder [${defaults.tmp_folder}].`, 'tmp');
+	output_instance.start_loading(
+		`Removing tmp folder [${defaults.tmp_folder}]...`
+	);
+	util_instance.fs.remove_directory(
+		`${init_params.root}/${defaults.tmp_folder}`,
+		'tmp'
+	);
+	output_instance.done_verbose_log(
+		`Removed tmp folder [${defaults.tmp_folder}].`,
+		'tmp'
+	);
 }
 
 function _copy_dot_files(){
@@ -281,15 +300,23 @@ async function _clone_dot(){
 
 function _remove_git_files(){
 	output_instance.start_loading(`Removing git files...`);
-	const cloned_server_repo_path = `${init_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}`;
-	util_instance.spawn.exec_sync(`( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`);
-	const cloned_client_repo_path = `${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`;
-	util_instance.spawn.exec_sync(`( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`);
+	const cloned_server_repo_path =
+		`${init_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}`;
+	util_instance.spawn.exec_sync(
+		`( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`
+	);
+	const cloned_client_repo_path = 
+		`${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`;
+	util_instance.spawn.exec_sync(
+		`( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`
+	);
 	output_instance.done_log(`Removed uranio .git files.`, '.git');
 }
 
 async function _clone_and_install_repo(){
-	output_instance.start_loading(`Cloning and intalling [${init_params.repo}]...`);
+	output_instance.start_loading(
+		`Cloning and intalling [${init_params.repo}]...`
+	);
 	switch(init_params.repo){
 		case 'core':{
 			await _clone_core();
@@ -304,24 +331,50 @@ async function _clone_and_install_repo(){
 			break;
 		}
 		default:{
-			output_instance.log(`Selected repo is not valid. [${init_params.repo}]`, 'init');
+			output_instance.error_log(
+				`Selected repo is not valid. [${init_params.repo}]`,
+				'init'
+			);
 			process.exit(1);
 		}
 	}
 	await _install_dep();
-	output_instance.done_log(`Cloned and installed repo [${init_params.repo}].`, 'repo');
+	output_instance.done_log(
+		`Cloned and installed repo [${init_params.repo}].`,
+		'repo'
+	);
 }
 
 function _create_client_server_folders(){
 	output_instance.start_loading(`Creating server folder...`);
-	util_instance.fs.create_directory(`${init_params.root}/${defaults.folder}/server`, 'init');
-	util_instance.fs.create_directory(`${init_params.root}/${defaults.folder}/server/src`, 'init');
-	util_instance.fs.create_directory(`${init_params.root}/${defaults.folder}/server/src/books`, 'init');
+	util_instance.fs.create_directory(
+		`${init_params.root}/${defaults.folder}/server`,
+		'init'
+	);
+	util_instance.fs.create_directory(
+		`${init_params.root}/${defaults.folder}/server/src`,
+		'init'
+	);
+	util_instance.fs.create_directory(
+		`${init_params.root}/${defaults.folder}/server/src/books`,
+		'init'
+	);
+	output_instance.done_verbose_log(`Created server folders.`, 'init');
+
 	output_instance.start_loading(`Creating client folder...`);
-	util_instance.fs.create_directory(`${init_params.root}/${defaults.folder}/client`, 'init');
-	util_instance.fs.create_directory(`${init_params.root}/${defaults.folder}/client/src`, 'init');
-	util_instance.fs.create_directory(`${init_params.root}/${defaults.folder}/client/src/books`, 'init');
-	output_instance.done_log(`Created client server folders.`, 'init');
+	util_instance.fs.create_directory(
+		`${init_params.root}/${defaults.folder}/client`,
+		'init'
+	);
+	util_instance.fs.create_directory(
+		`${init_params.root}/${defaults.folder}/client/src`,
+		'init'
+	);
+	util_instance.fs.create_directory(
+		`${init_params.root}/${defaults.folder}/client/src/books`,
+		'init'
+	);
+	output_instance.done_verbose_log(`Created client folders.`, 'init');
 }
 
 function _create_rc_file(){
@@ -351,14 +404,21 @@ function _ignore_urn_folder(){
 		content += `\n${defaults.log_filepath}`;
 	}
 	util_instance.fs.write_file(gitignore, content);
-	const log_msg = `Added ${defaults.folder} and ${defaults.log_filepath} to .gitignore.`;
+	const log_msg =
+		`Added ${defaults.folder} and ${defaults.log_filepath} to .gitignore.`;
 	output_instance.done_log(log_msg, '.git');
 }
 
 function _create_urn_folder(){
 	output_instance.start_loading(`Creating ${defaults.folder} folder...`);
-	util_instance.fs.remove_directory(`${init_params.root}/${defaults.folder}`, 'init');
-	util_instance.fs.create_directory(`${init_params.root}/${defaults.folder}`, 'init');
+	util_instance.fs.remove_directory(
+		`${init_params.root}/${defaults.folder}`,
+		'init'
+	);
+	util_instance.fs.create_directory(
+		`${init_params.root}/${defaults.folder}`,
+		'init'
+	);
 	output_instance.done_log(`Created folder ${defaults.folder}.`, 'init');
 }
 
@@ -379,7 +439,10 @@ function _update_package_scripts(){
 			'dev:client': `uranio dev:client`
 		};
 		try{
-			util_instance.fs.write_file(package_json_path, JSON.stringify(package_data, null, '\t'));
+			util_instance.fs.write_file(
+				package_json_path,
+				JSON.stringify(package_data, null, '\t')
+			);
 			output_instance.done_log(`Updated package.json scripts.`, 'alias');
 		}catch(ex){
 			output_instance.error_log(`Cannot update ${package_json_path}.`, 'alias');
@@ -390,7 +453,7 @@ function _update_package_scripts(){
 }
 
 function _update_package_aliases(){
-	output_instance.start_loading('Updating aliases...');
+	output_instance.start_loading('Updating package.json aliases...');
 	const package_json_path = `${init_params.root}/package.json`;
 	const data = util_instance.fs.read_file(package_json_path, 'utf8');
 	try{
@@ -417,7 +480,10 @@ function _update_package_aliases(){
 			}
 		}
 		try{
-			util_instance.fs.write_file(package_json_path, JSON.stringify(package_data, null, '\t'));
+			util_instance.fs.write_file(
+				package_json_path,
+				JSON.stringify(package_data, null, '\t')
+			);
 			output_instance.done_log(`Updated package.json module aliases.`, 'alias');
 		}catch(ex){
 			output_instance.error_log(`Cannot update ${package_json_path}.`, 'alias');
@@ -428,21 +494,25 @@ function _update_package_aliases(){
 }
 
 function _copy_dot_src_folder(){
-	const dot_src_folder = `${init_params.root}/${defaults.tmp_folder}/urn-dot/src`;
+	const dot_src_folder =
+		`${init_params.root}/${defaults.tmp_folder}/urn-dot/src`;
 	const dest = `${init_params.root}/`;
 	util_instance.fs.copy_directory(dot_src_folder, dest, 'dot');
 }
 
 function _copy_dot_tsconfigs(){
-	const dot_tsc_file = `${init_params.root}/${defaults.tmp_folder}/urn-dot/tsconfig.json`;
+	const dot_tsc_file =
+		`${init_params.root}/${defaults.tmp_folder}/urn-dot/tsconfig.json`;
 	const dest = `${init_params.root}/tsconfig.json`;
 	util_instance.fs.copy_file(dot_tsc_file, dest, 'tsco');
 	
-	const dot_tsc_file_server = `${init_params.root}/${defaults.tmp_folder}/urn-dot/.uranio/server/tsconfig.json`;
+	const dot_tsc_file_server =
+		`${init_params.root}/${defaults.tmp_folder}/urn-dot/.uranio/server/tsconfig.json`;
 	const dest_server = `${init_params.root}/.uranio/server/tsconfig.json`;
 	util_instance.fs.copy_file(dot_tsc_file_server, dest_server, 'tscs');
 	
-	const dot_tsc_file_client = `${init_params.root}/${defaults.tmp_folder}/urn-dot/.uranio/client/tsconfig.json`;
+	const dot_tsc_file_client =
+		`${init_params.root}/${defaults.tmp_folder}/urn-dot/.uranio/client/tsconfig.json`;
 	const dest_client = `${init_params.root}/.uranio/client/tsconfig.json`;
 	util_instance.fs.copy_file(dot_tsc_file_client, dest_client, 'tscc');
 }
@@ -463,13 +533,15 @@ function _copy_dot_eslint_files(){
 }
 
 function _copy_netlify_files(){
-	const dot_deploy_folder = `${init_params.root}/${defaults.tmp_folder}/urn-dot/deploy`;
+	const dot_deploy_folder =
+		`${init_params.root}/${defaults.tmp_folder}/urn-dot/deploy`;
 	
 	const toml_file = `${dot_deploy_folder}/netlify/netlify.toml`;
 	const toml_dest = `${init_params.root}/netlify.toml`;
 	util_instance.fs.copy_file(toml_file, toml_dest, 'ntlf');
 	
-	const function_folder = `${init_params.root}/${defaults.folder}/server/src/functions`;
+	const function_folder =
+		`${init_params.root}/${defaults.folder}/server/src/functions`;
 	if(!util_instance.fs.exists(function_folder)){
 		util_instance.fs.create_directory(function_folder);
 	}
@@ -483,7 +555,8 @@ function _copy_netlify_files(){
 }
 
 function _copy_express_files(){
-	const dot_deploy_folder = `${init_params.root}/${defaults.tmp_folder}/urn-dot/deploy`;
+	const dot_deploy_folder =
+		`${init_params.root}/${defaults.tmp_folder}/urn-dot/deploy`;
 	const src_folder = `${init_params.root}/src`;
 	if(!util_instance.fs.exists(src_folder)){
 		util_instance.fs.create_directory(src_folder);
@@ -546,9 +619,12 @@ async function _clone_trx(){
 
 async function _install_dep()
 		:Promise<true>{
-	await _uninstall_core_dep();
-	await _uninstall_api_dep();
-	await _uninstall_trx_dep();
+	const pack_data = util_instance.cmd.get_package_data(
+		`${init_params.root}/package.json`
+	);
+	await _uninstall_core_dep(pack_data);
+	await _uninstall_api_dep(pack_data);
+	await _uninstall_trx_dep(pack_data);
 	switch(init_params.repo){
 		case 'core':{
 			await _install_core_dep();
@@ -567,34 +643,38 @@ async function _install_dep()
 			return true;
 		}
 		default:{
-			output_instance.log('init', `Selected repo is not valid. [${init_params.repo}]`);
+			output_instance.log(
+				`Selected repo is not valid. [${init_params.repo}]`,
+				'init'
+			);
 			process.exit(1);
 		}
 	}
 }
 
-async function _uninstall_core_dep(){
-	await _uninstall_dep(defaults.core_dep_repo, 'core');
-	await _uninstall_dep(defaults.core_dep_dev_repo, 'core');
+async function _uninstall_core_dep(pack_data?:any){
+	await _uninstall_dep(defaults.core_dep_repo, 'core', pack_data);
+	await _uninstall_dep(defaults.core_dep_dev_repo, 'core', pack_data);
 	return true;
 }
 
-async function _uninstall_api_dep(){
-	await _uninstall_dep(defaults.api_dep_repo, 'api');
-	await _uninstall_dep(defaults.api_dep_dev_repo, 'api');
+async function _uninstall_api_dep(pack_data?:any){
+	await _uninstall_dep(defaults.api_dep_repo, 'api', pack_data);
+	await _uninstall_dep(defaults.api_dep_dev_repo, 'api', pack_data);
 	return true;
 }
 
-async function _uninstall_trx_dep(){
-	await _uninstall_dep(defaults.trx_dep_repo, 'trx');
-	await _uninstall_dep(defaults.trx_dep_dev_repo, 'trx');
+async function _uninstall_trx_dep(pack_data?:any){
+	await _uninstall_dep(defaults.trx_dep_repo, 'trx', pack_data);
+	await _uninstall_dep(defaults.trx_dep_dev_repo, 'trx', pack_data);
 	return true;
 }
 
-async function _uninstall_dep(repo:string, context:string){
-	const short_repo = (repo.substr(0,3) === 'ssh' || repo.substr(0,7) === 'git+ssh') ?
-		repo.split('/').slice(-1)[0] : repo;
-	if(util_instance.cmd.dependency_exists(short_repo)){
+async function _uninstall_dep(repo:string, context:string, pack_data?:any){
+	const short_repo =
+		(repo.substr(0,3) === 'ssh' || repo.substr(0,7) === 'git+ssh') ?
+			repo.split('/').slice(-1)[0] : repo;
+	if(util_instance.cmd.dependency_exists(short_repo, pack_data)){
 		output_instance.start_loading(`Uninstalling ${short_repo} dep...`);
 		const dep_folder = `${init_params.root}/node_modules/${short_repo}`;
 		util_instance.fs.remove_directory(dep_folder, context);

@@ -53,9 +53,9 @@ let watch_src_scanned = false;
 //   hide: false,
 //   verbose: true,
 // };
-// const nuxt_color = '#677cc7';
-// const tscw_color = '#734de3';
-// const watc_color = '#687a6a';
+const nuxt_color = '#677cc7';
+const tscw_color = '#734de3';
+const watc_color = '#687a6a';
 function dev(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_dev(params);
@@ -68,6 +68,7 @@ exports.dev = dev;
 function dev_server(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_dev(params);
+        output_instance.start_loading(`Developing server...`);
         yield _dev_server();
     });
 }
@@ -86,8 +87,7 @@ function _dev_server() {
         const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/server`;
         const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
         const cmd = `${cd_cmd} && ${ts_cmd}`;
-        output_instance.verbose_log(cmd, 'dev');
-        util_instance.spawn.log(cmd, 'tscw', 'developing server');
+        util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
     });
 }
 function _dev_client() {
@@ -96,14 +96,15 @@ function _dev_client() {
         const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/client`;
         const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
         const cmd = `${cd_cmd} && ${nu_cmd}`;
-        output_instance.verbose_log(cmd, 'dev');
-        util_instance.spawn.log(cmd, 'nuxt', 'developing client');
+        util_instance.spawn.log(cmd, 'nuxt', 'developing client', nuxt_color);
     });
 }
 function _init_dev(params) {
-    output_instance = output.create(params);
+    params.spin = false;
     dev_params = common_1.merge_params(params);
+    output_instance = output.create(params);
     util_instance = util.create(params, output_instance);
+    util_instance.must_be_initialized();
     _watch();
 }
 function _watch() {
@@ -113,7 +114,7 @@ function _watch() {
         output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
         watch_src_scanned = true;
     }, (event, path) => {
-        output_instance.verbose_log(`${event} ${path}`, 'wtch');
+        output_instance.verbose_log(`${event} ${path}`, 'wtch', watc_color);
         if (!watch_src_scanned) {
             return false;
         }
@@ -139,7 +140,7 @@ function _watch() {
         output_instance.done_log(`Initial scanner completed for [${lib_path}].`, 'wtch');
         watch_lib_scanned = true;
     }, (event, path) => {
-        output_instance.verbose_log(`${event} ${path}`, 'wtch');
+        output_instance.verbose_log(`${event} ${path}`, 'wtch', watc_color);
         if (!watch_lib_scanned) {
             return false;
         }
