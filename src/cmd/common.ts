@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-// import fs from 'fs';
+import fs from 'fs';
 
 // import * as cp from 'child_process';
 
@@ -17,7 +17,7 @@ import {Params} from '../types';
 // import * as output from '../output/';
 
 // import {default_params, defaults} from '../conf/defaults';
-import {default_params} from '../conf/defaults';
+import {default_params, jsonfile_path} from '../conf/defaults';
 
 import {
 	abstract_repos,
@@ -28,9 +28,29 @@ import {
 	valid_deploy,
 } from '../types';
 
+export function read_rc_file(params:Partial<Params>)
+		:Partial<Params>{
+	const rcfile_path = `${params.root}/${jsonfile_path}`;
+	if(!fs.existsSync(rcfile_path)){
+		return params;
+	}
+	try{
+		const rc_content = fs.readFileSync(rcfile_path, 'utf8');
+		const rc_obj = urn_util.json.clean_parse(rc_content);
+		params.repo = rc_obj.repo;
+		params.pacman = rc_obj.pacman;
+		params.deploy = rc_obj.deploy;
+	}catch(ex){
+		process.stderr.write(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
+		process.exit(1);
+	}
+	return params;
+}
 
-export function merge_params(params:Partial<Params>):Params{
-	const merged_params = default_params as Params;
+export function merge_params(params:Partial<Params>)
+		:Params{
+	let merged_params = default_params as Partial<Params>;
+	merged_params = read_rc_file(params);
 	for(const k in default_params){
 		if(urn_util.object.has_key(params, k)){
 			(merged_params as any)[k] = params[k];
@@ -41,7 +61,7 @@ export function merge_params(params:Partial<Params>):Params{
 			(merged_params as any)[l] = (params as any)[l];
 		}
 	}
-	return merged_params;
+	return merged_params as Params;
 }
 
 export function check_repo(repo:string)

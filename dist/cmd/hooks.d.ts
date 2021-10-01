@@ -6,4 +6,4 @@
  * @packageDocumentation
  */
 import { Params } from '../types';
-export declare function hooks(params: Partial<Params>): Promise<void>;
+export declare function hooks(params: Partial<Params>, included?: boolean): Promise<void>;

@@ -6,7 +6,7 @@
 
 import dateFormat from 'dateformat';
 
-import ora from 'ora';
+// import ora from 'ora';
 
 import chalk from 'chalk';
 
@@ -18,30 +18,20 @@ import {Params} from '../types';
 
 import {merge_params} from '../cmd/common';
 
+import {spinner, spinner_texts} from './spinner';
+
 // import {OutputParams} from './types';
 
 class Output {
 	
-	public spinner:ora.Ora
+	// public spinner:ora.Ora
 	
-	public spinner_texts:string[]
+	// public spinner_texts:string[]
 	
 	constructor(public params:Params){
-	//   public root:string,
-	//   public native=false,
-	//   public blank=false,
-	//   public hide=false,
-	//   public spin=false,
-	//   public verbose=false,
-	//   public fullwidth=false,
-	//   public filelog=true,
-	//   public prefix='',
-	//   public color='#859900',
-	//   public color_verbose='#668899'
-	// ){
 		
-		this.spinner = ora({text: 'Loading...', color: 'magenta', interval: 40});
-		this.spinner_texts = [];
+		// this.spinner = ora({text: 'Loading...', color: 'magenta', interval: 40});
+		// this.spinner_texts = [];
 		
 	}
 	
@@ -57,6 +47,13 @@ class Output {
 		const final_color = (typeof color === 'string') ? color : this.params.color_verbose;
 		const colored_text = (!this.params.blank) ? chalk.hex(final_color)(text) : text;
 		this._log(colored_text, context, (this.params.verbose === true));
+	}
+	
+	public debug_log(text:string, context='dlog', color?:string)
+			:void{
+		const final_color = (typeof color === 'string') ? color : this.params.color_debug;
+		const colored_text = (!this.params.blank) ? chalk.hex(final_color)(text) : text;
+		this._log(colored_text, context, (this.params.debug === true));
 	}
 	
 	public done_log(text:string, context='done')
@@ -100,23 +97,23 @@ class Output {
 			return;
 		}
 		if(this.params.blank === true){
-			this.spinner.color = 'white';
+			spinner.color = 'white';
 		}
-		this.spinner_texts.push(text);
+		spinner_texts.push(text);
 		this.spinner_text(text);
-		if(this.params.spin === true && !this.spinner.isSpinning){
-			this.spinner.start();
+		if(this.params.spin === true && !spinner.isSpinning){
+			spinner.start();
 		}
 	}
 	
 	public stop_loading()
 			:void{
-		this.spinner.stop();
+		spinner.stop();
 	}
 	
 	public spinner_text(text:string)
 			:void{
-		this.spinner.text = this._spinner_text_color(text);
+		spinner.text = this._spinner_text_color(text);
 	}
 	
 	private _log(text:string, context='log', out=false){
@@ -127,7 +124,7 @@ class Output {
 		}
 		if(out){
 			let was_spinning = false;
-			if(this.spinner.isSpinning){
+			if(spinner.isSpinning){
 				was_spinning = true;
 				this.stop_loading();
 			}
@@ -135,7 +132,7 @@ class Output {
 				process.stdout.write(output_text);
 			}
 			if(this.params.spin === true && was_spinning){
-				this.spinner.start();
+				spinner.start();
 			}
 		}
 	}
@@ -227,8 +224,10 @@ class Output {
 	}
 	
 	private _go_previous(){
-		this.spinner_texts.pop();
-		this.spinner_text(this.spinner_texts[this.spinner_texts.length - 1]);
+		spinner_texts.pop();
+		if(spinner_texts.length > 0){
+			this.spinner_text(spinner_texts[spinner_texts.length - 1]);
+		}
 	}
 	
 }
@@ -240,39 +239,9 @@ function _log_to_file(text:string)
 
 export type OutputInstance = InstanceType<typeof Output>;
 
-// const default_params:OutputParams = {
-//   root: '.',
-//   native: false,
-//   blank: false,
-//   hide: false,
-//   spin: false,
-//   verbose: false,
-//   fullwidth: false,
-//   filelog: true,
-//   prefix: '',
-//   color: '#859900',
-//   color_verbose: '#668899'
-// };
-
 export function create(params: Partial<Params>)
 		:OutputInstance{
-	// const merged_params = {
-	//   ...default_params,
-	//   ...params
-	// };
-	params = merge_params(params);
-	return new Output(params);
-	//   merged_params.root,
-	//   merged_params.native,
-	//   merged_params.blank,
-	//   merged_params.hide,
-	//   merged_params.spin,
-	//   merged_params.verbose,
-	//   merged_params.fullwidth,
-	//   merged_params.filelog,
-	//   merged_params.prefix,
-	//   merged_params.color,
-	//   merged_params.color_verbose
-	// );
+	const full_params = merge_params(params);
+	return new Output(full_params);
 }
 

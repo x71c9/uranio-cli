@@ -44,35 +44,36 @@ class Spawn {
         this.output.verbose_log(command, 'exec');
         cp.execSync(command);
     }
-    spin(command, context, action, resolve, reject) {
-        return this._spawn(command, context, action, true, false, false, resolve, reject);
+    spin(command, context, action, color, resolve, reject) {
+        return this._spawn(command, context, action, true, false, false, color, resolve, reject);
     }
-    log(command, context, action, resolve, reject) {
-        return this._spawn(command, context, action, false, true, false, resolve, reject);
+    log(command, context, action, color, resolve, reject) {
+        return this._spawn(command, context, action, false, true, false, color, resolve, reject);
     }
-    verbose_log(command, context, action, resolve, reject) {
-        return this._spawn(command, context, action, false, false, true, resolve, reject);
+    verbose_log(command, context, action, color, resolve, reject) {
+        return this._spawn(command, context, action, false, false, true, color, resolve, reject);
     }
-    spin_and_log(command, context, action, resolve, reject) {
-        return this._spawn(command, context, action, true, true, false, resolve, reject);
+    spin_and_log(command, context, action, color, resolve, reject) {
+        return this._spawn(command, context, action, true, true, false, color, resolve, reject);
     }
-    spin_and_verbose_log(command, context, action, resolve, reject) {
-        return this._spawn(command, context, action, true, false, true, resolve, reject);
+    spin_and_verbose_log(command, context, action, color, resolve, reject) {
+        return this._spawn(command, context, action, true, false, true, color, resolve, reject);
     }
-    _spawn(command, context, action, spin, log, verbose, resolve, reject) {
+    _spawn(command, context, action, spin, log, verbose, color, resolve, reject) {
         if (spin) {
             this.output.start_loading(command);
         }
         if (log) {
-            this.output.log(command, context);
+            this.output.log(command, context, color);
         }
         if (verbose) {
-            this.output.verbose_log(command, context);
+            this.output.verbose_log(command, context, color);
         }
-        const splitted_command = command.split(' ');
-        const first_command = splitted_command[0];
-        splitted_command.shift();
-        const child = cp.spawn(first_command, splitted_command);
+        // const splitted_command = command.split(' ');
+        // const first_command = splitted_command[0];
+        // splitted_command.shift();
+        // const child = cp.spawn(first_command, splitted_command);
+        const child = cp.spawn(command, { shell: true });
         if (child.stdout) {
             child.stdout.setEncoding('utf8');
             child.stdout.on('data', (chunk) => {
@@ -87,10 +88,10 @@ class Spawn {
                         continue;
                     }
                     if (log) {
-                        this.output.log(plain_text, context);
+                        this.output.log(plain_text, context, color);
                     }
                     if (verbose) {
-                        this.output.verbose_log(plain_text, context);
+                        this.output.verbose_log(plain_text, context, color);
                     }
                 }
             });
@@ -109,10 +110,10 @@ class Spawn {
                         continue;
                     }
                     if (log) {
-                        this.output.log(plain_text, context);
+                        this.output.log(plain_text, context, color);
                     }
                     if (verbose) {
-                        this.output.verbose_log(plain_text, context);
+                        this.output.verbose_log(plain_text, context, color);
                     }
                 }
             });

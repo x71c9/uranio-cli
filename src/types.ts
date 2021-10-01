@@ -6,6 +6,31 @@
 
 import minimist from 'minimist';
 
+export type Repo = keyof typeof abstract_repos;
+export type PacMan = keyof typeof abstract_pacman;
+export type Deploy = keyof typeof abstract_deploy;
+
+export type Params = {
+	force: boolean
+	verbose: boolean
+	debug: boolean
+	hide: boolean
+	blank: boolean
+	fullwidth: boolean
+	native: boolean
+	filelog: boolean
+	spin: boolean
+	prefix: string
+	branch: string
+	repo: Repo
+	pacman: PacMan
+	deploy: Deploy
+	color: string
+	color_verbose: string
+	color_debug: string
+	root: string
+}
+
 export type Arguments = minimist.ParsedArgs;
 
 export type ParseOptions = minimist.Opts;
@@ -52,26 +77,4 @@ export function valid_deploy()
 		vals.push(k);
 	}
 	return vals;
-}
-export type Repo = keyof typeof abstract_repos;
-export type PacMan = keyof typeof abstract_pacman;
-export type Deploy = keyof typeof abstract_deploy;
-
-export type Params = {
-	root: string
-	repo: Repo
-	deploy: Deploy
-	pacman: PacMan
-	branch: string
-	verbose: boolean,
-	blank: boolean,
-	hide: boolean,
-	spin: boolean,
-	fullwidth: boolean,
-	prefix: string,
-	force: boolean,
-	filelog: boolean,
-	color: string,
-	color_verbose: string,
-	native: boolean
 }

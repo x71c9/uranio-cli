@@ -3,15 +3,13 @@
  *
  * @packageDocumentation
  */
-import ora from 'ora';
 import { Params } from '../types';
 declare class Output {
     params: Params;
-    spinner: ora.Ora;
-    spinner_texts: string[];
     constructor(params: Params);
     log(text: string, context?: string, color?: string): void;
     verbose_log(text: string, context?: string, color?: string): void;
+    debug_log(text: string, context?: string, color?: string): void;
     done_log(text: string, context?: string): void;
     done_verbose_log(text: string, context?: string): void;
     error_log(text: string, context?: string): void;

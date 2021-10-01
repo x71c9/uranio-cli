@@ -6,9 +6,13 @@
 
 import {urn_util} from 'urn-lib';
 
+import {Params} from '../types';
+
+import {merge_params} from '../cmd/common';
+
 import * as out from '../output/';
 
-import {UtilParams} from './types';
+// import {UtilParams} from './types';
 
 // DO NO CANCEL IT
 // import * as common from '../cmd/common';
@@ -36,7 +40,7 @@ class CMD {
 	public fs:fs.FSInstance;
 	public spawn:spawn.SpawnInstance;
 	
-	constructor(public params:UtilParams, public output:out.OutputInstance){
+	constructor(public params:Params, public output:out.OutputInstance){
 		this.fs = fs.create(output);
 		this.spawn = spawn.create(output);
 	}
@@ -74,7 +78,7 @@ class CMD {
 		const action = `installing dependencies [${repo}]`;
 		this.output.verbose_log(`Started ${action}`, context);
 		return new Promise((resolve, reject) => {
-			this.spawn.spin(_pacman_commands.install[this.params.pacman](repo), context, action, resolve, reject);
+			this.spawn.spin(_pacman_commands.install[this.params.pacman](repo), context, action, undefined, resolve, reject);
 		});
 	}
 
@@ -83,7 +87,7 @@ class CMD {
 		const action = `installing dev dependencies [${repo}]`;
 		this.output.verbose_log(`Started ${action}`, context);
 		return new Promise((resolve, reject) => {
-			this.spawn.spin(_pacman_commands.install_dev[this.params.pacman](repo), context, action, resolve, reject);
+			this.spawn.spin(_pacman_commands.install_dev[this.params.pacman](repo), context, action, undefined, resolve, reject);
 		});
 	}
 
@@ -92,7 +96,7 @@ class CMD {
 		const action = `uninstalling dependencies [${repo}]`;
 		this.output.verbose_log(`Started ${action}`, context);
 		return new Promise((resolve, reject) => {
-			this.spawn.spin(_pacman_commands.uninstall[this.params.pacman](repo), context, action, resolve, reject);
+			this.spawn.spin(_pacman_commands.uninstall[this.params.pacman](repo), context, action, undefined, resolve, reject);
 		});
 	}
 	
@@ -106,22 +110,30 @@ class CMD {
 		return await this._clone_repo(address, dest_folder, context, branch, true);
 	}
 	
-	public dependency_exists(repo:string)
-			:boolean{
-		const package_json_path = `${this.params.root}/package.json`;
+	public get_package_data(package_json_path:string){
 		try{
 			const data = this.fs.read_file(package_json_path, 'utf8');
-			const package_data = urn_util.json.clean_parse(data);
-			const packdata_dep = package_data['dependencies'];
-			const packdata_dep_dev = package_data['devDependencies'];
-			return (
-				(packdata_dep && typeof packdata_dep[repo] === 'string') ||
-				(packdata_dep_dev && typeof packdata_dep_dev[repo] === 'string')
-			);
+			const pack_data = urn_util.json.clean_parse(data);
+			return pack_data;
 		}catch(ex){
 			this.output.wrong_end_log(`Invalid ${package_json_path}. ${ex.message}`);
 			process.exit(1);
 		}
+	}
+	
+	public dependency_exists(repo:string, package_data?:any)
+			:boolean{
+		let pack_data = package_data;
+		if(!package_data){
+			const package_json_path = `${this.params.root}/package.json`;
+			pack_data = this.get_package_data(package_json_path);
+		}
+		const packdata_dep = pack_data['dependencies'];
+		const packdata_dep_dev = pack_data['devDependencies'];
+		return (
+			(packdata_dep && typeof packdata_dep[repo] === 'string') ||
+			(packdata_dep_dev && typeof packdata_dep_dev[repo] === 'string')
+		);
 	}
 	
 	private async _clone_repo(
@@ -138,7 +150,7 @@ class CMD {
 				`-b ${branch} ` : '';
 			let cmd = `git clone ${branch_str}${address} ${dest_folder} --progress`;
 			cmd += (recursive === true) ? ` --recurse-submodules` : '';
-			this.spawn.spin(cmd, context, action, resolve, reject);
+			this.spawn.spin(cmd, context, action, undefined, resolve, reject);
 		});
 	}
 	
@@ -174,9 +186,10 @@ class CMD {
 
 export type CMDInstance = InstanceType<typeof CMD>;
 
-export function create(params:UtilParams, output:out.OutputInstance)
+export function create(params:Partial<Params>, output:out.OutputInstance)
 		:CMDInstance{
-	return new CMD(params, output);
+	const full_params = merge_params(params);
+	return new CMD(full_params, output);
 }
 
 const _pacman_commands = {

@@ -20,8 +20,6 @@ import {Params} from '../types';
 
 import {Aliases} from './types';
 
-// import * as common from './common';
-
 import {merge_params} from './common';
 
 let output_instance:output.OutputInstance;
@@ -38,29 +36,36 @@ const _project_option = {
 	}
 };
 
-export async function alias(params:Partial<Params>)
+export async function alias(params:Partial<Params>, included=false)
 		:Promise<void>{
 	
-	output_instance = output.create(params);
+	_init_alias(params);
 	
-	alias_params = merge_params(params);
+	const tsconfig_path_server =
+		`${alias_params.root}/${defaults.folder}/server/tsconfig.json`;
+	const tsconfig_path_client =
+		`${alias_params.root}/${defaults.folder}/client/tsconfig.json`;
 	
-	util_instance = util.create(params, output_instance);
-	
-	const tsconfig_path_server = `${alias_params.root}/${defaults.folder}/server/tsconfig.json`;
-	const tsconfig_path_client = `${alias_params.root}/${defaults.folder}/client/tsconfig.json`;
 	const aliases_server = get_aliases(tsconfig_path_server);
 	const aliases_client = get_aliases(tsconfig_path_client);
 	
 	_replace_aliases_server(aliases_server);
 	_replace_aliases_client(aliases_client);
 	
-	output_instance.end_log(`Aliases updated.`);
-	
+	if(!included){
+		output_instance.end_log(`Aliases updated.`);
+	}else{
+		output_instance.done_log(`Alias updated.`, 'alis');
+	}
 }
 
-export function get_aliases(tsconfig_path:string)
+export function get_aliases(tsconfig_path:string, params?:Partial<Params>)
 		:Aliases{
+	
+	if(typeof params !== 'undefined'){
+		_init_alias(params);
+	}
+	
 	const data = util_instance.fs.read_file(tsconfig_path, 'utf8');
 	try{
 		const tsconf_data = urn_util.json.clean_parse(data);
@@ -69,6 +74,37 @@ export function get_aliases(tsconfig_path:string)
 		output_instance.wrong_end_log(`Error parsing ${tsconfig_path}. ${ex.message}`);
 		process.exit(1);
 	}
+}
+
+export function replace_file_aliases(filepath:string, aliases:Aliases, params?:Partial<Params>)
+		:void{
+	
+	if(typeof params !== 'undefined'){
+		_init_alias(params);
+	}
+	
+	const _project = new tsm.Project(_project_option);
+	let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
+	// const {found, source} = _change_to_relative_statements(sourceFile, aliases);
+	const {source} = _change_to_relative_statements(sourceFile, aliases);
+	sourceFile = source;
+	// if(found === true){
+	//   const modified = sourceFile.print();
+	//   _replace_modified_file(modified, filepath);
+	//   util_instance.pretty(filepath);
+	// }
+}
+
+function _init_alias(params:Partial<Params>){
+	
+	alias_params = merge_params(params);
+	
+	output_instance = output.create(params);
+	
+	util_instance = util.create(params, output_instance);
+	
+	util_instance.must_be_initialized();
+	
 }
 
 function _replace_aliases_server(aliases:Aliases){
@@ -88,18 +124,6 @@ function _traverse_ts_aliases(directory:string, aliases:Aliases) {
 			replace_file_aliases(full_path, aliases);
 		}
 	});
-}
-
-export function replace_file_aliases(filepath:string, aliases:Aliases):void{
-	const _project = new tsm.Project(_project_option);
-	let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
-	const {found, source} = _change_to_relative_statements(sourceFile, aliases);
-	sourceFile = source;
-	if(found === true){
-		const modified = sourceFile.print();
-		_replace_modified_file(modified, filepath);
-		util_instance.pretty(filepath);
-	}
 }
 
 type FoundSource = {
@@ -136,7 +160,7 @@ function _change_to_relative(node:tsm.Node, aliases:Aliases)
 		const splitted_module = module_name.split('/');
 		if(module_name in aliases || splitted_module[0] in aliases){
 			found = true;
-			output_instance.start_loading(`Changing relative imports...`);
+			// output_instance.start_loading(`Changing relative imports...`);
 			const node_file_path = node.getSourceFile().getFilePath();
 			const node_file_dir = path.parse(node_file_path).dir;
 			let parent_folder = 'server';
@@ -157,17 +181,17 @@ function _change_to_relative(node:tsm.Node, aliases:Aliases)
 			const prepend = (relative_path.charAt(0) !== '.') ? './' : '';
 			const replace = `${prepend}${relative_path}${module_append}${append}`;
 			str_lit.replaceWithText(`'${replace}'`);
-			output_instance.verbose_log(`Changed [${full_module_name}] to [${replace}].`, 'alias');
+			output_instance.done_verbose_log(`Changed [${full_module_name}] to [${replace}].`, 'alias');
 		}
 	}
 	return found;
 }
 
-function _replace_modified_file(text:string, filename:string){
-	output_instance.start_loading(`Writing manipulated file...`);
-	util_instance.fs.write_file(filename, text);
-	output_instance.done_verbose_log(`File replaced [${filename}].`, 'alias');
-}
+// function _replace_modified_file(text:string, filename:string){
+//   output_instance.start_loading(`Writing manipulated file...`);
+//   util_instance.fs.write_file(filename, text);
+//   output_instance.done_verbose_log(`File replaced [${filename}].`, 'alias');
+// }
 
 
 // export const alias = {

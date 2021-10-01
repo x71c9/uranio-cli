@@ -16,25 +16,25 @@ class FS {
 	
 	public is_directory(path:string, context?:string){
 		const is = fs.statSync(path).isDirectory();
-		this.output.verbose_log(`Is directory sync [${path}] [${is}]`, context);
+		this.output.debug_log(`Is directory sync [${path}] [${is}]`, context);
 		return is;
 	}
 	
 	public exists(path:string, context='exst'){
 		const exists = fs.existsSync(path);
-		this.output.verbose_log(`Exists sync [${path}]`, context);
+		this.output.debug_log(`Exists sync [${path}]`, context);
 		return exists;
 	}
 	
 	public read_file(file_path:string, encoding?:BufferEncoding, context='rdfl'){
 		const read_file = fs.readFileSync(file_path, {encoding: encoding || 'utf8'});
-		this.output.verbose_log(`Opened file sync [${file_path}]`, context);
+		this.output.debug_log(`Opened file sync [${file_path}]`, context);
 		return read_file;
 	}
 	
 	public read_dir(dir_path:string, context='rddi'){
 		const read_dir = fs.readdirSync(dir_path);
-		this.output.verbose_log(`Read directory sync [${dir_path}]`, context);
+		this.output.debug_log(`Read directory sync [${dir_path}]`, context);
 		return read_dir;
 	}
 	
@@ -66,10 +66,10 @@ class FS {
 		this.output.verbose_log(`Created directory sync [${dir_path}]`, context);
 	}
 	
-	// public copy(dir_src:string, dir_dest:string, filter:(src:string, dest?:string) => boolean, context='cpp'){
-	//   fs.copy(dir_src, dir_dest, {filter: filter});
-	//   this.output.verbose_log(`Copied file sync with filter [${dir_src}] to [${dir_dest}]`, context);
-	// }
+	public copy(dir_src:string, dir_dest:string, context='cpp'){
+		fs.copy(dir_src, dir_dest);
+		this.output.verbose_log(`Copied "fs-extra" sync [${dir_src}] to [${dir_dest}]`, context);
+	}
 	
 	public copy_file_async(src:string, dest:string, context='cp_f'){
 		fs.copyFile(src, dest, () => {

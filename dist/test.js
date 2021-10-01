@@ -44,7 +44,7 @@ const cmd = 'git clone ssh+git://git@bitbucket.org/nbl7/urn-dot.git /home/nbl7/t
 // const cmd = 'ls -a';
 function run() {
     return new Promise((res, rej) => {
-        spa.spin(cmd, 'tst', 'action', res, rej);
+        spa.spin(cmd, 'tst', 'action', undefined, res, rej);
     });
 }
 run().then(() => {

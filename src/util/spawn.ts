@@ -32,24 +32,24 @@ class Spawn {
 		cp.execSync(command);
 	}
 	
-	public spin(command:string, context:string, action:string, resolve?:Resolve, reject?:Reject){
-		return this._spawn(command, context, action, true, false, false, resolve, reject);
+	public spin(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+		return this._spawn(command, context, action, true, false, false, color, resolve, reject);
 	}
 	
-	public log(command:string, context:string, action:string, resolve?:Resolve, reject?:Reject){
-		return this._spawn(command, context, action, false, true, false, resolve, reject);
+	public log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+		return this._spawn(command, context, action, false, true, false, color, resolve, reject);
 	}
 	
-	public verbose_log(command:string, context:string, action:string, resolve?:Resolve, reject?:Reject){
-		return this._spawn(command, context, action, false, false, true, resolve, reject);
+	public verbose_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+		return this._spawn(command, context, action, false, false, true, color, resolve, reject);
 	}
 	
-	public spin_and_log(command:string, context:string, action:string, resolve?:Resolve, reject?:Reject){
-		return this._spawn(command, context, action, true, true, false, resolve, reject);
+	public spin_and_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+		return this._spawn(command, context, action, true, true, false, color, resolve, reject);
 	}
 	
-	public spin_and_verbose_log(command:string, context:string, action:string, resolve?:Resolve, reject?:Reject){
-		return this._spawn(command, context, action, true, false, true, resolve, reject);
+	public spin_and_verbose_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+		return this._spawn(command, context, action, true, false, true, color, resolve, reject);
 	}
 	
 	private _spawn(
@@ -59,6 +59,7 @@ class Spawn {
 		spin:boolean,
 		log:boolean,
 		verbose:boolean,
+		color?:string,
 		resolve?:Resolve,
 		reject?:Reject
 	){
@@ -66,16 +67,17 @@ class Spawn {
 			this.output.start_loading(command);
 		}
 		if(log){
-			this.output.log(command, context);
+			this.output.log(command, context, color);
 		}
 		if(verbose){
-			this.output.verbose_log(command, context);
+			this.output.verbose_log(command, context, color);
 		}
 		
-		const splitted_command = command.split(' ');
-		const first_command = splitted_command[0];
-		splitted_command.shift();
-		const child = cp.spawn(first_command, splitted_command);
+		// const splitted_command = command.split(' ');
+		// const first_command = splitted_command[0];
+		// splitted_command.shift();
+		// const child = cp.spawn(first_command, splitted_command);
+		const child = cp.spawn(command, {shell: true});
 		
 		if(child.stdout){
 			child.stdout.setEncoding('utf8');
@@ -91,10 +93,10 @@ class Spawn {
 						continue;
 					}
 					if(log){
-						this.output.log(plain_text, context);
+						this.output.log(plain_text, context, color);
 					}
 					if(verbose){
-						this.output.verbose_log(plain_text, context);
+						this.output.verbose_log(plain_text, context, color);
 					}
 				}
 			});
@@ -114,10 +116,10 @@ class Spawn {
 						continue;
 					}
 					if(log){
-						this.output.log(plain_text, context);
+						this.output.log(plain_text, context, color);
 					}
 					if(verbose){
-						this.output.verbose_log(plain_text, context);
+						this.output.verbose_log(plain_text, context, color);
 					}
 				}
 			});
