@@ -22,6 +22,7 @@ import {
 	dev_server,
 	dev_client,
 	transpose,
+	transpose_one,
 	build,
 	build_server,
 	build_client,
@@ -372,7 +373,7 @@ function _switch_command(args:Arguments){
 		}
 		case 'transpose':{
 			if(args._.length > 1 && typeof args._[1] === 'string'){
-				transpose({...process_params, file: args._[1]});
+				transpose_one(args._[1], process_params);
 			}else{
 				transpose(process_params);
 			}

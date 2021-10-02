@@ -310,7 +310,7 @@ function _switch_command(args) {
         }
         case 'transpose': {
             if (args._.length > 1 && typeof args._[1] === 'string') {
-                cmd_1.transpose(Object.assign(Object.assign({}, process_params), { file: args._[1] }));
+                cmd_1.transpose_one(args._[1], process_params);
             }
             else {
                 cmd_1.transpose(process_params);
