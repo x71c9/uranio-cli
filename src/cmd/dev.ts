@@ -33,9 +33,8 @@ const watc_color = '#687a6a';
 
 export async function dev(params:Partial<Params>):Promise<void>{
 	
-	_init_dev(params);
-	
-	// output_instance.start_loading(`Developing...`);
+	_init_params(params);
+	_init_dev();
 	
 	await _dev_server();
 	
@@ -45,24 +44,23 @@ export async function dev(params:Partial<Params>):Promise<void>{
 }
 
 export async function dev_server(params:Partial<Params>):Promise<void>{
-	_init_dev(params);
-	// output_instance.start_loading(`Developing server...`);
+	_init_params(params);
+	_init_dev();
 	await _dev_server();
 }
 
 export async function dev_client(params:Partial<Params>):Promise<void>{
-	_init_dev(params);
-	// output_instance.start_loading(`Developing client...`);
+	_init_params(params);
+	if(params.native != true){
+		_init_dev();
+	}
 	await _dev_client();
 }
 
 async function _dev_server(){
 	
-	output_instance.start_loading(`Developing server...`);
-	
 	const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
 	const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
-	
 	const cmd = `${cd_cmd} && ${ts_cmd}`;
 	
 	util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
@@ -71,25 +69,15 @@ async function _dev_server(){
 
 async function _dev_client(){
 	
-	output_instance.start_loading(`Developing client...`);
-	
-	// if(dev_params.deploy === 'netlify'){
-		
-	//   const cmd = `npx ntl dev`;
-	//   util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
-		
-	// }else if(dev_params.deploy === 'express'){
-		
 	const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/client`;
 	const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
 	const cmd = `${cd_cmd} && ${nu_cmd}`;
+	
 	util_instance.spawn.log(cmd, 'nuxt', 'developing client', nuxt_color);
-		
-	// }
 	
 }
 
-function _init_dev(params:Partial<Params>)
+function _init_params(params:Partial<Params>)
 		:void{
 	
 	params.spin = false;
@@ -101,6 +89,10 @@ function _init_dev(params:Partial<Params>)
 	util_instance = util.create(params, output_instance);
 	
 	util_instance.must_be_initialized();
+	
+}
+
+function _init_dev(){
 	
 	transpose(dev_params, true);
 	

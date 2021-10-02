@@ -496,7 +496,7 @@ function _update_package_aliases(){
 function _copy_dot_src_folder(){
 	const dot_src_folder =
 		`${init_params.root}/${defaults.tmp_folder}/urn-dot/src`;
-	const dest = `${init_params.root}/`;
+	const dest = `${init_params.root}/src`;
 	util_instance.fs.copy_directory(dot_src_folder, dest, 'dot');
 }
 

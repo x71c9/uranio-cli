@@ -93,14 +93,13 @@ function replace_file_aliases(filepath, aliases, params) {
     }
     const _project = new tsm.Project(_project_option);
     let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
-    // const {found, source} = _change_to_relative_statements(sourceFile, aliases);
-    const { source } = _change_to_relative_statements(sourceFile, aliases);
+    const { found, source } = _change_to_relative_statements(sourceFile, aliases);
     sourceFile = source;
-    // if(found === true){
-    //   const modified = sourceFile.print();
-    //   _replace_modified_file(modified, filepath);
-    //   util_instance.pretty(filepath);
-    // }
+    if (found === true) {
+        const modified = sourceFile.print();
+        _replace_modified_file(modified, filepath);
+        util_instance.pretty(filepath);
+    }
 }
 exports.replace_file_aliases = replace_file_aliases;
 function _init_alias(params) {
@@ -178,11 +177,11 @@ function _change_to_relative(node, aliases) {
     }
     return found;
 }
-// function _replace_modified_file(text:string, filename:string){
-//   output_instance.start_loading(`Writing manipulated file...`);
-//   util_instance.fs.write_file(filename, text);
-//   output_instance.done_verbose_log(`File replaced [${filename}].`, 'alias');
-// }
+function _replace_modified_file(text, filename) {
+    output_instance.start_loading(`Writing manipulated file...`);
+    util_instance.fs.write_file(filename, text);
+    output_instance.done_verbose_log(`File replaced [${filename}].`, 'alias');
+}
 // export const alias = {
 //   run: (options?:Partial<Options>):void => {
 //     common.init_run(options);

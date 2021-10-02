@@ -50,8 +50,8 @@ const tscw_color = '#734de3';
 const watc_color = '#687a6a';
 function dev(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_dev(params);
-        // output_instance.start_loading(`Developing...`);
+        _init_params(params);
+        _init_dev();
         yield _dev_server();
         const cmd = `npx ntl dev`;
         util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
@@ -60,23 +60,24 @@ function dev(params) {
 exports.dev = dev;
 function dev_server(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_dev(params);
-        // output_instance.start_loading(`Developing server...`);
+        _init_params(params);
+        _init_dev();
         yield _dev_server();
     });
 }
 exports.dev_server = dev_server;
 function dev_client(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_dev(params);
-        // output_instance.start_loading(`Developing client...`);
+        _init_params(params);
+        if (params.native != true) {
+            _init_dev();
+        }
         yield _dev_client();
     });
 }
 exports.dev_client = dev_client;
 function _dev_server() {
     return __awaiter(this, void 0, void 0, function* () {
-        output_instance.start_loading(`Developing server...`);
         const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/server`;
         const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
         const cmd = `${cd_cmd} && ${ts_cmd}`;
@@ -85,24 +86,20 @@ function _dev_server() {
 }
 function _dev_client() {
     return __awaiter(this, void 0, void 0, function* () {
-        output_instance.start_loading(`Developing client...`);
-        // if(dev_params.deploy === 'netlify'){
-        //   const cmd = `npx ntl dev`;
-        //   util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
-        // }else if(dev_params.deploy === 'express'){
         const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/client`;
         const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
         const cmd = `${cd_cmd} && ${nu_cmd}`;
         util_instance.spawn.log(cmd, 'nuxt', 'developing client', nuxt_color);
-        // }
     });
 }
-function _init_dev(params) {
+function _init_params(params) {
     params.spin = false;
     dev_params = common_1.merge_params(params);
     output_instance = output.create(params);
     util_instance = util.create(params, output_instance);
     util_instance.must_be_initialized();
+}
+function _init_dev() {
     transpose_1.transpose(dev_params, true);
     if (dev_params.repo === 'trx') {
         hooks_1.hooks(dev_params, true);

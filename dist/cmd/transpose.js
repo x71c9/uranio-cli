@@ -117,8 +117,8 @@ function _transpose_file(file_path, included = false) {
         util_instance.fs.copy_file(file_path, new_path_server, 'trsp');
         util_instance.fs.copy_file(file_path, new_path_client, 'trsp');
         if (path_1.default.extname(file_path) === '.ts') {
-            alias.replace_file_aliases(new_path_server, alias.get_aliases(`${base_folder}/server/tsconfig.json`));
-            alias.replace_file_aliases(new_path_client, alias.get_aliases(`${base_folder}/client/tsconfig.json`));
+            alias.replace_file_aliases(new_path_server, alias.get_aliases(`${base_folder}/server/tsconfig.json`, transpose_params));
+            alias.replace_file_aliases(new_path_client, alias.get_aliases(`${base_folder}/client/tsconfig.json`, transpose_params));
             _avoid_import_loop(new_path_server);
             _avoid_import_loop(new_path_client);
             output_instance.done_verbose_log(`Transposed file [${file_path}].`, 'trsp');
@@ -160,8 +160,8 @@ function _transpose_folder(dir_path, included = false) {
     }
 }
 function _copy_from_src_into_uranio_folder() {
-    util_instance.fs.copy(`${transpose_params.root}/src/`, `${transpose_params.root}/${defaults_1.defaults.folder}/client/src/`, `trsp`);
-    util_instance.fs.copy(`${transpose_params.root}/src/`, `${transpose_params.root}/${defaults_1.defaults.folder}/server/src/`, `trsp`);
+    util_instance.fs.copy_directory(`${transpose_params.root}/src/`, `${transpose_params.root}/${defaults_1.defaults.folder}/client/src/`, `trsp`);
+    util_instance.fs.copy_directory(`${transpose_params.root}/src/`, `${transpose_params.root}/${defaults_1.defaults.folder}/server/src/`, `trsp`);
     util_instance.fs.remove_file(`${transpose_params.root}/${defaults_1.defaults.folder}/server/src/book.ts`, `book`);
     util_instance.fs.remove_file(`${transpose_params.root}/${defaults_1.defaults.folder}/client/src/book.ts`, `book`);
 }
@@ -307,12 +307,12 @@ function _resolve_aliases() {
     output_instance.start_loading(`Replacing aliases with relative paths...`);
     const base_folder = `${transpose_params.root}/${defaults_1.defaults.folder}`;
     const tsconfig_server = `${base_folder}/server/tsconfig.json`;
-    const aliases_server = alias.get_aliases(tsconfig_server);
+    const aliases_server = alias.get_aliases(tsconfig_server, transpose_params);
     const server_dir = `${transpose_params.root}/${defaults_1.defaults.folder}/server/src/`;
     _traverse_ts_resolve_aliases(server_dir, aliases_server);
     output_instance.done_log(`Server aliases replaced.`, 'alias');
     const tsconfig_client = `${base_folder}/client/tsconfig.json`;
-    const aliases_client = alias.get_aliases(tsconfig_client);
+    const aliases_client = alias.get_aliases(tsconfig_client, transpose_params);
     const client_dir = `${transpose_params.root}/${defaults_1.defaults.folder}/client/src/`;
     _traverse_ts_resolve_aliases(client_dir, aliases_client);
     output_instance.done_log(`Client aliases replaced.`, 'alias');
@@ -334,7 +334,7 @@ function _traverse_ts_resolve_aliases(directory, aliases) {
             return _traverse_ts_resolve_aliases(full_path, aliases);
         }
         else if (filename.split('.').pop() === 'ts') {
-            alias.replace_file_aliases(full_path, aliases);
+            alias.replace_file_aliases(full_path, aliases, transpose_params);
         }
     });
 }
@@ -769,11 +769,11 @@ function _create_a_book_file(file_path, text) {
 //   const base_folder = `${transpose_params.root}/${defaults.folder}`;
 //   const books_dir_server = `${base_folder}/server/books/`;
 //   const tsconfig_server = `${base_folder}/server/tsconfig.json`;
-//   const aliases_server = alias.get_aliases(tsconfig_server);
+//   const aliases_server = alias.get_aliases(tsconfig_server, transpose_params);
 //   _traverse_ts_resolve_aliases(books_dir_server, aliases_server);
 //   const books_dir_client = `${base_folder}/client/books/`;
 //   const tsconfig_client = `${base_folder}/client/tsconfig.json`;
-//   const aliases_client = alias.get_aliases(tsconfig_client);
+//   const aliases_client = alias.get_aliases(tsconfig_client, transpose_params);
 //   _traverse_ts_resolve_aliases(books_dir_client, aliases_client);
 //
 //   output_instance.done_verbose_log(`Replaced aliases with relative paths.`, 'alias');
