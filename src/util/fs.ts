@@ -4,9 +4,10 @@
  * @packageDocumentation
  */
 
-import fs from 'fs-extra';
+// import fs from 'fs-extra';
+import fs from 'fs';
 
-// import path from 'path';
+import path from 'path';
 
 import * as out from '../output/';
 
@@ -66,11 +67,6 @@ class FS {
 		this.output.verbose_log(`Created directory sync [${dir_path}]`, context);
 	}
 	
-	public copy(dir_src:string, dir_dest:string, context='cpp'){
-		fs.copy(dir_src, dir_dest);
-		this.output.verbose_log(`Copied "fs-extra" sync [${dir_src}] to [${dir_dest}]`, context);
-	}
-	
 	public copy_file_async(src:string, dest:string, context='cp_f'){
 		fs.copyFile(src, dest, () => {
 			this.output.verbose_log(`Copied file async [${src}] to [${dest}]`, context);
@@ -82,36 +78,70 @@ class FS {
 		this.output.verbose_log(`Copied file sync [${src}] to [${dest}]`, context);
 	}
 	
-	public copy_directory_async(src:string, dest:string, context='cp_d'){
-		fs.copy(src, dest, {recursive: true}, () => {
-			this.output.verbose_log(`Copied directory async [${src}] to [${dest}]`, context);
-		});
-	}
+	// public copy_directory_async(src:string, dest:string, context='cp_d'){
+	//   fs.copy(src, dest, {recursive: true}, () => {
+	//     this.output.verbose_log(`Copied directory async [${src}] to [${dest}]`, context);
+	//   });
+	// }
 	
+	/**
+	 * It will copy all files in src folder inside dest folder.
+	 * If dest folder does not exist it will create it.
+	 */
 	public copy_directory(src:string, dest:string, context='cp_d'){
-		fs.copySync(src, dest, {recursive: true});
+		// fs.copySync(src, dest, {recursive: true});
+		if(!fs.lstatSync(src).isDirectory()) {
+			this.output.error_log(`Provided src path is not a directory [${src}]`, context);
+			process.exit(1);
+		}
+		if(!fs.existsSync(dest)) {
+			fs.mkdirSync(dest, {recursive: true});
+		}
+		const files = fs.readdirSync(src);
+		for(let i = 0; i < files.length; i++){
+			const file = files[i];
+			const current_src = path.join(src, file);
+			const target_src = path.join(dest, path.basename(current_src));
+			if(fs.lstatSync(current_src).isDirectory()) {
+				this.copy_directory(current_src, target_src);
+			}else{
+				this.copy_file(current_src, target_src);
+			}
+		}
 		this.output.verbose_log(`Copied directory sync [${src}] to [${dest}]`, context);
 	}
 	
 	public remove_file_async(file_path:string, context='rm_f'){
-		fs.remove(file_path, () => {
+		if(!fs.existsSync(file_path)){
+			return;
+		}
+		fs.unlink(file_path, () => {
 			this.output.verbose_log(`Removed file async [${file_path}]`, context);
 		});
 	}
 	
 	public remove_file(file_path:string, context='rm_f'){
-		fs.removeSync(file_path);
-		this.output.verbose_log(`Removed file sync sync [${file_path}]`, context);
+		if(!fs.existsSync(file_path)){
+			return;
+		}
+		fs.unlinkSync(file_path);
+		this.output.verbose_log(`Removed file sync [${file_path}]`, context);
 	}
 	
 	public remove_directory_async(dir_path:string, context='rm_d'){
-		fs.remove(dir_path, () => {
+		if(!fs.existsSync(dir_path)){
+			return;
+		}
+		fs.rmdir(dir_path, {recursive: true}, () => {
 			this.output.verbose_log(`Removed directory async [${dir_path}]`, context);
 		});
 	}
 	
 	public remove_directory(dir_path:string, context='rm_d'){
-		fs.removeSync(dir_path);
+		if(!fs.existsSync(dir_path)){
+			return;
+		}
+		fs.rmdirSync(dir_path, {recursive: true});
 		this.output.verbose_log(`Removed directory sync [${dir_path}]`, context);
 	}
 	
