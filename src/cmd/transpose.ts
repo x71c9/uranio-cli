@@ -37,7 +37,7 @@ let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
 
-let transpose_params = default_params as Params & {file?: string};
+let transpose_params = default_params as Params;
 
 const _project_option = {
 	manipulationSettings: {
@@ -46,8 +46,38 @@ const _project_option = {
 	}
 };
 
-export async function transpose(params:Partial<Params> & {file?: string}, included=false)
+export async function transpose(params:Partial<Params>, included=false)
 		:Promise<void>{
+	
+	_init_tranpose(params);
+	
+	_transpose_all(included);
+	
+}
+
+export async function transpose_one(full_path:string, params:Partial<Params>, included=false)
+		:Promise<void>{
+	
+	_init_tranpose(params);
+	
+	if(typeof full_path !== 'string' || full_path === ''){
+		output_instance.error_log('Invalid path.', 'trsp');
+		process.exit(1);
+	}
+		
+	const parsed_path = path.parse(full_path);
+	if(typeof parsed_path.ext === 'string' && parsed_path.ext !== ''){
+		
+		_transpose_file(full_path, included);
+		
+	}else{
+		
+		_transpose_folder(full_path, included);
+		
+	}
+}
+
+function _init_tranpose(params:Partial<Params>){
 	
 	transpose_params = merge_params(params);
 	
@@ -57,24 +87,6 @@ export async function transpose(params:Partial<Params> & {file?: string}, includ
 	
 	util_instance.must_be_initialized();
 	
-	if(typeof params.file === 'string'){
-		
-		const parsed_path = path.parse(params.file);
-		if(typeof parsed_path.ext === 'string' && parsed_path.ext !== ''){
-			
-			_transpose_file(params.file);
-			
-		}else{
-			
-			_transpose_folder(params.file);
-			
-		}
-		
-	}else{
-		
-		_transpose_all(included);
-		
-	}
 }
 
 function _transpose_all(included=false){
@@ -95,64 +107,47 @@ function _transpose_all(included=false){
 	
 }
 
-function _transpose_file(file_path?:string){
+function _transpose_file(file_path:string, included=false){
 	
-	const filepath = (!file_path && typeof transpose_params.file === 'string') ?
-		transpose_params.file : file_path;
-	
-	if(filepath === `${transpose_params.root}/src/book.ts`){
+	if(file_path === `${transpose_params.root}/src/book.ts`){
 		
 		_transpose_book();
 		
-	}else{
-			
-		const src_path = `${transpose_params.root}/src/`;
-		
-		if(filepath && util_instance.fs.exists(filepath) && filepath.includes(`${transpose_params.root}/src/`)){
-			
-			const base_folder = `${transpose_params.root}/${defaults.folder}`;
-			const new_path_server = filepath.replace(src_path, `${base_folder}/server/src/`);
-			const new_path_client = filepath.replace(src_path, `${base_folder}/client/src/`);
-			util_instance.fs.copy_file(filepath, new_path_server, 'trsp');
-			util_instance.fs.copy_file(filepath, new_path_client, 'trsp');
-			
-			if(path.extname(filepath) === '.ts'){
-				alias.replace_file_aliases(new_path_server, alias.get_aliases(`${base_folder}/server/tsconfig.json`));
-				alias.replace_file_aliases(new_path_client, alias.get_aliases(`${base_folder}/client/tsconfig.json`));
-				_avoid_import_loop(new_path_server);
-				_avoid_import_loop(new_path_client);
-				output_instance.done_verbose_log(`Transposed file [${filepath}].`, 'trsp');
-			}
-			
-		}else{
-			let err_msg = '';
-			err_msg += `Invalid file path [${filepath}].`;
-			err_msg += ` File must be in [${transpose_params.root}/src/].`;
-			output_instance.error_log(err_msg, 'trsp');
+		if(!included){
+			output_instance.done_log(`Transpose book completed.`);
 		}
 		
-	}
-	
-}
-
-function _transpose_folder(dir_path?:string){
-	
-	const dirpath = (!dir_path && typeof transpose_params.file === 'string') ?
-		transpose_params.file : dir_path;
-	
-	if(!dirpath){
-		output_instance.error_log(`Invalid dir path [${dirpath}].`, 'trsp');
 		return;
 	}
 	
-	util_instance.fs.read_dir(dirpath).forEach((filename) => {
-		const full_path = path.resolve(dirpath, filename);
-		if (util_instance.fs.is_directory(full_path) && filename !== '.git'){
-			return _transpose_folder(full_path);
-		}else{
-			return _transpose_file(full_path);
+	const src_path = `${transpose_params.root}/src/`;
+	
+	if(file_path && util_instance.fs.exists(file_path) && file_path.includes(`${transpose_params.root}/src/`)){
+		
+		const base_folder = `${transpose_params.root}/${defaults.folder}`;
+		const new_path_server = file_path.replace(src_path, `${base_folder}/server/src/`);
+		const new_path_client = file_path.replace(src_path, `${base_folder}/client/src/`);
+		util_instance.fs.copy_file(file_path, new_path_server, 'trsp');
+		util_instance.fs.copy_file(file_path, new_path_client, 'trsp');
+		
+		if(path.extname(file_path) === '.ts'){
+			alias.replace_file_aliases(new_path_server, alias.get_aliases(`${base_folder}/server/tsconfig.json`));
+			alias.replace_file_aliases(new_path_client, alias.get_aliases(`${base_folder}/client/tsconfig.json`));
+			_avoid_import_loop(new_path_server);
+			_avoid_import_loop(new_path_client);
+			output_instance.done_verbose_log(`Transposed file [${file_path}].`, 'trsp');
 		}
-	});
+		
+	}else{
+		let err_msg = '';
+		err_msg += `Invalid file path [${file_path}].`;
+		err_msg += ` File must be in [${transpose_params.root}/src/].`;
+		output_instance.error_log(err_msg, 'trsp');
+	}
+	
+	if(!included){
+		output_instance.done_log(`Transpose file completed.`);
+	}
 }
 
 function _transpose_book(){
@@ -178,6 +173,20 @@ function _transpose_book(){
 	
 	util_instance.fs.remove_directory(tmp_book_folder, 'trbo');
 	
+}
+
+function _transpose_folder(dir_path:string, included=false){
+	util_instance.fs.read_dir(dir_path).forEach((filename) => {
+		const full_path = path.resolve(dir_path, filename);
+		if (util_instance.fs.is_directory(full_path) && filename !== '.git'){
+			return _transpose_folder(full_path);
+		}else{
+			return _transpose_file(full_path);
+		}
+	});
+	if(!included){
+		output_instance.done_log(`Transpose folder completed.`);
+	}
 }
 
 function _copy_from_src_into_uranio_folder(){
@@ -209,7 +218,7 @@ type ExpressionList = {
 	[k:string]: string[]
 }
 
-function _avoid_import_loop(filepath:string){
+function _avoid_import_loop(file_path:string){
 	
 	const modules:ModuleList = {};
 	const expressions:ExpressionList = {};
@@ -217,7 +226,7 @@ function _avoid_import_loop(filepath:string){
 	let uranio_import_state = '';
 	
 	const _project = new tsm.Project(_project_option);
-	const sourceFile = _project.addSourceFileAtPath(`${filepath}`);
+	const sourceFile = _project.addSourceFileAtPath(`${file_path}`);
 	const import_decls = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.ImportDeclaration);
 	let uranio_var_name = '';
 	
@@ -295,12 +304,12 @@ function _avoid_import_loop(filepath:string){
 	
 	const import_states:string[] = [];
 	
-	const is_server_folder = (filepath.includes(`${transpose_params.root}/${defaults.folder}/server/`));
-	// const is_client_folder = (filepath.includes(`${transpose_params.root}/${defaults.folder}/client/`));
+	const is_server_folder = (file_path.includes(`${transpose_params.root}/${defaults.folder}/server/`));
+	// const is_client_folder = (file_path.includes(`${transpose_params.root}/${defaults.folder}/client/`));
 	
 	const parent_folder = (is_server_folder) ? 'server' : 'client';
 	
-	const folderpath = path.parse(filepath).dir;
+	const folderpath = path.parse(file_path).dir;
 	const lib_path = `${transpose_params.root}/${defaults.folder}/${parent_folder}/src/${defaults.repo_folder}/`;
 	const relative_root = path.relative(folderpath, lib_path);
 
@@ -335,8 +344,8 @@ function _avoid_import_loop(filepath:string){
 		}
 		
 		if(is_file_importing_uranio){
-			util_instance.fs.write_file(filepath, with_imports_and_variables);
-			util_instance.pretty(filepath);
+			util_instance.fs.write_file(file_path, with_imports_and_variables);
+			util_instance.pretty(file_path);
 		}
 	}
 }
@@ -425,7 +434,7 @@ function _traverse_ts_avoid_import_loop(directory:string) {
 	});
 }
 
-function _manipulate_and_create_files(filepath:string){
+function _manipulate_and_create_files(file_path:string){
 	const action = `manipulating [src/book.ts]`;
 	
 	output_instance.start_loading(`${action[0].toUpperCase()}${action.substr(1)}...`);
@@ -436,7 +445,7 @@ function _manipulate_and_create_files(filepath:string){
 	
 	const _project = new tsm.Project(_project_option);
 	
-	let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
+	let sourceFile = _project.addSourceFileAtPath(`${file_path}`);
 	
 	sourceFile = _replace_comments(sourceFile);
 	// sourceFile = _change_realtive_imports(sourceFile);
@@ -624,8 +633,8 @@ function _create_dock_book(sourceFile:tsm.SourceFile, import_statements:string[]
 	);
 	source_file = _fill_empty_docks(source_file);
 	
-	const filepath = `${transpose_params.root}/${defaults.folder}/server/src/books/dock.ts`;
-	_create_a_book_file(filepath, source_file.getText());
+	const file_path = `${transpose_params.root}/${defaults.folder}/server/src/books/dock.ts`;
+	_create_a_book_file(file_path, source_file.getText());
 	
 	return source_file;
 }
@@ -642,8 +651,8 @@ function _create_routes_book(sourceFile:tsm.SourceFile, import_statements:string
 	source_file = _fill_empty_docks(source_file);
 	source_file = _remove_dock_route_call_implementation(source_file);
 	
-	const filepath = `${transpose_params.root}/${defaults.folder}/server/src/books/routes.ts`;
-	_create_a_book_file(filepath, source_file.getText());
+	const file_path = `${transpose_params.root}/${defaults.folder}/server/src/books/routes.ts`;
+	_create_a_book_file(file_path, source_file.getText());
 	
 	return source_file;
 }
@@ -682,9 +691,9 @@ function _generate_client_book(book_name:BookName, required_props:string[]){
 		const imports = _copy_imports(sourceFile);
 		const required_imports = _get_required_imports(imports, text_without_imports);
 		const text = required_imports.join('\n') + text_without_imports;
-		const filepath = `${client_books_dir}/${book_name}.ts`;
-		util_instance.fs.write_file(filepath, text);
-		util_instance.pretty(filepath);
+		const file_path = `${client_books_dir}/${book_name}.ts`;
+		util_instance.fs.write_file(file_path, text);
+		util_instance.pretty(file_path);
 		output_instance.done_log(`Generated client book [${book_name}].`, 'clnt');
 	
 	}else{
@@ -721,9 +730,9 @@ function _create_a_book(
 			cloned_book_decl = _add_as_const(cloned_book_decl);
 		}
 		const required_imports = _get_required_imports(import_statements, cloned_book_source.getText());
-		const filepath = `${transpose_params.root}/${defaults.folder}/server/src/books/${book_name}.ts`;
+		const file_path = `${transpose_params.root}/${defaults.folder}/server/src/books/${book_name}.ts`;
 		const text = `\n` + required_imports.join('\n') + cloned_book_source.getText();
-		_create_a_book_file(filepath, text);
+		_create_a_book_file(file_path, text);
 		output_instance.done_log(`Generated server book [${book_name}].`, book_name);
 		cloned_book_source.replaceWithText(text);
 		return cloned_book_source;
@@ -985,10 +994,10 @@ function _find_book_statement(sourceFile:tsm.SourceFile, book_name:string)
 	return undefined;
 }
 
-function _create_a_book_file(filepath:string, text:string){
-	output_instance.start_loading(`Creating book file [${filepath}]...`);
-	util_instance.fs.remove_file(filepath, 'book');
-	util_instance.fs.create_file(filepath, 'book');
+function _create_a_book_file(file_path:string, text:string){
+	output_instance.start_loading(`Creating book file [${file_path}]...`);
+	util_instance.fs.remove_file(file_path, 'book');
+	util_instance.fs.create_file(file_path, 'book');
 	let comment = '';
 	comment += `/**\n`;
 	comment += ` *\n`;
@@ -996,9 +1005,9 @@ function _create_a_book_file(filepath:string, text:string){
 	comment += ` *\n`;
 	comment += ` */\n`;
 	const content = comment + text;
-	util_instance.fs.write_file(filepath, content);
-	util_instance.pretty(filepath);
-	output_instance.done_verbose_log(`Created book file [${filepath}].`, 'book');
+	util_instance.fs.write_file(file_path, content);
+	util_instance.pretty(file_path);
+	output_instance.done_verbose_log(`Created book file [${file_path}].`, 'book');
 }
 
 
@@ -1233,10 +1242,10 @@ function _keep_only_client_second_level_properties(sourceFile:tsm.SourceFile, bo
 
 
 // export const transpose = {
-//   run: (root:string, filepath?:string, options?:Partial<Options>):void => {
+//   run: (root:string, file_path?:string, options?:Partial<Options>):void => {
 //     transpose_params.root = root;
-//     if(typeof filepath === 'string'){
-//       transpose_params.file = util_instance.relative_to_absolute_path(filepath);
+//     if(typeof file_path === 'string'){
+//       transpose_params.file = util_instance.relative_to_absolute_path(file_path);
 //     }
 //     common.init_run(options);
 //     transpose.command();
@@ -1245,9 +1254,9 @@ function _keep_only_client_second_level_properties(sourceFile:tsm.SourceFile, bo
 //     output_instance.start_loading('Transposing...');
 //     util_instance.read_rc_file();
 //     if(args && args.file){
-//       const filepath = args.file;
-//       if(typeof filepath === 'string' && filepath !== ''){
-//         transpose_params.file = util_instance.relative_to_absolute_path(filepath);
+//       const file_path = args.file;
+//       if(typeof file_path === 'string' && file_path !== ''){
+//         transpose_params.file = util_instance.relative_to_absolute_path(file_path);
 //       }
 //     }
 //     if(typeof transpose_params.file === 'string'){

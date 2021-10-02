@@ -12,13 +12,11 @@ import {default_params, defaults} from '../conf/defaults';
 
 import {Params} from '../types';
 
-import {transpose} from './transpose';
+import {transpose, transpose_one} from './transpose';
 
 import {hooks} from './hooks';
 
 import {merge_params} from './common';
-
-// import {DevParams} from './types';
 
 let output_instance:output.OutputInstance;
 
@@ -26,16 +24,8 @@ let util_instance:util.UtilInstance;
 
 let dev_params = default_params as Params;
 
-// let watch_client_scanned = false;
-// let watch_server_scanned = false;
-// let watch_book_scanned = false;
 let watch_lib_scanned = false;
 let watch_src_scanned = false;
-
-// const cli_options = {
-//   hide: false,
-//   verbose: true,
-// };
 
 const nuxt_color = '#677cc7';
 const tscw_color = '#734de3';
@@ -45,22 +35,24 @@ export async function dev(params:Partial<Params>):Promise<void>{
 	
 	_init_dev(params);
 	
-	output_instance.start_loading(`Developing...`);
+	// output_instance.start_loading(`Developing...`);
 	
 	await _dev_server();
-	await _dev_client();
+	
+	const cmd = `npx ntl dev`;
+	util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
 	
 }
 
 export async function dev_server(params:Partial<Params>):Promise<void>{
 	_init_dev(params);
-	output_instance.start_loading(`Developing server...`);
+	// output_instance.start_loading(`Developing server...`);
 	await _dev_server();
 }
 
 export async function dev_client(params:Partial<Params>):Promise<void>{
 	_init_dev(params);
-	output_instance.start_loading(`Developing client...`);
+	// output_instance.start_loading(`Developing client...`);
 	await _dev_client();
 }
 
@@ -81,12 +73,19 @@ async function _dev_client(){
 	
 	output_instance.start_loading(`Developing client...`);
 	
+	// if(dev_params.deploy === 'netlify'){
+		
+	//   const cmd = `npx ntl dev`;
+	//   util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
+		
+	// }else if(dev_params.deploy === 'express'){
+		
 	const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/client`;
 	const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
-	
 	const cmd = `${cd_cmd} && ${nu_cmd}`;
-	
 	util_instance.spawn.log(cmd, 'nuxt', 'developing client', nuxt_color);
+		
+	// }
 	
 }
 
@@ -102,6 +101,12 @@ function _init_dev(params:Partial<Params>)
 	util_instance = util.create(params, output_instance);
 	
 	util_instance.must_be_initialized();
+	
+	transpose(dev_params, true);
+	
+	if(dev_params.repo === 'trx'){
+		hooks(dev_params, true);
+	}
 	
 	_watch();
 	
@@ -126,7 +131,7 @@ function _watch(){
 				return false;
 			}
 			if(event !== 'unlink'){
-				transpose({...dev_params, file: path}, true);
+				transpose_one(path, dev_params, true);
 				if(dev_params.repo === 'trx'){
 					hooks(dev_params, true);
 				}
@@ -141,6 +146,7 @@ function _watch(){
 			_replace_netlify_function_file();
 		}
 	);
+	
 	const lib_path = `${dev_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}/`;
 	output_instance.log(`Watching uranio repo folder [${lib_path}] ...`, 'wtch');
 	util_instance.watch(
@@ -158,6 +164,7 @@ function _watch(){
 			_replace_netlify_function_file();
 		}
 	);
+	
 }
 
 function _replace_netlify_function_file(){
@@ -177,7 +184,7 @@ function _replace_netlify_function_file(){
 		new_content += `\n// ${update_number + 1}`;
 	}
 	util_instance.fs.write_file(api_file_path, new_content, 'utf8');
-	output_instance.verbose_log(`Replacing Netlify serverless function file.`, 'less');
+	output_instance.done_verbose_log(`Replaced Netlify serverless function file.`, 'less');
 }
 
 

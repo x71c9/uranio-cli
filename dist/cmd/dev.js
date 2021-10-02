@@ -40,35 +40,28 @@ const defaults_1 = require("../conf/defaults");
 const transpose_1 = require("./transpose");
 const hooks_1 = require("./hooks");
 const common_1 = require("./common");
-// import {DevParams} from './types';
 let output_instance;
 let util_instance;
 let dev_params = defaults_1.default_params;
-// let watch_client_scanned = false;
-// let watch_server_scanned = false;
-// let watch_book_scanned = false;
 let watch_lib_scanned = false;
 let watch_src_scanned = false;
-// const cli_options = {
-//   hide: false,
-//   verbose: true,
-// };
 const nuxt_color = '#677cc7';
 const tscw_color = '#734de3';
 const watc_color = '#687a6a';
 function dev(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_dev(params);
-        output_instance.start_loading(`Developing...`);
+        // output_instance.start_loading(`Developing...`);
         yield _dev_server();
-        yield _dev_client();
+        const cmd = `npx ntl dev`;
+        util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
     });
 }
 exports.dev = dev;
 function dev_server(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_dev(params);
-        output_instance.start_loading(`Developing server...`);
+        // output_instance.start_loading(`Developing server...`);
         yield _dev_server();
     });
 }
@@ -76,7 +69,7 @@ exports.dev_server = dev_server;
 function dev_client(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_dev(params);
-        output_instance.start_loading(`Developing client...`);
+        // output_instance.start_loading(`Developing client...`);
         yield _dev_client();
     });
 }
@@ -93,10 +86,15 @@ function _dev_server() {
 function _dev_client() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Developing client...`);
+        // if(dev_params.deploy === 'netlify'){
+        //   const cmd = `npx ntl dev`;
+        //   util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
+        // }else if(dev_params.deploy === 'express'){
         const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/client`;
         const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
         const cmd = `${cd_cmd} && ${nu_cmd}`;
         util_instance.spawn.log(cmd, 'nuxt', 'developing client', nuxt_color);
+        // }
     });
 }
 function _init_dev(params) {
@@ -105,6 +103,10 @@ function _init_dev(params) {
     output_instance = output.create(params);
     util_instance = util.create(params, output_instance);
     util_instance.must_be_initialized();
+    transpose_1.transpose(dev_params, true);
+    if (dev_params.repo === 'trx') {
+        hooks_1.hooks(dev_params, true);
+    }
     _watch();
 }
 function _watch() {
@@ -119,7 +121,7 @@ function _watch() {
             return false;
         }
         if (event !== 'unlink') {
-            transpose_1.transpose(Object.assign(Object.assign({}, dev_params), { file: path }), true);
+            transpose_1.transpose_one(path, dev_params, true);
             if (dev_params.repo === 'trx') {
                 hooks_1.hooks(dev_params, true);
             }
@@ -165,7 +167,7 @@ function _replace_netlify_function_file() {
         new_content += `\n// ${update_number + 1}`;
     }
     util_instance.fs.write_file(api_file_path, new_content, 'utf8');
-    output_instance.verbose_log(`Replacing Netlify serverless function file.`, 'less');
+    output_instance.done_verbose_log(`Replaced Netlify serverless function file.`, 'less');
 }
 // export const dev = {
 //   command: async ():Promise<void> => {
