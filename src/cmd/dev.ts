@@ -10,7 +10,7 @@ import * as util from '../util/';
 
 import {default_params, defaults} from '../conf/defaults';
 
-import {Params} from '../types';
+import {Params, valid_hooks_repos} from '../types';
 
 import {transpose, transpose_one} from './transpose';
 
@@ -96,7 +96,7 @@ function _init_dev(){
 	
 	transpose(dev_params, true);
 	
-	if(dev_params.repo === 'trx'){
+	if(dev_params.repo in valid_hooks_repos()){
 		hooks(dev_params, true);
 	}
 	
@@ -124,7 +124,7 @@ function _watch(){
 			}
 			if(event !== 'unlink'){
 				transpose_one(path, dev_params, true);
-				if(dev_params.repo === 'trx'){
+				if(dev_params.repo in valid_hooks_repos()){
 					hooks(dev_params, true);
 				}
 				output_instance.done_log(`[Book watch] Transposed [${path}].`, 'wtch');

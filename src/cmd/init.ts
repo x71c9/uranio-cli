@@ -19,7 +19,8 @@ import {
 	Params,
 	abstract_repos,
 	abstract_pacman,
-	abstract_deploy
+	abstract_deploy,
+	valid_deploy_repos
 } from '../types';
 
 import {alias} from './alias';
@@ -130,7 +131,7 @@ function _log_important_params(){
 		`Selected pacman: [${init_params.pacman}]`,
 		'repo'
 	);
-	if(init_params.repo === 'api' || init_params.repo === 'trx'){
+	if(init_params.repo in valid_deploy_repos()){
 		output_instance.verbose_log(
 			`Selected deploy: [${init_params.deploy}]`,
 			'dply'
@@ -330,6 +331,10 @@ async function _clone_and_install_repo(){
 			await _clone_trx();
 			break;
 		}
+		case 'adm':{
+			await _clone_adm();
+			break;
+		}
 		default:{
 			output_instance.error_log(
 				`Selected repo is not valid. [${init_params.repo}]`,
@@ -463,6 +468,15 @@ function _update_package_aliases(){
 			'uranio-books': `./dist/${defaults.folder}/server/src/books/`,
 		};
 		switch(init_params.repo){
+			case 'adm':{
+				package_data['_moduleAliases']['uranio-trx'] =
+					`./dist/${defaults.folder}/server/src/${defaults.repo_folder}/trx/`;
+				package_data['_moduleAliases']['uranio-api'] =
+					`./dist/${defaults.folder}/server/src/${defaults.repo_folder}/trx/api/`;
+				package_data['_moduleAliases']['uranio-core'] =
+					`./dist/${defaults.folder}/server/src/${defaults.repo_folder}/trx/api/core/`;
+				break;
+			}
 			case 'trx':{
 				package_data['_moduleAliases']['uranio-api'] =
 					`./dist/${defaults.folder}/server/src/${defaults.repo_folder}/api/`;
@@ -545,7 +559,10 @@ function _copy_netlify_files(){
 	if(!util_instance.fs.exists(function_folder)){
 		util_instance.fs.create_directory(function_folder);
 	}
-	let api_file = `trx-api.txt`;
+	let api_file = `adm-api.txt`;
+	if(init_params.repo === 'trx'){
+		api_file = `trx-api.txt`;
+	}
 	if(init_params.repo === 'api'){
 		api_file = `api-api.txt`;
 	}
@@ -617,6 +634,23 @@ async function _clone_trx(){
 	output_instance.done_log(`Cloned trx repo.`, 'trx');
 }
 
+async function _clone_adm(){
+	output_instance.start_loading(`Cloning adm...`);
+	await util_instance.cmd.clone_repo_recursive(
+		defaults.adm_repo,
+		`${init_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}`,
+		'adm',
+		init_params.branch
+	);
+	await util_instance.cmd.clone_repo_recursive(
+		defaults.adm_repo,
+		`${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
+		'adm',
+		init_params.branch
+	);
+	output_instance.done_log(`Cloned adm repo.`, 'adm');
+}
+
 async function _install_dep()
 		:Promise<true>{
 	const pack_data = util_instance.cmd.get_package_data(
@@ -625,6 +659,7 @@ async function _install_dep()
 	await _uninstall_core_dep(pack_data);
 	await _uninstall_api_dep(pack_data);
 	await _uninstall_trx_dep(pack_data);
+	await _uninstall_adm_dep(pack_data);
 	switch(init_params.repo){
 		case 'core':{
 			await _install_core_dep();
@@ -639,7 +674,7 @@ async function _install_dep()
 			return true;
 		}
 		case 'adm':{
-			// await _install_adm_dep();
+			await _install_adm_dep();
 			return true;
 		}
 		default:{
@@ -667,6 +702,12 @@ async function _uninstall_api_dep(pack_data?:any){
 async function _uninstall_trx_dep(pack_data?:any){
 	await _uninstall_dep(defaults.trx_dep_repo, 'trx', pack_data);
 	await _uninstall_dep(defaults.trx_dep_dev_repo, 'trx', pack_data);
+	return true;
+}
+
+async function _uninstall_adm_dep(pack_data?:any){
+	await _uninstall_dep(defaults.adm_dep_repo, 'adm', pack_data);
+	await _uninstall_dep(defaults.adm_dep_dev_repo, 'adm', pack_data);
 	return true;
 }
 
@@ -707,5 +748,13 @@ async function _install_trx_dep(){
 	await util_instance.cmd.install_dep(defaults.trx_dep_repo, 'trx');
 	await util_instance.cmd.install_dep_dev(defaults.trx_dep_dev_repo, 'trx');
 	output_instance.done_log(`Installed trx dependencies.`, 'trx');
+	return true;
+}
+
+async function _install_adm_dep(){
+	output_instance.start_loading(`Installing adm dep...`);
+	await util_instance.cmd.install_dep(defaults.adm_dep_repo, 'adm');
+	await util_instance.cmd.install_dep_dev(defaults.adm_dep_dev_repo, 'adm');
+	output_instance.done_log(`Installed adm dependencies.`, 'adm');
 	return true;
 }

@@ -42,6 +42,21 @@ export const abstract_repos = {
 	adm: ''
 } as const;
 
+export const abstract_deploy_repos = {
+	api: '',
+	trx: '',
+	adm: ''
+} as const;
+
+export const abstract_hooks_repos = {
+	trx: '',
+	adm: ''
+} as const;
+
+export const abstract_admin_repos = {
+	adm: ''
+} as const;
+
 export const abstract_pacman = {
 	yarn: '',
 	npm: '',
@@ -56,6 +71,33 @@ export function valid_repos()
 		:string[]{
 	const vals:string[] = [];
 	for(const k in abstract_repos){
+		vals.push(k);
+	}
+	return vals;
+}
+
+export function valid_deploy_repos()
+		:string[]{
+	const vals:string[] = [];
+	for(const k in abstract_deploy_repos){
+		vals.push(k);
+	}
+	return vals;
+}
+
+export function valid_hooks_repos()
+		:string[]{
+	const vals:string[] = [];
+	for(const k in abstract_hooks_repos){
+		vals.push(k);
+	}
+	return vals;
+}
+
+export function valid_admin_repos()
+		:string[]{
+	const vals:string[] = [];
+	for(const k in abstract_admin_repos){
 		vals.push(k);
 	}
 	return vals;
