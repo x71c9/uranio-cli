@@ -68,9 +68,6 @@ function init(params) {
         _copy_dot_files();
         _remove_tmp();
         yield _replace_aliases();
-        if (init_params.repo === 'adm') {
-            _add_admin_files();
-        }
         output_instance.end_log(`Initialization completed.`);
     });
 }
@@ -230,6 +227,7 @@ function _copy_dot_files() {
         }
     }
     if (types_1.valid_admin_repos().includes(init_params.repo)) {
+        _add_admin_files();
         _copy_admin_files();
     }
 }
@@ -433,8 +431,8 @@ function _copy_netlify_files() {
     util_instance.fs.copy_file(functions_file, functions_dest, 'dot');
 }
 function _copy_admin_files() {
-    const dot_admin_folder = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/admin`;
-    const nuxt_config_file = `${dot_admin_folder}/nuxt.config.js`;
+    const dot_client_folder = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/${defaults_1.defaults.folder}/client`;
+    const nuxt_config_file = `${dot_client_folder}/nuxt.config.js`;
     const nuxt_config_dest = `${init_params.root}/${defaults_1.defaults.folder}/client/nuxt.config.js`;
     util_instance.fs.copy_file(nuxt_config_file, nuxt_config_dest, 'adm');
 }

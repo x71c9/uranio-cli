@@ -66,9 +66,6 @@ export async function init(params:Partial<Params>)
 	_copy_dot_files();
 	_remove_tmp();
 	await _replace_aliases();
-	if(init_params.repo === 'adm'){
-		_add_admin_files();
-	}
 	
 	output_instance.end_log(`Initialization completed.`);
 }
@@ -290,8 +287,10 @@ function _copy_dot_files(){
 	}
 	
 	if(valid_admin_repos().includes(init_params.repo)){
+		_add_admin_files();
 		_copy_admin_files();
 	}
+	
 }
 
 async function _clone_dot(){
@@ -577,10 +576,10 @@ function _copy_netlify_files(){
 }
 
 function _copy_admin_files(){
-	const dot_admin_folder =
-		`${init_params.root}/${defaults.tmp_folder}/urn-dot/admin`;
+	const dot_client_folder =
+		`${init_params.root}/${defaults.tmp_folder}/urn-dot/${defaults.folder}/client`;
 	
-	const nuxt_config_file = `${dot_admin_folder}/nuxt.config.js`;
+	const nuxt_config_file = `${dot_client_folder}/nuxt.config.js`;
 	const nuxt_config_dest = `${init_params.root}/${defaults.folder}/client/nuxt.config.js`;
 	util_instance.fs.copy_file(nuxt_config_file, nuxt_config_dest, 'adm');
 	
