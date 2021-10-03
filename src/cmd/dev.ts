@@ -96,7 +96,7 @@ function _init_dev(){
 	
 	transpose(dev_params, true);
 	
-	if(dev_params.repo in valid_hooks_repos()){
+	if(valid_hooks_repos().includes(dev_params.repo)){
 		hooks(dev_params, true);
 	}
 	
@@ -124,7 +124,7 @@ function _watch(){
 			}
 			if(event !== 'unlink'){
 				transpose_one(path, dev_params, true);
-				if(dev_params.repo in valid_hooks_repos()){
+				if(valid_hooks_repos().includes(dev_params.repo)){
 					hooks(dev_params, true);
 				}
 				output_instance.done_log(`[Book watch] Transposed [${path}].`, 'wtch');

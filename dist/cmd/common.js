@@ -8,7 +8,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_params = exports.read_rc_file = void 0;
+exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_init_params = exports.merge_params = exports.read_rc_file = void 0;
 const fs_1 = __importDefault(require("fs"));
 // import * as cp from 'child_process';
 const urn_lib_1 = require("urn-lib");
@@ -23,22 +23,33 @@ function read_rc_file(params) {
         return params;
     }
     try {
+        const cloned_params = Object.assign({}, params);
         const rc_content = fs_1.default.readFileSync(rcfile_path, 'utf8');
         const rc_obj = urn_lib_1.urn_util.json.clean_parse(rc_content);
-        params.repo = rc_obj.repo;
-        params.pacman = rc_obj.pacman;
-        params.deploy = rc_obj.deploy;
+        cloned_params.repo = rc_obj.repo;
+        cloned_params.pacman = rc_obj.pacman;
+        cloned_params.deploy = rc_obj.deploy;
+        return cloned_params;
     }
     catch (ex) {
         process.stderr.write(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
         process.exit(1);
     }
-    return params;
 }
 exports.read_rc_file = read_rc_file;
 function merge_params(params) {
+    return _merge_params(params, false);
+}
+exports.merge_params = merge_params;
+function merge_init_params(params) {
+    return _merge_params(params, true);
+}
+exports.merge_init_params = merge_init_params;
+function _merge_params(params, is_init = false) {
     let merged_params = defaults_1.default_params;
-    merged_params = read_rc_file(params);
+    if (!is_init) {
+        merged_params = read_rc_file(params);
+    }
     for (const k in defaults_1.default_params) {
         if (urn_lib_1.urn_util.object.has_key(params, k)) {
             merged_params[k] = params[k];
@@ -51,7 +62,6 @@ function merge_params(params) {
     }
     return merged_params;
 }
-exports.merge_params = merge_params;
 function check_repo(repo) {
     if (!urn_lib_1.urn_util.object.has_key(types_1.abstract_repos, repo)) {
         const valid_repos_str = types_1.valid_repos().join(', ');

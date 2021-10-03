@@ -102,7 +102,7 @@ function _init_params(params) {
 }
 function _init_dev() {
     transpose_1.transpose(dev_params, true);
-    if (dev_params.repo in types_1.valid_hooks_repos()) {
+    if (types_1.valid_hooks_repos().includes(dev_params.repo)) {
         hooks_1.hooks(dev_params, true);
     }
     _watch();
@@ -120,7 +120,7 @@ function _watch() {
         }
         if (event !== 'unlink') {
             transpose_1.transpose_one(path, dev_params, true);
-            if (dev_params.repo in types_1.valid_hooks_repos()) {
+            if (types_1.valid_hooks_repos().includes(dev_params.repo)) {
                 hooks_1.hooks(dev_params, true);
             }
             output_instance.done_log(`[Book watch] Transposed [${path}].`, 'wtch');

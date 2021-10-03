@@ -35,22 +35,35 @@ export function read_rc_file(params:Partial<Params>)
 		return params;
 	}
 	try{
+		const cloned_params = {...params};
 		const rc_content = fs.readFileSync(rcfile_path, 'utf8');
 		const rc_obj = urn_util.json.clean_parse(rc_content);
-		params.repo = rc_obj.repo;
-		params.pacman = rc_obj.pacman;
-		params.deploy = rc_obj.deploy;
+		cloned_params.repo = rc_obj.repo;
+		cloned_params.pacman = rc_obj.pacman;
+		cloned_params.deploy = rc_obj.deploy;
+		return cloned_params;
 	}catch(ex){
 		process.stderr.write(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
 		process.exit(1);
 	}
-	return params;
 }
 
 export function merge_params(params:Partial<Params>)
 		:Params{
+	return _merge_params(params, false);
+}
+
+export function merge_init_params(params:Partial<Params>)
+		:Params{
+	return _merge_params(params, true);
+}
+
+function _merge_params(params:Partial<Params>, is_init=false)
+		:Params{
 	let merged_params = default_params as Partial<Params>;
-	merged_params = read_rc_file(params);
+	if(!is_init){
+		merged_params = read_rc_file(params);
+	}
 	for(const k in default_params){
 		if(urn_util.object.has_key(params, k)){
 			(merged_params as any)[k] = params[k];
