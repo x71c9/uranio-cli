@@ -285,11 +285,24 @@ function _text_lines_in_args_params(url) {
     return lines;
 }
 function _save_to_file(text) {
-    const filepath_server = `${hooks_params.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/hooks/index.ts`;
+    const default_folder = `${hooks_params.root}/${defaults_1.defaults.folder}`;
+    let hooks_path_server = `${default_folder}/server/src/${defaults_1.defaults.repo_folder}`;
+    let hooks_path_client = `${default_folder}/client/src/${defaults_1.defaults.repo_folder}`;
+    switch (hooks_params.repo) {
+        case 'trx': {
+            break;
+        }
+        case 'adm': {
+            hooks_path_server = `${default_folder}/server/src/${defaults_1.defaults.repo_folder}/trx`;
+            hooks_path_client = `${default_folder}/client/src/${defaults_1.defaults.repo_folder}/trx`;
+            break;
+        }
+    }
+    const filepath_server = `${hooks_path_server}/hooks/index.ts`;
     util_instance.fs.write_file(filepath_server, text);
     util_instance.pretty(filepath_server);
     output_instance.done_verbose_log(`Created hooks file [${filepath_server}].`, 'hooks');
-    const filepath_client = `${hooks_params.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}/hooks/index.ts`;
+    const filepath_client = `${hooks_path_client}/hooks/index.ts`;
     util_instance.fs.write_file(filepath_client, text);
     util_instance.pretty(filepath_client);
     output_instance.done_verbose_log(`Created hooks file [${filepath_client}].`, 'hooks');

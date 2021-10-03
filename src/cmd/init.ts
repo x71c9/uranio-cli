@@ -20,7 +20,8 @@ import {
 	abstract_repos,
 	abstract_pacman,
 	abstract_deploy,
-	valid_deploy_repos
+	valid_deploy_repos,
+	valid_admin_repos
 } from '../types';
 
 import {alias} from './alias';
@@ -28,7 +29,7 @@ import {alias} from './alias';
 import {title} from './title';
 
 import {
-	merge_params,
+	merge_init_params,
 	check_repo,
 	check_deploy,
 	check_pacman
@@ -45,7 +46,7 @@ let init_params = default_params;
 export async function init(params:Partial<Params>)
 		:Promise<void>{
 	
-	init_params = merge_params(params);
+	init_params = merge_init_params(params);
 	
 	output_instance = output.create(params);
 	
@@ -124,14 +125,14 @@ function _log_important_params(){
 		'root'
 	);
 	output_instance.verbose_log(
-		`Selected repo: [${init_params.repo}]`,
+		`Selected repository: [${init_params.repo}]`,
 		'repo'
 	);
 	output_instance.verbose_log(
 		`Selected pacman: [${init_params.pacman}]`,
 		'repo'
 	);
-	if(init_params.repo in valid_deploy_repos()){
+	if(valid_deploy_repos().includes(init_params.repo)){
 		output_instance.verbose_log(
 			`Selected deploy: [${init_params.deploy}]`,
 			'dply'
@@ -279,10 +280,17 @@ function _copy_dot_files(){
 	}
 	_copy_dot_tsconfigs();
 	_copy_dot_eslint_files();
-	if(init_params.deploy === 'netlify'){
-		_copy_netlify_files();
-	}else{
-		_copy_express_files();
+	
+	if(valid_deploy_repos().includes(init_params.repo)){
+		if(init_params.deploy === 'netlify'){
+			_copy_netlify_files();
+		}else{
+			_copy_express_files();
+		}
+	}
+	
+	if(valid_admin_repos().includes(init_params.repo)){
+		_copy_admin_files();
 	}
 }
 
@@ -559,16 +567,23 @@ function _copy_netlify_files(){
 	if(!util_instance.fs.exists(function_folder)){
 		util_instance.fs.create_directory(function_folder);
 	}
-	let api_file = `adm-api.txt`;
-	if(init_params.repo === 'trx'){
-		api_file = `trx-api.txt`;
-	}
+	let api_file = `api.txt`;
 	if(init_params.repo === 'api'){
 		api_file = `api-api.txt`;
 	}
 	const functions_file = `${dot_deploy_folder}/netlify/functions/${api_file}`;
 	const functions_dest = `${function_folder}/api.ts`;
 	util_instance.fs.copy_file(functions_file, functions_dest, 'dot');
+}
+
+function _copy_admin_files(){
+	const dot_admin_folder =
+		`${init_params.root}/${defaults.tmp_folder}/urn-dot/admin`;
+	
+	const nuxt_config_file = `${dot_admin_folder}/nuxt.config.js`;
+	const nuxt_config_dest = `${init_params.root}/${defaults.folder}/client/nuxt.config.js`;
+	util_instance.fs.copy_file(nuxt_config_file, nuxt_config_dest, 'adm');
+	
 }
 
 function _copy_express_files(){
