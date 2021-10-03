@@ -114,7 +114,7 @@ function _log_important_params() {
     output_instance.verbose_log(`$URNROOT$Project root: [${init_params.root}]`, 'root');
     output_instance.verbose_log(`Selected repo: [${init_params.repo}]`, 'repo');
     output_instance.verbose_log(`Selected pacman: [${init_params.pacman}]`, 'repo');
-    if (init_params.repo === 'api' || init_params.repo === 'trx') {
+    if (init_params.repo in types_1.valid_deploy_repos()) {
         output_instance.verbose_log(`Selected deploy: [${init_params.deploy}]`, 'dply');
     }
 }
@@ -261,6 +261,10 @@ function _clone_and_install_repo() {
                 yield _clone_trx();
                 break;
             }
+            case 'adm': {
+                yield _clone_adm();
+                break;
+            }
             default: {
                 output_instance.error_log(`Selected repo is not valid. [${init_params.repo}]`, 'init');
                 process.exit(1);
@@ -347,6 +351,15 @@ function _update_package_aliases() {
             'uranio-books': `./dist/${defaults_1.defaults.folder}/server/src/books/`,
         };
         switch (init_params.repo) {
+            case 'adm': {
+                package_data['_moduleAliases']['uranio-trx'] =
+                    `./dist/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/trx/`;
+                package_data['_moduleAliases']['uranio-api'] =
+                    `./dist/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/trx/api/`;
+                package_data['_moduleAliases']['uranio-core'] =
+                    `./dist/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/trx/api/core/`;
+                break;
+            }
             case 'trx': {
                 package_data['_moduleAliases']['uranio-api'] =
                     `./dist/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/api/`;
@@ -406,7 +419,10 @@ function _copy_netlify_files() {
     if (!util_instance.fs.exists(function_folder)) {
         util_instance.fs.create_directory(function_folder);
     }
-    let api_file = `trx-api.txt`;
+    let api_file = `adm-api.txt`;
+    if (init_params.repo === 'trx') {
+        api_file = `trx-api.txt`;
+    }
     if (init_params.repo === 'api') {
         api_file = `api-api.txt`;
     }
@@ -448,12 +464,21 @@ function _clone_trx() {
         output_instance.done_log(`Cloned trx repo.`, 'trx');
     });
 }
+function _clone_adm() {
+    return __awaiter(this, void 0, void 0, function* () {
+        output_instance.start_loading(`Cloning adm...`);
+        yield util_instance.cmd.clone_repo_recursive(defaults_1.defaults.adm_repo, `${init_params.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}`, 'adm', init_params.branch);
+        yield util_instance.cmd.clone_repo_recursive(defaults_1.defaults.adm_repo, `${init_params.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}`, 'adm', init_params.branch);
+        output_instance.done_log(`Cloned adm repo.`, 'adm');
+    });
+}
 function _install_dep() {
     return __awaiter(this, void 0, void 0, function* () {
         const pack_data = util_instance.cmd.get_package_data(`${init_params.root}/package.json`);
         yield _uninstall_core_dep(pack_data);
         yield _uninstall_api_dep(pack_data);
         yield _uninstall_trx_dep(pack_data);
+        yield _uninstall_adm_dep(pack_data);
         switch (init_params.repo) {
             case 'core': {
                 yield _install_core_dep();
@@ -468,7 +493,7 @@ function _install_dep() {
                 return true;
             }
             case 'adm': {
-                // await _install_adm_dep();
+                yield _install_adm_dep();
                 return true;
             }
             default: {
@@ -496,6 +521,13 @@ function _uninstall_trx_dep(pack_data) {
     return __awaiter(this, void 0, void 0, function* () {
         yield _uninstall_dep(defaults_1.defaults.trx_dep_repo, 'trx', pack_data);
         yield _uninstall_dep(defaults_1.defaults.trx_dep_dev_repo, 'trx', pack_data);
+        return true;
+    });
+}
+function _uninstall_adm_dep(pack_data) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield _uninstall_dep(defaults_1.defaults.adm_dep_repo, 'adm', pack_data);
+        yield _uninstall_dep(defaults_1.defaults.adm_dep_dev_repo, 'adm', pack_data);
         return true;
     });
 }
@@ -539,6 +571,15 @@ function _install_trx_dep() {
         yield util_instance.cmd.install_dep(defaults_1.defaults.trx_dep_repo, 'trx');
         yield util_instance.cmd.install_dep_dev(defaults_1.defaults.trx_dep_dev_repo, 'trx');
         output_instance.done_log(`Installed trx dependencies.`, 'trx');
+        return true;
+    });
+}
+function _install_adm_dep() {
+    return __awaiter(this, void 0, void 0, function* () {
+        output_instance.start_loading(`Installing adm dep...`);
+        yield util_instance.cmd.install_dep(defaults_1.defaults.adm_dep_repo, 'adm');
+        yield util_instance.cmd.install_dep_dev(defaults_1.defaults.adm_dep_dev_repo, 'adm');
+        output_instance.done_log(`Installed adm dependencies.`, 'adm');
         return true;
     });
 }

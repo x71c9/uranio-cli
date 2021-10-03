@@ -37,6 +37,7 @@ exports.dev_client = exports.dev_server = exports.dev = void 0;
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const defaults_1 = require("../conf/defaults");
+const types_1 = require("../types");
 const transpose_1 = require("./transpose");
 const hooks_1 = require("./hooks");
 const common_1 = require("./common");
@@ -101,7 +102,7 @@ function _init_params(params) {
 }
 function _init_dev() {
     transpose_1.transpose(dev_params, true);
-    if (dev_params.repo === 'trx') {
+    if (dev_params.repo in types_1.valid_hooks_repos()) {
         hooks_1.hooks(dev_params, true);
     }
     _watch();
@@ -119,7 +120,7 @@ function _watch() {
         }
         if (event !== 'unlink') {
             transpose_1.transpose_one(path, dev_params, true);
-            if (dev_params.repo === 'trx') {
+            if (dev_params.repo in types_1.valid_hooks_repos()) {
                 hooks_1.hooks(dev_params, true);
             }
             output_instance.done_log(`[Book watch] Transposed [${path}].`, 'wtch');

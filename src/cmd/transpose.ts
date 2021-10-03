@@ -373,6 +373,14 @@ function _avoid_import_loop(file_path:string){
 
 function _resolve_path_tree(submodule_name:string){
 	switch(transpose_params.repo){
+		case 'adm':{
+			switch(submodule_name){
+				case 'core': return 'trx/api/core/';
+				case 'api': return 'trx/api/';
+				case 'trx': return 'trx/';
+			}
+			break;
+		}
 		case 'trx':{
 			switch(submodule_name){
 				case 'core': return 'api/core/';
@@ -892,6 +900,10 @@ function _add_core_books(book_decl:tsm.VariableDeclaration, required_book_name:B
 			core_repo_path = `${defaults.folder}/server/src/${defaults.repo_folder}/api/core`;
 			break;
 		}
+		case 'adm':{
+			core_repo_path = `${defaults.folder}/server/src/${defaults.repo_folder}/trx/api/core`;
+			break;
+		}
 	}
 	const required_books_path = `${transpose_params.root}/${core_repo_path}/books.ts`;
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
@@ -908,21 +920,43 @@ function _add_api_book(book_decl:tsm.VariableDeclaration, required_book_name:Boo
 			api_repo_path = `${defaults.folder}/server/src/${defaults.repo_folder}/api`;
 			break;
 		}
+		case 'adm':{
+			api_repo_path = `${defaults.folder}/server/src/${defaults.repo_folder}/trx/api`;
+			break;
+		}
 	}
 	const required_books_path = `${transpose_params.root}/${api_repo_path}/books.ts`;
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 
 function _add_trx_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName){
-	const trx_repo_path = `${defaults.folder}/server/src/${defaults.repo_folder}`;
+	let trx_repo_path = `${defaults.folder}/server/src/${defaults.repo_folder}`;
 	switch(transpose_params.repo){
 		case 'core':
 		case 'api':
 		case 'trx':{
 			break;
 		}
+		case 'adm':{
+			trx_repo_path = `${defaults.folder}/server/src/${defaults.repo_folder}/trx`;
+			break;
+		}
 	}
 	const required_books_path = `${transpose_params.root}/${trx_repo_path}/books.ts`;
+	_add_book_from_file(book_decl, required_book_name, required_books_path);
+}
+
+function _add_adm_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName){
+	const adm_repo_path = `${defaults.folder}/server/src/${defaults.repo_folder}`;
+	switch(transpose_params.repo){
+		case 'core':
+		case 'api':
+		case 'trx':
+		case 'adm':{
+			break;
+		}
+	}
+	const required_books_path = `${transpose_params.root}/${adm_repo_path}/books.ts`;
 	_add_book_from_file(book_decl, required_book_name, required_books_path);
 }
 
@@ -937,6 +971,12 @@ function _append_required_book(book_decl:tsm.VariableDeclaration, required_book_
 		case 'trx':{
 			_add_api_book(book_decl, required_book_name);
 			_add_trx_book(book_decl, required_book_name);
+			break;
+		}
+		case 'adm':{
+			_add_api_book(book_decl, required_book_name);
+			_add_trx_book(book_decl, required_book_name);
+			_add_adm_book(book_decl, required_book_name);
 			break;
 		}
 	}

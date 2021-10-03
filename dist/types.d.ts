@@ -35,6 +35,18 @@ export declare const abstract_repos: {
     readonly trx: "";
     readonly adm: "";
 };
+export declare const abstract_deploy_repos: {
+    readonly api: "";
+    readonly trx: "";
+    readonly adm: "";
+};
+export declare const abstract_hooks_repos: {
+    readonly trx: "";
+    readonly adm: "";
+};
+export declare const abstract_admin_repos: {
+    readonly adm: "";
+};
 export declare const abstract_pacman: {
     readonly yarn: "";
     readonly npm: "";
@@ -44,5 +56,8 @@ export declare const abstract_deploy: {
     readonly express: "";
 };
 export declare function valid_repos(): string[];
+export declare function valid_deploy_repos(): string[];
+export declare function valid_hooks_repos(): string[];
+export declare function valid_admin_repos(): string[];
 export declare function valid_pacman(): string[];
 export declare function valid_deploy(): string[];
