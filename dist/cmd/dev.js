@@ -32,8 +32,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.dev_client = exports.dev_server = exports.dev = void 0;
+const path_1 = __importDefault(require("path"));
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const defaults_1 = require("../conf/defaults");
@@ -113,22 +117,35 @@ function _watch() {
     util_instance.watch(src_path, `watching \`src\` folder.`, () => {
         output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
         watch_src_scanned = true;
-    }, (event, path) => {
-        output_instance.verbose_log(`${event} ${path}`, 'wtch', watc_color);
+    }, (_event, _path) => {
+        output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
         if (!watch_src_scanned) {
             return false;
         }
-        if (event !== 'unlink') {
-            transpose_1.transpose_one(path, dev_params, true);
+        const base_path = `${dev_params.root}/${defaults_1.defaults.folder}`;
+        const base_path_server = `${base_path}/server/src`;
+        const base_path_client = `${base_path}/client/src`;
+        if (_event === 'addDir') {
+            if (types_1.valid_admin_repos().includes(dev_params.repo) && _path.includes(`${dev_params.root}/src/frontend`)) {
+                util_instance.fs.create_directory(`${base_path_client}/${defaults_1.defaults.repo_folder}/nuxt/${path_1.default.basename(_path)}`);
+            }
+            else {
+                util_instance.fs.create_directory(`${base_path_server}/${path_1.default.basename(_path)}`);
+                util_instance.fs.create_directory(`${base_path_client}/${path_1.default.basename(_path)}`);
+            }
+            output_instance.done_log(`[Src watch] Transposed dir [${_path}].`, 'wtch');
+        }
+        else if (_event !== 'unlink') {
+            transpose_1.transpose_one(_path, dev_params, true);
             if (types_1.valid_hooks_repos().includes(dev_params.repo)) {
                 hooks_1.hooks(dev_params, true);
             }
-            output_instance.done_log(`[Book watch] Transposed [${path}].`, 'wtch');
+            output_instance.done_log(`[Src watch] Transposed [${_path}].`, 'wtch');
         }
         else {
-            const relative_path = path.replace(`${dev_params.root}/src/`, '');
-            const new_path_server = `${dev_params.root}/${defaults_1.defaults.folder}/server/src/${relative_path}`;
-            const new_path_client = `${dev_params.root}/${defaults_1.defaults.folder}/client/src/${relative_path}`;
+            const relative_path = _path.replace(`${dev_params.root}/src/`, '');
+            const new_path_server = `${base_path_server}/${relative_path}`;
+            const new_path_client = `${base_path_client}/${relative_path}`;
             util_instance.fs.remove_file(new_path_server);
             util_instance.fs.remove_file(new_path_client);
         }
@@ -139,11 +156,14 @@ function _watch() {
     util_instance.watch(lib_path, `watching uranio repo folder.`, () => {
         output_instance.done_log(`Initial scanner completed for [${lib_path}].`, 'wtch');
         watch_lib_scanned = true;
-    }, (event, path) => {
-        output_instance.verbose_log(`${event} ${path}`, 'wtch', watc_color);
+    }, (_event, _path) => {
         if (!watch_lib_scanned) {
             return false;
         }
+        if (_path.includes(`hooks/index.ts`)) {
+            return;
+        }
+        output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
         _replace_netlify_function_file();
     });
 }
@@ -223,19 +243,19 @@ function _replace_netlify_function_file() {
 //       output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
 //       watch_src_scanned = true;
 //     },
-//     (event, path) => {
-//       output_instance.verbose_log(`${event} ${path}`, 'wtch', watc_color);
+//     (_event, _path) => {
+//       output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
 //       if(!watch_src_scanned){
 //         return false;
 //       }
-//       if(event !== 'unlink'){
-//         transpose.run(dev_params.root, path, cli_options);
+//       if(_event !== 'unlink'){
+//         transpose.run(dev_params.root, _path, cli_options);
 //         if(dev_params.repo === 'trx'){
 //           hooks.run(cli_options);
 //         }
-//         output_instance.done_log(`[Book watch] Transposed [${path}].`, 'wtch');
+//         output_instance.done_log(`[Book watch] Transposed [${_path}].`, 'wtch');
 //       }else{
-//         const relative_path = path.replace(`${dev_params.root}/src/`, '');
+//         const relative_path = _path.replace(`${dev_params.root}/src/`, '');
 //         const new_path_server = `${dev_params.root}/${defaults.folder}/server/src/${relative_path}`;
 //         const new_path_client = `${dev_params.root}/${defaults.folder}/client/src/${relative_path}`;
 //         util_instance.delete_file_sync(new_path_server);
@@ -253,8 +273,8 @@ function _replace_netlify_function_file() {
 //       output_instance.done_log(`Initial scanner completed for [${lib_path}].`, 'wtch');
 //       watch_lib_scanned = true;
 //     },
-//     (event, path) => {
-//       output_instance.verbose_log(`${event} ${path}`, 'wtch', watc_color);
+//     (_event, _path) => {
+//       output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
 //       if(!watch_lib_scanned){
 //         return false;
 //       }

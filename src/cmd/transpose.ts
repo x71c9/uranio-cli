@@ -8,7 +8,10 @@ import path from 'path';
 
 import * as tsm from 'ts-morph';
 
-import {Params} from '../types';
+import {
+	Params,
+	valid_admin_repos
+} from '../types';
 
 import {default_params, defaults} from '../conf/defaults';
 
@@ -65,8 +68,7 @@ export async function transpose_one(full_path:string, params:Partial<Params>, in
 		process.exit(1);
 	}
 		
-	const parsed_path = path.parse(full_path);
-	if(typeof parsed_path.ext === 'string' && parsed_path.ext !== ''){
+	if(!util_instance.fs.is_directory(full_path)){
 		
 		_transpose_file(full_path, included);
 		
@@ -125,38 +127,69 @@ function _transpose_file(file_path:string, included=false){
 	if(file_path && util_instance.fs.exists(file_path) && file_path.includes(`${transpose_params.root}/src/`)){
 		
 		const base_folder = `${transpose_params.root}/${defaults.folder}`;
-		const new_path_server = file_path.replace(
-			src_path,
-			`${base_folder}/server/src/`
-		);
-		const new_path_client = file_path.replace(
-			src_path,
-			`${base_folder}/client/src/`
-		);
-		util_instance.fs.copy_file(file_path, new_path_server, 'trsp');
-		util_instance.fs.copy_file(file_path, new_path_client, 'trsp');
 		
-		if(path.extname(file_path) === '.ts'){
-			alias.replace_file_aliases(
-				new_path_server,
-				alias.get_aliases(
-					`${base_folder}/server/tsconfig.json`,
-					transpose_params
-				)
+		const frontend_src_path = `${transpose_params.root}/src/frontend`;
+		
+		if(valid_admin_repos().includes(transpose_params.repo) && file_path.includes(frontend_src_path)){
+			
+			const frontend_target = file_path.replace(
+				frontend_src_path,
+				path.join(base_folder, 'client/src', defaults.repo_folder, 'nuxt')
 			);
-			alias.replace_file_aliases(
-				new_path_client,
-				alias.get_aliases(
-					`${base_folder}/client/tsconfig.json`,
-					transpose_params
-				)
+			util_instance.fs.copy_file(file_path, frontend_target, 'trsp');
+			
+			if(path.extname(file_path) === '.ts'){
+				alias.replace_file_aliases(
+					frontend_target,
+					alias.get_aliases(
+						`${base_folder}/client/tsconfig.json`,
+						transpose_params
+					)
+				);
+				_avoid_import_loop(frontend_target);
+				output_instance.done_verbose_log(
+					`Transposed file [${file_path}] [${frontend_target}].`,
+					'trsp'
+				);
+			}
+			
+		}else{
+			
+			const new_path_server = file_path.replace(
+				src_path,
+				`${base_folder}/server/src/`
 			);
-			_avoid_import_loop(new_path_server);
-			_avoid_import_loop(new_path_client);
-			output_instance.done_verbose_log(
-				`Transposed file [${file_path}].`,
-				'trsp'
+			const new_path_client = file_path.replace(
+				src_path,
+				`${base_folder}/client/src/`
 			);
+			
+			util_instance.fs.copy_file(file_path, new_path_server, 'trsp');
+			util_instance.fs.copy_file(file_path, new_path_client, 'trsp');
+			
+			if(path.extname(file_path) === '.ts'){
+				alias.replace_file_aliases(
+					new_path_server,
+					alias.get_aliases(
+						`${base_folder}/server/tsconfig.json`,
+						transpose_params
+					)
+				);
+				alias.replace_file_aliases(
+					new_path_client,
+					alias.get_aliases(
+						`${base_folder}/client/tsconfig.json`,
+						transpose_params
+					)
+				);
+				_avoid_import_loop(new_path_server);
+				_avoid_import_loop(new_path_client);
+				output_instance.done_verbose_log(
+					`Transposed file [${file_path}].`,
+					'trsp'
+				);
+			}
+			
 		}
 		
 	}else{
@@ -211,24 +244,60 @@ function _transpose_folder(dir_path:string, included=false){
 }
 
 function _copy_from_src_into_uranio_folder(){
-	util_instance.fs.copy_directory(
-		`${transpose_params.root}/src/`,
-		`${transpose_params.root}/${defaults.folder}/client/src/`,
-		`trsp`
-	);
-	util_instance.fs.copy_directory(
-		`${transpose_params.root}/src/`,
-		`${transpose_params.root}/${defaults.folder}/server/src/`,
-		`trsp`
-	);
-	util_instance.fs.remove_file(
-		`${transpose_params.root}/${defaults.folder}/server/src/book.ts`,
-		`book`
-	);
-	util_instance.fs.remove_file(
-		`${transpose_params.root}/${defaults.folder}/client/src/book.ts`,
-		`book`
-	);
+	const root = transpose_params.root;
+	const src_paths = util_instance.fs.read_dir(`${root}/src/`);
+	for(let i = 0; i < src_paths.length; i++){
+		const src_path = src_paths[i];
+		const full_src_path = path.join(root,'src',src_path);
+		if(src_path === 'frontend' && valid_admin_repos().includes(transpose_params.repo)){
+			const frontend_paths = util_instance.fs.read_dir(full_src_path);
+			for(let j = 0; j < frontend_paths.length; j++){
+				const file_path = frontend_paths[j];
+				const full_file_path = path.join(full_src_path, file_path);
+				const target_client = path.join(
+					root,
+					defaults.folder,
+					'client/src',
+					defaults.repo_folder,
+					'nuxt',
+					file_path
+				);
+				if(util_instance.fs.is_directory(full_file_path)){
+					util_instance.fs.copy_directory(full_file_path, target_client);
+				}else{
+					util_instance.fs.copy_file(full_file_path, target_client);
+				}
+			}
+		}else if(src_path !== 'book.ts'){
+			const target_server = path.join(root, defaults.folder, 'server/src', src_path);
+			const target_client = path.join(root, defaults.folder, 'client/src', src_path);
+			if(util_instance.fs.is_directory(full_src_path)){
+				util_instance.fs.copy_directory(full_src_path, target_server);
+				util_instance.fs.copy_directory(full_src_path, target_client);
+			}else{
+				util_instance.fs.copy_file(full_src_path, target_server);
+				util_instance.fs.copy_file(full_src_path, target_client);
+			}
+		}
+	}
+	// util_instance.fs.copy_directory(
+	//   `${transpose_params.root}/src/`,
+	//   `${transpose_params.root}/${defaults.folder}/client/src/`,
+	//   `trsp`
+	// );
+	// util_instance.fs.copy_directory(
+	//   `${transpose_params.root}/src/`,
+	//   `${transpose_params.root}/${defaults.folder}/server/src/`,
+	//   `trsp`
+	// );
+	// util_instance.fs.remove_file(
+	//   `${transpose_params.root}/${defaults.folder}/server/src/book.ts`,
+	//   `book`
+	// );
+	// util_instance.fs.remove_file(
+	//   `${transpose_params.root}/${defaults.folder}/client/src/book.ts`,
+	//   `book`
+	// );
 }
 
 type ModuleList = {
