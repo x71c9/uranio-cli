@@ -16,6 +16,9 @@ class FS {
 	constructor(public output:out.OutputInstance){}
 	
 	public is_directory(path:string, context?:string){
+		// if(!fs.existsSync(path)){
+		//   return false;
+		// }
 		const is = fs.statSync(path).isDirectory();
 		this.output.debug_log(`Is directory sync [${path}] [${is}]`, context);
 		return is;

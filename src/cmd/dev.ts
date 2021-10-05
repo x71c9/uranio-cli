@@ -135,7 +135,7 @@ function _watch(){
 					util_instance.fs.create_directory(`${base_path_client}/${path.basename(_path)}`);
 				}
 				output_instance.done_log(`[Src watch] Transposed dir [${_path}].`, 'wtch');
-			}else if(_event !== 'unlink'){
+			}else if(_event !== 'unlink' && _event !== 'unlinkDir'){
 				transpose_one(_path, dev_params, true);
 				if(valid_hooks_repos().includes(dev_params.repo)){
 					hooks(dev_params, true);
@@ -145,8 +145,16 @@ function _watch(){
 				const relative_path = _path.replace(`${dev_params.root}/src/`, '');
 				const new_path_server = `${base_path_server}/${relative_path}`;
 				const new_path_client = `${base_path_client}/${relative_path}`;
-				util_instance.fs.remove_file(new_path_server);
-				util_instance.fs.remove_file(new_path_client);
+				if(util_instance.fs.is_directory(new_path_server)){
+					util_instance.fs.remove_directory(new_path_server);
+				}else{
+					util_instance.fs.remove_file(new_path_server);
+				}
+				if(util_instance.fs.is_directory(new_path_client)){
+					util_instance.fs.remove_directory(new_path_client);
+				}else{
+					util_instance.fs.remove_file(new_path_client);
+				}
 			}
 			_replace_netlify_function_file();
 		}
@@ -162,11 +170,12 @@ function _watch(){
 			watch_lib_scanned = true;
 		},
 		(_event, _path) => {
+			output_instance.verbose_log(`[uranio repo folder] ${_event} ${_path}`, 'wtch', watc_color);
 			if(!watch_lib_scanned){
 				return false;
 			}
-			if(_path.includes(`hooks/index.ts`)){
-				return;
+			if(_path.includes(`hooks/index.ts`) || _path.includes(`src/books/`) || _path.includes(`nuxt/`)){
+				return false;
 			}
 			output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
 			_replace_netlify_function_file();

@@ -17,6 +17,9 @@ class FS {
         this.output = output;
     }
     is_directory(path, context) {
+        // if(!fs.existsSync(path)){
+        //   return false;
+        // }
         const is = fs_1.default.statSync(path).isDirectory();
         this.output.debug_log(`Is directory sync [${path}] [${is}]`, context);
         return is;
