@@ -34,15 +34,11 @@ const tscw_color = '#734de3';
 const watc_color = '#687a6a';
 
 export async function dev(params:Partial<Params>):Promise<void>{
-	
 	_init_params(params);
 	_init_dev();
-	
 	await _dev_server();
-	
 	const cmd = `npx ntl dev`;
 	util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
-	
 }
 
 export async function dev_server(params:Partial<Params>):Promise<void>{
@@ -109,6 +105,7 @@ function _init_dev(){
 function _watch(){
 	
 	const src_path = `${dev_params.root}/src/`;
+	const base_path = `${dev_params.root}/${defaults.folder}`;
 	
 	output_instance.log(`Watching \`src\` folder [${src_path}] ...`, 'wtch');
 	
@@ -124,7 +121,6 @@ function _watch(){
 			if(!watch_src_scanned){
 				return false;
 			}
-			const base_path = `${dev_params.root}/${defaults.folder}`;
 			const base_path_server = `${base_path}/server/src`;
 			const base_path_client = `${base_path}/client/src`;
 			if(_event === 'addDir'){
@@ -160,21 +156,31 @@ function _watch(){
 		}
 	);
 	
-	const lib_path = `${dev_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}/`;
+	const lib_path = `${base_path}/server/src/${defaults.repo_folder}/`;
 	output_instance.log(`Watching uranio repo folder [${lib_path}] ...`, 'wtch');
 	util_instance.watch(
 		lib_path,
 		`watching uranio repo folder.`,
 		() => {
-			output_instance.done_log(`Initial scanner completed for [${lib_path}].`, 'wtch');
+			output_instance.done_log(
+				`Initial scanner completed for [${lib_path}].`,
+				'wtch'
+			);
 			watch_lib_scanned = true;
 		},
 		(_event, _path) => {
-			output_instance.verbose_log(`[uranio repo folder] ${_event} ${_path}`, 'wtch', watc_color);
+			output_instance.verbose_log(
+				`[uranio repo folder] ${_event} ${_path}`,
+				'wtch',
+				watc_color
+			);
 			if(!watch_lib_scanned){
 				return false;
 			}
-			if(_path.includes(`hooks/index.ts`) || _path.includes(`src/books/`) || _path.includes(`nuxt/`)){
+			if(_path.includes(`hooks/index.ts`) || _path.includes(`src/books/`)){
+				return false;
+			}
+			if(!dev_params.is_dot && _path.includes(`nuxt/`)){
 				return false;
 			}
 			output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);

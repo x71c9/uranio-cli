@@ -115,6 +115,10 @@ function _set_params(args) {
     if (typeof args.nonative === 'boolean' && !!args.nonative !== !params.native) {
         params.native = !args.nonative;
     }
+    const is_dot = args.is_dot;
+    if (is_dot == true) {
+        params.is_dot = true;
+    }
     // Paramteters with default value = true
     const filelog = args.l || args.filelog;
     if (filelog == false) {

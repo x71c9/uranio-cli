@@ -18,6 +18,7 @@ export type Params = {
 	blank: boolean
 	fullwidth: boolean
 	native: boolean
+	is_dot: boolean
 	filelog: boolean
 	spin: boolean
 	prefix: string

@@ -113,6 +113,7 @@ function _init_dev() {
 }
 function _watch() {
     const src_path = `${dev_params.root}/src/`;
+    const base_path = `${dev_params.root}/${defaults_1.defaults.folder}`;
     output_instance.log(`Watching \`src\` folder [${src_path}] ...`, 'wtch');
     util_instance.watch(src_path, `watching \`src\` folder.`, () => {
         output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
@@ -122,7 +123,6 @@ function _watch() {
         if (!watch_src_scanned) {
             return false;
         }
-        const base_path = `${dev_params.root}/${defaults_1.defaults.folder}`;
         const base_path_server = `${base_path}/server/src`;
         const base_path_client = `${base_path}/client/src`;
         if (_event === 'addDir') {
@@ -161,7 +161,7 @@ function _watch() {
         }
         _replace_netlify_function_file();
     });
-    const lib_path = `${dev_params.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/`;
+    const lib_path = `${base_path}/server/src/${defaults_1.defaults.repo_folder}/`;
     output_instance.log(`Watching uranio repo folder [${lib_path}] ...`, 'wtch');
     util_instance.watch(lib_path, `watching uranio repo folder.`, () => {
         output_instance.done_log(`Initial scanner completed for [${lib_path}].`, 'wtch');
@@ -171,7 +171,10 @@ function _watch() {
         if (!watch_lib_scanned) {
             return false;
         }
-        if (_path.includes(`hooks/index.ts`) || _path.includes(`src/books/`) || _path.includes(`nuxt/`)) {
+        if (_path.includes(`hooks/index.ts`) || _path.includes(`src/books/`)) {
+            return false;
+        }
+        if (!dev_params.is_dot && _path.includes(`nuxt/`)) {
             return false;
         }
         output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
