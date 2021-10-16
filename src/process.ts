@@ -152,6 +152,12 @@ function _set_params(args:Arguments)
 		params.native = !args.nonative;
 	}
 	
+	const is_dot = args.is_dot;
+	
+	if(is_dot == true){
+		params.is_dot = true;
+	}
+	
 	// Paramteters with default value = true
 	
 	const filelog = args.l || args.filelog;

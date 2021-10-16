@@ -14,6 +14,7 @@ export const default_params:Params = {
 	blank: false,
 	fullwidth: false,
 	native: false,
+	is_dot: false,
 	filelog: true,
 	spin: true,
 	prefix: '',
