@@ -51,16 +51,17 @@ export async function init(params:Partial<Params>)
 	output_instance = output.create(params);
 	
 	util_instance = util.create(params, output_instance);
-
-	_log_important_params();
 	
+	_log_important_params();
+	await _init_pacman();
 	_update_package_aliases();
 	_update_package_scripts();
 	_create_urn_folder();
 	_ignore_urn_folder();
 	_create_rc_file();
 	_create_client_server_folders();
-	await _clone_and_install_repo();
+	await _clone_repo();
+	await _install_repo();
 	_remove_git_files();
 	await _clone_dot();
 	_copy_dot_files();
@@ -134,6 +135,13 @@ function _log_important_params(){
 			`Selected deploy: [${init_params.deploy}]`,
 			'dply'
 		);
+	}
+}
+
+async function _init_pacman(){
+	const yarn_lock = `${init_params.root}/yarn.lock`;
+	if(init_params.pacman === 'yarn' && !util_instance.fs.exists(yarn_lock)){
+		await util_instance.cmd.yarn_install();
 	}
 }
 
@@ -321,9 +329,9 @@ function _remove_git_files(){
 	output_instance.done_log(`Removed uranio .git files.`, '.git');
 }
 
-async function _clone_and_install_repo(){
+async function _clone_repo(){
 	output_instance.start_loading(
-		`Cloning and intalling [${init_params.repo}]...`
+		`Cloning [${init_params.repo}]...`
 	);
 	switch(init_params.repo){
 		case 'core':{
@@ -350,9 +358,19 @@ async function _clone_and_install_repo(){
 			process.exit(1);
 		}
 	}
+	output_instance.done_log(
+		`Cloned repo [${init_params.repo}].`,
+		'repo'
+	);
+}
+
+async function _install_repo(){
+	output_instance.start_loading(
+		`Intalling [${init_params.repo}]...`
+	);
 	await _install_dep();
 	output_instance.done_log(
-		`Cloned and installed repo [${init_params.repo}].`,
+		`Installed repo [${init_params.repo}].`,
 		'repo'
 	);
 }
@@ -611,7 +629,7 @@ async function _clone_core(){
 		'core',
 		init_params.branch
 	);
-	output_instance.done_log(`Cloned core repo.`, 'core');
+	output_instance.done_verbose_log(`Cloned core repo.`, 'core');
 }
 
 async function _clone_api(){
@@ -628,7 +646,7 @@ async function _clone_api(){
 		'api',
 		init_params.branch
 	);
-	output_instance.done_log(`Cloned api repo.`, 'api');
+	output_instance.done_verbose_log(`Cloned api repo.`, 'api');
 }
 
 async function _clone_trx(){
@@ -645,7 +663,7 @@ async function _clone_trx(){
 		'trx',
 		init_params.branch
 	);
-	output_instance.done_log(`Cloned trx repo.`, 'trx');
+	output_instance.done_verbose_log(`Cloned trx repo.`, 'trx');
 }
 
 async function _clone_adm(){
@@ -662,7 +680,7 @@ async function _clone_adm(){
 		'adm',
 		init_params.branch
 	);
-	output_instance.done_log(`Cloned adm repo.`, 'adm');
+	output_instance.done_verbose_log(`Cloned adm repo.`, 'adm');
 }
 
 async function _install_dep()
@@ -733,8 +751,8 @@ async function _uninstall_dep(repo:string, context:string, pack_data?:any){
 		output_instance.start_loading(`Uninstalling ${short_repo} dep...`);
 		const dep_folder = `${init_params.root}/node_modules/${short_repo}`;
 		util_instance.fs.remove_directory(dep_folder, context);
-		const dep_dev_folder = `${init_params.root}/node_modules/${short_repo}`;
-		util_instance.fs.remove_directory(dep_dev_folder, context);
+		// const dep_dev_folder = `${init_params.root}/node_modules/${short_repo}`;
+		// util_instance.fs.remove_directory(dep_dev_folder, context);
 		await util_instance.cmd.uninstall_dep(`${short_repo}`, context);
 		output_instance.done_log(`Uninstalled ${short_repo} dependencies.`, context);
 		return true;

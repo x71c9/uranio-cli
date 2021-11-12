@@ -26,7 +26,7 @@ class FS {
     }
     exists(path, context = 'exst') {
         const exists = fs_1.default.existsSync(path);
-        this.output.debug_log(`Exists sync [${path}]`, context);
+        this.output.debug_log(`Exists sync [${path}] [${exists}]`, context);
         return exists;
     }
     read_file(file_path, encoding, context = 'rdfl') {

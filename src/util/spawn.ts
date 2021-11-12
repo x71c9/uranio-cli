@@ -33,22 +33,27 @@ class Spawn {
 	}
 	
 	public spin(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+		this.output.debug_log(command, 'spin');
 		return this._spawn(command, context, action, true, false, false, color, resolve, reject);
 	}
 	
 	public log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+		this.output.debug_log(command, 'log');
 		return this._spawn(command, context, action, false, true, false, color, resolve, reject);
 	}
 	
 	public verbose_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+		this.output.debug_log(command, 'verbose log');
 		return this._spawn(command, context, action, false, false, true, color, resolve, reject);
 	}
 	
 	public spin_and_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+		this.output.debug_log(command, 'spin and log');
 		return this._spawn(command, context, action, true, true, false, color, resolve, reject);
 	}
 	
 	public spin_and_verbose_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+		this.output.debug_log(command, 'spin and verbose');
 		return this._spawn(command, context, action, true, false, true, color, resolve, reject);
 	}
 	
