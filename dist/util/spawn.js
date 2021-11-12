@@ -45,18 +45,23 @@ class Spawn {
         cp.execSync(command);
     }
     spin(command, context, action, color, resolve, reject) {
+        this.output.debug_log(command, 'spin');
         return this._spawn(command, context, action, true, false, false, color, resolve, reject);
     }
     log(command, context, action, color, resolve, reject) {
+        this.output.debug_log(command, 'log');
         return this._spawn(command, context, action, false, true, false, color, resolve, reject);
     }
     verbose_log(command, context, action, color, resolve, reject) {
+        this.output.debug_log(command, 'verbose log');
         return this._spawn(command, context, action, false, false, true, color, resolve, reject);
     }
     spin_and_log(command, context, action, color, resolve, reject) {
+        this.output.debug_log(command, 'spin and log');
         return this._spawn(command, context, action, true, true, false, color, resolve, reject);
     }
     spin_and_verbose_log(command, context, action, color, resolve, reject) {
+        this.output.debug_log(command, 'spin and verbose');
         return this._spawn(command, context, action, true, false, true, color, resolve, reject);
     }
     _spawn(command, context, action, spin, log, verbose, color, resolve, reject) {

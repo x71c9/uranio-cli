@@ -73,6 +73,15 @@ class CMD {
 		return (this.fs.exists(`${this.params.root}/${jsonfile_path}`));
 	}
 	
+	public async yarn_install()
+			:Promise<any>{
+		const action = `yarn install`;
+		this.output.verbose_log(`Started ${action}`, 'pacman');
+		return new Promise((resolve, reject) => {
+			this.spawn.spin(`yarn install --verbose`, 'pacman', action, undefined, resolve, reject);
+		});
+	}
+
 	public async install_dep(repo:string, context:string)
 			:Promise<any>{
 		const action = `installing dependencies [${repo}]`;

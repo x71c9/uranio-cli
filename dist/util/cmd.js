@@ -85,6 +85,15 @@ class CMD {
     is_initialized() {
         return (this.fs.exists(`${this.params.root}/${defaults_1.jsonfile_path}`));
     }
+    yarn_install() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const action = `yarn install`;
+            this.output.verbose_log(`Started ${action}`, 'pacman');
+            return new Promise((resolve, reject) => {
+                this.spawn.spin(`yarn install --verbose`, 'pacman', action, undefined, resolve, reject);
+            });
+        });
+    }
     install_dep(repo, context) {
         return __awaiter(this, void 0, void 0, function* () {
             const action = `installing dependencies [${repo}]`;

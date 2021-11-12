@@ -26,7 +26,7 @@ class FS {
 	
 	public exists(path:string, context='exst'){
 		const exists = fs.existsSync(path);
-		this.output.debug_log(`Exists sync [${path}]`, context);
+		this.output.debug_log(`Exists sync [${path}] [${exists}]`, context);
 		return exists;
 	}
 	
