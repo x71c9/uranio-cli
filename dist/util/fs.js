@@ -80,7 +80,7 @@ class FS {
      * It will copy all files in src folder inside dest folder.
      * If dest folder does not exist it will create it.
      */
-    copy_directory(src, dest, context = 'cp_d') {
+    copy_directory(src, dest, context = 'cp_d', exclude) {
         // fs.copySync(src, dest, {recursive: true});
         if (!fs_1.default.lstatSync(src).isDirectory()) {
             this.output.error_log(`Provided src path is not a directory [${src}]`, context);
@@ -90,12 +90,23 @@ class FS {
             fs_1.default.mkdirSync(dest, { recursive: true });
         }
         const files = fs_1.default.readdirSync(src);
-        for (let i = 0; i < files.length; i++) {
+        fileloop: for (let i = 0; i < files.length; i++) {
             const file = files[i];
+            if (exclude && Array.isArray(exclude)) {
+                for (let e = 0; e < exclude.length; e++) {
+                    const exc = exclude[e];
+                    if (!(exc instanceof RegExp) && file === exc) {
+                        continue fileloop;
+                    }
+                    if (exc instanceof RegExp && file.match(exc) !== null) {
+                        continue fileloop;
+                    }
+                }
+            }
             const current_src = path_1.default.join(src, file);
             const target_src = path_1.default.join(dest, path_1.default.basename(current_src));
             if (fs_1.default.lstatSync(current_src).isDirectory()) {
-                this.copy_directory(current_src, target_src);
+                this.copy_directory(current_src, target_src, context, exclude);
             }
             else {
                 this.copy_file(current_src, target_src);

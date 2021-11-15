@@ -4,126 +4,281 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+Aliases	cmd/types.ts	/^export type Aliases = {$/;"	t
+AnyByAtom	cmd/hooks.ts	/^type AnyByAtom = {$/;"	t
 Arguments	types.ts	/^export type Arguments = minimist.ParsedArgs;$/;"	t
-Conf	types.ts	/^export type Conf = Options & {$/;"	t
-Global	global.d.ts	/^		interface Global {$/;"	i
-NodeJS	global.d.ts	/^	namespace NodeJS {$/;"	c
-Options	types.ts	/^export type Options = {$/;"	t
-PF	util/util.ts	/^type PF = (v?:unknown) => void;$/;"	t
+BookName	cmd/transpose.ts	/^type BookName = 'atom' | 'dock' | 'bll' | 'routes';$/;"	t
+CMD	util/cmd.ts	/^class CMD {$/;"	c
+CMDInstance	util/cmd.ts	/^export type CMDInstance = InstanceType<typeof CMD>;$/;"	t
+Deploy	types.ts	/^export type Deploy = keyof typeof abstract_deploy;$/;"	t
+ExpressionList	cmd/transpose.ts	/^type ExpressionList = {$/;"	t
+FS	util/fs.ts	/^class FS {$/;"	c
+FSInstance	util/fs.ts	/^export type FSInstance = InstanceType<typeof FS>;$/;"	t
+FoundSource	cmd/alias.ts	/^type FoundSource = {$/;"	t
+InitParams	cmd/types.ts	/^export type InitParams = Partial<Params> & {$/;"	t
+ModuleList	cmd/transpose.ts	/^type ModuleList = {$/;"	t
+OnAllCallback	util/types.ts	/^export type OnAllCallback = (event:WatchEvent, path:string) => void;$/;"	t
+OnReadyCallback	util/types.ts	/^export type OnReadyCallback = () => void;$/;"	t
+Output	output/class.ts	/^class Output {$/;"	c
+OutputInstance	output/class.ts	/^export type OutputInstance = InstanceType<typeof Output>;$/;"	t
+PacMan	types.ts	/^export type PacMan = keyof typeof abstract_pacman;$/;"	t
+Params	types.ts	/^export type Params = {$/;"	t
 ParseOptions	types.ts	/^export type ParseOptions = minimist.Opts;$/;"	t
+Reject	util/spawn.ts	/^type Reject = (err?:Error) => void;$/;"	t
 Repo	types.ts	/^export type Repo = keyof typeof abstract_repos;$/;"	t
-_add_as_const	cmd/transpose.ts	/^function _add_as_const(book_decl:VariableDeclaration){$/;"	f
+Resolve	util/spawn.ts	/^type Resolve = (v?:unknown) => void;$/;"	t
+Spawn	util/spawn.ts	/^class Spawn {$/;"	c
+SpawnInstance	util/spawn.ts	/^export type SpawnInstance = InstanceType<typeof Spawn>;$/;"	t
+Util	util/class.ts	/^class Util {$/;"	c
+UtilInstance	util/class.ts	/^export type UtilInstance = InstanceType<typeof Util>;$/;"	t
+WatchEvent	util/types.ts	/^export type WatchEvent = 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir';$/;"	t
+WatchProcessObject	util/types.ts	/^export type WatchProcessObject = {$/;"	t
+_add_adm_book	cmd/transpose.ts	/^function _add_adm_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName){$/;"	f
+_add_admin_files	cmd/init.ts	/^function _add_admin_files(){$/;"	f
+_add_api_book	cmd/transpose.ts	/^function _add_api_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName){$/;"	f
+_add_as_const	cmd/transpose.ts	/^function _add_as_const(book_decl:tsm.VariableDeclaration){$/;"	f
 _add_book_from_file	cmd/transpose.ts	/^function _add_book_from_file($/;"	f
-_add_core_books	cmd/transpose.ts	/^function _add_core_books(book_decl:VariableDeclaration, required_book_name:string){$/;"	f
-_add_ntl_books	cmd/transpose.ts	/^function _add_ntl_books(book_decl:VariableDeclaration, required_book_name:string){$/;"	f
-_add_web_books	cmd/transpose.ts	/^function _add_web_books(book_decl:VariableDeclaration, required_book_name:string){$/;"	f
-_append_requried_book	cmd/transpose.ts	/^function _append_requried_book(book_decl:VariableDeclaration, required_book_name:string)$/;"	f
-_change_realtive_import	cmd/transpose.ts	/^function _change_realtive_import(node:Node)$/;"	f
-_change_realtive_imports	cmd/transpose.ts	/^function _change_realtive_imports(sourceFile:SourceFile)$/;"	f
-_check_folder	process.ts	/^function _check_folder(folder_path:string)$/;"	f
-_clean_all_but	cmd/transpose.ts	/^function _clean_all_but(but:string, var_decl:VariableDeclaration)$/;"	f
-_clean_prop	cmd/transpose.ts	/^function _clean_prop(prop:string, var_decl:VariableDeclaration)$/;"	f
-_clone_and_install_repo	cmd/init.ts	/^async function _clone_and_install_repo(){$/;"	f
+_add_core_books	cmd/transpose.ts	/^function _add_core_books(book_decl:tsm.VariableDeclaration, required_book_name:BookName){$/;"	f
+_add_trx_book	cmd/transpose.ts	/^function _add_trx_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName){$/;"	f
+_append_required_book	cmd/transpose.ts	/^function _append_required_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName)$/;"	f
+_ask_for_deploy	cmd/init.ts	/^async function _ask_for_deploy(args:Arguments){$/;"	f
+_ask_for_pacman	cmd/init.ts	/^async function _ask_for_pacman(args:Arguments){$/;"	f
+_ask_for_repo	cmd/init.ts	/^async function _ask_for_repo(args:Arguments){$/;"	f
+_avoid_import_loop	cmd/transpose.ts	/^function _avoid_import_loop(file_path:string){$/;"	f
+_build_client	cmd/build.ts	/^async function _build_client(){$/;"	f
+_build_server	cmd/build.ts	/^async function _build_server(){$/;"	f
+_change_import_statements_relative_path	cmd/transpose.ts	/^function _change_import_statements_relative_path(import_statements:string[])$/;"	f
+_change_to_relative	cmd/alias.ts	/^function _change_to_relative(node:tsm.Node, aliases:Aliases)$/;"	f
+_change_to_relative_statements	cmd/alias.ts	/^function _change_to_relative_statements(sourceFile:tsm.SourceFile, aliases:Aliases)$/;"	f
+_check_folder	process.ts	/^function _check_folder(folder_path:string){$/;"	f
+_clean_all_but	cmd/transpose.ts	/^function _clean_all_but(but:string[], var_decl:tsm.VariableDeclaration)$/;"	f
+_clean_chunk	util/spawn.ts	/^function _clean_chunk(chunk:string){$/;"	f
+_clone_adm	cmd/init.ts	/^async function _clone_adm(){$/;"	f
+_clone_api	cmd/init.ts	/^async function _clone_api(){$/;"	f
 _clone_core	cmd/init.ts	/^async function _clone_core(){$/;"	f
 _clone_dot	cmd/init.ts	/^async function _clone_dot(){$/;"	f
-_clone_ntl	cmd/init.ts	/^async function _clone_ntl(){$/;"	f
-_clone_repo	util/util.ts	/^async function _clone_repo(context: string, address:string, dest_folder:string, recursive=false)$/;"	f
-_clone_web	cmd/init.ts	/^async function _clone_web(){$/;"	f
+_clone_repo	cmd/init.ts	/^async function _clone_repo(){$/;"	f
+_clone_repo	util/cmd.ts	/^	private async _clone_repo($/;"	m
+_clone_trx	cmd/init.ts	/^async function _clone_trx(){$/;"	f
+_copy_admin_files	cmd/init.ts	/^function _copy_admin_files(){$/;"	f
 _copy_dot_eslint_files	cmd/init.ts	/^function _copy_dot_eslint_files(){$/;"	f
 _copy_dot_files	cmd/init.ts	/^function _copy_dot_files(){$/;"	f
 _copy_dot_src_folder	cmd/init.ts	/^function _copy_dot_src_folder(){$/;"	f
-_copy_dot_tsconfig	cmd/init.ts	/^function _copy_dot_tsconfig(){$/;"	f
-_copy_manipulated_file	cmd/transpose.ts	/^function _copy_manipulated_file(text:string){$/;"	f
+_copy_dot_tsconfigs	cmd/init.ts	/^function _copy_dot_tsconfigs(){$/;"	f
+_copy_express_files	cmd/init.ts	/^function _copy_express_files(){$/;"	f
+_copy_from_src_into_uranio_folder	cmd/transpose.ts	/^function _copy_from_src_into_uranio_folder(){$/;"	f
+_copy_imports	cmd/transpose.ts	/^function _copy_imports(sourceFile:tsm.SourceFile){$/;"	f
+_copy_netlify_files	cmd/init.ts	/^function _copy_netlify_files(){$/;"	f
+_copy_routes_book	cmd/transpose.ts	/^function _copy_routes_book(){$/;"	f
 _create_a_book	cmd/transpose.ts	/^function _create_a_book($/;"	f
-_create_api_book	cmd/transpose.ts	/^function _create_api_book(sourceFile:SourceFile)$/;"	f
-_create_bll_book	cmd/transpose.ts	/^function _create_bll_book(sourceFile:SourceFile)$/;"	f
-_create_json_file	cmd/init.ts	/^function _create_json_file(){$/;"	f
+_create_a_book_file	cmd/transpose.ts	/^function _create_a_book_file(file_path:string, text:string){$/;"	f
+_create_atom_book	cmd/transpose.ts	/^function _create_atom_book(sourceFile:tsm.SourceFile, import_statements:string[])$/;"	f
+_create_bll_book	cmd/transpose.ts	/^function _create_bll_book(sourceFile:tsm.SourceFile, import_statements:string[])$/;"	f
+_create_client_server_folders	cmd/init.ts	/^function _create_client_server_folders(){$/;"	f
+_create_dock_book	cmd/transpose.ts	/^function _create_dock_book(sourceFile:tsm.SourceFile, import_statements:string[])$/;"	f
+_create_rc_file	cmd/init.ts	/^function _create_rc_file(){$/;"	f
+_create_routes_book	cmd/transpose.ts	/^function _create_routes_book(sourceFile:tsm.SourceFile, import_statements:string[])$/;"	f
 _create_urn_folder	cmd/init.ts	/^function _create_urn_folder(){$/;"	f
-_find_atom_book_declaration	cmd/transpose.ts	/^function _find_atom_book_declaration(sourceFile:SourceFile)$/;"	f
-_find_atom_book_statement	cmd/transpose.ts	/^function _find_atom_book_statement(sourceFile:SourceFile)$/;"	f
-_format_text	log/log.ts	/^function _format_text(context:string, text:string)$/;"	f
-_get_project_root	process.ts	/^function _get_project_root(){$/;"	f
-_get_variable_content	cmd/transpose.ts	/^function _get_variable_content(source:SourceFile, variable_name:string)$/;"	f
-_go_previous	log/log.ts	/^function _go_previous(){$/;"	f
+_dev_client	cmd/dev.ts	/^async function _dev_client(){$/;"	f
+_dev_server	cmd/dev.ts	/^async function _dev_server(){$/;"	f
+_fill_empty_docks	cmd/transpose.ts	/^function _fill_empty_docks(sourceFile:tsm.SourceFile){$/;"	f
+_find_atom_book_statement	cmd/transpose.ts	/^function _find_atom_book_statement(sourceFile:tsm.SourceFile)$/;"	f
+_find_book_statement	cmd/transpose.ts	/^function _find_book_statement(sourceFile:tsm.SourceFile, book_name:string)$/;"	f
+_folder_is_uranio	process.ts	/^function _folder_is_uranio(folder_path:string){$/;"	f
+_folder_is_valid	process.ts	/^function _folder_is_valid(folder_path:string){$/;"	f
+_format_text	output/class.ts	/^	private _format_text(text:string, context='frmt'){$/;"	m
+_generate_args	cmd/hooks.ts	/^function _generate_args(params:string[]){$/;"	f
+_generate_client_book	cmd/transpose.ts	/^function _generate_client_book(book_name:BookName, required_props:string[]){$/;"	f
+_generate_client_books	cmd/transpose.ts	/^function _generate_client_books(){$/;"	f
+_generate_text	cmd/hooks.ts	/^function _generate_text(){$/;"	f
+_generate_variable_name	cmd/transpose.ts	/^function _generate_variable_name(str:string){$/;"	f
+_get_atom_def_plural	cmd/hooks.ts	/^function _get_atom_def_plural(){$/;"	f
+_get_atom_name_from_book	cmd/hooks.ts	/^function _get_atom_name_from_book(book_name:string){$/;"	f
+_get_atom_routes	cmd/hooks.ts	/^function _get_atom_routes(){$/;"	f
+_get_book_atom_def	cmd/hooks.ts	/^function _get_book_atom_def(book_name:string){$/;"	f
+_get_book_atom_def_props	cmd/hooks.ts	/^function _get_book_atom_def_props(book_name:string){$/;"	f
+_get_custom_routes	cmd/hooks.ts	/^function _get_custom_routes(){$/;"	f
+_get_parameters_from_url	cmd/hooks.ts	/^function _get_parameters_from_url(url:string){$/;"	f
+_get_project_root	process.ts	/^function _get_project_root()$/;"	f
+_get_required_imports	cmd/transpose.ts	/^function _get_required_imports(import_statements:string[], text:string){$/;"	f
+_get_variable_content	cmd/transpose.ts	/^function _get_variable_content(source:tsm.SourceFile, variable_name:string)$/;"	f
+_go_previous	output/class.ts	/^	private _go_previous(){$/;"	m
 _ignore_urn_folder	cmd/init.ts	/^function _ignore_urn_folder(){$/;"	f
+_init_alias	cmd/alias.ts	/^function _init_alias(params:Partial<Params>){$/;"	f
+_init_build	cmd/build.ts	/^function _init_build(params:Partial<Params>)$/;"	f
+_init_dev	cmd/dev.ts	/^function _init_dev(){$/;"	f
 _init_log	process.ts	/^function _init_log(){$/;"	f
-_initialize	cmd/init.ts	/^async function _initialize(args:Arguments){$/;"	f
+_init_pacman	cmd/init.ts	/^async function _init_pacman(){$/;"	f
+_init_params	cmd/dev.ts	/^function _init_params(params:Partial<Params>)$/;"	f
+_init_tranpose	cmd/transpose.ts	/^function _init_tranpose(params:Partial<Params>){$/;"	f
+_install_adm_dep	cmd/init.ts	/^async function _install_adm_dep(){$/;"	f
+_install_api_dep	cmd/init.ts	/^async function _install_api_dep(){$/;"	f
 _install_core_dep	cmd/init.ts	/^async function _install_core_dep(){$/;"	f
-_install_dep	cmd/init.ts	/^async function _install_dep(repo:Repo)$/;"	f
-_install_ntl_dep	cmd/init.ts	/^async function _install_ntl_dep(){$/;"	f
-_install_web_dep	cmd/init.ts	/^async function _install_web_dep(){$/;"	f
-_is_already_initialized	cmd/init.ts	/^function _is_already_initialized(){$/;"	f
-_log	log/log.ts	/^function _log(context:string, text:string, out=false){$/;"	f
-_log_arguments	process.ts	/^function _log_arguments(args:Arguments){$/;"	f
-_log_to_file	log/log.ts	/^function _log_to_file(text:string)$/;"	f
-_manipulate_atom_book	cmd/transpose.ts	/^function _manipulate_atom_book(sourceFile:SourceFile)$/;"	f
-_manipulate_file	cmd/transpose.ts	/^function _manipulate_file(){$/;"	f
-_pretty_books	cmd/transpose.ts	/^function _pretty_books(){$/;"	f
-_proceed_with_repo	cmd/init.ts	/^async function _proceed_with_repo(repo:Repo){$/;"	f
-_read_options	process.ts	/^function _read_options(args:Arguments){$/;"	f
+_install_dep	cmd/init.ts	/^async function _install_dep()$/;"	f
+_install_repo	cmd/init.ts	/^async function _install_repo(){$/;"	f
+_install_trx_dep	cmd/init.ts	/^async function _install_trx_dep(){$/;"	f
+_keep_only_client_first_level_properties	cmd/transpose.ts	/^function _keep_only_client_first_level_properties(sourceFile:tsm.SourceFile, book_name:BookName, required_props:string[]){$/;"	f
+_keep_only_client_second_level_properties	cmd/transpose.ts	/^function _keep_only_client_second_level_properties(sourceFile:tsm.SourceFile, book_name:BookName, required_props:string[]){$/;"	f
+_log	output/class.ts	/^	private _log(text:string, context='log', out=false){$/;"	m
+_log_arguments	process.ts	/^function _log_arguments(params:Params){$/;"	f
+_log_important_params	cmd/init.ts	/^function _log_important_params(){$/;"	f
+_log_root	process.ts	/^function _log_root(){$/;"	f
+_log_to_file	output/class.ts	/^function _log_to_file(text:string)$/;"	f
+_manipulate_and_create_files	cmd/transpose.ts	/^function _manipulate_and_create_files(file_path:string){$/;"	f
+_merge_params	cmd/common.ts	/^function _merge_params(params:Partial<Params>, is_init=false)$/;"	f
+_remove_dock_route_call_implementation	cmd/transpose.ts	/^function _remove_dock_route_call_implementation(sourceFile:tsm.SourceFile){$/;"	f
+_remove_git_files	cmd/init.ts	/^function _remove_git_files(){$/;"	f
 _remove_tmp	cmd/init.ts	/^function _remove_tmp(){$/;"	f
-_remove_type_reference	cmd/transpose.ts	/^function _remove_type_reference(book_decl:VariableDeclaration){$/;"	f
-_rename_book	cmd/transpose.ts	/^function _rename_book(book_name:string, var_decl:VariableDeclaration)$/;"	f
-_replace_comments	cmd/transpose.ts	/^function _replace_comments(sourceFile:SourceFile)$/;"	f
-_replace_root_string	log/log.ts	/^function _replace_root_string(str:string)$/;"	f
-_spinner_text_color	log/log.ts	/^function _spinner_text_color(text?:string):string{$/;"	f
-_start_dev	cmd/dev.ts	/^async function _start_dev()$/;"	f
+_remove_type_reference	cmd/transpose.ts	/^function _remove_type_reference(book_decl:tsm.VariableDeclaration){$/;"	f
+_rename_book	cmd/transpose.ts	/^function _rename_book(book_name:BookName, var_decl:tsm.VariableDeclaration)$/;"	f
+_replace_aliases	cmd/init.ts	/^async function _replace_aliases(){$/;"	f
+_replace_aliases_client	cmd/alias.ts	/^function _replace_aliases_client(aliases:Aliases){$/;"	f
+_replace_aliases_server	cmd/alias.ts	/^function _replace_aliases_server(aliases:Aliases){$/;"	f
+_replace_comments	cmd/transpose.ts	/^function _replace_comments(sourceFile:tsm.SourceFile)$/;"	f
+_replace_import_to_avoid_loops	cmd/transpose.ts	/^function _replace_import_to_avoid_loops(){$/;"	f
+_replace_imports_to_avoid_loops_in_books	cmd/transpose.ts	/^function _replace_imports_to_avoid_loops_in_books(){$/;"	f
+_replace_modified_file	cmd/alias.ts	/^function _replace_modified_file(text:string, filename:string){$/;"	f
+_replace_netlify_function_file	cmd/dev.ts	/^function _replace_netlify_function_file(){$/;"	f
+_replace_root_string	output/class.ts	/^	private _replace_root_string(str:string)$/;"	m
+_replace_uranio_client_dependecy	cmd/transpose.ts	/^function _replace_uranio_client_dependecy(sourceFile:tsm.SourceFile){$/;"	f
+_resolve_aliases	cmd/transpose.ts	/^function _resolve_aliases(){$/;"	f
+_resolve_aliases_in_books	cmd/transpose.ts	/^function _resolve_aliases_in_books(){$/;"	f
+_resolve_path_tree	cmd/transpose.ts	/^function _resolve_path_tree(submodule_name:string){$/;"	f
+_save_to_file	cmd/hooks.ts	/^function _save_to_file(text:string){$/;"	f
+_set_params	process.ts	/^function _set_params(args:Arguments)$/;"	f
+_spawn	util/spawn.ts	/^	private _spawn($/;"	m
+_spinner_text_color	output/class.ts	/^	private _spinner_text_color(text?:string):string{$/;"	m
 _switch_command	process.ts	/^function _switch_command(args:Arguments){$/;"	f
-_uninstall_core_dep	cmd/init.ts	/^async function _uninstall_core_dep(){$/;"	f
-_uninstall_ntl_dep	cmd/init.ts	/^async function _uninstall_ntl_dep(){$/;"	f
-_uninstall_web_dep	cmd/init.ts	/^async function _uninstall_web_dep(){$/;"	f
-_update_aliases	cmd/init.ts	/^function _update_aliases(){$/;"	f
+_text_args_for_url	cmd/hooks.ts	/^function _text_args_for_url(url:string){$/;"	f
+_text_lines_in_args_params	cmd/hooks.ts	/^function _text_lines_in_args_params(url:string){$/;"	f
+_transpose_all	cmd/transpose.ts	/^function _transpose_all(included=false){$/;"	f
+_transpose_book	cmd/transpose.ts	/^function _transpose_book(){$/;"	f
+_transpose_file	cmd/transpose.ts	/^function _transpose_file(file_path:string, included=false){$/;"	f
+_transpose_folder	cmd/transpose.ts	/^function _transpose_folder(dir_path:string, included=false){$/;"	f
+_traverse_ts_aliases	cmd/alias.ts	/^function _traverse_ts_aliases(directory:string, aliases:Aliases) {$/;"	f
+_traverse_ts_avoid_import_loop	cmd/transpose.ts	/^function _traverse_ts_avoid_import_loop(directory:string) {$/;"	f
+_traverse_ts_resolve_aliases	cmd/transpose.ts	/^function _traverse_ts_resolve_aliases(directory:string, aliases:Aliases) {$/;"	f
+_uninstall_adm_dep	cmd/init.ts	/^async function _uninstall_adm_dep(pack_data?:any){$/;"	f
+_uninstall_api_dep	cmd/init.ts	/^async function _uninstall_api_dep(pack_data?:any){$/;"	f
+_uninstall_core_dep	cmd/init.ts	/^async function _uninstall_core_dep(pack_data?:any){$/;"	f
+_uninstall_dep	cmd/init.ts	/^async function _uninstall_dep(repo:string, context:string, pack_data?:any){$/;"	f
+_uninstall_trx_dep	cmd/init.ts	/^async function _uninstall_trx_dep(pack_data?:any){$/;"	f
+_update_package_aliases	cmd/init.ts	/^function _update_package_aliases(){$/;"	f
+_update_package_scripts	cmd/init.ts	/^function _update_package_scripts(){$/;"	f
+_watch	cmd/dev.ts	/^function _watch(){$/;"	f
+abstract_admin_repos	types.ts	/^export const abstract_admin_repos = {$/;"	v
+abstract_deploy	types.ts	/^export const abstract_deploy = {$/;"	v
+abstract_deploy_repos	types.ts	/^export const abstract_deploy_repos = {$/;"	v
+abstract_hooks_repos	types.ts	/^export const abstract_hooks_repos = {$/;"	v
+abstract_pacman	types.ts	/^export const abstract_pacman = {$/;"	v
 abstract_repos	types.ts	/^export const abstract_repos = {$/;"	v
-chalk	log/log.ts	/^import chalk from 'chalk';$/;"	I
-clone_repo	util/util.ts	/^export async function clone_repo(context: string, address:string, dest_folder:string)$/;"	f
-clone_repo_recursive	util/util.ts	/^export async function clone_repo_recursive(context: string, address:string, dest_folder:string)$/;"	f
-conf	conf/defaults.ts	/^export const conf:Conf = {$/;"	v
-copy_file	util/util.ts	/^export function copy_file(context:string, source:string, destination:string)$/;"	f
-copy_files	util/util.ts	/^export function copy_files(context:string, source:string, destination:string)$/;"	f
-copy_folder	util/util.ts	/^export function copy_folder(context:string, source:string, destination:string)$/;"	f
-create_folder_if_doesnt_exists	util/util.ts	/^export function create_folder_if_doesnt_exists(context:string, folder_path:string)$/;"	f
-dateFormat	log/log.ts	/^import dateFormat from 'dateformat';$/;"	I
+alias	cmd/alias.ts	/^export async function alias(params:Partial<Params>, included=false)$/;"	f
+build	cmd/build.ts	/^export async function build(params:Params)$/;"	f
+build_client	cmd/build.ts	/^export async function build_client(params:Partial<Params>)$/;"	f
+build_server	cmd/build.ts	/^export async function build_server(params:Partial<Params>)$/;"	f
+chalk	output/class.ts	/^import chalk from 'chalk';$/;"	I
+check_deploy	cmd/common.ts	/^export function check_deploy(deploy:string)$/;"	f
+check_pacman	cmd/common.ts	/^export function check_pacman(pacman:string)$/;"	f
+check_repo	cmd/common.ts	/^export function check_repo(repo:string)$/;"	f
+chokidar	util/class.ts	/^import chokidar from 'chokidar';$/;"	I
+chokidar	util/types.ts	/^import chokidar from 'chokidar';$/;"	I
+clone_repo	util/cmd.ts	/^	public async clone_repo(address:string, dest_folder:string, context='clrp', branch='master')$/;"	m
+clone_repo_recursive	util/cmd.ts	/^	public async clone_repo_recursive(address:string, dest_folder:string, context='clrr', branch='master')$/;"	m
+cmd	util/class.ts	/^	public cmd:cmd.CMDInstance;$/;"	m
+copy_directory	util/fs.ts	/^	public copy_directory(src:string, dest:string, context='cp_d'){$/;"	m
+copy_file	util/fs.ts	/^	public copy_file(src:string, dest:string, context='cp_f'){$/;"	m
+copy_file_async	util/fs.ts	/^	public copy_file_async(src:string, dest:string, context='cp_f'){$/;"	m
+create	output/class.ts	/^export function create(params: Partial<Params>)$/;"	f
+create	util/class.ts	/^export function create(params:Partial<Params>, output:out.OutputInstance)$/;"	f
+create	util/cmd.ts	/^export function create(params:Partial<Params>, output:out.OutputInstance)$/;"	f
+create	util/fs.ts	/^export function create(output:out.OutputInstance):FSInstance{$/;"	f
+create	util/spawn.ts	/^export function create(output:out.OutputInstance):SpawnInstance{$/;"	f
+create_directory	util/fs.ts	/^	public create_directory(dir_path:string, context='mkdr'){$/;"	m
+create_directory_async	util/fs.ts	/^	public create_directory_async(dir_path:string, context='mkdr'){$/;"	m
+create_file	util/fs.ts	/^	public create_file(file_path:string, context='tch'){$/;"	m
+create_file_async	util/fs.ts	/^	public create_file_async(file_path:string, context='tch'){$/;"	m
+dateFormat	output/class.ts	/^import dateFormat from 'dateformat';$/;"	I
+debug_log	output/class.ts	/^	public debug_log(text:string, context='dlog', color?:string)$/;"	m
+default_params	conf/defaults.ts	/^export const default_params:Params = {$/;"	v
 defaults	conf/defaults.ts	/^export const defaults = {$/;"	v
-dev	cmd/dev.ts	/^export const dev = {$/;"	v
-done_log	log/log.ts	/^export function done_log(context:string, text:string)$/;"	f
-done_verbose_log	log/log.ts	/^export function done_verbose_log(context:string, text:string)$/;"	f
-end_log	log/log.ts	/^export function end_log(text:string)$/;"	f
-error_log	log/log.ts	/^export function error_log(context:string, text:string)$/;"	f
-fs	cmd/init.ts	/^import fs from 'fs';$/;"	I
-fs	cmd/transpose.ts	/^import fs from 'fs';$/;"	I
-fs	log/log.ts	/^import fs from 'fs';$/;"	I
+dependency_exists	util/cmd.ts	/^	public dependency_exists(repo:string, package_data?:any)$/;"	m
+dev	cmd/dev.ts	/^export async function dev(params:Partial<Params>):Promise<void>{$/;"	f
+dev_client	cmd/dev.ts	/^export async function dev_client(params:Partial<Params>):Promise<void>{$/;"	f
+dev_server	cmd/dev.ts	/^export async function dev_server(params:Partial<Params>):Promise<void>{$/;"	f
+done_log	output/class.ts	/^	public done_log(text:string, context='done')$/;"	m
+done_verbose_log	output/class.ts	/^	public done_verbose_log(text:string, context='vdne')$/;"	m
+end_log	output/class.ts	/^	public end_log(text:string)$/;"	m
+error_log	output/class.ts	/^	public error_log(text:string, context='errr')$/;"	m
+exec_sync	util/spawn.ts	/^	public exec_sync(command:string){$/;"	m
+exists	util/fs.ts	/^	public exists(path:string, context='exst'){$/;"	m
+fs	cmd/common.ts	/^import fs from 'fs';$/;"	I
+fs	output/class.ts	/^import fs from 'fs';$/;"	I
 fs	process.ts	/^import fs from 'fs';$/;"	I
-fs	util/util.ts	/^import fs from 'fs';$/;"	I
-help	cmd/help.ts	/^export const help = {$/;"	v
-init	cmd/init.ts	/^export const init = {$/;"	v
-initialize	cmd/init.ts	/^export async function initialize(root: string, repo: Repo, options: Options)$/;"	f
+fs	util/class.ts	/^	public fs:fs.FSInstance;$/;"	m
+fs	util/cmd.ts	/^	public fs:fs.FSInstance;$/;"	m
+fs	util/fs.ts	/^import fs from 'fs';$/;"	I
+get_aliases	cmd/alias.ts	/^export function get_aliases(tsconfig_path:string, params?:Partial<Params>)$/;"	f
+get_package_data	util/cmd.ts	/^	public get_package_data(package_json_path:string){$/;"	m
+help	cmd/help.ts	/^export async function help():Promise<void> {$/;"	f
+hooks	cmd/hooks.ts	/^export async function hooks(params:Partial<Params>, included=false)$/;"	f
+init	cmd/init.ts	/^export async function init(params:Partial<Params>)$/;"	f
 inquirer	cmd/init.ts	/^import inquirer from 'inquirer';$/;"	I
-install_dep	util/util.ts	/^export async function install_dep(repo:string, context:string)$/;"	f
-install_dep_dev	util/util.ts	/^export async function install_dep_dev(repo:string, context:string)$/;"	f
-is_initialized	util/util.ts	/^export function is_initialized()$/;"	f
+install_dep	util/cmd.ts	/^	public async install_dep(repo:string, context:string)$/;"	m
+install_dep_dev	util/cmd.ts	/^	public async install_dep_dev(repo:string, context:string)$/;"	m
+is_directory	util/fs.ts	/^	public is_directory(path:string, context?:string){$/;"	m
+is_initialized	util/class.ts	/^	public is_initialized(){$/;"	m
+is_initialized	util/cmd.ts	/^	public is_initialized()$/;"	m
 jsonfile_path	conf/defaults.ts	/^export const jsonfile_path = `${defaults.folder}\/${defaults.json_filename}`;$/;"	v
-log	log/log.ts	/^export function log(context:string, text:string)$/;"	f
+log	output/class.ts	/^	public log(text:string, context='log', color?:string)$/;"	m
+log	util/spawn.ts	/^	public log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){$/;"	m
+merge_init_params	cmd/common.ts	/^export function merge_init_params(params:Partial<Params>)$/;"	f
+merge_params	cmd/common.ts	/^export function merge_params(params:Partial<Params>)$/;"	f
 minimist	args/args.ts	/^import minimist from 'minimist';$/;"	I
 minimist	types.ts	/^import minimist from 'minimist';$/;"	I
-ora	log/log.ts	/^import ora from 'ora';$/;"	I
+must_be_initialized	util/class.ts	/^	public must_be_initialized(){$/;"	m
+ora	output/spinner.ts	/^import ora from 'ora';$/;"	I
 parser	args/args.ts	/^export function parser(args:string[] | undefined, options?:ParseOptions)$/;"	f
-prettier	util/util.ts	/^import prettier from 'prettier';$/;"	I
-pretty	util/util.ts	/^export function pretty(path:string, parser='typescript')$/;"	f
-read_rc_file	util/util.ts	/^export function read_rc_file()$/;"	f
-relative_to_absolute_path	util/util.ts	/^export function relative_to_absolute_path(path:string)$/;"	f
-remove_folder_if_exists	util/util.ts	/^export function remove_folder_if_exists(context:string, folder_path:string)$/;"	f
-set_repo	util/util.ts	/^export function set_repo(repo:unknown)$/;"	f
-spawn_cmd	util/util.ts	/^export function spawn_cmd(command:string, context:string, action:string, resolve:PF, reject:PF)$/;"	f
-spinner_text	log/log.ts	/^export function spinner_text(text:string)$/;"	f
-start_loading	log/log.ts	/^export function start_loading(text:string)$/;"	f
-stop_loading	log/log.ts	/^export function stop_loading()$/;"	f
-sync_exec	util/util.ts	/^export function sync_exec(command:string)$/;"	f
-test	cmd/test.ts	/^export const test = {$/;"	v
+path	cmd/alias.ts	/^import path from 'path';$/;"	I
+path	cmd/dev.ts	/^import path from 'path';$/;"	I
+path	cmd/transpose.ts	/^import path from 'path';$/;"	I
+path	process.ts	/^import path from 'path';$/;"	I
+path	util/fs.ts	/^import path from 'path';$/;"	I
+prettier	util/class.ts	/^import prettier from 'prettier';$/;"	I
+pretty	util/class.ts	/^	public pretty(filepath:string, parser='typescript')$/;"	m
+prompt_init	cmd/init.ts	/^export async function prompt_init(params:Params, args:Arguments)$/;"	f
+read_dir	util/fs.ts	/^	public read_dir(dir_path:string, context='rddi'){$/;"	m
+read_file	util/fs.ts	/^	public read_file(file_path:string, encoding?:BufferEncoding, context='rdfl'){$/;"	m
+read_rc_file	cmd/common.ts	/^export function read_rc_file(params:Partial<Params>)$/;"	f
+remove_directory	util/fs.ts	/^	public remove_directory(dir_path:string, context='rm_d'){$/;"	m
+remove_directory_async	util/fs.ts	/^	public remove_directory_async(dir_path:string, context='rm_d'){$/;"	m
+remove_file	util/fs.ts	/^	public remove_file(file_path:string, context='rm_f'){$/;"	m
+remove_file_async	util/fs.ts	/^	public remove_file_async(file_path:string, context='rm_f'){$/;"	m
+replace_file_aliases	cmd/alias.ts	/^export function replace_file_aliases(filepath:string, aliases:Aliases, params?:Partial<Params>)$/;"	f
+run	test.ts	/^function run(){$/;"	f
+spawn	util/class.ts	/^	public spawn:spawn.SpawnInstance;$/;"	m
+spawn	util/cmd.ts	/^	public spawn:spawn.SpawnInstance;$/;"	m
+spin	util/spawn.ts	/^	public spin(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){$/;"	m
+spin_and_log	util/spawn.ts	/^	public spin_and_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){$/;"	m
+spin_and_verbose_log	util/spawn.ts	/^	public spin_and_verbose_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){$/;"	m
+spinner	output/spinner.ts	/^export const spinner = ora({text: 'Loading...', color: 'magenta', interval: 40});$/;"	v
+spinner_text	output/class.ts	/^	public spinner_text(text:string)$/;"	m
+spinner_texts	output/spinner.ts	/^export const spinner_texts:string[] = [];$/;"	v
+start_loading	output/class.ts	/^	public start_loading(text:string)$/;"	m
+stop_loading	output/class.ts	/^	public stop_loading()$/;"	m
 title	cmd/title.ts	/^export function title()$/;"	f
-transpose	cmd/transpose.ts	/^export const transpose = {$/;"	v
-uninstall_dep	util/util.ts	/^export async function uninstall_dep(repo:string, context:string)$/;"	f
-urn_cli	test.ts	/^import urn_cli from '.\/index';$/;"	I
-urn_process	process.ts	/^export function urn_process(args:Arguments)$/;"	f
+transpose	cmd/transpose.ts	/^export async function transpose(params:Partial<Params>, included=false)$/;"	f
+transpose_one	cmd/transpose.ts	/^export async function transpose_one(full_path:string, params:Partial<Params>, included=false)$/;"	f
+uninstall_dep	util/cmd.ts	/^	public async uninstall_dep(repo:string, context:string)$/;"	m
+uranio_process	process.ts	/^export function uranio_process(args:Arguments)$/;"	f
+valid_admin_repos	types.ts	/^export function valid_admin_repos()$/;"	f
+valid_deploy	types.ts	/^export function valid_deploy()$/;"	f
+valid_deploy_repos	types.ts	/^export function valid_deploy_repos()$/;"	f
+valid_hooks_repos	types.ts	/^export function valid_hooks_repos()$/;"	f
+valid_pacman	types.ts	/^export function valid_pacman()$/;"	f
 valid_repos	types.ts	/^export function valid_repos()$/;"	f
-verbose_log	log/log.ts	/^export function verbose_log(context:string, text:string)$/;"	f
-wrong_end_log	log/log.ts	/^export function wrong_end_log(text:string)$/;"	f
+verbose_log	output/class.ts	/^	public verbose_log(text:string, context='vlog', color?:string)$/;"	m
+verbose_log	util/spawn.ts	/^	public verbose_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){$/;"	m
+watch	util/class.ts	/^	public watch($/;"	m
+write_file	util/fs.ts	/^	public write_file(file_path:string, content:string, encoding?:BufferEncoding, context='wrfl'){$/;"	m
+wrong_end_log	output/class.ts	/^	public wrong_end_log(text:string)$/;"	m
+yarn_install	util/cmd.ts	/^	public async yarn_install()$/;"	m

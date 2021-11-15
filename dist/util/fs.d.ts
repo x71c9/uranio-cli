@@ -23,7 +23,7 @@ declare class FS {
      * It will copy all files in src folder inside dest folder.
      * If dest folder does not exist it will create it.
      */
-    copy_directory(src: string, dest: string, context?: string): void;
+    copy_directory(src: string, dest: string, context?: string, exclude?: string[] | RegExp[]): void;
     remove_file_async(file_path: string, context?: string): void;
     remove_file(file_path: string, context?: string): void;
     remove_directory_async(dir_path: string, context?: string): void;
