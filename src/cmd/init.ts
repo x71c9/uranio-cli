@@ -280,9 +280,9 @@ function _remove_tmp(){
 }
 
 function _copy_dot_files(){
-	if(util_instance.fs.exists(`${init_params.root}/src`) === false){
-		_copy_dot_src_folder();
-	}
+	// if(util_instance.fs.exists(`${init_params.root}/src`) === false){
+	//   _copy_dot_src_folder();
+	// }
 	_copy_dot_tsconfigs();
 	_copy_dot_eslint_files();
 	
@@ -532,12 +532,12 @@ function _update_package_aliases(){
 	}
 }
 
-function _copy_dot_src_folder(){
-	const dot_src_folder =
-		`${init_params.root}/${defaults.tmp_folder}/urn-dot/src`;
-	const dest = `${init_params.root}/src`;
-	util_instance.fs.copy_directory(dot_src_folder, dest, 'dot');
-}
+// function _copy_dot_src_folder(){
+//   const dot_src_folder =
+//     `${init_params.root}/${defaults.tmp_folder}/urn-dot/src`;
+//   const dest = `${init_params.root}/src`;
+//   util_instance.fs.copy_directory(dot_src_folder, dest, 'dot');
+// }
 
 function _copy_dot_tsconfigs(){
 	const dot_tsc_file =
@@ -546,12 +546,12 @@ function _copy_dot_tsconfigs(){
 	util_instance.fs.copy_file(dot_tsc_file, dest, 'tsco');
 	
 	const dot_tsc_file_server =
-		`${init_params.root}/${defaults.tmp_folder}/urn-dot/.uranio/server/tsconfig.json`;
+		`${init_params.root}/${defaults.tmp_folder}/urn-dot/files/server/tsconfig.json`;
 	const dest_server = `${init_params.root}/.uranio/server/tsconfig.json`;
 	util_instance.fs.copy_file(dot_tsc_file_server, dest_server, 'tscs');
 	
 	const dot_tsc_file_client =
-		`${init_params.root}/${defaults.tmp_folder}/urn-dot/.uranio/client/tsconfig.json`;
+		`${init_params.root}/${defaults.tmp_folder}/urn-dot/files/client/tsconfig.json`;
 	const dest_client = `${init_params.root}/.uranio/client/tsconfig.json`;
 	util_instance.fs.copy_file(dot_tsc_file_client, dest_client, 'tscc');
 }
@@ -594,13 +594,17 @@ function _copy_netlify_files(){
 }
 
 function _copy_admin_files(){
-	const dot_client_folder =
-		`${init_params.root}/${defaults.tmp_folder}/urn-dot/${defaults.folder}/client`;
+	// const dot_client_folder =
+	//   `${init_params.root}/${defaults.tmp_folder}/urn-dot/${defaults.folder}/client`;
 	
-	const nuxt_config_file = `${dot_client_folder}/nuxt.config.js`;
+	// const nuxt_config_file = `${dot_client_folder}/nuxt.config.js`;
+	// const nuxt_config_dest = `${init_params.root}/${defaults.folder}/client/nuxt.config.js`;
+	// util_instance.fs.copy_file(nuxt_config_file, nuxt_config_dest, 'adm');
+	
+	const dot_files_folder = `${init_params.root}/${defaults.tmp_folder}/urn-dot/files/`;
+	const nuxt_config_file = `${dot_files_folder}/client/nuxt.config.js`;
 	const nuxt_config_dest = `${init_params.root}/${defaults.folder}/client/nuxt.config.js`;
 	util_instance.fs.copy_file(nuxt_config_file, nuxt_config_dest, 'adm');
-	
 }
 
 function _copy_express_files(){
