@@ -90,10 +90,11 @@ function _init_tranpose(params) {
     util_instance.must_be_initialized();
 }
 function _transpose_all(included = false) {
-    _copy_from_src_into_uranio_folder();
-    _transpose_book();
-    _resolve_aliases();
-    _replace_import_to_avoid_loops();
+    // _copy_from_src_into_uranio_folder();
+    // _transpose_book();
+    // _resolve_aliases();
+    // _replace_import_to_avoid_loops();
+    _transpose_folder(path_1.default.join(transpose_params.root, 'src'), true);
     if (included) {
         output_instance.done_log(`Transpose completed.`);
     }
@@ -113,7 +114,24 @@ function _transpose_file(file_path, included = false) {
     if (file_path && util_instance.fs.exists(file_path) && file_path.includes(`${transpose_params.root}/src/`)) {
         const base_folder = `${transpose_params.root}/${defaults_1.defaults.folder}`;
         const frontend_src_path = `${transpose_params.root}/src/frontend`;
-        if (types_1.valid_admin_repos().includes(transpose_params.repo) && file_path.includes(frontend_src_path)) {
+        const uranio_src_path = `${transpose_params.root}/src/uranio`;
+        if (file_path.includes(uranio_src_path)) {
+            const uranio_server_target = file_path.replace(uranio_src_path, path_1.default.join(base_folder, 'server/src', defaults_1.defaults.repo_folder));
+            util_instance.fs.copy_file(file_path, uranio_server_target, 'trsp');
+            if (path_1.default.extname(file_path) === '.ts') {
+                alias.replace_file_aliases(uranio_server_target, alias.get_aliases(`${base_folder}/server/tsconfig.json`, transpose_params));
+                _avoid_import_loop(uranio_server_target);
+                output_instance.done_verbose_log(`Transposed uranio file [${file_path}] [${uranio_server_target}].`, 'trsp');
+            }
+            const uranio_client_target = file_path.replace(uranio_src_path, path_1.default.join(base_folder, 'client/src', defaults_1.defaults.repo_folder));
+            util_instance.fs.copy_file(file_path, uranio_client_target, 'trsp');
+            if (path_1.default.extname(file_path) === '.ts') {
+                alias.replace_file_aliases(uranio_client_target, alias.get_aliases(`${base_folder}/client/tsconfig.json`, transpose_params));
+                _avoid_import_loop(uranio_client_target);
+                output_instance.done_verbose_log(`Transposed uranio file [${file_path}] [${uranio_client_target}].`, 'trsp');
+            }
+        }
+        else if (types_1.valid_admin_repos().includes(transpose_params.repo) && file_path.includes(frontend_src_path)) {
             const frontend_target = file_path.replace(frontend_src_path, path_1.default.join(base_folder, 'client/src', defaults_1.defaults.repo_folder, 'nuxt'));
             util_instance.fs.copy_file(file_path, frontend_target, 'trsp');
             if (path_1.default.extname(file_path) === '.ts') {
@@ -161,7 +179,7 @@ function _transpose_folder(dir_path, included = false) {
     util_instance.fs.read_dir(dir_path).forEach((filename) => {
         const full_path = path_1.default.resolve(dir_path, filename);
         if (util_instance.fs.is_directory(full_path) && filename !== '.git') {
-            return _transpose_folder(full_path);
+            return _transpose_folder(full_path, true);
         }
         else {
             return _transpose_file(full_path);
@@ -170,80 +188,6 @@ function _transpose_folder(dir_path, included = false) {
     if (!included) {
         output_instance.done_log(`Transpose folder completed.`);
     }
-}
-function _copy_from_src_into_uranio_folder() {
-    const root = transpose_params.root;
-    const src_paths = util_instance.fs.read_dir(`${root}/src/`);
-    for (let i = 0; i < src_paths.length; i++) {
-        const src_path = src_paths[i];
-        const full_src_path = path_1.default.join(root, 'src', src_path);
-        if (src_path === 'uranio') {
-            const uranio_paths = util_instance.fs.read_dir(full_src_path);
-            for (let j = 0; j < uranio_paths.length; j++) {
-                const file_path = uranio_paths[j];
-                if (file_path.startsWith('.git')) {
-                    continue;
-                }
-                const full_file_path = path_1.default.join(full_src_path, file_path);
-                const default_folder_path = path_1.default.join(root, defaults_1.defaults.folder);
-                const target_uranio_path = path_1.default.join('src', defaults_1.defaults.repo_folder, file_path);
-                const target_client = path_1.default.join(default_folder_path, 'client', target_uranio_path);
-                const target_server = path_1.default.join(default_folder_path, 'server', target_uranio_path);
-                if (util_instance.fs.is_directory(full_file_path)) {
-                    util_instance.fs.copy_directory(full_file_path, target_client, 'cpsrc', [/^\.git/]);
-                    util_instance.fs.copy_directory(full_file_path, target_server, 'cpsrc', [/^\.git/]);
-                }
-                else {
-                    util_instance.fs.copy_file(full_file_path, target_client);
-                    util_instance.fs.copy_file(full_file_path, target_server);
-                }
-            }
-        }
-        else if (src_path === 'frontend' && types_1.valid_admin_repos().includes(transpose_params.repo)) {
-            const frontend_paths = util_instance.fs.read_dir(full_src_path);
-            for (let j = 0; j < frontend_paths.length; j++) {
-                const file_path = frontend_paths[j];
-                const full_file_path = path_1.default.join(full_src_path, file_path);
-                const target_client = path_1.default.join(root, defaults_1.defaults.folder, 'client/src', defaults_1.defaults.repo_folder, 'nuxt', file_path);
-                if (util_instance.fs.is_directory(full_file_path)) {
-                    util_instance.fs.copy_directory(full_file_path, target_client);
-                }
-                else {
-                    util_instance.fs.copy_file(full_file_path, target_client);
-                }
-            }
-        }
-        else if (src_path !== 'book.ts') {
-            const target_server = path_1.default.join(root, defaults_1.defaults.folder, 'server/src', src_path);
-            const target_client = path_1.default.join(root, defaults_1.defaults.folder, 'client/src', src_path);
-            if (util_instance.fs.is_directory(full_src_path)) {
-                util_instance.fs.copy_directory(full_src_path, target_server);
-                util_instance.fs.copy_directory(full_src_path, target_client);
-            }
-            else {
-                util_instance.fs.copy_file(full_src_path, target_server);
-                util_instance.fs.copy_file(full_src_path, target_client);
-            }
-        }
-    }
-    // util_instance.fs.copy_directory(
-    //   `${transpose_params.root}/src/`,
-    //   `${transpose_params.root}/${defaults.folder}/client/src/`,
-    //   `trsp`
-    // );
-    // util_instance.fs.copy_directory(
-    //   `${transpose_params.root}/src/`,
-    //   `${transpose_params.root}/${defaults.folder}/server/src/`,
-    //   `trsp`
-    // );
-    // util_instance.fs.remove_file(
-    //   `${transpose_params.root}/${defaults.folder}/server/src/book.ts`,
-    //   `book`
-    // );
-    // util_instance.fs.remove_file(
-    //   `${transpose_params.root}/${defaults.folder}/client/src/book.ts`,
-    //   `book`
-    // );
 }
 function _avoid_import_loop(file_path) {
     const modules = {};
@@ -391,41 +335,40 @@ function _generate_variable_name(str) {
     }
     return `${str}_${num}`;
 }
-function _resolve_aliases() {
-    output_instance.start_loading(`Replacing aliases with relative paths...`);
-    const base_folder = `${transpose_params.root}/${defaults_1.defaults.folder}`;
-    const tsconfig_server = `${base_folder}/server/tsconfig.json`;
-    const aliases_server = alias.get_aliases(tsconfig_server, transpose_params);
-    const server_dir = `${transpose_params.root}/${defaults_1.defaults.folder}/server/src/`;
-    _traverse_ts_resolve_aliases(server_dir, aliases_server);
-    output_instance.done_log(`Server aliases replaced.`, 'alias');
-    const tsconfig_client = `${base_folder}/client/tsconfig.json`;
-    const aliases_client = alias.get_aliases(tsconfig_client, transpose_params);
-    const client_dir = `${transpose_params.root}/${defaults_1.defaults.folder}/client/src/`;
-    _traverse_ts_resolve_aliases(client_dir, aliases_client);
-    output_instance.done_log(`Client aliases replaced.`, 'alias');
-}
-function _replace_import_to_avoid_loops() {
-    const server_dir = `${transpose_params.root}/${defaults_1.defaults.folder}/server/`;
-    if (util_instance.fs.exists(server_dir)) {
-        _traverse_ts_avoid_import_loop(server_dir);
-    }
-    const client_dir = `${transpose_params.root}/${defaults_1.defaults.folder}/client/`;
-    if (util_instance.fs.exists(client_dir)) {
-        _traverse_ts_avoid_import_loop(client_dir);
-    }
-}
-function _traverse_ts_resolve_aliases(directory, aliases) {
-    util_instance.fs.read_dir(directory).forEach((filename) => {
-        const full_path = path_1.default.resolve(directory, filename);
-        if (util_instance.fs.is_directory(full_path) && filename !== '.git' && filename !== 'books' && filename !== 'uranio') {
-            return _traverse_ts_resolve_aliases(full_path, aliases);
-        }
-        else if (filename.split('.').pop() === 'ts') {
-            alias.replace_file_aliases(full_path, aliases, transpose_params);
-        }
-    });
-}
+// function _resolve_aliases(){
+//   output_instance.start_loading(`Replacing aliases with relative paths...`);
+//   const base_folder = `${transpose_params.root}/${defaults.folder}`;
+//   const tsconfig_server = `${base_folder}/server/tsconfig.json`;
+//   const aliases_server = alias.get_aliases(tsconfig_server, transpose_params);
+//   const server_dir = `${transpose_params.root}/${defaults.folder}/server/src/`;
+//   _traverse_ts_resolve_aliases(server_dir, aliases_server);
+//   output_instance.done_log(`Server aliases replaced.`, 'alias');
+//   const tsconfig_client = `${base_folder}/client/tsconfig.json`;
+//   const aliases_client = alias.get_aliases(tsconfig_client, transpose_params);
+//   const client_dir = `${transpose_params.root}/${defaults.folder}/client/src/`;
+//   _traverse_ts_resolve_aliases(client_dir, aliases_client);
+//   output_instance.done_log(`Client aliases replaced.`, 'alias');
+// }
+// function _replace_import_to_avoid_loops(){
+//   const server_dir = `${transpose_params.root}/${defaults.folder}/server/`;
+//   if(util_instance.fs.exists(server_dir)){
+//     _traverse_ts_avoid_import_loop(server_dir);
+//   }
+//   const client_dir = `${transpose_params.root}/${defaults.folder}/client/`;
+//   if(util_instance.fs.exists(client_dir)){
+//     _traverse_ts_avoid_import_loop(client_dir);
+//   }
+// }
+// function _traverse_ts_resolve_aliases(directory:string, aliases:Aliases) {
+//   util_instance.fs.read_dir(directory).forEach((filename) => {
+//     const full_path = path.resolve(directory, filename);
+//     if (util_instance.fs.is_directory(full_path) && filename !== '.git' && filename !== 'books' && filename !== 'uranio'){
+//       return _traverse_ts_resolve_aliases(full_path, aliases);
+//     }else if(filename.split('.').pop() === 'ts'){
+//       alias.replace_file_aliases(full_path, aliases, transpose_params);
+//     }
+//   });
+// }
 function _traverse_ts_avoid_import_loop(directory) {
     util_instance.fs.read_dir(directory).forEach((filename) => {
         const full_path = path_1.default.resolve(directory, filename);
