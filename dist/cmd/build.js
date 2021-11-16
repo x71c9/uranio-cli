@@ -150,9 +150,9 @@ function _build_client() {
     });
 }
 function _init_build(params) {
-    output_instance = output.create(params);
     build_params = common_1.merge_params(params);
-    util_instance = util.create(params, output_instance);
+    output_instance = output.create(build_params);
+    util_instance = util.create(build_params, output_instance);
     util_instance.must_be_initialized();
 }
 // export const build = {

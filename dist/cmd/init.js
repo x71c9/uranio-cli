@@ -53,8 +53,8 @@ let init_params = defaults_1.default_params;
 function init(params) {
     return __awaiter(this, void 0, void 0, function* () {
         init_params = common_1.merge_init_params(params);
-        output_instance = output.create(params);
-        util_instance = util.create(params, output_instance);
+        output_instance = output.create(init_params);
+        util_instance = util.create(init_params, output_instance);
         _log_important_params();
         yield _init_pacman();
         _update_package_aliases();

@@ -43,6 +43,7 @@ class FS {
 	}
 	
 	public write_file(file_path:string, content:string, encoding?:BufferEncoding, context='wrfl'){
+		fs.mkdirSync(path.dirname(file_path), {recursive: true});
 		const wrote_file = fs.writeFileSync(file_path, content, {encoding: encoding || 'utf8'});
 		this.output.verbose_log(`Wrote file sync [${file_path}]`, context);
 		return wrote_file;
@@ -71,12 +72,15 @@ class FS {
 	}
 	
 	public copy_file_async(src:string, dest:string, context='cp_f'){
-		fs.copyFile(src, dest, () => {
-			this.output.verbose_log(`Copied file async [${src}] to [${dest}]`, context);
+		fs.mkdir(path.dirname(dest), {recursive: true}, () => {
+			fs.copyFile(src, dest, () => {
+				this.output.verbose_log(`Copied file async [${src}] to [${dest}]`, context);
+			});
 		});
 	}
 	
 	public copy_file(src:string, dest:string, context='cp_f'){
+		fs.mkdirSync(path.dirname(dest), {recursive: true});
 		fs.copyFileSync(src, dest);
 		this.output.verbose_log(`Copied file sync [${src}] to [${dest}]`, context);
 	}

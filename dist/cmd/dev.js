@@ -100,8 +100,8 @@ function _dev_client() {
 function _init_params(params) {
     params.spin = false;
     dev_params = common_1.merge_params(params);
-    output_instance = output.create(params);
-    util_instance = util.create(params, output_instance);
+    output_instance = output.create(dev_params);
+    util_instance = util.create(dev_params, output_instance);
     util_instance.must_be_initialized();
 }
 function _init_dev() {

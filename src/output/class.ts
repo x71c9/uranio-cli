@@ -16,7 +16,7 @@ import {defaults} from '../conf/defaults';
 
 import {Params} from '../types';
 
-import {merge_params} from '../cmd/common';
+// import {merge_params} from '../cmd/common';
 
 import {spinner, spinner_texts} from './spinner';
 
@@ -239,9 +239,9 @@ function _log_to_file(text:string)
 
 export type OutputInstance = InstanceType<typeof Output>;
 
-export function create(params: Partial<Params>)
+export function create(params: Params)
 		:OutputInstance{
-	const full_params = merge_params(params);
-	return new Output(full_params);
+	// const full_params = merge_params(params);
+	return new Output(params);
 }
 

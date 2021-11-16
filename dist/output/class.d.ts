@@ -25,5 +25,5 @@ declare class Output {
     private _go_previous;
 }
 export declare type OutputInstance = InstanceType<typeof Output>;
-export declare function create(params: Partial<Params>): OutputInstance;
+export declare function create(params: Params): OutputInstance;
 export {};

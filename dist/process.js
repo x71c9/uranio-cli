@@ -41,7 +41,8 @@ let util_instance;
 let process_params = defaults_1.default_params;
 function uranio_process(args) {
     process_params.spin = true;
-    process_params = _set_params(args);
+    process_params = common_1.read_rc_file(process_params);
+    process_params = _set_args(process_params, args);
     process.chdir(process_params.root);
     output_instance = output.create(process_params);
     util_instance = util.create(process_params, output_instance);
@@ -54,6 +55,9 @@ function _init_log() {
     if (!util_instance.fs.exists(log_file_path)) {
         util_instance.fs.create_file(log_file_path);
     }
+    // if(!fs.existsSync(log_file_path)){
+    //   fs.writeFileSync(log_file_path, '');
+    // }
     _log_arguments(process_params);
     _log_root();
 }
@@ -63,8 +67,7 @@ function _log_arguments(params) {
 function _log_root() {
     output_instance.verbose_log(`$URNROOT$Project root [${process_params.root}]`, 'root');
 }
-function _set_params(args) {
-    const params = defaults_1.default_params;
+function _set_args(params, args) {
     // Paramters with default value = false
     const force = args.f || args.force;
     if (force == true) {

@@ -40,6 +40,7 @@ class FS {
         return read_dir;
     }
     write_file(file_path, content, encoding, context = 'wrfl') {
+        fs_1.default.mkdirSync(path_1.default.dirname(file_path), { recursive: true });
         const wrote_file = fs_1.default.writeFileSync(file_path, content, { encoding: encoding || 'utf8' });
         this.output.verbose_log(`Wrote file sync [${file_path}]`, context);
         return wrote_file;
@@ -63,11 +64,14 @@ class FS {
         this.output.verbose_log(`Created directory sync [${dir_path}]`, context);
     }
     copy_file_async(src, dest, context = 'cp_f') {
-        fs_1.default.copyFile(src, dest, () => {
-            this.output.verbose_log(`Copied file async [${src}] to [${dest}]`, context);
+        fs_1.default.mkdir(path_1.default.dirname(dest), { recursive: true }, () => {
+            fs_1.default.copyFile(src, dest, () => {
+                this.output.verbose_log(`Copied file async [${src}] to [${dest}]`, context);
+            });
         });
     }
     copy_file(src, dest, context = 'cp_f') {
+        fs_1.default.mkdirSync(path_1.default.dirname(dest), { recursive: true });
         fs_1.default.copyFileSync(src, dest);
         this.output.verbose_log(`Copied file sync [${src}] to [${dest}]`, context);
     }

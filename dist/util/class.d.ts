@@ -22,5 +22,5 @@ declare class Util {
     pretty(filepath: string, parser?: string): void;
 }
 export declare type UtilInstance = InstanceType<typeof Util>;
-export declare function create(params: Partial<Params>, output: out.OutputInstance): UtilInstance;
+export declare function create(params: Params, output: out.OutputInstance): UtilInstance;
 export {};

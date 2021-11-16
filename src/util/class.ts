@@ -16,7 +16,7 @@ import * as out from '../output/';
 
 // import {UtilParams} from './types';
 
-import {merge_params} from '../cmd/common';
+// import {merge_params} from '../cmd/common';
 
 import * as fs from './fs';
 
@@ -116,9 +116,9 @@ class Util {
 
 export type UtilInstance = InstanceType<typeof Util>;
 
-export function create(params:Partial<Params>, output:out.OutputInstance)
+export function create(params:Params, output:out.OutputInstance)
 		:UtilInstance{
-	const full_params = merge_params(params);
-	return new Util(full_params, output);
+	// const full_params = merge_params(params);
+	return new Util(params, output);
 }
 

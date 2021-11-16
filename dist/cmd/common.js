@@ -46,7 +46,7 @@ function merge_init_params(params) {
 }
 exports.merge_init_params = merge_init_params;
 function _merge_params(params, is_init = false) {
-    let merged_params = defaults_1.default_params;
+    let merged_params = Object.assign({}, defaults_1.default_params);
     if (!is_init) {
         merged_params = read_rc_file(params);
     }

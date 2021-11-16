@@ -104,8 +104,8 @@ function replace_file_aliases(filepath, aliases, params) {
 exports.replace_file_aliases = replace_file_aliases;
 function _init_alias(params) {
     alias_params = common_1.merge_params(params);
-    output_instance = output.create(params);
-    util_instance = util.create(params, output_instance);
+    output_instance = output.create(alias_params);
+    util_instance = util.create(alias_params, output_instance);
     util_instance.must_be_initialized();
 }
 function _replace_aliases_server(aliases) {

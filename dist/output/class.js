@@ -14,7 +14,7 @@ const dateformat_1 = __importDefault(require("dateformat"));
 const chalk_1 = __importDefault(require("chalk"));
 const fs_1 = __importDefault(require("fs"));
 const defaults_1 = require("../conf/defaults");
-const common_1 = require("../cmd/common");
+// import {merge_params} from '../cmd/common';
 const spinner_1 = require("./spinner");
 // import {OutputParams} from './types';
 class Output {
@@ -201,8 +201,8 @@ function _log_to_file(text) {
     fs_1.default.appendFileSync(defaults_1.defaults.log_filepath, text);
 }
 function create(params) {
-    const full_params = common_1.merge_params(params);
-    return new Output(full_params);
+    // const full_params = merge_params(params);
+    return new Output(params);
 }
 exports.create = create;
 //# sourceMappingURL=class.js.map

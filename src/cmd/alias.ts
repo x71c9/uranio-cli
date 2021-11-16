@@ -98,9 +98,9 @@ function _init_alias(params:Partial<Params>){
 	
 	alias_params = merge_params(params);
 	
-	output_instance = output.create(params);
+	output_instance = output.create(alias_params);
 	
-	util_instance = util.create(params, output_instance);
+	util_instance = util.create(alias_params, output_instance);
 	
 	util_instance.must_be_initialized();
 	

@@ -63,9 +63,9 @@ let util_instance;
 let hooks_params = defaults_1.default_params;
 function hooks(params, included = false) {
     return __awaiter(this, void 0, void 0, function* () {
-        output_instance = output.create(params);
         hooks_params = common_1.merge_params(params);
-        util_instance = util.create(params, output_instance);
+        output_instance = output.create(hooks_params);
+        util_instance = util.create(hooks_params, output_instance);
         util_instance.must_be_initialized();
         output_instance.start_loading('Generating TRX Hooks...');
         const text = _generate_text();
