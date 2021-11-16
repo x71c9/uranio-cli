@@ -32,7 +32,7 @@ const chokidar_1 = __importDefault(require("chokidar"));
 const prettier_1 = __importDefault(require("prettier"));
 const defaults_1 = require("../conf/defaults");
 // import {UtilParams} from './types';
-const common_1 = require("../cmd/common");
+// import {merge_params} from '../cmd/common';
 const fs = __importStar(require("./fs"));
 const spawn = __importStar(require("./spawn"));
 const cmd = __importStar(require("./cmd"));
@@ -90,8 +90,8 @@ class Util {
     }
 }
 function create(params, output) {
-    const full_params = common_1.merge_params(params);
-    return new Util(full_params, output);
+    // const full_params = merge_params(params);
+    return new Util(params, output);
 }
 exports.create = create;
 //# sourceMappingURL=class.js.map

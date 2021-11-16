@@ -34,7 +34,12 @@ import {
 
 import {default_params, defaults} from './conf/defaults';
 
-import {check_repo, check_deploy, check_pacman} from './cmd/common';
+import {
+	check_repo,
+	check_deploy,
+	check_pacman,
+	read_rc_file
+} from './cmd/common';
 
 let output_instance:output.OutputInstance;
 
@@ -46,7 +51,10 @@ export function uranio_process(args:Arguments)
 		:void{
 	
 	process_params.spin = true;
-	process_params = _set_params(args);
+
+	process_params = read_rc_file(process_params);
+	
+	process_params = _set_args(process_params, args);
 	
 	process.chdir(process_params.root);
 	
@@ -65,6 +73,9 @@ function _init_log(){
 	if(!util_instance.fs.exists(log_file_path)){
 		util_instance.fs.create_file(log_file_path);
 	}
+	// if(!fs.existsSync(log_file_path)){
+	//   fs.writeFileSync(log_file_path, '');
+	// }
 	
 	_log_arguments(process_params);
 	_log_root();
@@ -82,10 +93,8 @@ function _log_root(){
 	);
 }
 
-function _set_params(args:Arguments)
+function _set_args(params:Params, args:Arguments)
 		:Params{
-	
-	const params = default_params;
 	
 	// Paramters with default value = false
 	

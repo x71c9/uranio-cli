@@ -49,9 +49,9 @@ export async function init(params:Partial<Params>)
 	
 	init_params = merge_init_params(params);
 	
-	output_instance = output.create(params);
+	output_instance = output.create(init_params);
 	
-	util_instance = util.create(params, output_instance);
+	util_instance = util.create(init_params, output_instance);
 	
 	_log_important_params();
 	await _init_pacman();

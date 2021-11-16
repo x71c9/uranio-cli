@@ -47,11 +47,11 @@ let hooks_params = default_params as Params;
 export async function hooks(params:Partial<Params>, included=false)
 		:Promise<void>{
 	
-	output_instance = output.create(params);
-	
 	hooks_params = merge_params(params);
 	
-	util_instance = util.create(params, output_instance);
+	output_instance = output.create(hooks_params);
+	
+	util_instance = util.create(hooks_params, output_instance);
 	
 	util_instance.must_be_initialized();
 	

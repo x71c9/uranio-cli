@@ -8,7 +8,7 @@ import {urn_util} from 'urn-lib';
 
 import {Params} from '../types';
 
-import {merge_params} from '../cmd/common';
+// import {merge_params} from '../cmd/common';
 
 import * as out from '../output/';
 
@@ -195,10 +195,10 @@ class CMD {
 
 export type CMDInstance = InstanceType<typeof CMD>;
 
-export function create(params:Partial<Params>, output:out.OutputInstance)
+export function create(params:Params, output:out.OutputInstance)
 		:CMDInstance{
-	const full_params = merge_params(params);
-	return new CMD(full_params, output);
+	// const full_params = merge_params(params);
+	return new CMD(params, output);
 }
 
 const _pacman_commands = {

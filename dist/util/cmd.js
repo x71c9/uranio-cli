@@ -35,7 +35,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = void 0;
 const urn_lib_1 = require("urn-lib");
-const common_1 = require("../cmd/common");
 // import {UtilParams} from './types';
 // DO NO CANCEL IT
 // import * as common from '../cmd/common';
@@ -168,8 +167,8 @@ class CMD {
     }
 }
 function create(params, output) {
-    const full_params = common_1.merge_params(params);
-    return new CMD(full_params, output);
+    // const full_params = merge_params(params);
+    return new CMD(params, output);
 }
 exports.create = create;
 const _pacman_commands = {

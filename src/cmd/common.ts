@@ -28,8 +28,9 @@ import {
 	valid_deploy,
 } from '../types';
 
-export function read_rc_file(params:Partial<Params>)
-		:Partial<Params>{
+export function read_rc_file(params:Params):Params;
+export function read_rc_file(params:Partial<Params>):Partial<Params>;
+export function read_rc_file(params:Partial<Params>):Partial<Params>{
 	const rcfile_path = `${params.root}/${jsonfile_path}`;
 	if(!fs.existsSync(rcfile_path)){
 		return params;
@@ -60,7 +61,7 @@ export function merge_init_params(params:Partial<Params>)
 
 function _merge_params(params:Partial<Params>, is_init=false)
 		:Params{
-	let merged_params = default_params as Partial<Params>;
+	let merged_params = {...default_params} as Partial<Params>;
 	if(!is_init){
 		merged_params = read_rc_file(params);
 	}

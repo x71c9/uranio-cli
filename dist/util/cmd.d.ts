@@ -25,5 +25,5 @@ declare class CMD {
     private _clone_repo;
 }
 export declare type CMDInstance = InstanceType<typeof CMD>;
-export declare function create(params: Partial<Params>, output: out.OutputInstance): CMDInstance;
+export declare function create(params: Params, output: out.OutputInstance): CMDInstance;
 export {};
