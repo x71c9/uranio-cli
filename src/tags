@@ -63,7 +63,6 @@ _clone_trx	cmd/init.ts	/^async function _clone_trx(){$/;"	f
 _copy_admin_files	cmd/init.ts	/^function _copy_admin_files(){$/;"	f
 _copy_dot_eslint_files	cmd/init.ts	/^function _copy_dot_eslint_files(){$/;"	f
 _copy_dot_files	cmd/init.ts	/^function _copy_dot_files(){$/;"	f
-_copy_dot_src_folder	cmd/init.ts	/^function _copy_dot_src_folder(){$/;"	f
 _copy_dot_tsconfigs	cmd/init.ts	/^function _copy_dot_tsconfigs(){$/;"	f
 _copy_express_files	cmd/init.ts	/^function _copy_express_files(){$/;"	f
 _copy_from_src_into_uranio_folder	cmd/transpose.ts	/^function _copy_from_src_into_uranio_folder(){$/;"	f
@@ -90,6 +89,7 @@ _format_text	output/class.ts	/^	private _format_text(text:string, context='frmt'
 _generate_args	cmd/hooks.ts	/^function _generate_args(params:string[]){$/;"	f
 _generate_client_book	cmd/transpose.ts	/^function _generate_client_book(book_name:BookName, required_props:string[]){$/;"	f
 _generate_client_books	cmd/transpose.ts	/^function _generate_client_books(){$/;"	f
+_generate_paths	cmd/init.ts	/^function _generate_paths(repo:Repo, prefix:string){$/;"	f
 _generate_text	cmd/hooks.ts	/^function _generate_text(){$/;"	f
 _generate_variable_name	cmd/transpose.ts	/^function _generate_variable_name(str:string){$/;"	f
 _get_atom_def_plural	cmd/hooks.ts	/^function _get_atom_def_plural(){$/;"	f
@@ -165,6 +165,8 @@ _uninstall_dep	cmd/init.ts	/^async function _uninstall_dep(repo:string, context:
 _uninstall_trx_dep	cmd/init.ts	/^async function _uninstall_trx_dep(pack_data?:any){$/;"	f
 _update_package_aliases	cmd/init.ts	/^function _update_package_aliases(){$/;"	f
 _update_package_scripts	cmd/init.ts	/^function _update_package_scripts(){$/;"	f
+_update_paths	cmd/init.ts	/^function _update_paths(tsconfig_filepath:string, paths:string){$/;"	f
+_update_tsconfig_paths	cmd/init.ts	/^function _update_tsconfig_paths(){$/;"	f
 _watch	cmd/dev.ts	/^function _watch(){$/;"	f
 abstract_admin_repos	types.ts	/^export const abstract_admin_repos = {$/;"	v
 abstract_deploy	types.ts	/^export const abstract_deploy = {$/;"	v
@@ -185,7 +187,7 @@ chokidar	util/types.ts	/^import chokidar from 'chokidar';$/;"	I
 clone_repo	util/cmd.ts	/^	public async clone_repo(address:string, dest_folder:string, context='clrp', branch='master')$/;"	m
 clone_repo_recursive	util/cmd.ts	/^	public async clone_repo_recursive(address:string, dest_folder:string, context='clrr', branch='master')$/;"	m
 cmd	util/class.ts	/^	public cmd:cmd.CMDInstance;$/;"	m
-copy_directory	util/fs.ts	/^	public copy_directory(src:string, dest:string, context='cp_d'){$/;"	m
+copy_directory	util/fs.ts	/^	public copy_directory(src:string, dest:string, context='cp_d', exclude?:string[]|RegExp[]){$/;"	m
 copy_file	util/fs.ts	/^	public copy_file(src:string, dest:string, context='cp_f'){$/;"	m
 copy_file_async	util/fs.ts	/^	public copy_file_async(src:string, dest:string, context='cp_f'){$/;"	m
 create	output/class.ts	/^export function create(params: Partial<Params>)$/;"	f
