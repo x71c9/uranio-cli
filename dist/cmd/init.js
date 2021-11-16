@@ -223,10 +223,11 @@ function _remove_tmp() {
     output_instance.done_verbose_log(`Removed tmp folder [${defaults_1.defaults.tmp_folder}].`, 'tmp');
 }
 function _copy_dot_files() {
-    if (util_instance.fs.exists(`${init_params.root}/src`) === false) {
-        _copy_dot_src_folder();
-    }
+    // if(util_instance.fs.exists(`${init_params.root}/src`) === false){
+    //   _copy_dot_src_folder();
+    // }
     _copy_dot_tsconfigs();
+    _update_tsconfig_paths();
     _copy_dot_eslint_files();
     if (types_1.valid_deploy_repos().includes(init_params.repo)) {
         if (init_params.deploy === 'netlify') {
@@ -240,6 +241,64 @@ function _copy_dot_files() {
         _add_admin_files();
         _copy_admin_files();
     }
+}
+function _update_tsconfig_paths() {
+    const paths = _generate_paths(init_params.repo, `.uranio/server`);
+    const real_paths = _generate_paths(init_params.repo, `.`);
+    const main_tsconfig = `tsconfig.json`;
+    _update_paths(main_tsconfig, paths);
+    const real_tsconfig_server = `.uranio/server/tsconfig.json`;
+    _update_paths(real_tsconfig_server, real_paths);
+    const real_tsconfig_client = `.uranio/client/tsconfig.json`;
+    _update_paths(real_tsconfig_client, real_paths);
+}
+function _update_paths(tsconfig_filepath, paths) {
+    if (!util_instance.fs.exists(tsconfig_filepath)) {
+        util_instance.fs.write_file(tsconfig_filepath, '');
+    }
+    const content = util_instance.fs.read_file(tsconfig_filepath, 'utf8');
+    const tsdata = JSON.parse(content);
+    if (!tsdata.compilerOptions) {
+        tsdata.compilerOptions = {};
+    }
+    if (!tsdata.compilerOptions.paths) {
+        tsdata.compilerOptions.paths = [];
+    }
+    tsdata.compilerOptions.paths = paths;
+    util_instance.fs.write_file(tsconfig_filepath, JSON.stringify(tsdata, null, '\t'));
+}
+function _generate_paths(repo, prefix) {
+    const paths = {};
+    paths['uranio'] = [`${prefix}/src/uranio`];
+    paths['uranio-books'] = [`${prefix}/src/books`];
+    paths['uranio-books/*'] = [`${prefix}/src/books/*`];
+    switch (repo) {
+        case 'core': {
+            break;
+        }
+        case 'api': {
+            paths['uranio-core'] = [`${prefix}/src/uranio/core`];
+            paths['uranio-core/*'] = [`${prefix}/src/uranio/core/*`];
+            break;
+        }
+        case 'trx': {
+            paths['uranio-core'] = [`${prefix}/src/uranio/api/core`];
+            paths['uranio-core/*'] = [`${prefix}/src/uranio/api/core/*`];
+            paths['uranio-api'] = [`${prefix}/src/uranio/api`];
+            paths['uranio-api/*'] = [`${prefix}/src/uranio/api/*`];
+            break;
+        }
+        case 'adm': {
+            paths['uranio-core'] = [`${prefix}/src/uranio/trx/api/core`];
+            paths['uranio-core/*'] = [`${prefix}/src/uranio/trx/api/core/*`];
+            paths['uranio-api'] = [`${prefix}/src/uranio/trx/api`];
+            paths['uranio-api/*'] = [`${prefix}/src/uranio/trx/api/*`];
+            paths['uranio-trx'] = [`${prefix}/src/uranio/trx`];
+            paths['uranio-trx/*'] = [`${prefix}/src/uranio/trx/*`];
+            break;
+        }
+    }
+    return paths;
 }
 function _clone_dot() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -327,7 +386,7 @@ function _ignore_urn_folder() {
     if (content.indexOf(defaults_1.defaults.folder + '/') === -1) {
         content += `\n${defaults_1.defaults.folder}/`;
     }
-    if (content.indexOf(defaults_1.defaults.log_filepath + '/') === -1) {
+    if (content.indexOf(defaults_1.defaults.log_filepath) === -1) {
         content += `\n${defaults_1.defaults.log_filepath}`;
     }
     util_instance.fs.write_file(gitignore, content);
@@ -346,7 +405,8 @@ function _update_package_scripts() {
     const data = util_instance.fs.read_file(package_json_path, 'utf8');
     try {
         const package_data = urn_lib_1.urn_util.json.clean_parse(data);
-        package_data['scripts'] = Object.assign(Object.assign({}, package_data['scripts']), { 'build': `uranio build`, 'build:server': `uranio build:client`, 'build:client': `uranio build:client`, 'dev': `uranio dev`, 'dev:server': `uranio dev:server`, 'dev:client': `uranio dev:client` });
+        const old_scripts = package_data['scripts'] || {};
+        package_data['scripts'] = Object.assign(Object.assign({}, old_scripts), { 'build': `uranio build`, 'build:server': `uranio build:client`, 'build:client': `uranio build:client`, 'dev': `uranio dev`, 'dev:server': `uranio dev:server`, 'dev:client': `uranio dev:client` });
         try {
             util_instance.fs.write_file(package_json_path, JSON.stringify(package_data, null, '\t'));
             output_instance.done_log(`Updated package.json scripts.`, 'alias');
@@ -407,19 +467,20 @@ function _update_package_aliases() {
         output_instance.error_log(`Cannot parse ${package_json_path}.`, 'alias');
     }
 }
-function _copy_dot_src_folder() {
-    const dot_src_folder = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/src`;
-    const dest = `${init_params.root}/src`;
-    util_instance.fs.copy_directory(dot_src_folder, dest, 'dot');
-}
+// function _copy_dot_src_folder(){
+//   const dot_src_folder =
+//     `${init_params.root}/${defaults.tmp_folder}/urn-dot/src`;
+//   const dest = `${init_params.root}/src`;
+//   util_instance.fs.copy_directory(dot_src_folder, dest, 'dot');
+// }
 function _copy_dot_tsconfigs() {
     const dot_tsc_file = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/tsconfig.json`;
     const dest = `${init_params.root}/tsconfig.json`;
     util_instance.fs.copy_file(dot_tsc_file, dest, 'tsco');
-    const dot_tsc_file_server = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/.uranio/server/tsconfig.json`;
+    const dot_tsc_file_server = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/files/server/tsconfig.json`;
     const dest_server = `${init_params.root}/.uranio/server/tsconfig.json`;
     util_instance.fs.copy_file(dot_tsc_file_server, dest_server, 'tscs');
-    const dot_tsc_file_client = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/.uranio/client/tsconfig.json`;
+    const dot_tsc_file_client = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/files/client/tsconfig.json`;
     const dest_client = `${init_params.root}/.uranio/client/tsconfig.json`;
     util_instance.fs.copy_file(dot_tsc_file_client, dest_client, 'tscc');
 }
@@ -447,8 +508,13 @@ function _copy_netlify_files() {
     util_instance.fs.copy_file(functions_file, functions_dest, 'dot');
 }
 function _copy_admin_files() {
-    const dot_client_folder = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/${defaults_1.defaults.folder}/client`;
-    const nuxt_config_file = `${dot_client_folder}/nuxt.config.js`;
+    // const dot_client_folder =
+    //   `${init_params.root}/${defaults.tmp_folder}/urn-dot/${defaults.folder}/client`;
+    // const nuxt_config_file = `${dot_client_folder}/nuxt.config.js`;
+    // const nuxt_config_dest = `${init_params.root}/${defaults.folder}/client/nuxt.config.js`;
+    // util_instance.fs.copy_file(nuxt_config_file, nuxt_config_dest, 'adm');
+    const dot_files_folder = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/files/`;
+    const nuxt_config_file = `${dot_files_folder}/client/nuxt.config.js`;
     const nuxt_config_dest = `${init_params.root}/${defaults_1.defaults.folder}/client/nuxt.config.js`;
     util_instance.fs.copy_file(nuxt_config_file, nuxt_config_dest, 'adm');
 }
@@ -561,8 +627,6 @@ function _uninstall_dep(repo, context, pack_data) {
             output_instance.start_loading(`Uninstalling ${short_repo} dep...`);
             const dep_folder = `${init_params.root}/node_modules/${short_repo}`;
             util_instance.fs.remove_directory(dep_folder, context);
-            // const dep_dev_folder = `${init_params.root}/node_modules/${short_repo}`;
-            // util_instance.fs.remove_directory(dep_dev_folder, context);
             yield util_instance.cmd.uninstall_dep(`${short_repo}`, context);
             output_instance.done_log(`Uninstalled ${short_repo} dependencies.`, context);
             return true;

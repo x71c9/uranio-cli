@@ -17,6 +17,7 @@ import * as util from '../util/';
 import {
 	Arguments,
 	Params,
+	Repo,
 	abstract_repos,
 	abstract_pacman,
 	abstract_deploy,
@@ -280,10 +281,13 @@ function _remove_tmp(){
 }
 
 function _copy_dot_files(){
+	
 	// if(util_instance.fs.exists(`${init_params.root}/src`) === false){
 	//   _copy_dot_src_folder();
 	// }
 	_copy_dot_tsconfigs();
+	_update_tsconfig_paths();
+	
 	_copy_dot_eslint_files();
 	
 	if(valid_deploy_repos().includes(init_params.repo)){
@@ -299,6 +303,73 @@ function _copy_dot_files(){
 		_copy_admin_files();
 	}
 	
+}
+
+function _update_tsconfig_paths(){
+	const paths = _generate_paths(init_params.repo, `.uranio/server`);
+	const real_paths = _generate_paths(init_params.repo, `.`);
+	
+	const main_tsconfig = `tsconfig.json`;
+	_update_paths(main_tsconfig, paths);
+	
+	const real_tsconfig_server = `.uranio/server/tsconfig.json`;
+	_update_paths(real_tsconfig_server, real_paths);
+	
+	const real_tsconfig_client = `.uranio/client/tsconfig.json`;
+	_update_paths(real_tsconfig_client, real_paths);
+}
+
+function _update_paths(tsconfig_filepath:string, paths:string){
+	if(!util_instance.fs.exists(tsconfig_filepath)){
+		util_instance.fs.write_file(tsconfig_filepath, '');
+	}
+	const content = util_instance.fs.read_file(tsconfig_filepath, 'utf8');
+	const tsdata = JSON.parse(content);
+	if(!tsdata.compilerOptions){
+		tsdata.compilerOptions = {};
+	}
+	if(!tsdata.compilerOptions.paths){
+		tsdata.compilerOptions.paths = [];
+	}
+	tsdata.compilerOptions.paths = paths;
+	util_instance.fs.write_file(
+		tsconfig_filepath,
+		JSON.stringify(tsdata, null, '\t')
+	);
+}
+
+function _generate_paths(repo:Repo, prefix:string){
+	const paths = {} as any;
+	paths['uranio'] = [`${prefix}/src/uranio`];
+	paths['uranio-books'] = [`${prefix}/src/books`];
+	paths['uranio-books/*'] = [`${prefix}/src/books/*`];
+	switch(repo){
+		case 'core':{
+			break;
+		}
+		case 'api':{
+			paths['uranio-core'] = [`${prefix}/src/uranio/core`];
+			paths['uranio-core/*'] = [`${prefix}/src/uranio/core/*`];
+			break;
+		}
+		case 'trx':{
+			paths['uranio-core'] = [`${prefix}/src/uranio/api/core`];
+			paths['uranio-core/*'] = [`${prefix}/src/uranio/api/core/*`];
+			paths['uranio-api'] = [`${prefix}/src/uranio/api`];
+			paths['uranio-api/*'] = [`${prefix}/src/uranio/api/*`];
+			break;
+		}
+		case 'adm':{
+			paths['uranio-core'] = [`${prefix}/src/uranio/trx/api/core`];
+			paths['uranio-core/*'] = [`${prefix}/src/uranio/trx/api/core/*`];
+			paths['uranio-api'] = [`${prefix}/src/uranio/trx/api`];
+			paths['uranio-api/*'] = [`${prefix}/src/uranio/trx/api/*`];
+			paths['uranio-trx'] = [`${prefix}/src/uranio/trx`];
+			paths['uranio-trx/*'] = [`${prefix}/src/uranio/trx/*`];
+			break;
+		}
+	}
+	return paths;
 }
 
 async function _clone_dot(){
@@ -321,7 +392,7 @@ function _remove_git_files(){
 	util_instance.spawn.exec_sync(
 		`( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`
 	);
-	const cloned_client_repo_path = 
+	const cloned_client_repo_path =
 		`${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`;
 	util_instance.spawn.exec_sync(
 		`( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`
@@ -430,7 +501,7 @@ function _ignore_urn_folder(){
 	if(content.indexOf(defaults.folder+'/') === -1){
 		content += `\n${defaults.folder}/`;
 	}
-	if(content.indexOf(defaults.log_filepath+'/') === -1){
+	if(content.indexOf(defaults.log_filepath) === -1){
 		content += `\n${defaults.log_filepath}`;
 	}
 	util_instance.fs.write_file(gitignore, content);
@@ -459,8 +530,9 @@ function _update_package_scripts(){
 	const data = util_instance.fs.read_file(package_json_path, 'utf8');
 	try{
 		const package_data = urn_util.json.clean_parse(data);
+		const old_scripts = package_data['scripts'] || {};
 		package_data['scripts'] = {
-			...package_data['scripts'],
+			...old_scripts,
 			'build': `uranio build`,
 			'build:server': `uranio build:client`,
 			'build:client': `uranio build:client`,
@@ -755,8 +827,6 @@ async function _uninstall_dep(repo:string, context:string, pack_data?:any){
 		output_instance.start_loading(`Uninstalling ${short_repo} dep...`);
 		const dep_folder = `${init_params.root}/node_modules/${short_repo}`;
 		util_instance.fs.remove_directory(dep_folder, context);
-		// const dep_dev_folder = `${init_params.root}/node_modules/${short_repo}`;
-		// util_instance.fs.remove_directory(dep_dev_folder, context);
 		await util_instance.cmd.uninstall_dep(`${short_repo}`, context);
 		output_instance.done_log(`Uninstalled ${short_repo} dependencies.`, context);
 		return true;
