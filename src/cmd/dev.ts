@@ -26,7 +26,7 @@ let util_instance:util.UtilInstance;
 
 let dev_params = default_params as Params;
 
-let watch_lib_scanned = false;
+// let watch_lib_scanned = false;
 let watch_src_scanned = false;
 
 const nuxt_color = '#677cc7';
@@ -123,6 +123,9 @@ function _watch(){
 			}
 			const base_path_server = `${base_path}/server/src`;
 			const base_path_client = `${base_path}/client/src`;
+			const relative_path_to_src = _path.replace(`${dev_params.root}/src/`, '');
+			const new_path_server = `${base_path_server}/${relative_path_to_src}`;
+			const new_path_client = `${base_path_client}/${relative_path_to_src}`;
 			if(_event === 'addDir'){
 				if(
 					valid_admin_repos().includes(dev_params.repo)
@@ -132,27 +135,14 @@ function _watch(){
 						`${base_path_client}/${defaults.repo_folder}/nuxt/${path.basename(_path)}`
 					);
 				}else{
-					util_instance.fs.create_directory(
-						`${base_path_server}/${path.basename(_path)}`
-					);
-					util_instance.fs.create_directory(
-						`${base_path_client}/${path.basename(_path)}`
-					);
+					util_instance.fs.create_directory(new_path_server);
+					util_instance.fs.create_directory(new_path_client);
 				}
 				output_instance.done_log(
 					`[Src watch] Transposed dir [${_path}].`,
 					'wtch'
 				);
-			}else if(_event !== 'unlink' && _event !== 'unlinkDir'){
-				transpose_one(_path, dev_params, true);
-				if(valid_hooks_repos().includes(dev_params.repo)){
-					hooks(dev_params, true);
-				}
-				output_instance.done_log(`[Src watch] Transposed [${_path}].`, 'wtch');
-			}else{
-				const relative_path = _path.replace(`${dev_params.root}/src/`, '');
-				const new_path_server = `${base_path_server}/${relative_path}`;
-				const new_path_client = `${base_path_client}/${relative_path}`;
+			}else if(_event === 'unlink' || _event === 'unlinkDir'){
 				if(util_instance.fs.is_directory(new_path_server)){
 					util_instance.fs.remove_directory(new_path_server);
 				}else{
@@ -163,44 +153,54 @@ function _watch(){
 				}else{
 					util_instance.fs.remove_file(new_path_client);
 				}
+			}else{
+				
+				transpose_one(_path, dev_params, true);
+				
+				if(valid_hooks_repos().includes(dev_params.repo)){
+					hooks(dev_params, true);
+				}
+				output_instance.done_log(`[Src watch] Transposed [${_path}].`, 'wtch');
 			}
+			
 			if(_is_file_related_to_lambda_function(_path)){
 				_replace_netlify_function_file();
 			}
+			
 		}
 	);
 	
-	const lib_path = `${base_path}/server/src/${defaults.repo_folder}/`;
-	output_instance.log(`Watching uranio repo folder [${lib_path}] ...`, 'wtch');
-	util_instance.watch(
-		lib_path,
-		`watching uranio repo folder.`,
-		() => {
-			output_instance.done_log(
-				`Initial scanner completed for [${lib_path}].`,
-				'wtch'
-			);
-			watch_lib_scanned = true;
-		},
-		(_event, _path) => {
-			output_instance.verbose_log(
-				`[uranio repo folder] ${_event} ${_path}`,
-				'wtch',
-				watc_color
-			);
-			if(!watch_lib_scanned){
-				return false;
-			}
-			if(_path.includes(`hooks/index.ts`) || _path.includes(`src/books/`)){
-				return false;
-			}
-			if(!dev_params.is_dot && _path.includes(`nuxt/`)){
-				return false;
-			}
-			output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
-			_replace_netlify_function_file();
-		}
-	);
+	// const lib_path = `${base_path}/server/src/${defaults.repo_folder}/`;
+	// output_instance.log(`Watching uranio repo folder [${lib_path}] ...`, 'wtch');
+	// util_instance.watch(
+	//   lib_path,
+	//   `watching uranio repo folder.`,
+	//   () => {
+	//     output_instance.done_log(
+	//       `Initial scanner completed for [${lib_path}].`,
+	//       'wtch'
+	//     );
+	//     watch_lib_scanned = true;
+	//   },
+	//   (_event, _path) => {
+	//     output_instance.verbose_log(
+	//       `[uranio repo folder] ${_event} ${_path}`,
+	//       'wtch',
+	//       watc_color
+	//     );
+	//     if(!watch_lib_scanned){
+	//       return false;
+	//     }
+	//     if(_path.includes(`hooks/index.ts`) || _path.includes(`src/books/`)){
+	//       return false;
+	//     }
+	//     if(!dev_params.is_dot && _path.includes(`nuxt/`)){
+	//       return false;
+	//     }
+	//     output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
+	//     _replace_netlify_function_file();
+	//   }
+	// );
 	
 }
 
