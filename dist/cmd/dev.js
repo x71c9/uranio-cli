@@ -126,7 +126,8 @@ function _watch() {
         const base_path_server = `${base_path}/server/src`;
         const base_path_client = `${base_path}/client/src`;
         if (_event === 'addDir') {
-            if (types_1.valid_admin_repos().includes(dev_params.repo) && _path.includes(`${dev_params.root}/src/frontend`)) {
+            if (types_1.valid_admin_repos().includes(dev_params.repo)
+                && _path.includes(`${dev_params.root}/src/frontend`)) {
                 util_instance.fs.create_directory(`${base_path_client}/${defaults_1.defaults.repo_folder}/nuxt/${path_1.default.basename(_path)}`);
             }
             else {
@@ -159,7 +160,9 @@ function _watch() {
                 util_instance.fs.remove_file(new_path_client);
             }
         }
-        _replace_netlify_function_file();
+        if (_is_file_related_to_lambda_function(_path)) {
+            _replace_netlify_function_file();
+        }
     });
     const lib_path = `${base_path}/server/src/${defaults_1.defaults.repo_folder}/`;
     output_instance.log(`Watching uranio repo folder [${lib_path}] ...`, 'wtch');
@@ -180,6 +183,16 @@ function _watch() {
         output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
         _replace_netlify_function_file();
     });
+}
+function _is_file_related_to_lambda_function(_path) {
+    if (types_1.valid_admin_repos().includes(dev_params.repo)
+        && _path.includes(`${dev_params.root}/src/frontend`)) {
+        return false;
+    }
+    if (_path.includes(`${dev_params.root}/src/uranio`)) {
+        return false;
+    }
+    return true;
 }
 function _replace_netlify_function_file() {
     const api_file_path = `${dev_params.root}/.uranio/server/src/functions/api.ts`;
