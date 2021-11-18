@@ -124,13 +124,25 @@ function _watch(){
 			const base_path_server = `${base_path}/server/src`;
 			const base_path_client = `${base_path}/client/src`;
 			if(_event === 'addDir'){
-				if(valid_admin_repos().includes(dev_params.repo) && _path.includes(`${dev_params.root}/src/frontend`)){
-					util_instance.fs.create_directory(`${base_path_client}/${defaults.repo_folder}/nuxt/${path.basename(_path)}`);
+				if(
+					valid_admin_repos().includes(dev_params.repo)
+					&& _path.includes(`${dev_params.root}/src/frontend`)
+				){
+					util_instance.fs.create_directory(
+						`${base_path_client}/${defaults.repo_folder}/nuxt/${path.basename(_path)}`
+					);
 				}else{
-					util_instance.fs.create_directory(`${base_path_server}/${path.basename(_path)}`);
-					util_instance.fs.create_directory(`${base_path_client}/${path.basename(_path)}`);
+					util_instance.fs.create_directory(
+						`${base_path_server}/${path.basename(_path)}`
+					);
+					util_instance.fs.create_directory(
+						`${base_path_client}/${path.basename(_path)}`
+					);
 				}
-				output_instance.done_log(`[Src watch] Transposed dir [${_path}].`, 'wtch');
+				output_instance.done_log(
+					`[Src watch] Transposed dir [${_path}].`,
+					'wtch'
+				);
 			}else if(_event !== 'unlink' && _event !== 'unlinkDir'){
 				transpose_one(_path, dev_params, true);
 				if(valid_hooks_repos().includes(dev_params.repo)){
@@ -152,7 +164,9 @@ function _watch(){
 					util_instance.fs.remove_file(new_path_client);
 				}
 			}
-			_replace_netlify_function_file();
+			if(_is_file_related_to_lambda_function(_path)){
+				_replace_netlify_function_file();
+			}
 		}
 	);
 	
@@ -188,6 +202,21 @@ function _watch(){
 		}
 	);
 	
+}
+
+function _is_file_related_to_lambda_function(_path:string){
+	if(
+		valid_admin_repos().includes(dev_params.repo)
+		&& _path.includes(`${dev_params.root}/src/frontend`)
+	){
+		return false;
+	}
+	if(
+		_path.includes(`${dev_params.root}/src/uranio`)
+	){
+		return false;
+	}
+	return true;
 }
 
 function _replace_netlify_function_file(){
