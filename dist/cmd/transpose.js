@@ -168,7 +168,7 @@ function _transpose_file(file_path, included = false) {
         output_instance.error_log(err_msg, 'trsp');
     }
     if (!included) {
-        output_instance.done_log(`Transpose file completed.`);
+        output_instance.done_log(`Transpose file completed. [${file_path}]`);
     }
 }
 function _transpose_book() {
@@ -189,7 +189,7 @@ function _transpose_folder(dir_path, included = false) {
             return _transpose_folder(full_path, true);
         }
         else {
-            return _transpose_file(full_path);
+            return _transpose_file(full_path, true);
         }
     });
     if (!included) {

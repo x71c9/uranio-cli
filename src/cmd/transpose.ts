@@ -262,7 +262,7 @@ function _transpose_file(file_path:string, included=false){
 	}
 	
 	if(!included){
-		output_instance.done_log(`Transpose file completed.`);
+		output_instance.done_log(`Transpose file completed. [${file_path}]`);
 	}
 }
 
@@ -297,7 +297,7 @@ function _transpose_folder(dir_path:string, included=false){
 		if (util_instance.fs.is_directory(full_path) && filename !== '.git'){
 			return _transpose_folder(full_path, true);
 		}else{
-			return _transpose_file(full_path);
+			return _transpose_file(full_path, true);
 		}
 	});
 	if(!included){
