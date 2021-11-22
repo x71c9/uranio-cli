@@ -126,7 +126,9 @@ function _watch(){
 			const relative_path_to_src = _path.replace(`${dev_params.root}/src/`, '');
 			const new_path_server = `${base_path_server}/${relative_path_to_src}`;
 			const new_path_client = `${base_path_client}/${relative_path_to_src}`;
+			
 			if(_event === 'addDir'){
+				
 				if(
 					valid_admin_repos().includes(dev_params.repo)
 					&& _path.includes(`${dev_params.root}/src/frontend`)
@@ -142,7 +144,9 @@ function _watch(){
 					`[Src watch] Transposed dir [${_path}].`,
 					'wtch'
 				);
+				
 			}else if(_event === 'unlink' || _event === 'unlinkDir'){
+				
 				if(util_instance.fs.is_directory(new_path_server)){
 					util_instance.fs.remove_directory(new_path_server);
 				}else{
@@ -153,6 +157,7 @@ function _watch(){
 				}else{
 					util_instance.fs.remove_file(new_path_client);
 				}
+				
 			}else{
 				
 				transpose_one(_path, dev_params, true);
@@ -160,7 +165,8 @@ function _watch(){
 				if(valid_hooks_repos().includes(dev_params.repo)){
 					hooks(dev_params, true);
 				}
-				output_instance.done_log(`[Src watch] Transposed [${_path}].`, 'wtch');
+				output_instance.done_log(`[src watch] Transposed [${_path}].`, 'wtch');
+				
 			}
 			
 			if(_is_file_related_to_lambda_function(_path)){
@@ -212,7 +218,8 @@ function _is_file_related_to_lambda_function(_path:string){
 		return false;
 	}
 	if(
-		_path.includes(`${dev_params.root}/src/uranio`)
+		valid_admin_repos().includes(dev_params.repo)
+		&& _path.includes(`${dev_params.root}/src/uranio/nuxt`)
 	){
 		return false;
 	}

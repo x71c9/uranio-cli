@@ -158,7 +158,7 @@ function _watch() {
             if (types_1.valid_hooks_repos().includes(dev_params.repo)) {
                 hooks_1.hooks(dev_params, true);
             }
-            output_instance.done_log(`[Src watch] Transposed [${_path}].`, 'wtch');
+            output_instance.done_log(`[src watch] Transposed [${_path}].`, 'wtch');
         }
         if (_is_file_related_to_lambda_function(_path)) {
             _replace_netlify_function_file();
@@ -201,7 +201,8 @@ function _is_file_related_to_lambda_function(_path) {
         && _path.includes(`${dev_params.root}/src/frontend`)) {
         return false;
     }
-    if (_path.includes(`${dev_params.root}/src/uranio`)) {
+    if (types_1.valid_admin_repos().includes(dev_params.repo)
+        && _path.includes(`${dev_params.root}/src/uranio/nuxt`)) {
         return false;
     }
     return true;
