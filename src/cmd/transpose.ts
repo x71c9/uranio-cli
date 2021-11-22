@@ -68,13 +68,13 @@ export async function transpose_one(full_path:string, params:Partial<Params>, in
 		process.exit(1);
 	}
 		
-	if(!util_instance.fs.is_directory(full_path)){
+	if(util_instance.fs.is_directory(full_path)){
 		
-		_transpose_file(full_path, included);
+		_transpose_folder(full_path, included);
 		
 	}else{
 		
-		_transpose_folder(full_path, included);
+		_transpose_file(full_path, included);
 		
 	}
 }
@@ -135,7 +135,7 @@ function _transpose_file(file_path:string, included=false){
 	if(
 		file_path &&
 		util_instance.fs.exists(file_path) &&
-		file_path.includes(`${transpose_params.root}/src/`)
+		file_path.includes(src_path)
 	){
 		
 		const base_folder = `${transpose_params.root}/${defaults.folder}`;
@@ -162,7 +162,7 @@ function _transpose_file(file_path:string, included=false){
 				);
 				_avoid_import_loop(uranio_server_target);
 				output_instance.done_verbose_log(
-					`Transposed uranio file [${file_path}] [${uranio_server_target}].`,
+					`Transposed uranio server file [${file_path}] [${uranio_server_target}].`,
 					'trsp'
 				);
 			}
@@ -183,7 +183,7 @@ function _transpose_file(file_path:string, included=false){
 				);
 				_avoid_import_loop(uranio_client_target);
 				output_instance.done_verbose_log(
-					`Transposed uranio file [${file_path}] [${uranio_client_target}].`,
+					`Transposed uranio client file [${file_path}] [${uranio_client_target}].`,
 					'trsp'
 				);
 			}
@@ -210,7 +210,7 @@ function _transpose_file(file_path:string, included=false){
 				);
 				_avoid_import_loop(frontend_target);
 				output_instance.done_verbose_log(
-					`Transposed file [${file_path}] [${frontend_target}].`,
+					`Transposed frontend file [${file_path}] [${frontend_target}].`,
 					'trsp'
 				);
 			}

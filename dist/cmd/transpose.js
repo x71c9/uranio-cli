@@ -74,11 +74,11 @@ function transpose_one(full_path, params, included = false) {
             output_instance.error_log('Invalid path.', 'trsp');
             process.exit(1);
         }
-        if (!util_instance.fs.is_directory(full_path)) {
-            _transpose_file(full_path, included);
+        if (util_instance.fs.is_directory(full_path)) {
+            _transpose_folder(full_path, included);
         }
         else {
-            _transpose_folder(full_path, included);
+            _transpose_file(full_path, included);
         }
     });
 }
@@ -117,7 +117,7 @@ function _transpose_file(file_path, included = false) {
     const src_path = `${transpose_params.root}/src/`;
     if (file_path &&
         util_instance.fs.exists(file_path) &&
-        file_path.includes(`${transpose_params.root}/src/`)) {
+        file_path.includes(src_path)) {
         const base_folder = `${transpose_params.root}/${defaults_1.defaults.folder}`;
         const frontend_src_path = `${transpose_params.root}/src/frontend`;
         const uranio_src_path = `${transpose_params.root}/src/uranio`;
@@ -127,14 +127,14 @@ function _transpose_file(file_path, included = false) {
             if (path_1.default.extname(file_path) === '.ts') {
                 alias.replace_file_aliases(uranio_server_target, alias.get_aliases(`${base_folder}/server/tsconfig.json`, transpose_params));
                 _avoid_import_loop(uranio_server_target);
-                output_instance.done_verbose_log(`Transposed uranio file [${file_path}] [${uranio_server_target}].`, 'trsp');
+                output_instance.done_verbose_log(`Transposed uranio server file [${file_path}] [${uranio_server_target}].`, 'trsp');
             }
             const uranio_client_target = file_path.replace(uranio_src_path, path_1.default.join(base_folder, 'client/src', defaults_1.defaults.repo_folder));
             util_instance.fs.copy_file(file_path, uranio_client_target, 'trsp');
             if (path_1.default.extname(file_path) === '.ts') {
                 alias.replace_file_aliases(uranio_client_target, alias.get_aliases(`${base_folder}/client/tsconfig.json`, transpose_params));
                 _avoid_import_loop(uranio_client_target);
-                output_instance.done_verbose_log(`Transposed uranio file [${file_path}] [${uranio_client_target}].`, 'trsp');
+                output_instance.done_verbose_log(`Transposed uranio client file [${file_path}] [${uranio_client_target}].`, 'trsp');
             }
         }
         else if (types_1.valid_admin_repos().includes(transpose_params.repo)
@@ -144,7 +144,7 @@ function _transpose_file(file_path, included = false) {
             if (path_1.default.extname(file_path) === '.ts') {
                 alias.replace_file_aliases(frontend_target, alias.get_aliases(`${base_folder}/client/tsconfig.json`, transpose_params));
                 _avoid_import_loop(frontend_target);
-                output_instance.done_verbose_log(`Transposed file [${file_path}] [${frontend_target}].`, 'trsp');
+                output_instance.done_verbose_log(`Transposed frontend file [${file_path}] [${frontend_target}].`, 'trsp');
             }
         }
         else {
