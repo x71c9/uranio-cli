@@ -243,14 +243,15 @@ function _copy_dot_files() {
     }
 }
 function _update_tsconfig_paths() {
-    const paths = _generate_paths(init_params.repo, `.uranio/server`);
-    const real_paths = _generate_paths(init_params.repo, `.`);
+    const paths = _generate_paths_server(init_params.repo, `.uranio/server`);
+    const real_paths_server = _generate_paths_server(init_params.repo, `.`);
+    const real_paths_client = _generate_paths_client(init_params.repo, `.`);
     const main_tsconfig = `tsconfig.json`;
     _update_paths(main_tsconfig, paths);
     const real_tsconfig_server = `.uranio/server/tsconfig.json`;
-    _update_paths(real_tsconfig_server, real_paths);
+    _update_paths(real_tsconfig_server, real_paths_server);
     const real_tsconfig_client = `.uranio/client/tsconfig.json`;
-    _update_paths(real_tsconfig_client, real_paths);
+    _update_paths(real_tsconfig_client, real_paths_client);
 }
 function _update_paths(tsconfig_filepath, paths) {
     if (!util_instance.fs.exists(tsconfig_filepath)) {
@@ -267,9 +268,42 @@ function _update_paths(tsconfig_filepath, paths) {
     tsdata.compilerOptions.paths = paths;
     util_instance.fs.write_file(tsconfig_filepath, JSON.stringify(tsdata, null, '\t'));
 }
-function _generate_paths(repo, prefix) {
+function _generate_paths_server(repo, prefix) {
     const paths = {};
     paths['uranio'] = [`${prefix}/src/uranio`];
+    paths['uranio-books'] = [`${prefix}/src/books`];
+    paths['uranio-books/*'] = [`${prefix}/src/books/*`];
+    switch (repo) {
+        case 'core': {
+            break;
+        }
+        case 'api': {
+            paths['uranio-core'] = [`${prefix}/src/uranio/core`];
+            paths['uranio-core/*'] = [`${prefix}/src/uranio/core/*`];
+            break;
+        }
+        case 'trx': {
+            paths['uranio-core'] = [`${prefix}/src/uranio/api/core`];
+            paths['uranio-core/*'] = [`${prefix}/src/uranio/api/core/*`];
+            paths['uranio-api'] = [`${prefix}/src/uranio/api`];
+            paths['uranio-api/*'] = [`${prefix}/src/uranio/api/*`];
+            break;
+        }
+        case 'adm': {
+            paths['uranio-core'] = [`${prefix}/src/uranio/trx/api/core`];
+            paths['uranio-core/*'] = [`${prefix}/src/uranio/trx/api/core/*`];
+            paths['uranio-api'] = [`${prefix}/src/uranio/trx/api`];
+            paths['uranio-api/*'] = [`${prefix}/src/uranio/trx/api/*`];
+            paths['uranio-trx'] = [`${prefix}/src/uranio/trx`];
+            paths['uranio-trx/*'] = [`${prefix}/src/uranio/trx/*`];
+            break;
+        }
+    }
+    return paths;
+}
+function _generate_paths_client(repo, prefix) {
+    const paths = {};
+    paths['uranio'] = [`${prefix}/src/uranio/client`];
     paths['uranio-books'] = [`${prefix}/src/books`];
     paths['uranio-books/*'] = [`${prefix}/src/books/*`];
     switch (repo) {
