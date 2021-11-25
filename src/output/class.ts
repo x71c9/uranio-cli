@@ -114,6 +114,9 @@ class Output {
 	public spinner_text(text:string)
 			:void{
 		spinner.text = this._spinner_text_color(text);
+		if(spinner.text.length > process.stdout.columns){
+			spinner.text = spinner.text.substr(0, process.stdout.columns - 4);
+		}
 	}
 	
 	private _log(text:string, context='log', out=false){
