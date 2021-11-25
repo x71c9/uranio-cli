@@ -83,6 +83,9 @@ class Output {
     }
     spinner_text(text) {
         spinner_1.spinner.text = this._spinner_text_color(text);
+        if (spinner_1.spinner.text.length > process.stdout.columns) {
+            spinner_1.spinner.text = spinner_1.spinner.text.substr(0, process.stdout.columns - 4);
+        }
     }
     _log(text, context = 'log', out = false) {
         const output_text = (!this.params.native) ?
