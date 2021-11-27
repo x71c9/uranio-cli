@@ -140,17 +140,21 @@ function _watch() {
             output_instance.done_log(`[Src watch] Transposed dir [${_path}].`, 'wtch');
         }
         else if (_event === 'unlink' || _event === 'unlinkDir') {
-            if (util_instance.fs.is_directory(new_path_server)) {
-                util_instance.fs.remove_directory(new_path_server);
+            if (util_instance.fs.exists(new_path_server)) {
+                if (util_instance.fs.is_directory(new_path_server)) {
+                    util_instance.fs.remove_directory(new_path_server);
+                }
+                else {
+                    util_instance.fs.remove_file(new_path_server);
+                }
             }
-            else {
-                util_instance.fs.remove_file(new_path_server);
-            }
-            if (util_instance.fs.is_directory(new_path_client)) {
-                util_instance.fs.remove_directory(new_path_client);
-            }
-            else {
-                util_instance.fs.remove_file(new_path_client);
+            if (util_instance.fs.exists(new_path_client)) {
+                if (util_instance.fs.is_directory(new_path_client)) {
+                    util_instance.fs.remove_directory(new_path_client);
+                }
+                else {
+                    util_instance.fs.remove_file(new_path_client);
+                }
             }
         }
         else {
