@@ -44,12 +44,43 @@ function uranio_process(args) {
     process_params = common_1.read_rc_file(process_params);
     process_params = _set_args(process_params, args);
     process.chdir(process_params.root);
+    process_params = _autoset_is_dot(process_params, args);
     output_instance = output.create(process_params);
     util_instance = util.create(process_params, output_instance);
     _init_log();
     _switch_command(args);
 }
 exports.uranio_process = uranio_process;
+function _autoset_is_dot(params, args) {
+    if (typeof args.is_dot === 'undefined' && _check_if_is_dot(params.root)) {
+        params.is_dot = true;
+    }
+    return params;
+}
+function _check_if_is_dot(path) {
+    const data = fs_1.default.readdirSync(path);
+    if (!data) {
+        return false;
+    }
+    for (const file of data) {
+        if (file === 'package.json') {
+            const package_json_path = `${path}/${file}`;
+            try {
+                const content = fs_1.default.readFileSync(package_json_path, 'utf8');
+                const pack = urn_lib_1.urn_util.json.clean_parse(content);
+                if (pack.name === 'urn-dot') {
+                    return true;
+                }
+                return false;
+            }
+            catch (ex) {
+                process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
+                return false;
+            }
+        }
+    }
+    return false;
+}
 function _init_log() {
     const log_file_path = `${process_params.root}/${defaults_1.defaults.log_filepath}`;
     if (!util_instance.fs.exists(log_file_path)) {

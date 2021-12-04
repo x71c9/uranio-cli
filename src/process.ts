@@ -51,12 +51,14 @@ export function uranio_process(args:Arguments)
 		:void{
 	
 	process_params.spin = true;
-
+	
 	process_params = read_rc_file(process_params);
 	
 	process_params = _set_args(process_params, args);
 	
 	process.chdir(process_params.root);
+	
+	process_params = _autoset_is_dot(process_params, args);
 	
 	output_instance = output.create(process_params);
 	util_instance = util.create(process_params, output_instance);
@@ -65,6 +67,37 @@ export function uranio_process(args:Arguments)
 	
 	_switch_command(args);
 	
+}
+
+function _autoset_is_dot(params:Params, args:Arguments):Params{
+	if(typeof args.is_dot === 'undefined' && _check_if_is_dot(params.root)){
+		params.is_dot = true;
+	}
+	return params;
+}
+
+function _check_if_is_dot(path:string):boolean{
+	const data = fs.readdirSync(path);
+	if(!data){
+		return false;
+	}
+	for(const file of data){
+		if(file === 'package.json'){
+			const package_json_path = `${path}/${file}`;
+			try{
+				const content = fs.readFileSync(package_json_path,'utf8');
+				const pack = urn_util.json.clean_parse(content);
+				if(pack.name === 'urn-dot'){
+					return true;
+				}
+				return false;
+			}catch(ex){
+				process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
+				return false;
+			}
+		}
+	}
+	return false;
 }
 
 function _init_log(){
