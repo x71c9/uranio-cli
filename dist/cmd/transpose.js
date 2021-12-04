@@ -107,6 +107,10 @@ function _transpose_file(file_path, included = false) {
     if (basename.match(/^\.git/) !== null) {
         return;
     }
+    const dot_book_dir = `${transpose_params.root}/src/books`;
+    if (transpose_params.is_dot && file_path.includes(dot_book_dir)) {
+        return false;
+    }
     if (file_path === `${transpose_params.root}/src/book.ts`) {
         _transpose_book();
         if (!included) {
@@ -407,12 +411,22 @@ function _manipulate_and_create_files(file_path) {
     _create_bll_book(sourceFile, import_statements);
     _create_dock_book(sourceFile, import_statements);
     _create_routes_book(sourceFile, import_statements);
+    if (transpose_params.is_dot) {
+        _copy_books_to_dot_src();
+    }
     // sourceFile = _manipulate_atom_book(sourceFile);
     // const modified = sourceFile.print();
     // _create_manipulated_file(modified);
     // _pretty_books();
     // _type_check_books();
     output_instance.done_log(`Manipulated book and created files.`, 'book');
+}
+function _copy_books_to_dot_src() {
+    output_instance.start_loading(`Copying books to urn-dot/src...`);
+    const server_book_dir = `${transpose_params.root}/${defaults_1.defaults.folder}/server/src/books`;
+    const dot_book_dir = `${transpose_params.root}/src/books`;
+    util_instance.fs.copy_directory(server_book_dir, dot_book_dir);
+    output_instance.done_log(`Copied books to urn-dot/src.`, 'dot');
 }
 function _generate_client_books() {
     output_instance.start_loading(`Generating client books...`);

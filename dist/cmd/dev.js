@@ -119,6 +119,9 @@ function _watch() {
         output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
         watch_src_scanned = true;
     }, (_event, _path) => {
+        if (dev_params.is_dot === true && _path === `${dev_params.root}/src/books`) {
+            return false;
+        }
         output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
         if (!watch_src_scanned) {
             return false;

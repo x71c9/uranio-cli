@@ -17,7 +17,7 @@
 		"client:dev": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js client:dev\"",
 		"alias": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js alias -wv\"",
 		"hooks": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js hooks -wv\"",
-		"run": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/test.js\""
+		"watch": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/test.js\""
 	},
 	"repository": {
 		"type": "git",
