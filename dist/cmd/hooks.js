@@ -92,31 +92,33 @@ function _generate_text() {
     text += `\n`;
     text += `import * as uranio from '../cln/main';\n`;
     text += `\n`;
-    text += `export const hooks = {\n`;
+    // text += `export const hooks = {\n`;
     for (const atom_name of atom_names) {
         const plural = (typeof atom_plurals[atom_name] === 'string') ?
             atom_plurals[atom_name] : `${atom_name}s`;
-        text += `\t${plural}: {\n`;
+        text += `export const ${plural} = {\n`;
         for (const route_name in atom_routes[atom_name]) {
             const text_args = _text_args_for_url(atom_routes[atom_name][route_name].url);
-            text += `\t\t${route_name}: async (${text_args}options?:uranio.types.Hook.Arguments<'${atom_name}', '${route_name}'>) => {\n`;
-            text += `\t\t\tconst args:uranio.types.Hook.Arguments<'${atom_name}', '${route_name}'> = {\n`;
+            text += `\t${route_name}: async <D extends uranio.types.Depth>(\n`;
+            text += `\t\t${text_args}options?:uranio.types.Hook.Arguments<'${atom_name}', '${route_name}', D>\n`;
+            text += `\t):Promise<uranio.types.Hook.Response<'${atom_name}', '${route_name}', D>>  => {\n`;
+            text += `\t\tconst args:uranio.types.Hook.Arguments<'${atom_name}', '${route_name}', D> = {\n`;
             const lines = _text_lines_in_args_params(atom_routes[atom_name][route_name].url);
             if (lines.length > 0) {
-                text += `\t\t\t\tparams: {\n`;
+                text += `\t\t\tparams: {\n`;
                 for (const line of lines) {
-                    text += `\t\t\t\t\t${line}\n`;
+                    text += `\t\t\t\t${line}\n`;
                 }
-                text += `\t\t\t\t},\n`;
+                text += `\t\t\t},\n`;
             }
-            text += `\t\t\t\t...options\n`;
-            text += `\t\t\t};\n`;
-            text += `\t\t\treturn await uranio.base.create('${atom_name}').hook('${route_name}')(args);\n`;
-            text += `\t\t},\n`;
+            text += `\t\t\t...options\n`;
+            text += `\t\t};\n`;
+            text += `\t\treturn await uranio.base.create('${atom_name}').hook<'${route_name}',D>('${route_name}')(args);\n`;
+            text += `\t},\n`;
         }
-        text += `\t},\n`;
+        text += `};\n`;
     }
-    text += `} as const;\n`;
+    // text += `} as const;\n`;
     output_instance.done_verbose_log(`Generated hooks text.`, 'hooks');
     return text;
 }
@@ -167,7 +169,7 @@ function _get_atom_def_plural() {
                 if (string_lits.length > 0) {
                     atom_prop_value = string_lits[0].getText();
                 }
-                plural_by_atom[atom_name] = atom_prop_value;
+                plural_by_atom[atom_name] = atom_prop_value.slice(1, -1);
             }
         }
     }
@@ -298,11 +300,11 @@ function _save_to_file(text) {
             break;
         }
     }
-    const filepath_server = `${hooks_path_server}/hooks/index.ts`;
+    const filepath_server = `${hooks_path_server}/hooks/hooks.ts`;
     util_instance.fs.write_file(filepath_server, text);
     util_instance.pretty(filepath_server);
     output_instance.done_verbose_log(`Created hooks file [${filepath_server}].`, 'hooks');
-    const filepath_client = `${hooks_path_client}/hooks/index.ts`;
+    const filepath_client = `${hooks_path_client}/hooks/hooks.ts`;
     util_instance.fs.write_file(filepath_client, text);
     util_instance.pretty(filepath_client);
     output_instance.done_verbose_log(`Created hooks file [${filepath_client}].`, 'hooks');
