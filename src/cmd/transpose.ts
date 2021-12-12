@@ -488,7 +488,10 @@ function _avoid_import_loop(file_path:string){
 	
 	const folderpath = path.parse(file_path).dir;
 	const lib_path = `${transpose_params.root}/${defaults.folder}/${parent_folder}/src/${defaults.repo_folder}/`;
-	const relative_root = path.relative(folderpath, lib_path);
+	let relative_root = path.relative(folderpath, lib_path);
+	if(relative_root[0] !== '.'){
+		relative_root = './' + relative_root;
+	}
 
 	const clnsrv_folder = (is_server_folder) ? 'srv' : 'cln';
 	

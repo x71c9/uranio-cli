@@ -306,12 +306,12 @@ function _copy_dot_files(){
 }
 
 function _update_tsconfig_paths(){
-	const paths = _generate_paths_server(init_params.repo, `.uranio/server`);
+	// const paths = _generate_paths_server(init_params.repo, `.uranio/server`);
 	const real_paths_server = _generate_paths_server(init_params.repo, `.`);
 	const real_paths_client = _generate_paths_client(init_params.repo, `.`);
 	
-	const main_tsconfig = `tsconfig.json`;
-	_update_paths(main_tsconfig, paths);
+	// const main_tsconfig = `tsconfig.json`;
+	// _update_paths(main_tsconfig, paths);
 	
 	const real_tsconfig_server = `.uranio/server/tsconfig.json`;
 	_update_paths(real_tsconfig_server, real_paths_server);
