@@ -282,10 +282,8 @@ function _remove_tmp(){
 
 function _copy_dot_files(){
 	
-	// if(util_instance.fs.exists(`${init_params.root}/src`) === false){
-	//   _copy_dot_src_folder();
-	// }
 	_copy_dot_tsconfigs();
+	
 	_update_tsconfig_paths();
 	
 	_copy_dot_eslint_files();
@@ -653,12 +651,12 @@ function _copy_dot_tsconfigs(){
 	util_instance.fs.copy_file(dot_tsc_file, dest, 'tsco');
 	
 	const dot_tsc_file_server =
-		`${init_params.root}/${defaults.tmp_folder}/urn-dot/files/server/tsconfig.json`;
+		`${init_params.root}/${defaults.tmp_folder}/urn-dot/assets/server/tsconfig.json`;
 	const dest_server = `${init_params.root}/.uranio/server/tsconfig.json`;
 	util_instance.fs.copy_file(dot_tsc_file_server, dest_server, 'tscs');
 	
 	const dot_tsc_file_client =
-		`${init_params.root}/${defaults.tmp_folder}/urn-dot/files/client/tsconfig.json`;
+		`${init_params.root}/${defaults.tmp_folder}/urn-dot/assets/client/tsconfig.json`;
 	const dest_client = `${init_params.root}/.uranio/client/tsconfig.json`;
 	util_instance.fs.copy_file(dot_tsc_file_client, dest_client, 'tscc');
 }
@@ -680,7 +678,7 @@ function _copy_dot_eslint_files(){
 
 function _copy_netlify_files(){
 	const dot_deploy_folder =
-		`${init_params.root}/${defaults.tmp_folder}/urn-dot/deploy`;
+		`${init_params.root}/${defaults.tmp_folder}/urn-dot/assets/deploy`;
 	
 	const toml_file = `${dot_deploy_folder}/netlify/netlify.toml`;
 	const toml_dest = `${init_params.root}/netlify.toml`;
@@ -708,7 +706,7 @@ function _copy_admin_files(){
 	// const nuxt_config_dest = `${init_params.root}/${defaults.folder}/client/nuxt.config.js`;
 	// util_instance.fs.copy_file(nuxt_config_file, nuxt_config_dest, 'adm');
 	
-	const dot_files_folder = `${init_params.root}/${defaults.tmp_folder}/urn-dot/files/`;
+	const dot_files_folder = `${init_params.root}/${defaults.tmp_folder}/urn-dot/assets/`;
 	const nuxt_config_file = `${dot_files_folder}/client/nuxt.config.js`;
 	const nuxt_config_dest = `${init_params.root}/${defaults.folder}/client/nuxt.config.js`;
 	util_instance.fs.copy_file(nuxt_config_file, nuxt_config_dest, 'adm');
@@ -716,7 +714,7 @@ function _copy_admin_files(){
 
 function _copy_express_files(){
 	const dot_deploy_folder =
-		`${init_params.root}/${defaults.tmp_folder}/urn-dot/deploy`;
+		`${init_params.root}/${defaults.tmp_folder}/urn-dot/assets/deploy`;
 	const src_folder = `${init_params.root}/src`;
 	if(!util_instance.fs.exists(src_folder)){
 		util_instance.fs.create_directory(src_folder);
