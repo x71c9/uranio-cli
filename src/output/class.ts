@@ -37,7 +37,7 @@ class Output {
 	
 	public log(text:string, context='log', color?:string)
 			:void{
-		const final_color = (typeof color === 'string') ? color : this.params.color;
+		const final_color = (typeof color === 'string') ? color : this.params.color_log;
 		const colored_text = (!this.params.blank) ? chalk.hex(final_color)(text) : text;
 		this._log(colored_text, context, true);
 	}
@@ -149,8 +149,8 @@ class Output {
 		}
 		text = this._replace_root_string(text);
 		const prefix = this.params.prefix;
-		context = `[${context}]`;
-		time = `[${time}]`;
+		context = (this.params.context === true) ? `[${context}]` : '';
+		time = (this.params.time === true) ? `[${time}]` : '';
 		let text_lenght = 0;
 		text_lenght += prefix.length;
 		text_lenght += context.length;
@@ -160,7 +160,13 @@ class Output {
 		const count_tabs = (text.match(new RegExp("\t", "g")) || []).length;
 		text_lenght += count_tabs * 7;
 		text_lenght += time.length;
-		text_lenght += 4;
+		text_lenght += 1;
+		if(this.params.context){
+			text_lenght += 1;
+		}
+		if(this.params.time){
+			text_lenght += 2;
+		}
 		if(this.params.fullwidth === true){
 			const gap_lenght = process.stdout.columns - text_lenght;
 			if(gap_lenght < 0 && gap_lenght > -9){
@@ -191,16 +197,27 @@ class Output {
 			time = chalk.blue(time);
 		}
 		if(this.params.fullwidth === true){
-			output_text += context + ' ';
+			output_text += context;
+			if(context.length > 0){
+				output_text += ' ';
+			}
 			output_text += text + ' ';
 			for(let i = 0; i < process.stdout.columns - text_lenght; i++){
 				output_text += dot;
 			}
-			output_text += ' ';
+			if(time.length > 0){
+				output_text += ' ';
+			}
 			output_text += time;
 		}else{
-			output_text += time + ' ';
-			output_text += context + ' ';
+			output_text += time;
+			if(time.length > 0){
+				output_text += ' ';
+			}
+			output_text += context;
+			if(context.length > 0){
+				output_text += ' ';
+			}
 			output_text += text + ' ';
 		}
 		output_text += `\n`;

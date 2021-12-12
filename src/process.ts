@@ -200,6 +200,24 @@ function _set_args(params:Params, args:Arguments)
 		params.is_dot = true;
 	}
 	
+	const time = args.t || args.time;
+	
+	if(time == true){
+		params.time = true;
+	}
+	if(typeof args.notime === 'boolean' && !!args.notime !== !params.time){
+		params.time = !args.notime;
+	}
+	
+	const context = args.a || args.context;
+	
+	if(context == true){
+		params.context = true;
+	}
+	if(typeof args.nocontext === 'boolean' && !!args.nocontext !== !params.context){
+		params.context = !args.nocontext;
+	}
+	
 	// Paramteters with default value = true
 	
 	const filelog = args.l || args.filelog;
@@ -255,10 +273,10 @@ function _set_args(params:Params, args:Arguments)
 		params.deploy = deploy as Deploy;
 	}
 	
-	const color = args.c || args.color;
+	const color_log = args.c || args.color_log;
 	
-	if(typeof color === 'string' && color != ''){
-		params.color = color;
+	if(typeof color_log === 'string' && color_log != ''){
+		params.color_log = color_log;
 	}
 	
 	const color_verbose = args.o || args.color_verbose;

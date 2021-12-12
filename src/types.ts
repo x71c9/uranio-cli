@@ -19,6 +19,8 @@ export type Params = {
 	fullwidth: boolean
 	native: boolean
 	is_dot: boolean
+	time: boolean
+	context: boolean
 	filelog: boolean
 	spin: boolean
 	prefix: string
@@ -26,7 +28,7 @@ export type Params = {
 	repo: Repo
 	pacman: PacMan
 	deploy: Deploy
-	color: string
+	color_log: string
 	color_verbose: string
 	color_debug: string
 	root: string

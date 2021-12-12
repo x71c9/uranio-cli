@@ -151,7 +151,11 @@ class FS {
 		if(!fs.existsSync(dir_path)){
 			return;
 		}
-		fs.rmdir(dir_path, {recursive: true}, () => {
+		// rmdir is deprecated
+		// fs.rmdir(dir_path, {recursive: true}, () => {
+		//   this.output.verbose_log(`Removed directory async [${dir_path}]`, context);
+		// });
+		fs.rm(dir_path, {recursive: true}, () => {
 			this.output.verbose_log(`Removed directory async [${dir_path}]`, context);
 		});
 	}
@@ -160,7 +164,8 @@ class FS {
 		if(!fs.existsSync(dir_path)){
 			return;
 		}
-		fs.rmdirSync(dir_path, {recursive: true});
+		// fs.rmdirSync(dir_path, {recursive: true});
+		fs.rmSync(dir_path, {recursive: true});
 		this.output.verbose_log(`Removed directory sync [${dir_path}]`, context);
 	}
 	
