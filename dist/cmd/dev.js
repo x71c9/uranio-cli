@@ -58,12 +58,14 @@ function dev(params) {
         _init_params(params);
         _init_dev();
         yield _dev_server();
-        if (dev_params.deploy === 'express') {
-            yield _dev_client();
-        }
-        else if (dev_params.deploy === 'netlify') {
-            const cmd = `npx ntl dev`;
-            util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
+        if (types_1.valid_admin_repos().includes(dev_params.repo)) {
+            if (dev_params.deploy === 'express') {
+                yield _dev_client();
+            }
+            else if (dev_params.deploy === 'netlify') {
+                const cmd = `npx ntl dev`;
+                util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
+            }
         }
     });
 }
@@ -79,24 +81,29 @@ exports.dev_server = dev_server;
 function dev_client(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
-        if (params.native != true) {
-            _init_dev();
+        if (types_1.valid_admin_repos().includes(dev_params.repo)) {
+            if (params.native != true) {
+                _init_dev();
+            }
+            yield _dev_client();
         }
-        yield _dev_client();
+        else {
+            output_instance.error_log(`The selected repo [${dev_params.repo}] has no client development.`);
+        }
     });
 }
 exports.dev_client = dev_client;
 function _dev_server() {
     return __awaiter(this, void 0, void 0, function* () {
-        if (dev_params.deploy === 'express') {
+        if (dev_params.deploy === 'netlify') {
             const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/server`;
-            const ts_cmd = `npx tsc-watch --onSuccess "node -r source-map-support/register ../../dist/server/index.js"`;
+            const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
             const cmd = `${cd_cmd} && ${ts_cmd}`;
             util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
         }
-        else if (dev_params.deploy === 'netlify') {
+        else { // this is valid also if the repo is core.
             const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/server`;
-            const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
+            const ts_cmd = `npx tsc-watch --onSuccess "node -r source-map-support/register ../../dist/server/index.js"`;
             const cmd = `${cd_cmd} && ${ts_cmd}`;
             util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
         }

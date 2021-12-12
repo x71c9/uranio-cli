@@ -234,17 +234,23 @@ function _copy_dot_files() {
             _copy_express_files();
         }
     }
+    if (init_params.repo === 'trx') {
+        _copy_trx_files();
+    }
+    if (init_params.repo === 'core') {
+        _copy_core_files();
+    }
     if (types_1.valid_admin_repos().includes(init_params.repo)) {
         _add_admin_files();
         _copy_admin_files();
     }
 }
 function _update_tsconfig_paths() {
-    // const paths = _generate_paths_server(init_params.repo, `.uranio/server`);
+    const main_paths = _generate_paths_server(init_params.repo, `.`);
     const real_paths_server = _generate_paths_server(init_params.repo, `.`);
     const real_paths_client = _generate_paths_client(init_params.repo, `.`);
-    // const main_tsconfig = `tsconfig.json`;
-    // _update_paths(main_tsconfig, paths);
+    const main_tsconfig = `tsconfig.json`;
+    _update_paths(main_tsconfig, main_paths);
     const real_tsconfig_server = `.uranio/server/tsconfig.json`;
     _update_paths(real_tsconfig_server, real_paths_server);
     const real_tsconfig_client = `.uranio/client/tsconfig.json`;
@@ -558,6 +564,26 @@ function _copy_express_files() {
     const index_file = `${dot_deploy_folder}/express/index.txt`;
     const index_dest = `${src_folder}/index.ts`;
     util_instance.fs.copy_file(index_file, index_dest, 'xprs');
+}
+function _copy_trx_files() {
+    const trx_asset_dir = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/assets/trx`;
+    const src_folder = `${init_params.root}/src`;
+    if (!util_instance.fs.exists(src_folder)) {
+        util_instance.fs.create_directory(src_folder);
+    }
+    const index_file = `${trx_asset_dir}/index.txt`;
+    const index_dest = `${src_folder}/index.ts`;
+    util_instance.fs.copy_file(index_file, index_dest, 'core');
+}
+function _copy_core_files() {
+    const core_assets_dir = `${init_params.root}/${defaults_1.defaults.tmp_folder}/urn-dot/assets/core`;
+    const src_folder = `${init_params.root}/src`;
+    if (!util_instance.fs.exists(src_folder)) {
+        util_instance.fs.create_directory(src_folder);
+    }
+    const index_file = `${core_assets_dir}/index.txt`;
+    const index_dest = `${src_folder}/index.ts`;
+    util_instance.fs.copy_file(index_file, index_dest, 'core');
 }
 function _clone_core() {
     return __awaiter(this, void 0, void 0, function* () {
