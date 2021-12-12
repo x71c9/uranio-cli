@@ -274,7 +274,10 @@ function _avoid_import_loop(file_path) {
     const parent_folder = (is_server_folder) ? 'server' : 'client';
     const folderpath = path_1.default.parse(file_path).dir;
     const lib_path = `${transpose_params.root}/${defaults_1.defaults.folder}/${parent_folder}/src/${defaults_1.defaults.repo_folder}/`;
-    const relative_root = path_1.default.relative(folderpath, lib_path);
+    let relative_root = path_1.default.relative(folderpath, lib_path);
+    if (relative_root[0] !== '.') {
+        relative_root = './' + relative_root;
+    }
     const clnsrv_folder = (is_server_folder) ? 'srv' : 'cln';
     let relative_path = '';
     for (const submodule_name in modules) {

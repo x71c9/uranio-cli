@@ -58,8 +58,13 @@ function dev(params) {
         _init_params(params);
         _init_dev();
         yield _dev_server();
-        const cmd = `npx ntl dev`;
-        util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
+        if (dev_params.deploy === 'express') {
+            yield _dev_client();
+        }
+        else if (dev_params.deploy === 'netlify') {
+            const cmd = `npx ntl dev`;
+            util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
+        }
     });
 }
 exports.dev = dev;
@@ -83,10 +88,18 @@ function dev_client(params) {
 exports.dev_client = dev_client;
 function _dev_server() {
     return __awaiter(this, void 0, void 0, function* () {
-        const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/server`;
-        const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
-        const cmd = `${cd_cmd} && ${ts_cmd}`;
-        util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
+        if (dev_params.deploy === 'express') {
+            const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/server`;
+            const ts_cmd = `npx tsc-watch --onSuccess "node -r source-map-support/register ../../dist/server/index.js"`;
+            const cmd = `${cd_cmd} && ${ts_cmd}`;
+            util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
+        }
+        else if (dev_params.deploy === 'netlify') {
+            const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/server`;
+            const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
+            const cmd = `${cd_cmd} && ${ts_cmd}`;
+            util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
+        }
     });
 }
 function _dev_client() {
@@ -167,7 +180,7 @@ function _watch() {
             }
             output_instance.done_log(`[src watch] Transposed [${_path}].`, 'wtch');
         }
-        if (_is_file_related_to_lambda_function(_path)) {
+        if (dev_params.deploy === 'netlify' && _is_file_related_to_lambda_function(_path)) {
             _replace_netlify_function_file();
         }
     });

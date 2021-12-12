@@ -37,8 +37,12 @@ export async function dev(params:Partial<Params>):Promise<void>{
 	_init_params(params);
 	_init_dev();
 	await _dev_server();
-	const cmd = `npx ntl dev`;
-	util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
+	if(dev_params.deploy === 'express'){
+		await _dev_client();
+	}else if(dev_params.deploy === 'netlify'){
+		const cmd = `npx ntl dev`;
+		util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
+	}
 }
 
 export async function dev_server(params:Partial<Params>):Promise<void>{
@@ -57,12 +61,21 @@ export async function dev_client(params:Partial<Params>):Promise<void>{
 
 async function _dev_server(){
 	
-	const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
-	const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
-	const cmd = `${cd_cmd} && ${ts_cmd}`;
-	
-	util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
-	
+	if(dev_params.deploy === 'express'){
+		
+		const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
+		const ts_cmd = `npx tsc-watch --onSuccess "node -r source-map-support/register ../../dist/server/index.js"`;
+		const cmd = `${cd_cmd} && ${ts_cmd}`;
+		util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
+		
+	}else if(dev_params.deploy === 'netlify'){
+		
+		const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
+		const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
+		const cmd = `${cd_cmd} && ${ts_cmd}`;
+		util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
+		
+	}
 }
 
 async function _dev_client(){
@@ -176,7 +189,7 @@ function _watch(){
 				
 			}
 			
-			if(_is_file_related_to_lambda_function(_path)){
+			if(dev_params.deploy === 'netlify' && _is_file_related_to_lambda_function(_path)){
 				_replace_netlify_function_file();
 			}
 			
