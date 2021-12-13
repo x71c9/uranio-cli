@@ -12,7 +12,7 @@ import * as util from '../util/';
 
 import {default_params, defaults} from '../conf/defaults';
 
-import {Params, valid_hooks_repos, valid_admin_repos} from '../types';
+import {Params, valid_hooks_repos, valid_admin_repos, valid_client_repos} from '../types';
 
 import {transpose, transpose_one} from './transpose';
 
@@ -37,13 +37,8 @@ export async function dev(params:Partial<Params>):Promise<void>{
 	_init_params(params);
 	_init_dev();
 	await _dev_server();
-	if(valid_admin_repos().includes(dev_params.repo)){
-		if(dev_params.deploy === 'express'){
-			await _dev_client();
-		}else if(dev_params.deploy === 'netlify'){
-			const cmd = `npx ntl dev`;
-			util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
-		}
+	if(valid_client_repos().includes(dev_params.repo)){
+		await _dev_client();
 	}
 }
 
@@ -55,7 +50,7 @@ export async function dev_server(params:Partial<Params>):Promise<void>{
 
 export async function dev_client(params:Partial<Params>):Promise<void>{
 	_init_params(params);
-	if(valid_admin_repos().includes(dev_params.repo)){
+	if(valid_client_repos().includes(dev_params.repo)){
 		if(params.native != true){
 			_init_dev();
 		}
@@ -87,12 +82,64 @@ async function _dev_server(){
 }
 
 async function _dev_client(){
+	switch(dev_params.repo){
+		case 'trx':{
+			await _dev_trx_client();
+			break;
+		}
+		case 'adm':{
+			await _dev_client_adm();
+		}
+	}
+}
+
+async function _dev_trx_client(){
+	if(dev_params.deploy === 'express' || dev_params.native === true){
+		await _dev_trx_webpack_express();
+	}else if(dev_params.deploy === 'netlify'){
+		await _dev_trx_webpack_netlify();
+	}
+}
+
+async function _dev_trx_webpack_express(){
+	
+	const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/client`;
+	const nu_cmd = `npx webpack serve --open`;
+	const cmd = `${cd_cmd} && ${nu_cmd}`;
+	
+	util_instance.spawn.log(cmd, 'webpack', 'developing client', nuxt_color);
+	
+}
+
+async function _dev_trx_webpack_netlify(){
+	
+	const cmd = `npx ntl dev`;
+	util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
+	
+}
+
+async function _dev_client_adm(){
+	if(dev_params.deploy === 'express' || dev_params.native === true){
+		await _dev_admin_nuxt_express();
+	}else if(dev_params.deploy === 'netlify'){
+		await _dev_admin_nuxt_netlify();
+	}
+}
+
+async function _dev_admin_nuxt_express(){
 	
 	const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/client`;
 	const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
 	const cmd = `${cd_cmd} && ${nu_cmd}`;
 	
 	util_instance.spawn.log(cmd, 'nuxt', 'developing client', nuxt_color);
+	
+}
+
+async function _dev_admin_nuxt_netlify(){
+	
+	const cmd = `npx ntl dev`;
+	util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
 	
 }
 

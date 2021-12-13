@@ -29,6 +29,7 @@ import {
 	alias,
 	hooks,
 	help,
+	info,
 	// test,
 } from './cmd/';
 
@@ -487,6 +488,10 @@ function _switch_command(args:Arguments){
 					build(process_params);
 				}
 			}
+			break;
+		}
+		case 'info':{
+			info(process_params);
 			break;
 		}
 		case 'help':{

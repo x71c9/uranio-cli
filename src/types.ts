@@ -88,6 +88,11 @@ export function valid_deploy_repos()
 	return vals;
 }
 
+export function valid_client_repos()
+		:string[]{
+	return valid_hooks_repos();
+}
+
 export function valid_hooks_repos()
 		:string[]{
 	const vals:string[] = [];

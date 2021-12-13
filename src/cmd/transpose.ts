@@ -10,7 +10,8 @@ import * as tsm from 'ts-morph';
 
 import {
 	Params,
-	valid_admin_repos
+	valid_admin_repos,
+	valid_client_repos
 } from '../types';
 
 import {default_params, defaults} from '../conf/defaults';
@@ -202,6 +203,32 @@ function _transpose_file(file_path:string, included=false){
 			const frontend_target = file_path.replace(
 				frontend_src_path,
 				path.join(base_folder, 'client/src', defaults.repo_folder, 'nuxt')
+			);
+			util_instance.fs.copy_file(file_path, frontend_target, 'trsp');
+			
+			if(path.extname(file_path) === '.ts'){
+				alias.replace_file_aliases(
+					frontend_target,
+					alias.get_aliases(
+						`${base_folder}/client/tsconfig.json`,
+						transpose_params
+					)
+				);
+				_avoid_import_loop(frontend_target);
+				output_instance.done_verbose_log(
+					`Transposed frontend file [${file_path}] [${frontend_target}].`,
+					'trsp'
+				);
+			}
+			
+		}else if(
+			valid_client_repos().includes(transpose_params.repo)
+			&& file_path.includes(frontend_src_path)
+		){
+			
+			const frontend_target = file_path.replace(
+				frontend_src_path,
+				path.join(base_folder, 'client/src', defaults.repo_folder)
 			);
 			util_instance.fs.copy_file(file_path, frontend_target, 'trsp');
 			

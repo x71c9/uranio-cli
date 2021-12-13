@@ -58,14 +58,8 @@ function dev(params) {
         _init_params(params);
         _init_dev();
         yield _dev_server();
-        if (types_1.valid_admin_repos().includes(dev_params.repo)) {
-            if (dev_params.deploy === 'express') {
-                yield _dev_client();
-            }
-            else if (dev_params.deploy === 'netlify') {
-                const cmd = `npx ntl dev`;
-                util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
-            }
+        if (types_1.valid_client_repos().includes(dev_params.repo)) {
+            yield _dev_client();
         }
     });
 }
@@ -81,7 +75,7 @@ exports.dev_server = dev_server;
 function dev_client(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
-        if (types_1.valid_admin_repos().includes(dev_params.repo)) {
+        if (types_1.valid_client_repos().includes(dev_params.repo)) {
             if (params.native != true) {
                 _init_dev();
             }
@@ -111,10 +105,63 @@ function _dev_server() {
 }
 function _dev_client() {
     return __awaiter(this, void 0, void 0, function* () {
+        switch (dev_params.repo) {
+            case 'trx': {
+                yield _dev_trx_client();
+                break;
+            }
+            case 'adm': {
+                yield _dev_client_adm();
+            }
+        }
+    });
+}
+function _dev_trx_client() {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (dev_params.deploy === 'express' || dev_params.native === true) {
+            yield _dev_trx_webpack_express();
+        }
+        else if (dev_params.deploy === 'netlify') {
+            yield _dev_trx_webpack_netlify();
+        }
+    });
+}
+function _dev_trx_webpack_express() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/client`;
+        const nu_cmd = `npx webpack serve --open`;
+        const cmd = `${cd_cmd} && ${nu_cmd}`;
+        util_instance.spawn.log(cmd, 'webpack', 'developing client', nuxt_color);
+    });
+}
+function _dev_trx_webpack_netlify() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const cmd = `npx ntl dev`;
+        util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
+    });
+}
+function _dev_client_adm() {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (dev_params.deploy === 'express' || dev_params.native === true) {
+            yield _dev_admin_nuxt_express();
+        }
+        else if (dev_params.deploy === 'netlify') {
+            yield _dev_admin_nuxt_netlify();
+        }
+    });
+}
+function _dev_admin_nuxt_express() {
+    return __awaiter(this, void 0, void 0, function* () {
         const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/client`;
         const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
         const cmd = `${cd_cmd} && ${nu_cmd}`;
         util_instance.spawn.log(cmd, 'nuxt', 'developing client', nuxt_color);
+    });
+}
+function _dev_admin_nuxt_netlify() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const cmd = `npx ntl dev`;
+        util_instance.spawn.log(cmd, 'ntlf', 'developing client', nuxt_color);
     });
 }
 function _init_params(params) {

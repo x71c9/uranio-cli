@@ -413,6 +413,10 @@ function _switch_command(args) {
             }
             break;
         }
+        case 'info': {
+            cmd_1.info(process_params);
+            break;
+        }
         case 'help': {
             cmd_1.help();
             break;

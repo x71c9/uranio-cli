@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.valid_deploy = exports.valid_pacman = exports.valid_admin_repos = exports.valid_hooks_repos = exports.valid_deploy_repos = exports.valid_repos = exports.abstract_deploy = exports.abstract_pacman = exports.abstract_admin_repos = exports.abstract_hooks_repos = exports.abstract_deploy_repos = exports.abstract_repos = void 0;
+exports.valid_deploy = exports.valid_pacman = exports.valid_admin_repos = exports.valid_hooks_repos = exports.valid_client_repos = exports.valid_deploy_repos = exports.valid_repos = exports.abstract_deploy = exports.abstract_pacman = exports.abstract_admin_repos = exports.abstract_hooks_repos = exports.abstract_deploy_repos = exports.abstract_repos = void 0;
 exports.abstract_repos = {
     core: '',
     api: '',
@@ -48,6 +48,10 @@ function valid_deploy_repos() {
     return vals;
 }
 exports.valid_deploy_repos = valid_deploy_repos;
+function valid_client_repos() {
+    return valid_hooks_repos();
+}
+exports.valid_client_repos = valid_client_repos;
 function valid_hooks_repos() {
     const vals = [];
     for (const k in exports.abstract_hooks_repos) {
