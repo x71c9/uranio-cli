@@ -60,6 +60,7 @@ export declare const abstract_deploy: {
 };
 export declare function valid_repos(): string[];
 export declare function valid_deploy_repos(): string[];
+export declare function valid_client_repos(): string[];
 export declare function valid_hooks_repos(): string[];
 export declare function valid_admin_repos(): string[];
 export declare function valid_pacman(): string[];

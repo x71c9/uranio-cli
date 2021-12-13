@@ -151,6 +151,16 @@ function _transpose_file(file_path, included = false) {
                 output_instance.done_verbose_log(`Transposed frontend file [${file_path}] [${frontend_target}].`, 'trsp');
             }
         }
+        else if (types_1.valid_client_repos().includes(transpose_params.repo)
+            && file_path.includes(frontend_src_path)) {
+            const frontend_target = file_path.replace(frontend_src_path, path_1.default.join(base_folder, 'client/src', defaults_1.defaults.repo_folder));
+            util_instance.fs.copy_file(file_path, frontend_target, 'trsp');
+            if (path_1.default.extname(file_path) === '.ts') {
+                alias.replace_file_aliases(frontend_target, alias.get_aliases(`${base_folder}/client/tsconfig.json`, transpose_params));
+                _avoid_import_loop(frontend_target);
+                output_instance.done_verbose_log(`Transposed frontend file [${file_path}] [${frontend_target}].`, 'trsp');
+            }
+        }
         else {
             const new_path_server = file_path.replace(src_path, `${base_folder}/server/src/`);
             const new_path_client = file_path.replace(src_path, `${base_folder}/client/src/`);

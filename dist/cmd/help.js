@@ -27,6 +27,7 @@ function help() {
         console.log(`  init ............... init uranio repo.`);
         console.log(`  dev ................ start uranio development mode.`);
         console.log(`  transpose .......... transpose atom books.`);
+        console.log(`  info ............... show uranio info for this repo.`);
         console.log(`  version ............ show package version.`);
         console.log(`  help ............... show help menu [this one].`);
         console.log(``);
