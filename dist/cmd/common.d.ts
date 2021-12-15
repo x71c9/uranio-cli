@@ -11,3 +11,4 @@ export declare function merge_init_params(params: Partial<Params>): Params;
 export declare function check_repo(repo: string): void;
 export declare function check_pacman(pacman: string): void;
 export declare function check_deploy(deploy: string): void;
+export declare function check_if_is_dot(path: string): boolean;

@@ -52,34 +52,10 @@ function uranio_process(args) {
 }
 exports.uranio_process = uranio_process;
 function _autoset_is_dot(params, args) {
-    if (typeof args.is_dot === 'undefined' && _check_if_is_dot(params.root)) {
+    if (typeof args.is_dot === 'undefined' && common_1.check_if_is_dot(params.root)) {
         params.is_dot = true;
     }
     return params;
-}
-function _check_if_is_dot(path) {
-    const data = fs_1.default.readdirSync(path);
-    if (!data) {
-        return false;
-    }
-    for (const file of data) {
-        if (file === 'package.json') {
-            const package_json_path = `${path}/${file}`;
-            try {
-                const content = fs_1.default.readFileSync(package_json_path, 'utf8');
-                const pack = urn_lib_1.urn_util.json.clean_parse(content);
-                if (pack.name === 'urn-dot') {
-                    return true;
-                }
-                return false;
-            }
-            catch (ex) {
-                process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
-                return false;
-            }
-        }
-    }
-    return false;
 }
 function _init_log() {
     const log_file_path = `${process_params.root}/${defaults_1.defaults.log_filepath}`;
@@ -419,6 +395,10 @@ function _switch_command(args) {
         }
         case 'help': {
             cmd_1.help();
+            break;
+        }
+        case 'dot': {
+            cmd_1.dot(process_params, args);
             break;
         }
         case 'test': {

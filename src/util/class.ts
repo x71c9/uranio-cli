@@ -90,12 +90,17 @@ class Util {
 		:void{
 		this.output.start_loading(`Prettier [${filepath}]...`);
 		const content = this.fs.read_file(filepath, 'utf8');
-		const pretty_string = prettier.format(
-			content,
-			{ useTabs: true, tabWidth: 2, parser: parser }
-		);
-		this.fs.write_file(filepath, pretty_string);
-		this.output.done_verbose_log(`Prettier [${filepath}] done.`, 'prtt');
+		try{
+			const pretty_string = prettier.format(
+				content,
+				{ useTabs: true, tabWidth: 2, parser: parser }
+			);
+			this.fs.write_file(filepath, pretty_string);
+			this.output.done_verbose_log(`Prettier [${filepath}] done.`, 'prtt');
+		}catch(e){
+			const err = e as Error;
+			this.output.error_log(`Cannot pretty file. ${err.message}`, 'prtt');
+		}
 	}
 	
 	// public relative_to_absolute_path(path:string)

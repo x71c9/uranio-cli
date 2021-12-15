@@ -84,7 +84,7 @@ export function check_repo(repo:string)
 		const valid_repos_str = valid_repos().join(', ');
 		let end_log = '';
 		end_log += `Wrong repo. `;
-		end_log += `Repo must be one of the following [${valid_repos_str}]`;
+		end_log += `Repo must be one of the following [${valid_repos_str}]\n`;
 		process.stderr.write(end_log);
 		process.exit(1);
 	}
@@ -96,7 +96,7 @@ export function check_pacman(pacman:string)
 		const valid_pacman_str = valid_pacman().join(', ');
 		let end_log = '';
 		end_log += `Wrong package manager. `;
-		end_log += `Package manager must be one of the following [${valid_pacman_str}]`;
+		end_log += `Package manager must be one of the following [${valid_pacman_str}]\n`;
 		process.stderr.write(end_log);
 		process.exit(1);
 	}
@@ -108,10 +108,34 @@ export function check_deploy(deploy:string)
 		const valid_deploy_str = valid_deploy().join(', ');
 		let end_log = '';
 		end_log += `Wrong deploy value. `;
-		end_log += `Deploy value must be one of the following [${valid_deploy_str}]`;
+		end_log += `Deploy value must be one of the following [${valid_deploy_str}]\n`;
 		process.stderr.write(end_log);
 		process.exit(1);
 	}
+}
+
+export function check_if_is_dot(path:string):boolean{
+	const data = fs.readdirSync(path);
+	if(!data){
+		return false;
+	}
+	for(const file of data){
+		if(file === 'package.json'){
+			const package_json_path = `${path}/${file}`;
+			try{
+				const content = fs.readFileSync(package_json_path,'utf8');
+				const pack = urn_util.json.clean_parse(content);
+				if(pack.name === 'urn-dot'){
+					return true;
+				}
+				return false;
+			}catch(ex){
+				process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
+				return false;
+			}
+		}
+	}
+	return false;
 }
 
 
