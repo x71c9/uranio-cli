@@ -104,7 +104,12 @@ function _transpose_all(included = false) {
 }
 function _transpose_file(file_path, included = false) {
     const basename = path_1.default.basename(file_path);
+    const extension = path_1.default.extname(basename);
     if (basename.match(/^\.git/) !== null) {
+        return;
+    }
+    const not_valid_extensions = ['swp', 'swo'];
+    if (not_valid_extensions.includes(extension)) {
         return;
     }
     const dot_book_dir = `${transpose_params.root}/src/books`;

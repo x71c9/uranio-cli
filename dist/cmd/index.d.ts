@@ -11,3 +11,4 @@ export * from './transpose';
 export * from './hooks';
 export * from './info';
 export * from './help';
+export * from './dot';

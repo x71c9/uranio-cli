@@ -12,7 +12,13 @@ import * as util from '../util/';
 
 import {default_params, defaults} from '../conf/defaults';
 
-import {Params, valid_hooks_repos, valid_admin_repos, valid_client_repos} from '../types';
+import {
+	Params,
+	valid_hooks_repos,
+	valid_admin_repos,
+	valid_client_repos,
+	valid_deploy_repos
+} from '../types';
 
 import {transpose, transpose_one} from './transpose';
 
@@ -64,7 +70,7 @@ export async function dev_client(params:Partial<Params>):Promise<void>{
 
 async function _dev_server(){
 	
-	if(dev_params.deploy === 'netlify'){
+	if(dev_params.deploy === 'netlify' && valid_deploy_repos().includes(dev_params.repo)){
 		
 		const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
 		const ts_cmd = `npx tsc -w --project ./tsconfig.json`;

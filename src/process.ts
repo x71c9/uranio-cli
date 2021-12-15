@@ -30,6 +30,7 @@ import {
 	hooks,
 	help,
 	info,
+	dot
 	// test,
 } from './cmd/';
 
@@ -39,7 +40,8 @@ import {
 	check_repo,
 	check_deploy,
 	check_pacman,
-	read_rc_file
+	read_rc_file,
+	check_if_is_dot
 } from './cmd/common';
 
 let output_instance:output.OutputInstance;
@@ -71,34 +73,10 @@ export function uranio_process(args:Arguments)
 }
 
 function _autoset_is_dot(params:Params, args:Arguments):Params{
-	if(typeof args.is_dot === 'undefined' && _check_if_is_dot(params.root)){
+	if(typeof args.is_dot === 'undefined' && check_if_is_dot(params.root)){
 		params.is_dot = true;
 	}
 	return params;
-}
-
-function _check_if_is_dot(path:string):boolean{
-	const data = fs.readdirSync(path);
-	if(!data){
-		return false;
-	}
-	for(const file of data){
-		if(file === 'package.json'){
-			const package_json_path = `${path}/${file}`;
-			try{
-				const content = fs.readFileSync(package_json_path,'utf8');
-				const pack = urn_util.json.clean_parse(content);
-				if(pack.name === 'urn-dot'){
-					return true;
-				}
-				return false;
-			}catch(ex){
-				process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
-				return false;
-			}
-		}
-	}
-	return false;
 }
 
 function _init_log(){
@@ -496,6 +474,10 @@ function _switch_command(args:Arguments){
 		}
 		case 'help':{
 			help();
+			break;
+		}
+		case 'dot':{
+			dot(process_params, args);
 			break;
 		}
 		case 'test':{

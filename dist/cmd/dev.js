@@ -89,7 +89,7 @@ function dev_client(params) {
 exports.dev_client = dev_client;
 function _dev_server() {
     return __awaiter(this, void 0, void 0, function* () {
-        if (dev_params.deploy === 'netlify') {
+        if (dev_params.deploy === 'netlify' && types_1.valid_deploy_repos().includes(dev_params.repo)) {
             const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/server`;
             const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
             const cmd = `${cd_cmd} && ${ts_cmd}`;
