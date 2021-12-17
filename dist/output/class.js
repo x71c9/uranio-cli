@@ -26,18 +26,15 @@ class Output {
         this.params = params;
     }
     log(text, context = 'log', color) {
-        const final_color = (typeof color === 'string') ? color : this.params.color_log;
-        const colored_text = (!this.params.blank) ? chalk_1.default.hex(final_color)(text) : text;
+        const colored_text = this._color_text(text, 'log', color);
         this._log(colored_text, context, true);
     }
     verbose_log(text, context = 'vlog', color) {
-        const final_color = (typeof color === 'string') ? color : this.params.color_verbose;
-        const colored_text = (!this.params.blank) ? chalk_1.default.hex(final_color)(text) : text;
+        const colored_text = this._color_text(text, 'verbose', color);
         this._log(colored_text, context, (this.params.verbose === true));
     }
     debug_log(text, context = 'dlog', color) {
-        const final_color = (typeof color === 'string') ? color : this.params.color_debug;
-        const colored_text = (!this.params.blank) ? chalk_1.default.hex(final_color)(text) : text;
+        const colored_text = this._color_text(text, 'debug', color);
         this._log(colored_text, context, (this.params.debug === true));
     }
     done_log(text, context = 'done') {
@@ -194,6 +191,28 @@ class Output {
         output_text += `\n`;
         return output_text;
     }
+    _color_text(text, type, color) {
+        let colored_text = text;
+        if (_is_uranio_native(text)) {
+            colored_text = _uranio_color(text);
+        }
+        else {
+            let default_color = this.params.color_log;
+            switch (type) {
+                case 'verbose': {
+                    default_color = this.params.color_verbose;
+                    break;
+                }
+                case 'debug': {
+                    default_color = this.params.color_debug;
+                    break;
+                }
+            }
+            const final_color = (typeof color === 'string') ? color : default_color;
+            colored_text = (!this.params.blank) ? chalk_1.default.hex(final_color)(text) : text;
+        }
+        return colored_text;
+    }
     _replace_root_string(str) {
         if (str.indexOf('$URNROOT$') !== -1) {
             return str.replace('$URNROOT$', '');
@@ -216,6 +235,47 @@ class Output {
             this.spinner_text(spinner_1.spinner_texts[spinner_1.spinner_texts.length - 1]);
         }
     }
+}
+const prefix_types = [
+    '[fn_debug]',
+    '[debug]',
+    '[warn]',
+    '[error]'
+];
+function _is_uranio_native(text) {
+    for (const pre of prefix_types) {
+        if (text.indexOf(pre) === 0) {
+            return true;
+        }
+    }
+    return false;
+}
+function _uranio_color(text) {
+    let processed_text = text;
+    for (const pre of prefix_types) {
+        if (text.indexOf(pre) === 0) {
+            processed_text = processed_text.substr(pre.length, processed_text.length);
+            switch (pre) {
+                case '[fn_debug]': {
+                    processed_text = chalk_1.default.cyan(processed_text);
+                    break;
+                }
+                case '[debug]': {
+                    processed_text = chalk_1.default.blue(processed_text);
+                    break;
+                }
+                case '[warn]': {
+                    processed_text = chalk_1.default.yellow(processed_text);
+                    break;
+                }
+                case '[error]': {
+                    processed_text = chalk_1.default.red(processed_text);
+                    break;
+                }
+            }
+        }
+    }
+    return processed_text;
 }
 function _log_to_file(text) {
     fs_1.default.appendFileSync(defaults_1.defaults.log_filepath, text);
