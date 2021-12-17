@@ -8,6 +8,8 @@ import path from 'path';
 
 import * as tsm from 'ts-morph';
 
+import {urn_util} from 'urn-lib';
+
 import {
 	Params,
 	valid_admin_repos,
@@ -121,7 +123,7 @@ function _transpose_file(file_path:string, included=false){
 		return;
 	}
 	
-	const not_valid_extensions = ['swp', 'swo'];
+	const not_valid_extensions = ['.swp', '.swo'];
 	if(not_valid_extensions.includes(extension)){
 		return;
 	}
@@ -480,18 +482,25 @@ function _avoid_import_loop(file_path:string){
 			const prop_access_exps = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.PropertyAccessExpression) as tsm.Node[];
 			const qualified_name = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.QualifiedName) as tsm.Node[];
 			const nodes_to_check:tsm.Node[] = prop_access_exps.concat(qualified_name);
+			// loop all methods or variable with module.module.methods syntax
 			for(const prop_access_exp of nodes_to_check){
 				const prop_text = prop_access_exp.getText();
 				const exploded_text = prop_text.split('.');
+				// if the first is different than `uranio` continue.
 				if(exploded_text[0] !== uranio_var_name){
 					continue;
 				}
 				exploded_text.shift();
 				let parent_module = uranio_var_name;
+				// skipping uranio submodule
 				while(submodules.includes(exploded_text[0])){
 					parent_module = exploded_text[0];
 					exploded_text.shift();
 				}
+				// skipping all node longer than the only module that need to be imported
+				// this is because in the loop there are, for example,
+				// `bll.auth.create`, `bll.auth` and `bll` from the same node
+				// we want only `bll`
 				if(exploded_text.length !== 1){
 					continue;
 				}
@@ -525,20 +534,48 @@ function _avoid_import_loop(file_path:string){
 	if(relative_root[0] !== '.'){
 		relative_root = './' + relative_root;
 	}
-
+	
 	const clnsrv_folder = (is_server_folder) ? 'srv' : 'cln';
+	
+	/**
+	 * NOTE:
+	 * This need to be updated if new first level
+	 * functions are defined in urn-core repo.
+	 */
+	const first_level_core_methods = ['connect', 'disconnect', 'init'];
+	const path_by_method = {
+		'connect': 'cnn',
+		'disconnect': 'cnn',
+		'init': 'init'
+	};
 	
 	let relative_path = '';
 	for(const submodule_name in modules){
 		for(const module_name of modules[submodule_name]){
-			if(module_name === 'types'){
-				relative_path = `${relative_root}/${clnsrv_folder}/types`;
-			}else{
+			
+			if(
+				transpose_params.repo === 'core'
+				&& first_level_core_methods.includes(module_name)
+				&& urn_util.object.has_key(path_by_method, module_name)
+			){ // case for first level methods like `init`, `connect`, etc.
+				
 				const submod_tree = _resolve_path_tree(submodule_name);
-				relative_path = `${relative_root}/${submod_tree}${module_name}`;
+				relative_path = `${relative_root}/${submod_tree}${path_by_method[module_name]}`;
+				const import_state = `import {${module_name} as ${_generate_variable_name(module_name)}} from '${relative_path}';`;
+				import_states.push(import_state);
+				
+			}else{
+				
+				if(module_name === 'types'){
+					relative_path = `${relative_root}/${clnsrv_folder}/types`;
+				}else{
+					const submod_tree = _resolve_path_tree(submodule_name);
+					relative_path = `${relative_root}/${submod_tree}${module_name}`;
+				}
+				const import_state = `import * as ${_generate_variable_name(module_name)} from '${relative_path}';`;
+				import_states.push(import_state);
+				
 			}
-			const import_state = `import * as ${_generate_variable_name(module_name)} from '${relative_path}';`;
-			import_states.push(import_state);
 		}
 	}
 	

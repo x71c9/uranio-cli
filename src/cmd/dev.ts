@@ -80,7 +80,14 @@ async function _dev_server(){
 	}else{ // this is valid also if the repo is core.
 		
 		const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
-		const ts_cmd = `npx tsc-watch --onSuccess "node -r source-map-support/register ../../dist/server/index.js"`;
+		
+		// const dotenv_var = `DOTENV_CONFIG_PATH=${dev_params.root}/.env`;
+		const dotenv_part = ` -r dotenv/config`;
+		const dotenv_after = ` dotenv_config_path=${dev_params.root}/.env`;
+		const source_part = ` -r source-map-support/register`;
+		const urn_lib_pre = ` urn_log_prefix_type=true`;
+		
+		const ts_cmd = `npx tsc-watch --onSuccess "node${dotenv_part}${source_part} ../../dist/server/index.js${dotenv_after}${urn_lib_pre}"`;
 		const cmd = `${cd_cmd} && ${ts_cmd}`;
 		util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
 		
@@ -192,6 +199,12 @@ function _watch(){
 		},
 		(_event, _path) => {
 			if(dev_params.is_dot === true && _path === `${dev_params.root}/src/books`){
+				return false;
+			}
+			const basename = path.basename(_path);
+			const extension = path.extname(basename);
+			const not_valid_extensions = ['.swp', '.swo'];
+			if(not_valid_extensions.includes(extension)){
 				return false;
 			}
 			output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);

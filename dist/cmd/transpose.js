@@ -39,6 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.transpose_one = exports.transpose = void 0;
 const path_1 = __importDefault(require("path"));
 const tsm = __importStar(require("ts-morph"));
+const urn_lib_1 = require("urn-lib");
 const types_1 = require("../types");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
@@ -108,7 +109,7 @@ function _transpose_file(file_path, included = false) {
     if (basename.match(/^\.git/) !== null) {
         return;
     }
-    const not_valid_extensions = ['swp', 'swo'];
+    const not_valid_extensions = ['.swp', '.swo'];
     if (not_valid_extensions.includes(extension)) {
         return;
     }
@@ -252,18 +253,25 @@ function _avoid_import_loop(file_path) {
             const prop_access_exps = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.PropertyAccessExpression);
             const qualified_name = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.QualifiedName);
             const nodes_to_check = prop_access_exps.concat(qualified_name);
+            // loop all methods or variable with module.module.methods syntax
             for (const prop_access_exp of nodes_to_check) {
                 const prop_text = prop_access_exp.getText();
                 const exploded_text = prop_text.split('.');
+                // if the first is different than `uranio` continue.
                 if (exploded_text[0] !== uranio_var_name) {
                     continue;
                 }
                 exploded_text.shift();
                 let parent_module = uranio_var_name;
+                // skipping uranio submodule
                 while (submodules.includes(exploded_text[0])) {
                     parent_module = exploded_text[0];
                     exploded_text.shift();
                 }
+                // skipping all node longer than the only module that need to be imported
+                // this is because in the loop there are, for example,
+                // `bll.auth.create`, `bll.auth` and `bll` from the same node
+                // we want only `bll`
                 if (exploded_text.length !== 1) {
                     continue;
                 }
@@ -294,18 +302,39 @@ function _avoid_import_loop(file_path) {
         relative_root = './' + relative_root;
     }
     const clnsrv_folder = (is_server_folder) ? 'srv' : 'cln';
+    /**
+     * NOTE:
+     * This need to be updated if new first level
+     * functions are defined in urn-core repo.
+     */
+    const first_level_core_methods = ['connect', 'disconnect', 'init'];
+    const path_by_method = {
+        'connect': 'cnn',
+        'disconnect': 'cnn',
+        'init': 'init'
+    };
     let relative_path = '';
     for (const submodule_name in modules) {
         for (const module_name of modules[submodule_name]) {
-            if (module_name === 'types') {
-                relative_path = `${relative_root}/${clnsrv_folder}/types`;
+            if (transpose_params.repo === 'core'
+                && first_level_core_methods.includes(module_name)
+                && urn_lib_1.urn_util.object.has_key(path_by_method, module_name)) { // case for first level methods like `init`, `connect`, etc.
+                const submod_tree = _resolve_path_tree(submodule_name);
+                relative_path = `${relative_root}/${submod_tree}${path_by_method[module_name]}`;
+                const import_state = `import {${module_name} as ${_generate_variable_name(module_name)}} from '${relative_path}';`;
+                import_states.push(import_state);
             }
             else {
-                const submod_tree = _resolve_path_tree(submodule_name);
-                relative_path = `${relative_root}/${submod_tree}${module_name}`;
+                if (module_name === 'types') {
+                    relative_path = `${relative_root}/${clnsrv_folder}/types`;
+                }
+                else {
+                    const submod_tree = _resolve_path_tree(submodule_name);
+                    relative_path = `${relative_root}/${submod_tree}${module_name}`;
+                }
+                const import_state = `import * as ${_generate_variable_name(module_name)} from '${relative_path}';`;
+                import_states.push(import_state);
             }
-            const import_state = `import * as ${_generate_variable_name(module_name)} from '${relative_path}';`;
-            import_states.push(import_state);
         }
     }
     const file_content = sourceFile.print();

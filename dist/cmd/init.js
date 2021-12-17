@@ -562,7 +562,7 @@ function _copy_express_files() {
         util_instance.fs.create_directory(src_folder);
     }
     const index_file = `${dot_deploy_folder}/express/index.txt`;
-    const index_dest = `${src_folder}/index.ts`;
+    const index_dest = `${src_folder}/express.ts`;
     util_instance.fs.copy_file(index_file, index_dest, 'xprs');
 }
 function _copy_trx_files() {
@@ -572,7 +572,7 @@ function _copy_trx_files() {
         util_instance.fs.create_directory(src_folder);
     }
     const index_file = `${trx_asset_dir}/index.txt`;
-    const index_dest = `${src_folder}/index.ts`;
+    const index_dest = `${src_folder}/trx.ts`;
     util_instance.fs.copy_file(index_file, index_dest, 'core');
 }
 function _copy_core_files() {
@@ -582,7 +582,7 @@ function _copy_core_files() {
         util_instance.fs.create_directory(src_folder);
     }
     const index_file = `${core_assets_dir}/index.txt`;
-    const index_dest = `${src_folder}/index.ts`;
+    const index_dest = `${src_folder}/core.ts`;
     util_instance.fs.copy_file(index_file, index_dest, 'core');
 }
 function _clone_core() {
