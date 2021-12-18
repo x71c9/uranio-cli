@@ -41,6 +41,7 @@ let util_instance;
 let process_params = defaults_1.default_params;
 function uranio_process(args) {
     process_params.spin = true;
+    _set_root(args);
     process_params = common_1.read_rc_file(process_params);
     process_params = _set_args(process_params, args);
     process.chdir(process_params.root);
@@ -51,6 +52,26 @@ function uranio_process(args) {
     _switch_command(args);
 }
 exports.uranio_process = uranio_process;
+function _set_root(args) {
+    let root = args.s || args.root;
+    if (typeof root === 'string' && root !== '') {
+        if (root[0] !== '/') {
+            root = path_1.default.resolve(process.cwd(), root);
+        }
+        if (!_check_folder(root)) {
+            let end_log = '';
+            end_log += `\nInvalid project root.\n`;
+            process.stderr.write(end_log);
+            process.exit(1);
+        }
+        else {
+            process_params.root = root;
+        }
+    }
+    else {
+        process_params.root = _get_project_root();
+    }
+}
 function _autoset_is_dot(params, args) {
     if (typeof args.is_dot === 'undefined' && common_1.check_if_is_dot(params.root)) {
         params.is_dot = true;
@@ -195,24 +216,22 @@ function _set_args(params, args) {
         params.color_debug = color_debug;
     }
     // Root parameter
-    let root = args.s || args.root;
-    if (typeof root === 'string' && root !== '') {
-        if (root[0] !== '/') {
-            root = path_1.default.resolve(process.cwd(), root);
-        }
-        if (!_check_folder(root)) {
-            let end_log = '';
-            end_log += `\nInvalid project root.\n`;
-            process.stderr.write(end_log);
-            process.exit(1);
-        }
-        else {
-            params.root = root;
-        }
-    }
-    else {
-        params.root = _get_project_root();
-    }
+    // let root = args.s || args.root;
+    // if(typeof root === 'string' && root !== ''){
+    //   if(root[0] !== '/'){
+    //     root = path.resolve(process.cwd(), root);
+    //   }
+    //   if(!_check_folder(root)){
+    //     let end_log = '';
+    //     end_log += `\nInvalid project root.\n`;
+    //     process.stderr.write(end_log);
+    //     process.exit(1);
+    //   }else{
+    //     params.root = root;
+    //   }
+    // }else{
+    //   params.root = _get_project_root();
+    // }
     return params;
 }
 function _get_project_root() {
@@ -227,7 +246,7 @@ function _get_project_root() {
         folder_path = arr_folder.join('/');
         if (folder_path === '/' || arr_folder.length === 2) {
             let err_msg = `Cannot find project root.`;
-            err_msg += ' Be sure to run `uranio` inside an NPM project.';
+            err_msg += ' Be sure to run `uranio` inside an NPM project.\n';
             process.stderr.write(err_msg);
             process.exit(1);
         }
@@ -251,7 +270,8 @@ function _folder_is_valid(folder_path) {
                 return true;
             }
             catch (ex) {
-                process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
+                const err = ex;
+                process.stderr.write(`Invalid ${package_json_path}. ${err.message}`);
                 return false;
             }
         }
@@ -275,7 +295,8 @@ function _folder_is_uranio(folder_path) {
                 return false;
             }
             catch (ex) {
-                process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
+                const err = ex;
+                process.stderr.write(`Invalid ${package_json_path}. ${err.message}`);
                 return false;
             }
         }
@@ -307,8 +328,8 @@ function _check_folder(folder_path) {
                 return true;
             }
             catch (ex) {
-                // this.output.error_log(`Invalid ${package_json_path}. ${ex.message}`, 'root');
-                process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
+                const err = ex;
+                process.stderr.write(`Invalid ${package_json_path}. ${err.message}`);
                 return false;
             }
         }

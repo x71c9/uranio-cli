@@ -10,11 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.check_if_is_dot = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_init_params = exports.merge_params = exports.read_rc_file = void 0;
 const fs_1 = __importDefault(require("fs"));
-// import * as cp from 'child_process';
 const urn_lib_1 = require("urn-lib");
-// import * as util from '../util/';
-// import * as output from '../output/';
-// import {default_params, defaults} from '../conf/defaults';
 const defaults_1 = require("../conf/defaults");
 const types_1 = require("../types");
 function read_rc_file(params) {
@@ -32,7 +28,8 @@ function read_rc_file(params) {
         return cloned_params;
     }
     catch (ex) {
-        process.stderr.write(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
+        const err = ex;
+        process.stderr.write(`Cannot parse rcfile ${rcfile_path}. ${err.message}`);
         process.exit(1);
     }
 }
@@ -112,7 +109,8 @@ function check_if_is_dot(path) {
                 return false;
             }
             catch (ex) {
-                process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
+                const err = ex;
+                process.stderr.write(`Invalid ${package_json_path}. ${err.message}`);
                 return false;
             }
         }
@@ -120,29 +118,4 @@ function check_if_is_dot(path) {
     return false;
 }
 exports.check_if_is_dot = check_if_is_dot;
-// export function init_log()
-//     :void{
-//   if(!fs.existsSync(`${conf.root}/${defaults.log_filepath}`)){
-//     cp.execSync(`touch ${conf.root}/${defaults.log_filepath}`);
-//   }
-// }
-// export function init_run(options?:Partial<Options>)
-//     :void {
-//   conf.hide = true;
-//   conf.spinner = false;
-//   if(options){
-//     util.merge_options(options);
-//   }
-//   if(!util.check_folder(conf.root)){
-//     throw new Error(`Invalid root path [${conf.root}].`);
-//   }
-//   if(!util.check_repo(conf.repo)){
-//     throw new Error(`Invalid repo [${conf.repo}].`);
-//   }
-//   init_log();
-//   _log_options();
-// }
-// function _log_options(){
-//   output.verbose_log(JSON.stringify(conf), 'opts');
-// }
 //# sourceMappingURL=common.js.map

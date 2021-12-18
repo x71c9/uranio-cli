@@ -345,83 +345,6 @@ function _transpose_folder(dir_path:string, included=false){
 	}
 }
 
-// function _copy_from_src_into_uranio_folder(){
-//   const root = transpose_params.root;
-//   const src_paths = util_instance.fs.read_dir(`${root}/src/`);
-//   for(let i = 0; i < src_paths.length; i++){
-//     const src_path = src_paths[i];
-//     const full_src_path = path.join(root,'src',src_path);
-//     if(src_path === 'uranio'){
-//       const uranio_paths = util_instance.fs.read_dir(full_src_path);
-//       for(let j = 0; j < uranio_paths.length; j++){
-//         const file_path = uranio_paths[j];
-//         if(file_path.startsWith('.git')){
-//           continue;
-//         }
-//         const full_file_path = path.join(full_src_path, file_path);
-//         const default_folder_path = path.join(root, defaults.folder);
-//         const target_uranio_path = path.join('src', defaults.repo_folder, file_path);
-//         const target_client = path.join(default_folder_path, 'client', target_uranio_path);
-//         const target_server = path.join(default_folder_path, 'server', target_uranio_path);
-//         if(util_instance.fs.is_directory(full_file_path)){
-//           util_instance.fs.copy_directory(full_file_path, target_client, 'cpsrc', [/^\.git/]);
-//           util_instance.fs.copy_directory(full_file_path, target_server, 'cpsrc', [/^\.git/]);
-//         }else{
-//           util_instance.fs.copy_file(full_file_path, target_client);
-//           util_instance.fs.copy_file(full_file_path, target_server);
-//         }
-//       }
-//     }else if(src_path === 'frontend' && valid_admin_repos().includes(transpose_params.repo)){
-//       const frontend_paths = util_instance.fs.read_dir(full_src_path);
-//       for(let j = 0; j < frontend_paths.length; j++){
-//         const file_path = frontend_paths[j];
-//         const full_file_path = path.join(full_src_path, file_path);
-//         const target_client = path.join(
-//           root,
-//           defaults.folder,
-//           'client/src',
-//           defaults.repo_folder,
-//           'nuxt',
-//           file_path
-//         );
-//         if(util_instance.fs.is_directory(full_file_path)){
-//           util_instance.fs.copy_directory(full_file_path, target_client);
-//         }else{
-//           util_instance.fs.copy_file(full_file_path, target_client);
-//         }
-//       }
-//     }else if(src_path !== 'book.ts'){
-//       const target_server = path.join(root, defaults.folder, 'server/src', src_path);
-//       const target_client = path.join(root, defaults.folder, 'client/src', src_path);
-//       if(util_instance.fs.is_directory(full_src_path)){
-//         util_instance.fs.copy_directory(full_src_path, target_server);
-//         util_instance.fs.copy_directory(full_src_path, target_client);
-//       }else{
-//         util_instance.fs.copy_file(full_src_path, target_server);
-//         util_instance.fs.copy_file(full_src_path, target_client);
-//       }
-//     }
-//   }
-//   // util_instance.fs.copy_directory(
-//   //   `${transpose_params.root}/src/`,
-//   //   `${transpose_params.root}/${defaults.folder}/client/src/`,
-//   //   `trsp`
-//   // );
-//   // util_instance.fs.copy_directory(
-//   //   `${transpose_params.root}/src/`,
-//   //   `${transpose_params.root}/${defaults.folder}/server/src/`,
-//   //   `trsp`
-//   // );
-//   // util_instance.fs.remove_file(
-//   //   `${transpose_params.root}/${defaults.folder}/server/src/book.ts`,
-//   //   `book`
-//   // );
-//   // util_instance.fs.remove_file(
-//   //   `${transpose_params.root}/${defaults.folder}/client/src/book.ts`,
-//   //   `book`
-//   // );
-// }
-
 type ModuleList = {
 	[k:string]: string[]
 }
@@ -540,12 +463,10 @@ function _avoid_import_loop(file_path:string){
 	/**
 	 * NOTE:
 	 * This need to be updated if new first level
-	 * functions are defined in urn-core repo.
+	 * functions are defined.
 	 */
-	const first_level_core_methods = ['connect', 'disconnect', 'init'];
+	const first_level_core_methods = ['init'];
 	const path_by_method = {
-		'connect': 'cnn',
-		'disconnect': 'cnn',
 		'init': 'init'
 	};
 	
@@ -554,10 +475,10 @@ function _avoid_import_loop(file_path:string){
 		for(const module_name of modules[submodule_name]){
 			
 			if(
-				transpose_params.repo === 'core'
-				&& first_level_core_methods.includes(module_name)
+				// transpose_params.repo === 'core'
+				first_level_core_methods.includes(module_name)
 				&& urn_util.object.has_key(path_by_method, module_name)
-			){ // case for first level methods like `init`, `connect`, etc.
+			){ // case for first level methods like `init`, etc.
 				
 				const submod_tree = _resolve_path_tree(submodule_name);
 				relative_path = `${relative_root}/${submod_tree}${path_by_method[module_name]}`;

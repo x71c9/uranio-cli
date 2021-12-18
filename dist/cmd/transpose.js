@@ -305,20 +305,19 @@ function _avoid_import_loop(file_path) {
     /**
      * NOTE:
      * This need to be updated if new first level
-     * functions are defined in urn-core repo.
+     * functions are defined.
      */
-    const first_level_core_methods = ['connect', 'disconnect', 'init'];
+    const first_level_core_methods = ['init'];
     const path_by_method = {
-        'connect': 'cnn',
-        'disconnect': 'cnn',
         'init': 'init'
     };
     let relative_path = '';
     for (const submodule_name in modules) {
         for (const module_name of modules[submodule_name]) {
-            if (transpose_params.repo === 'core'
-                && first_level_core_methods.includes(module_name)
-                && urn_lib_1.urn_util.object.has_key(path_by_method, module_name)) { // case for first level methods like `init`, `connect`, etc.
+            if (
+            // transpose_params.repo === 'core'
+            first_level_core_methods.includes(module_name)
+                && urn_lib_1.urn_util.object.has_key(path_by_method, module_name)) { // case for first level methods like `init`, etc.
                 const submod_tree = _resolve_path_tree(submodule_name);
                 relative_path = `${relative_root}/${submod_tree}${path_by_method[module_name]}`;
                 const import_state = `import {${module_name} as ${_generate_variable_name(module_name)}} from '${relative_path}';`;
