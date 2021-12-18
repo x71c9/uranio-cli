@@ -109,12 +109,12 @@ async function _switch(args:Arguments):Promise<void>{
 	check_pacman(pacman);
 	check_deploy(deploy);
 	
+	await _check_if_clean_repo();
+	
+	await _execute(`git checkout ${repo}`, 'git', 'checking out');
+	output_instance.done_log(`Checked out ${repo}`);
+	
 	if(repo !== dot_params.repo){
-		
-		await _check_if_clean_repo();
-		
-		await _execute(`git checkout ${repo}`, 'git', 'checking out');
-		output_instance.done_log(`Checked out ${repo}`);
 		
 		const origin = defaults[`${repo}_repo` as keyof typeof defaults];
 		const dest = `src/uranio`;

@@ -101,10 +101,10 @@ function _switch(args) {
         common_1.check_repo(repo);
         common_1.check_pacman(pacman);
         common_1.check_deploy(deploy);
+        yield _check_if_clean_repo();
+        yield _execute(`git checkout ${repo}`, 'git', 'checking out');
+        output_instance.done_log(`Checked out ${repo}`);
         if (repo !== dot_params.repo) {
-            yield _check_if_clean_repo();
-            yield _execute(`git checkout ${repo}`, 'git', 'checking out');
-            output_instance.done_log(`Checked out ${repo}`);
             const origin = defaults_1.defaults[`${repo}_repo`];
             const dest = `src/uranio`;
             yield _commit_previous_submodule();

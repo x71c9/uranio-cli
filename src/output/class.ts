@@ -252,7 +252,7 @@ class Output {
 			return str;
 		}
 		const regex = new RegExp(`${this.params.root}`, 'g');
-		return str.replace(regex, 'ROOT');
+		return str.replace(regex, '__root');
 	}
 	
 	private _spinner_text_color(text?:string):string{

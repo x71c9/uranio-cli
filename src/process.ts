@@ -55,6 +55,8 @@ export function uranio_process(args:Arguments)
 	
 	process_params.spin = true;
 	
+	_set_root(args);
+	
 	process_params = read_rc_file(process_params);
 	
 	process_params = _set_args(process_params, args);
@@ -70,6 +72,28 @@ export function uranio_process(args:Arguments)
 	
 	_switch_command(args);
 	
+}
+
+function _set_root(args:Arguments){
+	
+	let root = args.s || args.root;
+	
+	if(typeof root === 'string' && root !== ''){
+		if(root[0] !== '/'){
+			root = path.resolve(process.cwd(), root);
+		}
+		if(!_check_folder(root)){
+			let end_log = '';
+			end_log += `\nInvalid project root.\n`;
+			process.stderr.write(end_log);
+			process.exit(1);
+		}else{
+			process_params.root = root;
+		}
+	}else{
+		process_params.root = _get_project_root();
+	}
+		
 }
 
 function _autoset_is_dot(params:Params, args:Arguments):Params{
@@ -272,23 +296,23 @@ function _set_args(params:Params, args:Arguments)
 	
 	// Root parameter
 	
-	let root = args.s || args.root;
+	// let root = args.s || args.root;
 	
-	if(typeof root === 'string' && root !== ''){
-		if(root[0] !== '/'){
-			root = path.resolve(process.cwd(), root);
-		}
-		if(!_check_folder(root)){
-			let end_log = '';
-			end_log += `\nInvalid project root.\n`;
-			process.stderr.write(end_log);
-			process.exit(1);
-		}else{
-			params.root = root;
-		}
-	}else{
-		params.root = _get_project_root();
-	}
+	// if(typeof root === 'string' && root !== ''){
+	//   if(root[0] !== '/'){
+	//     root = path.resolve(process.cwd(), root);
+	//   }
+	//   if(!_check_folder(root)){
+	//     let end_log = '';
+	//     end_log += `\nInvalid project root.\n`;
+	//     process.stderr.write(end_log);
+	//     process.exit(1);
+	//   }else{
+	//     params.root = root;
+	//   }
+	// }else{
+	//   params.root = _get_project_root();
+	// }
 		
 	return params;
 	
@@ -307,7 +331,7 @@ function _get_project_root()
 		folder_path = arr_folder.join('/');
 		if(folder_path === '/' || arr_folder.length === 2){
 			let err_msg = `Cannot find project root.`;
-			err_msg += ' Be sure to run `uranio` inside an NPM project.';
+			err_msg += ' Be sure to run `uranio` inside an NPM project.\n';
 			process.stderr.write(err_msg);
 			process.exit(1);
 		}
@@ -331,7 +355,8 @@ function _folder_is_valid(folder_path:string){
 				}
 				return true;
 			}catch(ex){
-				process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
+				const err = ex as Error;
+				process.stderr.write(`Invalid ${package_json_path}. ${err.message}`);
 				return false;
 			}
 		}
@@ -355,7 +380,8 @@ function _folder_is_uranio(folder_path:string){
 				}
 				return false;
 			}catch(ex){
-				process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
+				const err = ex as Error;
+				process.stderr.write(`Invalid ${package_json_path}. ${err.message}`);
 				return false;
 			}
 		}
@@ -386,8 +412,8 @@ function _check_folder(folder_path:string){
 				}
 				return true;
 			}catch(ex){
-				// this.output.error_log(`Invalid ${package_json_path}. ${ex.message}`, 'root');
-				process.stderr.write(`Invalid ${package_json_path}. ${ex.message}`);
+				const err = ex as Error;
+				process.stderr.write(`Invalid ${package_json_path}. ${err.message}`);
 				return false;
 			}
 		}
