@@ -1,8 +1,7 @@
 node_modules/
 config/*
 !config/example.env
-.urn
-.urnlog
-
 .uranio/
 .urnlog
+package-lock.json
+yarn.lock
