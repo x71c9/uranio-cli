@@ -739,7 +739,19 @@ function _copy_trx_files(){
 	}
 	const index_file = `${trx_asset_dir}/index.txt`;
 	const index_dest = `${src_folder}/trx.ts`;
-	util_instance.fs.copy_file(index_file, index_dest, 'core');
+	util_instance.fs.copy_file(index_file, index_dest, 'trx');
+	
+	const dist_folder = `${init_params.root}/dist`;
+	if(!util_instance.fs.exists(dist_folder)){
+		util_instance.fs.create_directory(dist_folder, 'trx');
+	}
+	const html_file = `${trx_asset_dir}/index.html`;
+	const html_dest = `${dist_folder}/index.html`;
+	util_instance.fs.copy_file(html_file, html_dest, 'trx');
+	
+	const webpack_config = `${trx_asset_dir}/webpack.config.js`;
+	const webpack_dest = `${init_params.root}/${defaults.folder}/client/webpack.config.js`;
+	util_instance.fs.copy_file(webpack_config, webpack_dest, 'trx');
 }
 
 function _copy_core_files(){
