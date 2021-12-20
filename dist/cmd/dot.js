@@ -81,7 +81,7 @@ function _switch(args) {
         if (typeof repo === 'undefined' && typeof args.repo === 'string') {
             repo = args.repo;
         }
-        let pacman = (args._[3] || 'npm');
+        let pacman = (args._[3] || 'yarn');
         if (typeof pacman === 'undefined' && typeof args.pacman === 'string') {
             pacman = args.pacman;
         }
