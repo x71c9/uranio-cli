@@ -76,7 +76,7 @@ async function _switch(args:Arguments):Promise<void>{
 	if(typeof repo === 'undefined' && typeof args.repo === 'string'){
 		repo = args.repo as Repo;
 	}
-	let pacman = (args._[3] || 'npm') as PacMan;
+	let pacman = (args._[3] || 'yarn') as PacMan;
 	if(typeof pacman === 'undefined' && typeof args.pacman === 'string'){
 		pacman = args.pacman as PacMan;
 	}
