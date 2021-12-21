@@ -90,6 +90,8 @@ function _generate_text() {
     text += ` * @packageDocumentation\n`;
     text += ` */\n`;
     text += `\n`;
+    text += `import {urn_response} from 'urn-lib';\n`;
+    text += `\n`;
     text += `import * as uranio from '../cln/main';\n`;
     text += `\n`;
     // text += `export const hooks = {\n`;
@@ -97,6 +99,9 @@ function _generate_text() {
         const plural = (typeof atom_plurals[atom_name] === 'string') ?
             atom_plurals[atom_name] : `${atom_name}s`;
         text += `export const ${plural} = {\n`;
+        if (_is_auth_atom(atom_name)) {
+            text += _authenticate_hooks(atom_name);
+        }
         for (const route_name in atom_routes[atom_name]) {
             const text_args = _text_args_for_url(atom_routes[atom_name][route_name].url);
             text += `\t${route_name}: async <D extends uranio.types.Depth>(\n`;
@@ -122,6 +127,20 @@ function _generate_text() {
     output_instance.done_verbose_log(`Generated hooks text.`, 'hooks');
     return text;
 }
+function _is_auth_atom(atom_name) {
+    const auth_by_atom = _get_atom_def_prop('authenticate', tsm.SyntaxKind.TrueKeyword);
+    return (auth_by_atom[atom_name] == 'true');
+}
+function _authenticate_hooks(atom_name) {
+    let text = '';
+    text += `\tauthenticate: async (\n`;
+    text += `\t\temail: string,\n`;
+    text += `\t\tpassword: string\n`;
+    text += `\t): Promise<urn_response.General<string>> => {\n`;
+    text += `\t\treturn await uranio.auth.create('${atom_name}').authenticate(email, password);\n`;
+    text += `\t},\n`;
+    return text;
+}
 function _get_atom_name_from_book(book_name) {
     const atom_names = [];
     const atom_def_with_atom_name = _get_book_atom_def(book_name);
@@ -136,7 +155,8 @@ function _get_atom_name_from_book(book_name) {
     return atom_names;
 }
 function _get_book_atom_def(book_name) {
-    const atom_book_path = `${hooks_params.root}/${defaults_1.defaults.folder}/client/src/books/${book_name}.ts`;
+    // const atom_book_path = `${hooks_params.root}/${defaults.folder}/client/src/books/${book_name}.ts`;
+    const atom_book_path = `${hooks_params.root}/${defaults_1.defaults.folder}/server/src/books/${book_name}.ts`;
     const _project = new tsm.Project(_project_option);
     const sourceFile = _project.addSourceFileAtPath(atom_book_path);
     const syntax_list = sourceFile.getLastChildByKindOrThrow(tsm.SyntaxKind.SyntaxList);
@@ -152,6 +172,33 @@ function _get_book_atom_def(book_name) {
             return prop_ass;
         }
     }
+}
+function _get_atom_def_prop(prop_name, type) {
+    const prop_by_atom = {};
+    const atom_def_props = _get_book_atom_def_props('atom');
+    if (!atom_def_props) {
+        return prop_by_atom;
+    }
+    for (const atom_name in atom_def_props) {
+        for (const atom_prop of atom_def_props[atom_name]) {
+            const atom_prop_id = atom_prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+            const atom_prop_name = atom_prop_id.getText();
+            if (atom_prop_name === prop_name) {
+                let atom_prop_value = undefined;
+                const type_key = atom_prop.getChildrenOfKind(type);
+                if (type_key.length > 0) {
+                    atom_prop_value = type_key[0].getText();
+                }
+                if (atom_prop_name[0] === '"' || atom_prop_name[0] === "'") {
+                    prop_by_atom[atom_name] = atom_prop_value.slice(1, -1);
+                }
+                else {
+                    prop_by_atom[atom_name] = atom_prop_value;
+                }
+            }
+        }
+    }
+    return prop_by_atom;
 }
 function _get_atom_def_plural() {
     const plural_by_atom = {};

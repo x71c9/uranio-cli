@@ -34,8 +34,8 @@ const atom_book_required_properties = ['properties', 'plural', 'connection', 'se
 const dock_book_required_properties = ['dock', 'plural'];
 const bll_book_required_properties = ['bll'];
 
-const atom_book_required_client_first_props = ['properties', 'plural', 'connection'];
-const dock_book_required_client_second_props = ['url', 'routes'];
+const atom_book_required_client_first_props = ['properties', 'plural', 'connection', 'authenticate'];
+const dock_book_required_client_second_props = ['url', 'routes', 'auth_url'];
 
 const submodules = ['core', 'api', 'trx'];
 
