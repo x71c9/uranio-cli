@@ -84,6 +84,11 @@ function _generate_text(){
 	text += `\n`;
 	text += `import * as uranio from '../cln/main';\n`;
 	text += `\n`;
+	text += `let hook_token:string|undefined;\n`;
+	text += `export function set_token(token:string):void{\n`;
+	text += `\thook_token = token;\n`;
+	text += `}\n\n`;
+
 	// text += `export const hooks = {\n`;
 	for(const atom_name of atom_names){
 		const plural = (typeof atom_plurals[atom_name] === 'string') ?
@@ -92,10 +97,14 @@ function _generate_text(){
 		if(_is_auth_atom(atom_name)){
 			text += _authenticate_hooks(atom_name);
 		}
+		if(atom_name === 'media'){
+			text += _upload_hooks();
+		}
 		for(const route_name in atom_routes[atom_name]){
 			const text_args = _text_args_for_url(atom_routes[atom_name][route_name].url);
 			text += `\t${route_name}: async <D extends uranio.types.Depth>(\n`;
-			text += `\t\t${text_args}options?:uranio.types.Hook.Arguments<'${atom_name}', '${route_name}', D>\n`;
+			text += `\t\t${text_args}options?:uranio.types.Hook.Arguments<'${atom_name}', '${route_name}', D>,\n`;
+			text += `\t\ttoken?:string\n`;
 			text += `\t):Promise<uranio.types.Hook.Response<'${atom_name}', '${route_name}', D>>  => {\n`;
 			text += `\t\tconst args:uranio.types.Hook.Arguments<'${atom_name}', '${route_name}', D> = {\n`;
 			const lines = _text_lines_in_args_params(atom_routes[atom_name][route_name].url);
@@ -108,7 +117,16 @@ function _generate_text(){
 			}
 			text += `\t\t\t...options\n`;
 			text += `\t\t};\n`;
-			text += `\t\treturn await uranio.base.create('${atom_name}').hook<'${route_name}',D>('${route_name}')(args);\n`;
+			
+			text += `\t\tlet current_token:string|undefined;`;
+			text += `\t\tif(typeof hook_token === 'string' && hook_token !== ''){`;
+			text += `\t\t\tcurrent_token = hook_token;`;
+			text += `\t\t}`;
+			text += `\t\tif(typeof token === 'string' && token !== ''){`;
+			text += `\t\t\tcurrent_token = token;`;
+			text += `\t\t}`;
+			
+			text += `\t\treturn await uranio.base.create('${atom_name}',current_token).hook<'${route_name}',D>('${route_name}')(args);\n`;
 			text += `\t},\n`;
 		}
 		text += `};\n`;
@@ -123,12 +141,30 @@ function _is_auth_atom(atom_name:string){
 	return (auth_by_atom[atom_name] == 'true');
 }
 
+function _upload_hooks(){
+	let text = '';
+	text += `\tupload: async<D extends uranio.types.Depth>(\n`;
+	text += `\t\tfile: Buffer | ArrayBuffer | Blob,\n`;
+	text += `\t\ttoken?: string\n`;
+	text += `\t): Promise<urn_response.General<uranio.types.Atom<'media'>>> => {\n`;
+	text += `\t\tlet current_token: string | undefined;\n`;
+	text += `\t\tif (typeof hook_token === "string" && hook_token !== "") {\n`;
+	text += `\t\t\tcurrent_token = hook_token;\n`;
+	text += `\t\t}\n`;
+	text += `\t\tif (typeof token === "string" && token !== "") {\n`;
+	text += `\t\t\tcurrent_token = token;\n`;
+	text += `\t\t}\n`;
+	text += `\t\treturn await uranio.media.create(current_token).upload<D>(file, current_token);\n`;
+	text += `\t},\n`;
+	return text;
+}
+
 function _authenticate_hooks(atom_name:string){
 	let text = '';
 	text += `\tauthenticate: async (\n`;
 	text += `\t\temail: string,\n`;
 	text += `\t\tpassword: string\n`;
-	text += `\t): Promise<urn_response.General<string>> => {\n`;
+	text += `\t): Promise<urn_response.General<uranio.types.Api.AuthResponse>> => {\n`;
 	text += `\t\treturn await uranio.auth.create('${atom_name}').authenticate(email, password);\n`;
 	text += `\t},\n`;
 	return text;
