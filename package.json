@@ -1,7 +1,7 @@
 {
-	"name": "urn-cli",
-	"version": "0.0.0",
-	"description": "Uranio Command Line Interface",
+	"name": "uranio-cli",
+	"version": "0.0.1",
+	"description": "Uranio command line interface",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {

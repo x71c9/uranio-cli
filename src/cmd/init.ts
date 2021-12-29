@@ -310,7 +310,8 @@ function _copy_dot_files(){
 }
 
 function _update_tsconfig_paths(){
-	const main_paths = _generate_paths_server(init_params.repo, `.`);
+	const prefix = init_params.is_dot === true ? '.' : `${defaults.folder}/server`;
+	const main_paths = _generate_paths_server(init_params.repo, prefix);
 	const real_paths_server = _generate_paths_server(init_params.repo, `.`);
 	const real_paths_client = _generate_paths_client(init_params.repo, `.`);
 	
