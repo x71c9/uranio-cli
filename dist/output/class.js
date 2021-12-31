@@ -105,7 +105,7 @@ class Output {
         }
     }
     _format_text(text, context = 'frmt') {
-        let time = dateformat_1.default(new Date(), defaults_1.defaults.time_format);
+        let time = (0, dateformat_1.default)(new Date(), defaults_1.defaults.time_format);
         if (context.length < 4) {
             context = context.padEnd(4, '_');
         }
@@ -135,7 +135,7 @@ class Output {
         if (this.params.fullwidth === true) {
             const gap_lenght = process.stdout.columns - text_lenght;
             if (gap_lenght < 0 && gap_lenght > -9) {
-                time = time.replace(dateformat_1.default(new Date, "yy-mm-dd'T'"), '');
+                time = time.replace((0, dateformat_1.default)(new Date, "yy-mm-dd'T'"), '');
                 text_lenght -= 9;
             }
             else if (gap_lenght <= -9 && gap_lenght > -21) {

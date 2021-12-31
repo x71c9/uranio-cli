@@ -62,8 +62,8 @@ function build(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_build(params);
         output_instance.start_loading(`Building...`);
-        yield transpose_1.transpose(build_params, true);
-        yield hooks_1.hooks(build_params, true);
+        yield (0, transpose_1.transpose)(build_params, true);
+        yield (0, hooks_1.hooks)(build_params, true);
         yield _build_server();
         yield _build_client();
     });
@@ -73,8 +73,8 @@ function build_server(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_build(params);
         output_instance.start_loading(`Building server...`);
-        yield transpose_1.transpose(build_params, true);
-        yield hooks_1.hooks(build_params, true);
+        yield (0, transpose_1.transpose)(build_params, true);
+        yield (0, hooks_1.hooks)(build_params, true);
         yield _build_server();
         // output_instance.end_log('Build server completed.');
     });
@@ -84,8 +84,8 @@ function build_client(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_build(params);
         output_instance.start_loading(`Building client...`);
-        yield transpose_1.transpose(build_params, true);
-        yield hooks_1.hooks(build_params, true);
+        yield (0, transpose_1.transpose)(build_params, true);
+        yield (0, hooks_1.hooks)(build_params, true);
         yield _build_client();
         // output_instance.end_log('Build client completed.');
     });
@@ -150,7 +150,7 @@ function _build_client() {
     });
 }
 function _init_build(params) {
-    build_params = common_1.merge_params(params);
+    build_params = (0, common_1.merge_params)(params);
     output_instance = output.create(build_params);
     util_instance = util.create(build_params, output_instance);
     util_instance.must_be_initialized();

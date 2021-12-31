@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.spinner_texts = exports.spinner = void 0;
 const ora_1 = __importDefault(require("ora"));
-exports.spinner = ora_1.default({ text: 'Loading...', color: 'magenta', interval: 40 });
+exports.spinner = (0, ora_1.default)({ text: 'Loading...', color: 'magenta', interval: 40 });
 exports.spinner_texts = [];
 // export function start_loading(text:string)
 //     :void{

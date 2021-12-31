@@ -71,7 +71,8 @@ export function get_aliases(tsconfig_path:string, params?:Partial<Params>)
 		const tsconf_data = urn_util.json.clean_parse(data);
 		return tsconf_data['compilerOptions']['paths'];
 	}catch(ex){
-		output_instance.wrong_end_log(`Error parsing ${tsconfig_path}. ${ex.message}`);
+		const e = ex as Error;
+		output_instance.wrong_end_log(`Error parsing ${tsconfig_path}. ${e.message}`);
 		process.exit(1);
 	}
 }

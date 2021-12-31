@@ -137,7 +137,8 @@ class CMD {
             return pack_data;
         }
         catch (ex) {
-            this.output.wrong_end_log(`Invalid ${package_json_path}. ${ex.message}`);
+            const e = ex;
+            this.output.wrong_end_log(`Invalid ${package_json_path}. ${e.message}`);
             process.exit(1);
         }
     }

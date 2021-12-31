@@ -59,7 +59,7 @@ function info(params) {
 }
 exports.info = info;
 function _info_init(params) {
-    info_params = common_1.merge_params(params);
+    info_params = (0, common_1.merge_params)(params);
     output_instance = output.create(info_params);
     util_instance = util.create(info_params, output_instance);
 }
