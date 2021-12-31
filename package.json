@@ -50,6 +50,7 @@
 		"urn-lib": "git+ssh://git@github.com/nbl7/uranio-lib.git"
 	},
 	"bin": {
+		"urn": "dist/sh.js",
 		"uranio": "dist/sh.js"
 	}
 }
