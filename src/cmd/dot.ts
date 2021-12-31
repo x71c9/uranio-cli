@@ -40,7 +40,7 @@ let dot_params = default_params as Params;
 export async function dot(params:Partial<Params>, args:Arguments):Promise<void>{
 	_init_params(params);
 	if(!check_if_is_dot(dot_params.root)){
-		output_instance.error_log(`Cannot run dot command outside urn-dot repo.`);
+		output_instance.error_log(`Cannot run dot command outside uranio-dot repo.`);
 		process.exit(1);
 	}
 	switch(args._[1]){
@@ -193,7 +193,7 @@ async function _remove_node_modules_and_lock_files(){
 
 async function _add_submodule(repo:Repo, origin:string, dest:string, branch:string){
 	await _execute(
-		`git submodule add -b ${branch} ${origin} ${dest}`,
+		`git submodule add --force -b ${branch} ${origin} ${dest}`,
 		'git',
 		'adding submodule'
 	);
@@ -227,7 +227,20 @@ async function _deinit(dest:string){
 	await _execute(`git submodule deinit ${dest}`, 'git', 'deinit');
 	await _execute(`git rm ${dest}`, 'git', 'gitrm');
 	await _execute(`rm -rf ${dest}`, 'git', 'rm');
-	await _execute(`rm -rf ../.git/modules/urn-dot/modules/${dest}`, 'git', 'rm');
+	
+	const included_repo = `../.git/modules/urn-dot/modules/${dest}`;
+	if(util_instance.fs.exists(included_repo)){
+		await _execute(`rm -rf ${included_repo}`, 'git', 'rm');
+	}
+	const included_repo_uranio = `../.git/modules/uranio-dot/modules/${dest}`;
+	if(util_instance.fs.exists(included_repo_uranio)){
+		await _execute(`rm -rf ${included_repo_uranio}`, 'git', 'rm');
+	}
+	const not_included_repo = `.git/modules/${dest}`;
+	if(util_instance.fs.exists(not_included_repo)){
+		await _execute(`rm -rf ${not_included_repo}`, 'git', 'rm');
+	}
+	
 	await _execute('git add .', 'git', 'add');
 	await _execute(`git commit -m "[removed submodule ${dest}]"`, 'git', 'commit');
 	

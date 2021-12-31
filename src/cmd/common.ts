@@ -119,7 +119,7 @@ export function check_if_is_dot(path:string):boolean{
 			try{
 				const content = fs.readFileSync(package_json_path,'utf8');
 				const pack = urn_util.json.clean_parse(content);
-				if(pack.name === 'urn-dot'){
+				if(pack.name === 'urn-dot' || pack.name === 'uranio-dot'){
 					return true;
 				}
 				return false;

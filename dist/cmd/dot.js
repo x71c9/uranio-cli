@@ -51,7 +51,7 @@ function dot(params, args) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
         if (!common_1.check_if_is_dot(dot_params.root)) {
-            output_instance.error_log(`Cannot run dot command outside urn-dot repo.`);
+            output_instance.error_log(`Cannot run dot command outside uranio-dot repo.`);
             process.exit(1);
         }
         switch (args._[1]) {
@@ -165,7 +165,7 @@ function _remove_node_modules_and_lock_files() {
 }
 function _add_submodule(repo, origin, dest, branch) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield _execute(`git submodule add -b ${branch} ${origin} ${dest}`, 'git', 'adding submodule');
+        yield _execute(`git submodule add --force -b ${branch} ${origin} ${dest}`, 'git', 'adding submodule');
         yield _execute(`git config -f .gitmodules submodule.${dest}.update rebase`, 'git', 'updating config');
         yield _execute(`git submodule update --remote --init --recursive`, 'git', 'updating submodule');
         let cmd = '';
@@ -183,7 +183,18 @@ function _deinit(dest) {
         yield _execute(`git submodule deinit ${dest}`, 'git', 'deinit');
         yield _execute(`git rm ${dest}`, 'git', 'gitrm');
         yield _execute(`rm -rf ${dest}`, 'git', 'rm');
-        yield _execute(`rm -rf ../.git/modules/urn-dot/modules/${dest}`, 'git', 'rm');
+        const included_repo = `../.git/modules/urn-dot/modules/${dest}`;
+        if (util_instance.fs.exists(included_repo)) {
+            yield _execute(`rm -rf ${included_repo}`, 'git', 'rm');
+        }
+        const included_repo_uranio = `../.git/modules/uranio-dot/modules/${dest}`;
+        if (util_instance.fs.exists(included_repo_uranio)) {
+            yield _execute(`rm -rf ${included_repo_uranio}`, 'git', 'rm');
+        }
+        const not_included_repo = `.git/modules/${dest}`;
+        if (util_instance.fs.exists(not_included_repo)) {
+            yield _execute(`rm -rf ${not_included_repo}`, 'git', 'rm');
+        }
         yield _execute('git add .', 'git', 'add');
         yield _execute(`git commit -m "[removed submodule ${dest}]"`, 'git', 'commit');
         output_instance.done_log(`Deinitialized submodule ${dest}.`);
