@@ -468,11 +468,11 @@ function _manipulate_and_create_files(file_path) {
     output_instance.done_log(`Manipulated book and created files.`, 'book');
 }
 function _copy_books_to_dot_src() {
-    output_instance.start_loading(`Copying books to urn-dot/src...`);
+    output_instance.start_loading(`Copying books to uranio-dot/src...`);
     const server_book_dir = `${transpose_params.root}/${defaults_1.defaults.folder}/server/src/books`;
     const dot_book_dir = `${transpose_params.root}/src/books`;
     util_instance.fs.copy_directory(server_book_dir, dot_book_dir);
-    output_instance.done_log(`Copied books to urn-dot/src.`, 'dot');
+    output_instance.done_log(`Copied books to uranio-dot/src.`, 'dot');
 }
 function _generate_client_books() {
     output_instance.start_loading(`Generating client books...`);
