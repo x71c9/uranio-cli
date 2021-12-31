@@ -282,6 +282,8 @@ function _remove_tmp(){
 
 function _copy_dot_files(){
 	
+	_copy_book();
+	
 	_copy_dot_tsconfigs();
 	
 	_update_tsconfig_paths();
@@ -650,6 +652,15 @@ function _update_package_aliases(){
 //   const dest = `${init_params.root}/src`;
 //   util_instance.fs.copy_directory(dot_src_folder, dest, 'dot');
 // }
+
+function _copy_book(){
+	const book_file =
+		`${init_params.root}/${defaults.tmp_folder}/uranio-dot/assets/book.txt`;
+	const dest = `${init_params.root}/src/book.ts`;
+	if(!util_instance.fs.exists(dest)){
+		util_instance.fs.copy_file(book_file, dest, 'book');
+	}
+}
 
 function _copy_dot_tsconfigs(){
 	const dot_tsc_file =
