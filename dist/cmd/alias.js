@@ -82,7 +82,8 @@ function get_aliases(tsconfig_path, params) {
         return tsconf_data['compilerOptions']['paths'];
     }
     catch (ex) {
-        output_instance.wrong_end_log(`Error parsing ${tsconfig_path}. ${ex.message}`);
+        const e = ex;
+        output_instance.wrong_end_log(`Error parsing ${tsconfig_path}. ${e.message}`);
         process.exit(1);
     }
 }
@@ -103,7 +104,7 @@ function replace_file_aliases(filepath, aliases, params) {
 }
 exports.replace_file_aliases = replace_file_aliases;
 function _init_alias(params) {
-    alias_params = common_1.merge_params(params);
+    alias_params = (0, common_1.merge_params)(params);
     output_instance = output.create(alias_params);
     util_instance = util.create(alias_params, output_instance);
     util_instance.must_be_initialized();

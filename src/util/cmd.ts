@@ -125,7 +125,8 @@ class CMD {
 			const pack_data = urn_util.json.clean_parse(data);
 			return pack_data;
 		}catch(ex){
-			this.output.wrong_end_log(`Invalid ${package_json_path}. ${ex.message}`);
+			const e = ex as Error;
+			this.output.wrong_end_log(`Invalid ${package_json_path}. ${e.message}`);
 			process.exit(1);
 		}
 	}

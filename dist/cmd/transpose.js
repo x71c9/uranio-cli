@@ -85,7 +85,7 @@ function transpose_one(full_path, params, included = false) {
 }
 exports.transpose_one = transpose_one;
 function _init_tranpose(params) {
-    transpose_params = common_1.merge_params(params);
+    transpose_params = (0, common_1.merge_params)(params);
     output_instance = output.create(transpose_params);
     util_instance = util.create(transpose_params, output_instance);
     util_instance.must_be_initialized();
@@ -147,7 +147,7 @@ function _transpose_file(file_path, included = false) {
                 output_instance.done_verbose_log(`Transposed uranio client file [${file_path}] [${uranio_client_target}].`, 'trsp');
             }
         }
-        else if (types_1.valid_admin_repos().includes(transpose_params.repo)
+        else if ((0, types_1.valid_admin_repos)().includes(transpose_params.repo)
             && file_path.includes(frontend_src_path)) {
             const frontend_target = file_path.replace(frontend_src_path, path_1.default.join(base_folder, 'client/src', defaults_1.defaults.repo_folder, 'nuxt'));
             util_instance.fs.copy_file(file_path, frontend_target, 'trsp');
@@ -157,7 +157,7 @@ function _transpose_file(file_path, included = false) {
                 output_instance.done_verbose_log(`Transposed frontend file [${file_path}] [${frontend_target}].`, 'trsp');
             }
         }
-        else if (types_1.valid_client_repos().includes(transpose_params.repo)
+        else if ((0, types_1.valid_client_repos)().includes(transpose_params.repo)
             && file_path.includes(frontend_src_path)) {
             const frontend_target = file_path.replace(frontend_src_path, path_1.default.join(base_folder, 'client/src', defaults_1.defaults.repo_folder));
             util_instance.fs.copy_file(file_path, frontend_target, 'trsp');

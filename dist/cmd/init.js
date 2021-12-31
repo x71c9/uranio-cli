@@ -52,7 +52,7 @@ let util_instance;
 let init_params = defaults_1.default_params;
 function init(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        init_params = common_1.merge_init_params(params);
+        init_params = (0, common_1.merge_init_params)(params);
         output_instance = output.create(init_params);
         util_instance = util.create(init_params, output_instance);
         _log_important_params();
@@ -80,7 +80,7 @@ function prompt_init(params, args) {
         output_instance = output.create(params);
         util_instance = util.create(init_params, output_instance);
         console.clear();
-        title_1.title();
+        (0, title_1.title)();
         if (util_instance.is_initialized() && init_params.force === false) {
             let confirm_msg = '';
             confirm_msg += `It appears the repo is already initialized.\n`;
@@ -113,7 +113,7 @@ function _log_important_params() {
     output_instance.verbose_log(`$URNROOT$Project root: [${init_params.root}]`, 'root');
     output_instance.verbose_log(`Selected repository: [${init_params.repo}]`, 'repo');
     output_instance.verbose_log(`Selected pacman: [${init_params.pacman}]`, 'repo');
-    if (types_1.valid_deploy_repos().includes(init_params.repo)) {
+    if ((0, types_1.valid_deploy_repos)().includes(init_params.repo)) {
         output_instance.verbose_log(`Selected deploy: [${init_params.deploy}]`, 'dply');
     }
 }
@@ -139,7 +139,7 @@ function _ask_for_pacman(args) {
                     choices: Object.keys(types_1.abstract_pacman)
                 }
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
-                common_1.check_pacman(answers.pacman);
+                (0, common_1.check_pacman)(answers.pacman);
                 init_params.pacman = answers.pacman;
                 yield _ask_for_repo(args);
             }));
@@ -163,7 +163,7 @@ function _ask_for_repo(args) {
                     choices: Object.keys(types_1.abstract_repos)
                 }
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
-                common_1.check_repo(answers.repo);
+                (0, common_1.check_repo)(answers.repo);
                 init_params.repo = answers.repo;
                 if (answers.repo !== 'core') {
                     yield _ask_for_deploy(args);
@@ -192,7 +192,7 @@ function _ask_for_deploy(args) {
                     choices: Object.keys(types_1.abstract_deploy)
                 }
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
-                common_1.check_deploy(answers.deploy);
+                (0, common_1.check_deploy)(answers.deploy);
                 init_params.deploy = answers.deploy;
                 yield init(init_params);
             }));
@@ -213,7 +213,7 @@ function _add_admin_files() {
 function _replace_aliases() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Updating relative paths aliases...`);
-        yield alias_1.alias(init_params, true);
+        yield (0, alias_1.alias)(init_params, true);
         output_instance.done_verbose_log('Updated relative paths aliases.', 'alias');
     });
 }
@@ -226,7 +226,7 @@ function _copy_dot_files() {
     _copy_dot_tsconfigs();
     _update_tsconfig_paths();
     _copy_dot_eslint_files();
-    if (types_1.valid_deploy_repos().includes(init_params.repo)) {
+    if ((0, types_1.valid_deploy_repos)().includes(init_params.repo)) {
         if (init_params.deploy === 'netlify') {
             _copy_netlify_files();
         }
@@ -240,7 +240,7 @@ function _copy_dot_files() {
     if (init_params.repo === 'core') {
         _copy_core_files();
     }
-    if (types_1.valid_admin_repos().includes(init_params.repo)) {
+    if ((0, types_1.valid_admin_repos)().includes(init_params.repo)) {
         _add_admin_files();
         _copy_admin_files();
     }

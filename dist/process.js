@@ -42,7 +42,7 @@ let process_params = defaults_1.default_params;
 function uranio_process(args) {
     process_params.spin = true;
     _set_root(args);
-    process_params = common_1.read_rc_file(process_params);
+    process_params = (0, common_1.read_rc_file)(process_params);
     process_params = _set_args(process_params, args);
     process.chdir(process_params.root);
     process_params = _autoset_is_dot(process_params, args);
@@ -73,7 +73,7 @@ function _set_root(args) {
     }
 }
 function _autoset_is_dot(params, args) {
-    if (typeof args.is_dot === 'undefined' && common_1.check_if_is_dot(params.root)) {
+    if (typeof args.is_dot === 'undefined' && (0, common_1.check_if_is_dot)(params.root)) {
         params.is_dot = true;
     }
     return params;
@@ -190,17 +190,17 @@ function _set_args(params, args) {
     }
     const pacman = args.p || args.pacman;
     if (typeof pacman === 'string' && pacman != '') {
-        common_1.check_pacman(pacman);
+        (0, common_1.check_pacman)(pacman);
         params.pacman = pacman;
     }
     const repo = args.r || args.repo;
     if (typeof repo === 'string' && repo != '') {
-        common_1.check_repo(repo);
+        (0, common_1.check_repo)(repo);
         params.repo = repo;
     }
     const deploy = args.d || args.deploy;
     if (typeof deploy === 'string' && deploy != '') {
-        common_1.check_deploy(deploy);
+        (0, common_1.check_deploy)(deploy);
         params.deploy = deploy;
     }
     const color_log = args.c || args.color_log;
@@ -354,40 +354,40 @@ function _switch_command(args) {
             break;
         }
         case 'init': {
-            cmd_1.prompt_init(process_params, args);
+            (0, cmd_1.prompt_init)(process_params, args);
             break;
         }
         case 'transpose': {
             if (args._.length > 1 && typeof args._[1] === 'string') {
-                cmd_1.transpose_one(args._[1], process_params);
+                (0, cmd_1.transpose_one)(args._[1], process_params);
             }
             else {
-                cmd_1.transpose(process_params);
+                (0, cmd_1.transpose)(process_params);
             }
             break;
         }
         case 'alias': {
-            cmd_1.alias(process_params);
+            (0, cmd_1.alias)(process_params);
             break;
         }
         case 'hooks': {
-            cmd_1.hooks(process_params);
+            (0, cmd_1.hooks)(process_params);
             break;
         }
         case 'dev': {
             switch (splitted_cmd[1]) {
                 case 'server': {
-                    cmd_1.dev_server(process_params);
+                    (0, cmd_1.dev_server)(process_params);
                     break;
                 }
                 case 'client': {
-                    cmd_1.dev_client(process_params);
+                    (0, cmd_1.dev_client)(process_params);
                     break;
                 }
                 case '':
                 case undefined:
                 default: {
-                    cmd_1.dev(process_params);
+                    (0, cmd_1.dev)(process_params);
                 }
             }
             break;
@@ -395,31 +395,31 @@ function _switch_command(args) {
         case 'build': {
             switch (splitted_cmd[1]) {
                 case 'server': {
-                    cmd_1.build_server(process_params);
+                    (0, cmd_1.build_server)(process_params);
                     break;
                 }
                 case 'client': {
-                    cmd_1.build_client(process_params);
+                    (0, cmd_1.build_client)(process_params);
                     break;
                 }
                 case '':
                 case undefined:
                 default: {
-                    cmd_1.build(process_params);
+                    (0, cmd_1.build)(process_params);
                 }
             }
             break;
         }
         case 'info': {
-            cmd_1.info(process_params);
+            (0, cmd_1.info)(process_params);
             break;
         }
         case 'help': {
-            cmd_1.help();
+            (0, cmd_1.help)();
             break;
         }
         case 'dot': {
-            cmd_1.dot(process_params, args);
+            (0, cmd_1.dot)(process_params, args);
             break;
         }
         case 'test': {

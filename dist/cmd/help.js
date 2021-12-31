@@ -19,7 +19,7 @@ const title_1 = require("./title");
 // import * as output from '../output/';
 function help() {
     return __awaiter(this, void 0, void 0, function* () {
-        title_1.title();
+        (0, title_1.title)();
         console.log(``);
         console.log(`usage: uranio [command] <options>`);
         console.log(``);

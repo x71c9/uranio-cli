@@ -61,7 +61,7 @@ function _merge_params(params, is_init = false) {
 }
 function check_repo(repo) {
     if (!urn_lib_1.urn_util.object.has_key(types_1.abstract_repos, repo)) {
-        const valid_repos_str = types_1.valid_repos().join(', ');
+        const valid_repos_str = (0, types_1.valid_repos)().join(', ');
         let end_log = '';
         end_log += `Wrong repo. `;
         end_log += `Repo must be one of the following [${valid_repos_str}]\n`;
@@ -72,7 +72,7 @@ function check_repo(repo) {
 exports.check_repo = check_repo;
 function check_pacman(pacman) {
     if (!urn_lib_1.urn_util.object.has_key(types_1.abstract_pacman, pacman)) {
-        const valid_pacman_str = types_1.valid_pacman().join(', ');
+        const valid_pacman_str = (0, types_1.valid_pacman)().join(', ');
         let end_log = '';
         end_log += `Wrong package manager. `;
         end_log += `Package manager must be one of the following [${valid_pacman_str}]\n`;
@@ -83,7 +83,7 @@ function check_pacman(pacman) {
 exports.check_pacman = check_pacman;
 function check_deploy(deploy) {
     if (!urn_lib_1.urn_util.object.has_key(types_1.abstract_deploy, deploy)) {
-        const valid_deploy_str = types_1.valid_deploy().join(', ');
+        const valid_deploy_str = (0, types_1.valid_deploy)().join(', ');
         let end_log = '';
         end_log += `Wrong deploy value. `;
         end_log += `Deploy value must be one of the following [${valid_deploy_str}]\n`;

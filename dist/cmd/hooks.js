@@ -63,7 +63,7 @@ let util_instance;
 let hooks_params = defaults_1.default_params;
 function hooks(params, included = false) {
     return __awaiter(this, void 0, void 0, function* () {
-        hooks_params = common_1.merge_params(params);
+        hooks_params = (0, common_1.merge_params)(params);
         output_instance = output.create(hooks_params);
         util_instance = util.create(hooks_params, output_instance);
         util_instance.must_be_initialized();

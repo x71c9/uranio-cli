@@ -50,7 +50,7 @@ let dot_params = defaults_1.default_params;
 function dot(params, args) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
-        if (!common_1.check_if_is_dot(dot_params.root)) {
+        if (!(0, common_1.check_if_is_dot)(dot_params.root)) {
             output_instance.error_log(`Cannot run dot command outside uranio-dot repo.`);
             process.exit(1);
         }
@@ -70,7 +70,7 @@ exports.dot = dot;
 function _init_params(params) {
     params.color_log = '#AAAAAA';
     // params.blank = true;
-    dot_params = common_1.merge_params(params);
+    dot_params = (0, common_1.merge_params)(params);
     output_instance = output.create(dot_params);
     util_instance = util.create(dot_params, output_instance);
     // util_instance.must_be_initialized();
@@ -95,12 +95,12 @@ function _switch(args) {
         output_instance.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`, `args`);
         output_instance.log(`Selected repo: ${repo}`, `args`);
         output_instance.log(`Selected pacman: ${pacman}`, `args`);
-        if (types_1.valid_deploy_repos().includes(repo)) {
+        if ((0, types_1.valid_deploy_repos)().includes(repo)) {
             output_instance.log(`Selected deploy: ${deploy}`, `args`);
         }
-        common_1.check_repo(repo);
-        common_1.check_pacman(pacman);
-        common_1.check_deploy(deploy);
+        (0, common_1.check_repo)(repo);
+        (0, common_1.check_pacman)(pacman);
+        (0, common_1.check_deploy)(deploy);
         yield _check_if_clean_repo();
         yield _execute(`git checkout ${repo}`, 'git', 'checking out');
         output_instance.done_log(`Checked out ${repo}`);
@@ -125,7 +125,7 @@ function _uranio_init(repo, pacman, deploy) {
         cloned_params.pacman = pacman;
         cloned_params.deploy = deploy;
         output_instance.log(`Initializing uranio ...`);
-        yield init_1.init(cloned_params);
+        yield (0, init_1.init)(cloned_params);
         output_instance.done_log(`Uranio initialized.`);
     });
 }

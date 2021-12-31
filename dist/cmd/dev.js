@@ -58,7 +58,7 @@ function dev(params) {
         _init_params(params);
         _init_dev();
         yield _dev_server();
-        if (types_1.valid_client_repos().includes(dev_params.repo)) {
+        if ((0, types_1.valid_client_repos)().includes(dev_params.repo)) {
             yield _dev_client();
         }
     });
@@ -75,7 +75,7 @@ exports.dev_server = dev_server;
 function dev_client(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
-        if (types_1.valid_client_repos().includes(dev_params.repo)) {
+        if ((0, types_1.valid_client_repos)().includes(dev_params.repo)) {
             if (params.native != true) {
                 _init_dev();
             }
@@ -89,7 +89,7 @@ function dev_client(params) {
 exports.dev_client = dev_client;
 function _dev_server() {
     return __awaiter(this, void 0, void 0, function* () {
-        if (dev_params.deploy === 'netlify' && types_1.valid_deploy_repos().includes(dev_params.repo)) {
+        if (dev_params.deploy === 'netlify' && (0, types_1.valid_deploy_repos)().includes(dev_params.repo)) {
             const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/server`;
             const ts_cmd = `npx tsc -w --project ./tsconfig.json`;
             const cmd = `${cd_cmd} && ${ts_cmd}`;
@@ -171,15 +171,15 @@ function _dev_admin_nuxt_netlify() {
 }
 function _init_params(params) {
     params.spin = false;
-    dev_params = common_1.merge_params(params);
+    dev_params = (0, common_1.merge_params)(params);
     output_instance = output.create(dev_params);
     util_instance = util.create(dev_params, output_instance);
     util_instance.must_be_initialized();
 }
 function _init_dev() {
-    transpose_1.transpose(dev_params, true);
-    if (types_1.valid_hooks_repos().includes(dev_params.repo)) {
-        hooks_1.hooks(dev_params, true);
+    (0, transpose_1.transpose)(dev_params, true);
+    if ((0, types_1.valid_hooks_repos)().includes(dev_params.repo)) {
+        (0, hooks_1.hooks)(dev_params, true);
     }
     _watch();
 }
@@ -210,7 +210,7 @@ function _watch() {
         const new_path_server = `${base_path_server}/${relative_path_to_src}`;
         const new_path_client = `${base_path_client}/${relative_path_to_src}`;
         if (_event === 'addDir') {
-            if (types_1.valid_admin_repos().includes(dev_params.repo)
+            if ((0, types_1.valid_admin_repos)().includes(dev_params.repo)
                 && _path.includes(`${dev_params.root}/src/frontend`)) {
                 util_instance.fs.create_directory(`${base_path_client}/${defaults_1.defaults.repo_folder}/nuxt/${path_1.default.basename(_path)}`);
             }
@@ -239,9 +239,9 @@ function _watch() {
             }
         }
         else {
-            transpose_1.transpose_one(_path, dev_params, true);
-            if (types_1.valid_hooks_repos().includes(dev_params.repo)) {
-                hooks_1.hooks(dev_params, true);
+            (0, transpose_1.transpose_one)(_path, dev_params, true);
+            if ((0, types_1.valid_hooks_repos)().includes(dev_params.repo)) {
+                (0, hooks_1.hooks)(dev_params, true);
             }
             output_instance.done_log(`[src watch] Transposed [${_path}].`, 'wtch');
         }
@@ -282,11 +282,11 @@ function _watch() {
     // );
 }
 function _is_file_related_to_lambda_function(_path) {
-    if (types_1.valid_admin_repos().includes(dev_params.repo)
+    if ((0, types_1.valid_admin_repos)().includes(dev_params.repo)
         && _path.includes(`${dev_params.root}/src/frontend`)) {
         return false;
     }
-    if (types_1.valid_admin_repos().includes(dev_params.repo)
+    if ((0, types_1.valid_admin_repos)().includes(dev_params.repo)
         && _path.includes(`${dev_params.root}/src/uranio/nuxt`)) {
         return false;
     }
