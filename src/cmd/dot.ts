@@ -1,5 +1,5 @@
 /**
- * Dev command module
+ * Dot command module
  *
  * @packageDocumentation
  */
@@ -76,13 +76,13 @@ async function _switch(args:Arguments):Promise<void>{
 	if(typeof repo === 'undefined' && typeof args.repo === 'string'){
 		repo = args.repo as Repo;
 	}
-	let pacman = (args._[3] || 'yarn') as PacMan;
-	if(typeof pacman === 'undefined' && typeof args.pacman === 'string'){
-		pacman = args.pacman as PacMan;
-	}
-	let deploy = (args._[4] || 'express') as Deploy;
+	let deploy = (args._[3] || 'express') as Deploy;
 	if(typeof deploy === 'undefined' && typeof args.deploy === 'string'){
 		deploy = args.deploy as Deploy;
+	}
+	let pacman = (args._[4] || 'yarn') as PacMan;
+	if(typeof pacman === 'undefined' && typeof args.pacman === 'string'){
+		pacman = args.pacman as PacMan;
 	}
 	
 	const branch = (args._[5] || 'master');

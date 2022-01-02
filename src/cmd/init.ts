@@ -542,7 +542,7 @@ function _ignore_urn_folder(){
 		util_instance.fs.create_file(gitignore, 'giti');
 	}
 	let content = util_instance.fs.read_file(gitignore, 'utf8');
-	if(content.indexOf(defaults.folder+'/') === -1){
+	if(content.indexOf(defaults.folder+'/') === -1 || content.indexOf(defaults.folder)){
 		content += `\n${defaults.folder}/`;
 	}
 	if(content.indexOf(defaults.log_filepath) === -1){

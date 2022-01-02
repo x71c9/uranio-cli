@@ -11,7 +11,13 @@ import * as out from '../output/';
 type Resolve = (v?:unknown) => void;
 type Reject = (err?:Error) => void;
 
+type CachedOutput = {
+	[id:string]: string[]
+}
+
 const child_list:cp.ChildProcessWithoutNullStreams[] = [];
+
+const child_outputs:CachedOutput = {};
 
 process.on('SIGINT', function() {
 	process.stdout.write("\r--- Caught interrupt signal [spawn] ---\n");
@@ -103,6 +109,7 @@ class Spawn {
 					if(verbose){
 						this.output.verbose_log(plain_text, context, color);
 					}
+					append(child_outputs[child.pid || 'pid0'], plain_text);
 				}
 			});
 		}
@@ -126,9 +133,15 @@ class Spawn {
 					if(verbose){
 						this.output.verbose_log(plain_text, context, color);
 					}
+					append(child_outputs[child.pid || 'pid0'], plain_text);
 				}
 			});
 		}
+		
+		child.on('error', (err) => {
+			this.output.error_log(`${err}`, context);
+			return (reject) ? reject() : false;
+		});
 		
 		child.on('close', (code) => {
 			this.output.stop_loading();
@@ -143,21 +156,33 @@ class Spawn {
 					return (resolve) ? resolve(true) : true;
 				}
 				default:{
+					print_cached_output(child_outputs[child.pid || 'pid0'], this.output);
+					this.output.error_log(`Error on: ${command}`, context);
 					this.output.error_log(`Child process exited with code ${code}`, context);
-					return (reject) ? reject() : false;
+					// return (reject) ? reject() : false;
 				}
 			}
 		});
 		
-		child.on('error', (err) => {
-			this.output.error_log(`${err}`, context);
-			return (reject) ? reject() : false;
-		});
-		
 		child_list.push(child);
+		
+		child_outputs[child.pid || 'pid0'] = [];
 		
 		return child;
 		
+	}
+}
+
+function print_cached_output(cached:string[], output:out.OutputInstance){
+	for(const s of cached){
+		output.error_log(s);
+	}
+}
+
+function append(arr:string[], value:string) {
+	arr.push(value);
+	while (arr.length > 5) {
+		arr.shift();
 	}
 }
 

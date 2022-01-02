@@ -38,19 +38,27 @@ class Output {
 	public log(text:string, context='log', color?:string)
 			:void{
 		const colored_text = this._color_text(text, 'log', color);
-		this._log(colored_text, context, true);
+		const final_color = (typeof color === 'string') ? color : this.params.color_log;
+		this._log(this._prefix_color(colored_text, final_color), context, true);
 	}
 	
 	public verbose_log(text:string, context='vlog', color?:string)
 			:void{
+			
+		// const final_color = (typeof color === 'string') ? color : this.params.color_verbose;
+		// const colored_text = this._color_text(this._prefix_color(text, final_color), 'verbose', color);
+		// this._log(this._prefix_color(colored_text, final_color), context, (this.params.verbose === true));
+		
 		const colored_text = this._color_text(text, 'verbose', color);
-		this._log(colored_text, context, (this.params.verbose === true));
+		const final_color = (typeof color === 'string') ? color : this.params.color_verbose;
+		this._log(this._prefix_color(colored_text, final_color), context, (this.params.verbose === true));
 	}
 	
 	public debug_log(text:string, context='dlog', color?:string)
 			:void{
 		const colored_text = this._color_text(text, 'debug', color);
-		this._log(colored_text, context, (this.params.debug === true));
+		const final_color = (typeof color === 'string') ? color : this.params.color_debug;
+		this._log(this._prefix_color(colored_text, final_color), context, (this.params.debug === true));
 	}
 	
 	public done_log(text:string, context='done')
@@ -221,11 +229,22 @@ class Output {
 		return output_text;
 	}
 	
+	private _prefix_color(text:string, color:string){
+		return (this.params.prefix_color === true) ? `[c${color}]${text}` : text;
+	}
+
 	private _color_text(text:string, type:string, color?:string){
 		let colored_text = text;
 		if(_is_uranio_native(text)){
+			
 			colored_text = _uranio_color(text);
+			
+		}else if(this._has_prefix_color(text)){
+			
+			colored_text = this._read_color(colored_text);
+			
 		}else{
+			
 			let default_color = this.params.color_log;
 			switch(type){
 				case 'verbose':{
@@ -242,7 +261,38 @@ class Output {
 		}
 		return colored_text;
 	}
-
+	
+	private _has_prefix_color(text:string):boolean{
+		const regex = new RegExp(/.?\[c#[0-9a-z]{0,6}\]/);
+		
+		return (regex.test(text.substring(0,10)));
+	}
+	
+	private _read_color(text:string):string{
+		const regex = new RegExp(/.?\[c#[0-9a-z]{0,6}\]/);
+		const match = regex.exec(text);
+		if(!match){
+			return text;
+		}
+		let processed_text = text;
+		let color_prefix = '';
+		let removed_prefix = '';
+		if(match.index === 0 && text.substring(0,3) === '[c#'){ // Regex match also with another random char in front
+			
+			color_prefix = text.substring(0, match.index + 10);
+			removed_prefix = text.substring(0, match.index) + text.substring(match.index + 10, text.length);
+			
+		}else{ // text might have something else in from "s6728 [c#666666]"
+			
+			color_prefix = text.substring(match.index + 1, match.index + 11);
+			removed_prefix = text.substring(0, match.index + 1) + text.substring(match.index + 11, text.length);
+			
+		}
+		const hexa_color = color_prefix.substring(2,9);
+		processed_text = chalk.hex(hexa_color)(removed_prefix);
+		return processed_text;
+	}
+	
 	private _replace_root_string(str:string)
 			:string{
 		if(str.indexOf('$URNROOT$') !== -1){

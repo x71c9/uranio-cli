@@ -23,5 +23,6 @@ __exportStar(require("./transpose"), exports);
 __exportStar(require("./hooks"), exports);
 __exportStar(require("./info"), exports);
 __exportStar(require("./help"), exports);
+__exportStar(require("./docker"), exports);
 __exportStar(require("./dot"), exports);
 //# sourceMappingURL=index.js.map

@@ -20,7 +20,10 @@ declare class Output {
     spinner_text(text: string): void;
     private _log;
     private _format_text;
+    private _prefix_color;
     private _color_text;
+    private _has_prefix_color;
+    private _read_color;
     private _replace_root_string;
     private _spinner_text_color;
     private _go_previous;

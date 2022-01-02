@@ -1,6 +1,6 @@
 "use strict";
 /**
- * Dev command module
+ * Dot command module
  *
  * @packageDocumentation
  */
@@ -81,13 +81,13 @@ function _switch(args) {
         if (typeof repo === 'undefined' && typeof args.repo === 'string') {
             repo = args.repo;
         }
-        let pacman = (args._[3] || 'yarn');
-        if (typeof pacman === 'undefined' && typeof args.pacman === 'string') {
-            pacman = args.pacman;
-        }
-        let deploy = (args._[4] || 'express');
+        let deploy = (args._[3] || 'express');
         if (typeof deploy === 'undefined' && typeof args.deploy === 'string') {
             deploy = args.deploy;
+        }
+        let pacman = (args._[4] || 'yarn');
+        if (typeof pacman === 'undefined' && typeof args.pacman === 'string') {
+            pacman = args.pacman;
         }
         const branch = (args._[5] || 'master');
         output_instance.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`, `args`);

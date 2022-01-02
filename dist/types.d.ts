@@ -18,6 +18,7 @@ export declare type Params = {
     is_dot: boolean;
     time: boolean;
     context: boolean;
+    prefix_color: boolean;
     filelog: boolean;
     spin: boolean;
     prefix: string;
