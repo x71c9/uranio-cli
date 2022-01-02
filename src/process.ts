@@ -235,7 +235,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const filelog = args.l || args.filelog;
 	
-	if(filelog == false){
+	if(filelog == false || filelog == 'false'){
 		params.filelog = false;
 	}
 	if(typeof args.nofilelog === 'boolean' && !!args.nofilelog !== !params.filelog){
@@ -244,7 +244,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const spin = args.i || args.spin;
 	
-	if(spin == false){
+	if(spin == false || spin == 'false'){
 		params.filelog = false;
 	}
 	if(typeof args.nospin === 'boolean' && !!args.nospin !== !params.spin){
@@ -253,7 +253,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const color_uranio = args.color_uranio;
 	
-	if(color_uranio == false){
+	if(color_uranio == false || color_uranio == 'false'){
 		params.color_uranio = false;
 	}
 	if(typeof args.nocolor_uranio === 'boolean' && !!args.nocolor_uranio !== !params.color_uranio){
