@@ -235,7 +235,7 @@ class Output {
 
 	private _color_text(text:string, type:string, color?:string){
 		let colored_text = text;
-		if(_is_uranio_native(text)){
+		if(_is_uranio_native(text) && this.params.color_uranio === true){
 			
 			colored_text = _uranio_color(text);
 			
@@ -264,8 +264,7 @@ class Output {
 	
 	private _has_prefix_color(text:string):boolean{
 		const regex = new RegExp(/.?\[c#[0-9a-z]{0,6}\]/);
-		
-		return (regex.test(text.substring(0,10)));
+		return (regex.test(text));
 	}
 	
 	private _read_color(text:string):string{

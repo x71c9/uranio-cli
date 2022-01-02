@@ -251,6 +251,15 @@ function _set_args(params:Params, args:Arguments)
 		params.spin = !args.nospin;
 	}
 	
+	const color_uranio = args.color_uranio;
+	
+	if(color_uranio == false){
+		params.color_uranio = false;
+	}
+	if(typeof args.nocolor_uranio === 'boolean' && !!args.nocolor_uranio !== !params.color_uranio){
+		params.color_uranio = !args.nocolor_uranio;
+	}
+	
 	// Parameters with default value type = string
 	
 	const prefix = args.x || args.prefix;
