@@ -284,6 +284,8 @@ function _copy_dot_files(){
 	
 	_copy_book();
 	
+	_copy_sample();
+	
 	_copy_dot_tsconfigs();
 	
 	_update_tsconfig_paths();
@@ -660,6 +662,15 @@ function _copy_book(){
 	if(!util_instance.fs.exists(dest)){
 		util_instance.fs.copy_file(book_file, dest, 'book');
 	}
+}
+
+function _copy_sample(){
+	const sample_file =
+		`${init_params.root}/${defaults.tmp_folder}/uranio-dot/sample.env`;
+	const dest = `${init_params.root}/sample.env`;
+	// if(!util_instance.fs.exists(dest)){
+	util_instance.fs.copy_file(sample_file, dest, 'book');
+	// }
 }
 
 function _copy_dot_tsconfigs(){
