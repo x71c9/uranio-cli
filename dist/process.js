@@ -173,21 +173,21 @@ function _set_args(params, args) {
     }
     // Paramteters with default value = true
     const filelog = args.l || args.filelog;
-    if (filelog == false) {
+    if (filelog == false || filelog == 'false') {
         params.filelog = false;
     }
     if (typeof args.nofilelog === 'boolean' && !!args.nofilelog !== !params.filelog) {
         params.filelog = !args.nofilelog;
     }
     const spin = args.i || args.spin;
-    if (spin == false) {
+    if (spin == false || spin == 'false') {
         params.filelog = false;
     }
     if (typeof args.nospin === 'boolean' && !!args.nospin !== !params.spin) {
         params.spin = !args.nospin;
     }
     const color_uranio = args.color_uranio;
-    if (color_uranio == false) {
+    if (color_uranio == false || color_uranio == 'false') {
         params.color_uranio = false;
     }
     if (typeof args.nocolor_uranio === 'boolean' && !!args.nocolor_uranio !== !params.color_uranio) {
