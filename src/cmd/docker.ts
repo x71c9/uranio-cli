@@ -77,7 +77,7 @@ async function _run(args:Arguments):Promise<void>{
 	
 	let cmd = '';
 	cmd += `docker run --rm -i -v $(pwd)/src:/app/src --network="host" uranio-${repo}-${deploy}`;
-	await _execute(cmd, 'docker', 'running');
+	await _execute_verbose(cmd, 'docker', 'running');
 	
 	output_instance.done_log(`Docker image runned ${repo} ${deploy}`);
 	
@@ -98,7 +98,7 @@ async function _build(args:Arguments):Promise<void>{
 	cmd += ` --build-arg deploy=${deploy}`;
 	cmd += ` --build-arg pacman=${pacman}`;
 	cmd += ` .`;
-	await _execute(cmd, 'docker', 'building');
+	await _execute_spin_verbose(cmd, 'docker', 'building');
 	
 	output_instance.done_log(`Docker image built ${repo} ${deploy}`);
 	
@@ -208,9 +208,22 @@ function _remove_tmp(){
 	);
 }
 
-async function _execute(cmd:string, context:string, action:string){
+async function _execute_spin_verbose(cmd:string, context:string, action:string){
 	return new Promise((resolve, reject) => {
 		util_instance.spawn.spin_and_verbose_log(
+			cmd,
+			context,
+			action,
+			undefined,
+			resolve,
+			reject
+		);
+	});
+}
+
+async function _execute_verbose(cmd:string, context:string, action:string){
+	return new Promise((resolve, reject) => {
+		util_instance.spawn.verbose_log(
 			cmd,
 			context,
 			action,

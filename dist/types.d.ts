@@ -21,6 +21,7 @@ export declare type Params = {
     prefix_color: boolean;
     filelog: boolean;
     spin: boolean;
+    color_uranio: boolean;
     prefix: string;
     branch: string;
     repo: Repo;

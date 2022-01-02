@@ -22,9 +22,9 @@ export type Params = {
 	time: boolean
 	context: boolean
 	prefix_color: boolean
-	// color_prefix: boolean
 	filelog: boolean
 	spin: boolean
+	color_uranio: boolean
 	prefix: string
 	branch: string
 	repo: Repo

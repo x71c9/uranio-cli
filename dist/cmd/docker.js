@@ -73,7 +73,7 @@ function _run(args) {
         const { repo, deploy } = _get_main_args(args);
         let cmd = '';
         cmd += `docker run --rm -i -v $(pwd)/src:/app/src --network="host" uranio-${repo}-${deploy}`;
-        yield _execute(cmd, 'docker', 'running');
+        yield _execute_verbose(cmd, 'docker', 'running');
         output_instance.done_log(`Docker image runned ${repo} ${deploy}`);
     });
 }
@@ -89,7 +89,7 @@ function _build(args) {
         cmd += ` --build-arg deploy=${deploy}`;
         cmd += ` --build-arg pacman=${pacman}`;
         cmd += ` .`;
-        yield _execute(cmd, 'docker', 'building');
+        yield _execute_spin_verbose(cmd, 'docker', 'building');
         output_instance.done_log(`Docker image built ${repo} ${deploy}`);
     });
 }
@@ -170,10 +170,17 @@ function _remove_tmp() {
     util_instance.fs.remove_directory(`${docker_params.root}/${defaults_1.defaults.tmp_folder}`, 'tmp');
     output_instance.done_verbose_log(`Removed tmp folder [${defaults_1.defaults.tmp_folder}].`, 'tmp');
 }
-function _execute(cmd, context, action) {
+function _execute_spin_verbose(cmd, context, action) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
             util_instance.spawn.spin_and_verbose_log(cmd, context, action, undefined, resolve, reject);
+        });
+    });
+}
+function _execute_verbose(cmd, context, action) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return new Promise((resolve, reject) => {
+            util_instance.spawn.verbose_log(cmd, context, action, undefined, resolve, reject);
         });
     });
 }
