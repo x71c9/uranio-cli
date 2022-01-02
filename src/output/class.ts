@@ -44,11 +44,6 @@ class Output {
 	
 	public verbose_log(text:string, context='vlog', color?:string)
 			:void{
-			
-		// const final_color = (typeof color === 'string') ? color : this.params.color_verbose;
-		// const colored_text = this._color_text(this._prefix_color(text, final_color), 'verbose', color);
-		// this._log(this._prefix_color(colored_text, final_color), context, (this.params.verbose === true));
-		
 		const colored_text = this._color_text(text, 'verbose', color);
 		const final_color = (typeof color === 'string') ? color : this.params.color_verbose;
 		this._log(this._prefix_color(colored_text, final_color), context, (this.params.verbose === true));
@@ -237,9 +232,9 @@ class Output {
 		let colored_text = text;
 		if(_is_uranio_native(text) && this.params.color_uranio === true){
 			
-			colored_text = _uranio_color(text);
+			colored_text = _uranio_color(colored_text);
 			
-		}else if(this._has_prefix_color(text)){
+		}else if(this._has_prefix_color(colored_text)){
 			
 			colored_text = this._read_color(colored_text);
 			
@@ -329,18 +324,34 @@ const prefix_types = [
 
 function _is_uranio_native(text:string){
 	for(const pre of prefix_types){
-		if(text.indexOf(pre) === 0){
+		if(text.indexOf(pre) !== -1){
 			return true;
 		}
 	}
 	return false;
 }
 
+function _remove_color_prefix(text:string):string{
+	const regex = new RegExp(/.?\[c#[0-9a-z]{0,6}\]/);
+	const match = regex.exec(text);
+	if(!match){
+		return text;
+	}
+	let removed_prefix = '';
+	if(match.index === 0 && text.substring(0,3) === '[c#'){ // Regex match also with another random char in front
+		removed_prefix = text.substring(0, match.index) + text.substring(match.index + 10, text.length);
+	}else{ // text might have something else in from "s6728 [c#666666]"
+		removed_prefix = text.substring(0, match.index + 1) + text.substring(match.index + 11, text.length);
+	}
+	return removed_prefix;
+}
+
 function _uranio_color(text:string){
 	let processed_text = text;
 	for(const pre of prefix_types){
-		if(text.indexOf(pre) === 0){
-			processed_text = processed_text.substr(pre.length, processed_text.length);
+		const index = text.indexOf(pre);
+		if(index !== -1){
+			processed_text = processed_text.substring(0, index) + processed_text.substring(index + pre.length, processed_text.length);
 			switch(pre){
 				case '[fn_debug]':{
 					processed_text = chalk.cyan(processed_text);
@@ -361,7 +372,7 @@ function _uranio_color(text:string){
 			}
 		}
 	}
-	return processed_text;
+	return _remove_color_prefix(processed_text);
 }
 
 function _log_to_file(text:string)
