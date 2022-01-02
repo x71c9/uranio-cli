@@ -1,5 +1,5 @@
 /**
- * Index module for log
+ * Index module for output logs
  *
  * @packageDocumentation
  */

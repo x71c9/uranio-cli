@@ -21,6 +21,8 @@ export type Params = {
 	is_dot: boolean
 	time: boolean
 	context: boolean
+	prefix_color: boolean
+	// color_prefix: boolean
 	filelog: boolean
 	spin: boolean
 	prefix: string

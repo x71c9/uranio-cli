@@ -17,6 +17,8 @@ exports.default_params = {
     is_dot: false,
     time: false,
     context: false,
+    prefix_color: false,
+    // color_prefix: false,
     filelog: true,
     spin: true,
     prefix: '',

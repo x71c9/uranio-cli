@@ -164,6 +164,13 @@ function _set_args(params, args) {
     if (typeof args.nocontext === 'boolean' && !!args.nocontext !== !params.context) {
         params.context = !args.nocontext;
     }
+    const prefix_color = args.prefix_color;
+    if (prefix_color == true) {
+        params.prefix_color = true;
+    }
+    if (typeof args.noprefix_color === 'boolean' && !!args.noprefix_color !== !params.prefix_color) {
+        params.prefix_color = !args.noprefix_color;
+    }
     // Paramteters with default value = true
     const filelog = args.l || args.filelog;
     if (filelog == false) {
@@ -420,6 +427,10 @@ function _switch_command(args) {
         }
         case 'dot': {
             (0, cmd_1.dot)(process_params, args);
+            break;
+        }
+        case 'docker': {
+            (0, cmd_1.docker)(process_params, args);
             break;
         }
         case 'test': {

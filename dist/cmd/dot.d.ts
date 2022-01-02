@@ -1,5 +1,5 @@
 /**
- * Dev command module
+ * Dot command module
  *
  * @packageDocumentation
  */

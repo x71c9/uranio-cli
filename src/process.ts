@@ -30,7 +30,8 @@ import {
 	hooks,
 	help,
 	info,
-	dot
+	dot,
+	docker
 	// test,
 } from './cmd/';
 
@@ -219,6 +220,15 @@ function _set_args(params:Params, args:Arguments)
 	}
 	if(typeof args.nocontext === 'boolean' && !!args.nocontext !== !params.context){
 		params.context = !args.nocontext;
+	}
+	
+	const prefix_color = args.prefix_color;
+	
+	if(prefix_color == true){
+		params.prefix_color = true;
+	}
+	if(typeof args.noprefix_color === 'boolean' && !!args.noprefix_color !== !params.prefix_color){
+		params.prefix_color = !args.noprefix_color;
 	}
 	
 	// Paramteters with default value = true
@@ -504,6 +514,10 @@ function _switch_command(args:Arguments){
 		}
 		case 'dot':{
 			dot(process_params, args);
+			break;
+		}
+		case 'docker':{
+			docker(process_params, args);
 			break;
 		}
 		case 'test':{

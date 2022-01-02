@@ -20,4 +20,6 @@ export * from './info';
 
 export * from './help';
 
+export * from './docker';
+
 export * from './dot';

@@ -27,15 +27,21 @@ class Output {
     }
     log(text, context = 'log', color) {
         const colored_text = this._color_text(text, 'log', color);
-        this._log(colored_text, context, true);
+        const final_color = (typeof color === 'string') ? color : this.params.color_log;
+        this._log(this._prefix_color(colored_text, final_color), context, true);
     }
     verbose_log(text, context = 'vlog', color) {
+        // const final_color = (typeof color === 'string') ? color : this.params.color_verbose;
+        // const colored_text = this._color_text(this._prefix_color(text, final_color), 'verbose', color);
+        // this._log(this._prefix_color(colored_text, final_color), context, (this.params.verbose === true));
         const colored_text = this._color_text(text, 'verbose', color);
-        this._log(colored_text, context, (this.params.verbose === true));
+        const final_color = (typeof color === 'string') ? color : this.params.color_verbose;
+        this._log(this._prefix_color(colored_text, final_color), context, (this.params.verbose === true));
     }
     debug_log(text, context = 'dlog', color) {
         const colored_text = this._color_text(text, 'debug', color);
-        this._log(colored_text, context, (this.params.debug === true));
+        const final_color = (typeof color === 'string') ? color : this.params.color_debug;
+        this._log(this._prefix_color(colored_text, final_color), context, (this.params.debug === true));
     }
     done_log(text, context = 'done') {
         this._go_previous();
@@ -191,10 +197,16 @@ class Output {
         output_text += `\n`;
         return output_text;
     }
+    _prefix_color(text, color) {
+        return (this.params.prefix_color === true) ? `[c${color}]${text}` : text;
+    }
     _color_text(text, type, color) {
         let colored_text = text;
         if (_is_uranio_native(text)) {
             colored_text = _uranio_color(text);
+        }
+        else if (this._has_prefix_color(text)) {
+            colored_text = this._read_color(colored_text);
         }
         else {
             let default_color = this.params.color_log;
@@ -212,6 +224,31 @@ class Output {
             colored_text = (!this.params.blank) ? chalk_1.default.hex(final_color)(text) : text;
         }
         return colored_text;
+    }
+    _has_prefix_color(text) {
+        const regex = new RegExp(/.?\[c#[0-9a-z]{0,6}\]/);
+        return (regex.test(text.substring(0, 10)));
+    }
+    _read_color(text) {
+        const regex = new RegExp(/.?\[c#[0-9a-z]{0,6}\]/);
+        const match = regex.exec(text);
+        if (!match) {
+            return text;
+        }
+        let processed_text = text;
+        let color_prefix = '';
+        let removed_prefix = '';
+        if (match.index === 0 && text.substring(0, 3) === '[c#') { // Regex match also with another random char in front
+            color_prefix = text.substring(0, match.index + 10);
+            removed_prefix = text.substring(0, match.index) + text.substring(match.index + 10, text.length);
+        }
+        else { // text might have something else in from "s6728 [c#666666]"
+            color_prefix = text.substring(match.index + 1, match.index + 11);
+            removed_prefix = text.substring(0, match.index + 1) + text.substring(match.index + 11, text.length);
+        }
+        const hexa_color = color_prefix.substring(2, 9);
+        processed_text = chalk_1.default.hex(hexa_color)(removed_prefix);
+        return processed_text;
     }
     _replace_root_string(str) {
         if (str.indexOf('$URNROOT$') !== -1) {
