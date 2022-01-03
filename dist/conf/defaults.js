@@ -18,6 +18,7 @@ exports.default_params = {
     time: false,
     context: false,
     prefix_color: false,
+    docker: false,
     filelog: true,
     spin: true,
     color_uranio: true,

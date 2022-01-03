@@ -171,6 +171,13 @@ function _set_args(params, args) {
     if (typeof args.noprefix_color === 'boolean' && !!args.noprefix_color !== !params.prefix_color) {
         params.prefix_color = !args.noprefix_color;
     }
+    const docker = args.k || args.docker;
+    if (docker == true) {
+        params.docker = true;
+    }
+    if (typeof args.nodocker === 'boolean' && !!args.nodocker !== !params.docker) {
+        params.docker = !args.nodocker;
+    }
     // Paramteters with default value = true
     const filelog = args.l || args.filelog;
     if (filelog == false || filelog == 'false') {

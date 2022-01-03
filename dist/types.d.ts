@@ -19,6 +19,7 @@ export declare type Params = {
     time: boolean;
     context: boolean;
     prefix_color: boolean;
+    docker: boolean;
     filelog: boolean;
     spin: boolean;
     color_uranio: boolean;
