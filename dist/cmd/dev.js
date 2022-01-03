@@ -45,6 +45,7 @@ const types_1 = require("../types");
 const transpose_1 = require("./transpose");
 const hooks_1 = require("./hooks");
 const common_1 = require("./common");
+const docker_1 = require("./docker");
 let output_instance;
 let util_instance;
 let dev_params = defaults_1.default_params;
@@ -55,34 +56,49 @@ const tscw_color = '#734de3';
 const watc_color = '#687a6a';
 function dev(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_params(params);
-        _init_dev();
-        yield _dev_server();
-        if ((0, types_1.valid_client_repos)().includes(dev_params.repo)) {
-            yield _dev_client();
+        if (params.docker === true) {
+            yield (0, docker_1.docker_start)(params);
+        }
+        else {
+            _init_params(params);
+            _init_dev();
+            yield _dev_server();
+            if ((0, types_1.valid_client_repos)().includes(dev_params.repo)) {
+                yield _dev_client();
+            }
         }
     });
 }
 exports.dev = dev;
 function dev_server(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_params(params);
-        _init_dev();
-        yield _dev_server();
+        if (params.docker === true) {
+            yield (0, docker_1.docker_start)(params);
+        }
+        else {
+            _init_params(params);
+            _init_dev();
+            yield _dev_server();
+        }
     });
 }
 exports.dev_server = dev_server;
 function dev_client(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_params(params);
-        if ((0, types_1.valid_client_repos)().includes(dev_params.repo)) {
-            if (params.native != true) {
-                _init_dev();
-            }
-            yield _dev_client();
+        if (params.docker === true) {
+            yield (0, docker_1.docker_start)(dev_params);
         }
         else {
-            output_instance.error_log(`The selected repo [${dev_params.repo}] has no client development.`);
+            _init_params(params);
+            if ((0, types_1.valid_client_repos)().includes(dev_params.repo)) {
+                if (params.native != true) {
+                    _init_dev();
+                }
+                yield _dev_client();
+            }
+            else {
+                output_instance.error_log(`The selected repo [${dev_params.repo}] has no client development.`);
+            }
         }
     });
 }

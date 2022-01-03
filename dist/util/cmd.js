@@ -40,17 +40,6 @@ const urn_lib_1 = require("urn-lib");
 // import * as common from '../cmd/common';
 const fs = __importStar(require("./fs"));
 const spawn = __importStar(require("./spawn"));
-// import {
-//   abstract_repos,
-//   valid_repos,
-//   Repo,
-//   abstract_pacman,
-//   valid_pacman,
-//   PacMan,
-//   abstract_deploy,
-//   valid_deploy,
-//   Deploy,
-// } from '../types';
 const defaults_1 = require("../conf/defaults");
 class CMD {
     constructor(params, output) {
@@ -152,6 +141,17 @@ class CMD {
         const packdata_dep_dev = pack_data['devDependencies'];
         return ((packdata_dep && typeof packdata_dep[repo] === 'string') ||
             (packdata_dep_dev && typeof packdata_dep_dev[repo] === 'string'));
+    }
+    read_dotenv() {
+        const dotenv_path = `${this.params.root}/.env`;
+        const content = this.fs.read_file(dotenv_path);
+        const dotenv = {};
+        const lines = content.split('\n');
+        for (const line of lines) {
+            const splitted = line.split('=');
+            dotenv[splitted[0]] = splitted[1];
+        }
+        return dotenv;
     }
     _clone_repo(address, dest_folder, context = '_clr', branch = 'master', recursive = false) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -7,6 +7,7 @@ import { Params } from '../types';
 export declare const default_params: Params;
 export declare const defaults: {
     readonly folder: ".uranio";
+    readonly docker_folder: ".docker";
     readonly repo_folder: "uranio";
     readonly tmp_folder: ".tmp";
     readonly log_filepath: ".urnlog";

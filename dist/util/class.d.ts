@@ -18,7 +18,9 @@ declare class Util {
     constructor(params: Params, output: out.OutputInstance);
     watch(watch_path: string, watch_text: string, on_ready: OnReadyCallback, on_all: OnAllCallback): void;
     is_initialized(): boolean;
+    is_docker_initialized(): boolean;
     must_be_initialized(): void;
+    must_be_docker_initialized(): void;
     pretty(filepath: string, parser?: string): void;
 }
 export declare type UtilInstance = InstanceType<typeof Util>;

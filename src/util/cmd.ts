@@ -33,6 +33,10 @@ import * as spawn from './spawn';
 //   Deploy,
 // } from '../types';
 
+type DotEnv = {
+	[k:string]: string
+}
+
 import {jsonfile_path} from '../conf/defaults';
 
 class CMD {
@@ -144,6 +148,19 @@ class CMD {
 			(packdata_dep && typeof packdata_dep[repo] === 'string') ||
 			(packdata_dep_dev && typeof packdata_dep_dev[repo] === 'string')
 		);
+	}
+	
+	public read_dotenv()
+			:DotEnv{
+		const dotenv_path = `${this.params.root}/.env`;
+		const content = this.fs.read_file(dotenv_path);
+		const dotenv:DotEnv = {};
+		const lines = content.split('\n');
+		for(const line of lines){
+			const splitted = line.split('=');
+			dotenv[splitted[0]] = splitted[1];
+		}
+		return dotenv;
 	}
 	
 	private async _clone_repo(

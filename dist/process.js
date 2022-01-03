@@ -447,6 +447,10 @@ function _switch_command(args) {
             (0, cmd_1.docker)(process_params, args);
             break;
         }
+        case 'deinit': {
+            (0, cmd_1.deinit)(process_params);
+            break;
+        }
         case 'test': {
             // test.command();
             break;

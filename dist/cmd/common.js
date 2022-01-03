@@ -8,7 +8,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.check_if_is_dot = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_init_params = exports.merge_params = exports.read_rc_file = void 0;
+exports.check_if_is_dot = exports.check_db = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_init_params = exports.merge_params = exports.read_rc_file = void 0;
 const fs_1 = __importDefault(require("fs"));
 const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
@@ -25,6 +25,7 @@ function read_rc_file(params) {
         cloned_params.repo = rc_obj.repo;
         cloned_params.pacman = rc_obj.pacman;
         cloned_params.deploy = rc_obj.deploy;
+        // cloned_params.docker = Boolean(rc_obj.docker);
         return cloned_params;
     }
     catch (ex) {
@@ -92,6 +93,17 @@ function check_deploy(deploy) {
     }
 }
 exports.check_deploy = check_deploy;
+function check_db(db) {
+    if (!urn_lib_1.urn_util.object.has_key(types_1.abstract_db, db)) {
+        const valid_db_str = (0, types_1.valid_db)().join(', ');
+        let end_log = '';
+        end_log += `Wrong db value. `;
+        end_log += `DB value must be one of the following [${valid_db_str}]\n`;
+        process.stderr.write(end_log);
+        process.exit(1);
+    }
+}
+exports.check_db = check_db;
 function check_if_is_dot(path) {
     const data = fs_1.default.readdirSync(path);
     if (!data) {

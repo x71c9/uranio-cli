@@ -9,6 +9,7 @@ import minimist from 'minimist';
 export type Repo = keyof typeof abstract_repos;
 export type PacMan = keyof typeof abstract_pacman;
 export type Deploy = keyof typeof abstract_deploy;
+export type DB = keyof typeof abstract_db;
 
 export type Params = {
 	force: boolean
@@ -73,6 +74,10 @@ export const abstract_deploy = {
 	express: '',
 } as const;
 
+export const abstract_db = {
+	mongo: ''
+} as const;
+
 export function valid_repos()
 		:string[]{
 	const vals:string[] = [];
@@ -127,6 +132,15 @@ export function valid_deploy()
 		:string[]{
 	const vals:string[] = [];
 	for(const k in abstract_deploy){
+		vals.push(k);
+	}
+	return vals;
+}
+
+export function valid_db()
+		:string[]{
+	const vals:string[] = [];
+	for(const k in abstract_db){
 		vals.push(k);
 	}
 	return vals;

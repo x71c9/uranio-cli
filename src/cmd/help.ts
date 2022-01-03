@@ -17,6 +17,7 @@ export async function help():Promise<void> {
 	console.log(``);
 	console.log(`commands:`);
 	console.log(`  init ............... init uranio repo.`);
+	console.log(`  deinit ............. deinit uranio repo.`);
 	console.log(`  dev ................ start uranio development mode.`);
 	console.log(`  transpose .......... transpose atom books.`);
 	console.log(`  info ............... show uranio info for this repo.`);

@@ -8,7 +8,7 @@ import chokidar from 'chokidar';
 
 import prettier from 'prettier';
 
-import {jsonfile_path} from '../conf/defaults';
+import {defaults, jsonfile_path} from '../conf/defaults';
 
 import {Params} from '../types';
 
@@ -69,9 +69,21 @@ class Util {
 	public is_initialized(){
 		const is = (this.fs.exists(`${this.params.root}/${jsonfile_path}`));
 		if(is){
-			this.output.verbose_log(`Uranio is initialized`);
+			this.output.verbose_log(`Uranio is initialized.`);
 		}else{
-			this.output.verbose_log(`Uranio is not initialized`);
+			this.output.verbose_log(`Uranio is not initialized.`);
+		}
+		return is;
+	}
+	
+	public is_docker_initialized(){
+		const is = (this.fs.exists(
+			`${this.params.root}/${defaults.docker_folder}/${defaults.json_filename}`
+		));
+		if(is){
+			this.output.verbose_log(`Uranio [docker] is initialized.`);
+		}else{
+			this.output.verbose_log(`Uranio [docker] is not initialized.`);
 		}
 		return is;
 	}
@@ -80,6 +92,16 @@ class Util {
 		if(!this.is_initialized()){
 			let err_msg = '';
 			err_msg += 'URANIO must be initialized first.';
+			err_msg += ` Please run \`uranio init\` in order to initialize the repo.`;
+			this.output.wrong_end_log(err_msg);
+			process.exit(1);
+		}
+	}
+	
+	public must_be_docker_initialized(){
+		if(!this.is_docker_initialized()){
+			let err_msg = '';
+			err_msg += 'URANIO [docker] must be initialized first.';
 			err_msg += ` Please run \`uranio init\` in order to initialize the repo.`;
 			this.output.wrong_end_log(err_msg);
 			process.exit(1);

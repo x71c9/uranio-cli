@@ -37,6 +37,7 @@ const cloud_address = 'git+ssh://git@github.com/nbl7/';
 
 export const defaults = {
 	folder: '.uranio',
+	docker_folder: '.docker',
 	repo_folder: 'uranio',
 	tmp_folder: '.tmp',
 	log_filepath: '.urnlog',

@@ -12,4 +12,5 @@ export * from './hooks';
 export * from './info';
 export * from './help';
 export * from './docker';
+export * from './deinit';
 export * from './dot';
