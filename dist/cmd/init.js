@@ -57,13 +57,15 @@ function init(params) {
         output_instance = output.create(init_params);
         util_instance = util.create(init_params, output_instance);
         _log_important_params();
-        _create_urn_folder();
         _ignore_urn_folder();
-        _create_rc_file();
         if (init_params.docker === true) {
+            _create_docker_folder();
+            _create_docker_rc_file();
             yield (0, docker_1.docker_build)(init_params);
         }
         else {
+            _create_urn_folder();
+            _create_rc_file();
             yield _init_pacman();
             _update_package_aliases();
             _update_package_scripts();
@@ -437,6 +439,19 @@ function _create_client_server_folders() {
     util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}/client/src/books`, 'init');
     output_instance.done_verbose_log(`Created client folders.`, 'init');
 }
+function _create_docker_rc_file() {
+    output_instance.start_loading('Creating rc file...');
+    let content = ``;
+    content += `{\n`;
+    content += `\t"repo": "${init_params.repo}",\n`;
+    content += `\t"pacman": "${init_params.pacman}",\n`;
+    content += `\t"deploy": "${init_params.deploy}",\n`;
+    content += `}`;
+    const docker_rc_file = `${init_params.root}/${defaults_1.defaults.docker_folder}/${defaults_1.defaults.json_filename}`;
+    util_instance.fs.write_file(docker_rc_file, content);
+    util_instance.pretty(docker_rc_file, 'json');
+    output_instance.done_log(`Created file ${docker_rc_file}.`, 'rcfl');
+}
 function _create_rc_file() {
     output_instance.start_loading('Creating rc file...');
     let content = ``;
@@ -444,7 +459,6 @@ function _create_rc_file() {
     content += `\t"repo": "${init_params.repo}",\n`;
     content += `\t"pacman": "${init_params.pacman}",\n`;
     content += `\t"deploy": "${init_params.deploy}",\n`;
-    content += `\t"docker": "${init_params.docker}"\n`;
     content += `}`;
     util_instance.fs.write_file(`${init_params.root}/${defaults_1.jsonfile_path}`, content);
     util_instance.pretty(`${init_params.root}/${defaults_1.jsonfile_path}`, 'json');
@@ -457,7 +471,7 @@ function _ignore_urn_folder() {
         util_instance.fs.create_file(gitignore, 'giti');
     }
     let content = util_instance.fs.read_file(gitignore, 'utf8');
-    if (content.indexOf(defaults_1.defaults.folder + '/') === -1 || content.indexOf(defaults_1.defaults.folder)) {
+    if (content.indexOf(defaults_1.defaults.folder + '/') === -1) {
         content += `\n${defaults_1.defaults.folder}/`;
     }
     if (content.indexOf(defaults_1.defaults.log_filepath) === -1) {
@@ -472,6 +486,12 @@ function _create_urn_folder() {
     util_instance.fs.remove_directory(`${init_params.root}/${defaults_1.defaults.folder}`, 'init');
     util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}`, 'init');
     output_instance.done_log(`Created folder ${defaults_1.defaults.folder}.`, 'init');
+}
+function _create_docker_folder() {
+    output_instance.start_loading(`Creating ${defaults_1.defaults.docker_folder} folder...`);
+    util_instance.fs.remove_directory(`${init_params.root}/${defaults_1.defaults.docker_folder}`, 'init');
+    util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.docker_folder}`, 'init');
+    output_instance.done_log(`Created folder ${defaults_1.defaults.docker_folder}.`, 'init');
 }
 function _update_package_scripts() {
     output_instance.start_loading('Updating scripts...');

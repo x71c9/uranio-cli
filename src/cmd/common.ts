@@ -19,6 +19,8 @@ import {
 	valid_pacman,
 	abstract_deploy,
 	valid_deploy,
+	abstract_db,
+	valid_db
 } from '../types';
 
 export function read_rc_file(params:Params):Params;
@@ -35,6 +37,7 @@ export function read_rc_file(params:Partial<Params>):Partial<Params>{
 		cloned_params.repo = rc_obj.repo;
 		cloned_params.pacman = rc_obj.pacman;
 		cloned_params.deploy = rc_obj.deploy;
+		// cloned_params.docker = Boolean(rc_obj.docker);
 		return cloned_params;
 	}catch(ex){
 		const err = ex as Error;
@@ -103,6 +106,18 @@ export function check_deploy(deploy:string)
 		let end_log = '';
 		end_log += `Wrong deploy value. `;
 		end_log += `Deploy value must be one of the following [${valid_deploy_str}]\n`;
+		process.stderr.write(end_log);
+		process.exit(1);
+	}
+}
+
+export function check_db(db:string)
+		:void{
+	if(!urn_util.object.has_key(abstract_db, db)){
+		const valid_db_str = valid_db().join(', ');
+		let end_log = '';
+		end_log += `Wrong db value. `;
+		end_log += `DB value must be one of the following [${valid_db_str}]\n`;
 		process.stderr.write(end_log);
 		process.exit(1);
 	}

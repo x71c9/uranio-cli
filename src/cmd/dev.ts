@@ -26,6 +26,8 @@ import {hooks} from './hooks';
 
 import {merge_params} from './common';
 
+import {docker_start} from './docker';
+
 let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
@@ -40,31 +42,49 @@ const tscw_color = '#734de3';
 const watc_color = '#687a6a';
 
 export async function dev(params:Partial<Params>):Promise<void>{
-	_init_params(params);
-	_init_dev();
-	await _dev_server();
-	if(valid_client_repos().includes(dev_params.repo)){
-		await _dev_client();
+	if(params.docker === true){
+		
+		await docker_start(params);
+		
+	}else{
+		_init_params(params);
+		_init_dev();
+		await _dev_server();
+		if(valid_client_repos().includes(dev_params.repo)){
+			await _dev_client();
+		}
 	}
 }
 
 export async function dev_server(params:Partial<Params>):Promise<void>{
-	_init_params(params);
-	_init_dev();
-	await _dev_server();
+	if(params.docker === true){
+		
+		await docker_start(params);
+		
+	}else{
+		_init_params(params);
+		_init_dev();
+		await _dev_server();
+	}
 }
 
 export async function dev_client(params:Partial<Params>):Promise<void>{
-	_init_params(params);
-	if(valid_client_repos().includes(dev_params.repo)){
-		if(params.native != true){
-			_init_dev();
-		}
-		await _dev_client();
+	if(params.docker === true){
+		
+		await docker_start(dev_params);
+		
 	}else{
-		output_instance.error_log(
-			`The selected repo [${dev_params.repo}] has no client development.`
-		);
+		_init_params(params);
+		if(valid_client_repos().includes(dev_params.repo)){
+			if(params.native != true){
+				_init_dev();
+			}
+			await _dev_client();
+		}else{
+			output_instance.error_log(
+				`The selected repo [${dev_params.repo}] has no client development.`
+			);
+		}
 	}
 }
 

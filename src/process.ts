@@ -31,8 +31,8 @@ import {
 	help,
 	info,
 	dot,
-	docker
-	// test,
+	docker,
+	deinit
 } from './cmd/';
 
 import {default_params, defaults} from './conf/defaults';
@@ -536,6 +536,10 @@ function _switch_command(args:Arguments){
 		}
 		case 'docker':{
 			docker(process_params, args);
+			break;
+		}
+		case 'deinit':{
+			deinit(process_params);
 			break;
 		}
 		case 'test':{
