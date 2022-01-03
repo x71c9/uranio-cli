@@ -33,7 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.docker = void 0;
+exports.docker_run = exports.docker_build = exports.docker = void 0;
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const defaults_1 = require("../conf/defaults");
@@ -45,13 +45,19 @@ let docker_params = defaults_1.default_params;
 function docker(params, args) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
+        const { repo, deploy, pacman } = _get_main_args(args);
+        docker_params.repo = repo;
+        docker_params.deploy = deploy;
+        docker_params.pacman = pacman;
         switch (args._[1]) {
             case 'build': {
-                yield _build(args);
+                // await _build(args);
+                yield docker_build(docker_params);
                 break;
             }
             case 'run': {
-                yield _run(args);
+                // await _run(args);
+                yield docker_run(docker_params);
                 break;
             }
             default: {
@@ -62,37 +68,61 @@ function docker(params, args) {
     });
 }
 exports.docker = docker;
+function docker_build(params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        _init_params(params);
+        yield _download_dockerfiles();
+        let cmd = '';
+        cmd += `docker build --ssh default`;
+        cmd += ` -t uranio-${docker_params.repo}-${docker_params.deploy}`;
+        cmd += ` -f ${docker_params.root}/${defaults_1.defaults.folder}/.docker/Dockerfile`;
+        cmd += ` --build-arg repo=${docker_params.repo}`;
+        cmd += ` --build-arg deploy=${docker_params.deploy}`;
+        cmd += ` --build-arg pacman=${docker_params.pacman}`;
+        cmd += ` .`;
+        yield _execute_spin_verbose(cmd, 'docker', 'building');
+        output_instance.done_log(`Docker image built ${docker_params.repo} ${docker_params.deploy}`);
+    });
+}
+exports.docker_build = docker_build;
+function docker_run(params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        _init_params(params);
+        let cmd = '';
+        cmd += `docker run --rm -i -v $(pwd)/src:/app/src --network="host"`;
+        cmd += ` uranio-${docker_params.repo}-${docker_params.deploy}`;
+        yield _execute_log(cmd, 'docker', 'running');
+        output_instance.done_log(`Docker image runned ${docker_params.repo} ${docker_params.deploy}`);
+    });
+}
+exports.docker_run = docker_run;
 function _init_params(params) {
     docker_params = (0, common_1.merge_params)(params);
     output_instance = output.create(docker_params);
     util_instance = util.create(docker_params, output_instance);
-    // util_instance.must_be_initialized();
+    util_instance.must_be_initialized();
 }
-function _run(args) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const { repo, deploy } = _get_main_args(args);
-        let cmd = '';
-        cmd += `docker run --rm -i -v $(pwd)/src:/app/src --network="host" uranio-${repo}-${deploy}`;
-        yield _execute_verbose(cmd, 'docker', 'running');
-        output_instance.done_log(`Docker image runned ${repo} ${deploy}`);
-    });
-}
-function _build(args) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const { repo, deploy, pacman } = _get_main_args(args);
-        yield _download_dockerfiles();
-        // _ignore_docker_folder();
-        let cmd = '';
-        cmd += `docker build --ssh default -t uranio-${repo}-${deploy}`;
-        cmd += ` -f ${docker_params.root}/${defaults_1.defaults.folder}/.docker/Dockerfile`;
-        cmd += ` --build-arg repo=${repo}`;
-        cmd += ` --build-arg deploy=${deploy}`;
-        cmd += ` --build-arg pacman=${pacman}`;
-        cmd += ` .`;
-        yield _execute_spin_verbose(cmd, 'docker', 'building');
-        output_instance.done_log(`Docker image built ${repo} ${deploy}`);
-    });
-}
+// async function _run(args:Arguments):Promise<void>{
+//   const {repo, deploy} = _get_main_args(args);
+//   let cmd = '';
+//   cmd += `docker run --rm -i -v $(pwd)/src:/app/src --network="host" uranio-${repo}-${deploy}`;
+//   await _execute_log(cmd, 'docker', 'running');
+//   output_instance.done_log(`Docker image runned ${repo} ${deploy}`);
+// }
+// async function _build(args:Arguments):Promise<void>{
+//   const {repo, deploy, pacman} = _get_main_args(args);
+//   await _download_dockerfiles();
+//   // _ignore_docker_folder();
+//   let cmd = '';
+//   cmd += `docker build --ssh default -t uranio-${repo}-${deploy}`;
+//   cmd += ` -f ${docker_params.root}/${defaults.folder}/.docker/Dockerfile`;
+//   cmd += ` --build-arg repo=${repo}`;
+//   cmd += ` --build-arg deploy=${deploy}`;
+//   cmd += ` --build-arg pacman=${pacman}`;
+//   cmd += ` .`;
+//   await _execute_spin_verbose(cmd, 'docker', 'building');
+//   output_instance.done_log(`Docker image built ${repo} ${deploy}`);
+// }
 function _get_main_args(args) {
     let repo = (args._[2]);
     if (typeof repo === 'undefined' && typeof args.repo === 'string') {
@@ -177,10 +207,10 @@ function _execute_spin_verbose(cmd, context, action) {
         });
     });
 }
-function _execute_verbose(cmd, context, action) {
+function _execute_log(cmd, context, action) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
-            util_instance.spawn.verbose_log(cmd, context, action, undefined, resolve, reject);
+            util_instance.spawn.log(cmd, context, action, undefined, resolve, reject);
         });
     });
 }

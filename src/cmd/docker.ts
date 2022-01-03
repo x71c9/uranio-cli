@@ -42,13 +42,21 @@ export async function docker(params:Partial<Params>, args:Arguments):Promise<voi
 	
 	_init_params(params);
 	
+	const {repo, deploy, pacman} = _get_main_args(args);
+	
+	docker_params.repo = repo;
+	docker_params.deploy = deploy;
+	docker_params.pacman = pacman;
+	
 	switch(args._[1]){
 		case 'build':{
-			await _build(args);
+			// await _build(args);
+			await docker_build(docker_params);
 			break;
 		}
 		case 'run':{
-			await _run(args);
+			// await _run(args);
+			await docker_run(docker_params);
 			break;
 		}
 		default:{
@@ -56,6 +64,44 @@ export async function docker(params:Partial<Params>, args:Arguments):Promise<voi
 			process.exit(1);
 		}
 	}
+}
+
+export async function docker_build(params:Partial<Params>)
+		:Promise<void>{
+	
+	_init_params(params);
+	
+	await _download_dockerfiles();
+	
+	let cmd = '';
+	cmd += `docker build --ssh default`;
+	cmd += ` -t uranio-${docker_params.repo}-${docker_params.deploy}`;
+	cmd += ` -f ${docker_params.root}/${defaults.folder}/.docker/Dockerfile`;
+	cmd += ` --build-arg repo=${docker_params.repo}`;
+	cmd += ` --build-arg deploy=${docker_params.deploy}`;
+	cmd += ` --build-arg pacman=${docker_params.pacman}`;
+	cmd += ` .`;
+	await _execute_spin_verbose(cmd, 'docker', 'building');
+	
+	output_instance.done_log(
+		`Docker image built ${docker_params.repo} ${docker_params.deploy}`
+	);
+	
+}
+
+export async function docker_run(params:Partial<Params>):Promise<void>{
+	
+	_init_params(params);
+	
+	let cmd = '';
+	cmd += `docker run --rm -i -v $(pwd)/src:/app/src --network="host"`;
+	cmd += ` uranio-${docker_params.repo}-${docker_params.deploy}`;
+	await _execute_log(cmd, 'docker', 'running');
+	
+	output_instance.done_log(
+		`Docker image runned ${docker_params.repo} ${docker_params.deploy}`
+	);
+	
 }
 
 function _init_params(params:Partial<Params>)
@@ -67,42 +113,42 @@ function _init_params(params:Partial<Params>)
 	
 	util_instance = util.create(docker_params, output_instance);
 	
-	// util_instance.must_be_initialized();
+	util_instance.must_be_initialized();
 	
 }
 
-async function _run(args:Arguments):Promise<void>{
+// async function _run(args:Arguments):Promise<void>{
 	
-	const {repo, deploy} = _get_main_args(args);
+//   const {repo, deploy} = _get_main_args(args);
 	
-	let cmd = '';
-	cmd += `docker run --rm -i -v $(pwd)/src:/app/src --network="host" uranio-${repo}-${deploy}`;
-	await _execute_verbose(cmd, 'docker', 'running');
+//   let cmd = '';
+//   cmd += `docker run --rm -i -v $(pwd)/src:/app/src --network="host" uranio-${repo}-${deploy}`;
+//   await _execute_log(cmd, 'docker', 'running');
 	
-	output_instance.done_log(`Docker image runned ${repo} ${deploy}`);
+//   output_instance.done_log(`Docker image runned ${repo} ${deploy}`);
 	
-}
+// }
 
-async function _build(args:Arguments):Promise<void>{
+// async function _build(args:Arguments):Promise<void>{
 	
-	const {repo, deploy, pacman} = _get_main_args(args);
+//   const {repo, deploy, pacman} = _get_main_args(args);
 	
-	await _download_dockerfiles();
+//   await _download_dockerfiles();
 	
-	// _ignore_docker_folder();
+//   // _ignore_docker_folder();
 	
-	let cmd = '';
-	cmd += `docker build --ssh default -t uranio-${repo}-${deploy}`;
-	cmd += ` -f ${docker_params.root}/${defaults.folder}/.docker/Dockerfile`;
-	cmd += ` --build-arg repo=${repo}`;
-	cmd += ` --build-arg deploy=${deploy}`;
-	cmd += ` --build-arg pacman=${pacman}`;
-	cmd += ` .`;
-	await _execute_spin_verbose(cmd, 'docker', 'building');
+//   let cmd = '';
+//   cmd += `docker build --ssh default -t uranio-${repo}-${deploy}`;
+//   cmd += ` -f ${docker_params.root}/${defaults.folder}/.docker/Dockerfile`;
+//   cmd += ` --build-arg repo=${repo}`;
+//   cmd += ` --build-arg deploy=${deploy}`;
+//   cmd += ` --build-arg pacman=${pacman}`;
+//   cmd += ` .`;
+//   await _execute_spin_verbose(cmd, 'docker', 'building');
 	
-	output_instance.done_log(`Docker image built ${repo} ${deploy}`);
+//   output_instance.done_log(`Docker image built ${repo} ${deploy}`);
 	
-}
+// }
 
 function _get_main_args(args:Arguments):MainArgs{
 	let repo = (args._[2]) as Repo;
@@ -134,7 +180,7 @@ function _get_main_args(args:Arguments):MainArgs{
 		repo,
 		pacman,
 		deploy
-	}
+	};
 }
 
 async function _clone_dot(){
@@ -221,9 +267,9 @@ async function _execute_spin_verbose(cmd:string, context:string, action:string){
 	});
 }
 
-async function _execute_verbose(cmd:string, context:string, action:string){
+async function _execute_log(cmd:string, context:string, action:string){
 	return new Promise((resolve, reject) => {
-		util_instance.spawn.verbose_log(
+		util_instance.spawn.log(
 			cmd,
 			context,
 			action,

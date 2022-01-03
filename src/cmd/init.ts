@@ -14,6 +14,8 @@ import * as output from '../output/';
 
 import * as util from '../util/';
 
+import {docker_build} from './docker';
+
 import {
 	Arguments,
 	Params,
@@ -54,20 +56,29 @@ export async function init(params:Partial<Params>)
 	util_instance = util.create(init_params, output_instance);
 	
 	_log_important_params();
-	await _init_pacman();
-	_update_package_aliases();
-	_update_package_scripts();
 	_create_urn_folder();
 	_ignore_urn_folder();
 	_create_rc_file();
-	_create_client_server_folders();
-	await _clone_repo();
-	await _install_repo();
-	_remove_git_files();
-	await _clone_dot();
-	_copy_dot_files();
-	_remove_tmp();
-	await _replace_aliases();
+	
+	if(init_params.docker === true){
+		
+		await docker_build(init_params);
+		
+	}else{
+		
+		await _init_pacman();
+		_update_package_aliases();
+		_update_package_scripts();
+		_create_client_server_folders();
+		await _clone_repo();
+		await _install_repo();
+		_remove_git_files();
+		await _clone_dot();
+		_copy_dot_files();
+		_remove_tmp();
+		await _replace_aliases();
+		
+	}
 	
 	output_instance.end_log(`Initialization completed.`);
 }
@@ -238,6 +249,42 @@ async function _ask_for_deploy(args:Arguments){
 				
 				check_deploy(answers.deploy);
 				init_params.deploy = answers.deploy;
+				
+				await _ask_for_docker(args);
+				
+			});
+		
+	}else{
+		
+		await _ask_for_docker(args);
+		
+	}
+}
+
+async function _ask_for_docker(args:Arguments){
+	
+	const docker = args.k || args.docker;
+	
+	if(!docker && init_params.force === false){
+			
+		let confirm_msg = '';
+		confirm_msg += `? Do you want to compile and run inside a docker container?\n`;
+		
+		const suffix = `? Docker need to be installed on your system.`;
+		
+		inquirer.
+			prompt([
+				{
+					type: 'confirm',
+					name: 'docker',
+					message: confirm_msg,
+					suffix: suffix
+				}
+			]).then(async (answers) => {
+				
+				if(answers.docker === true){
+					init_params.docker = true;
+				}
 				
 				await init(init_params);
 				
@@ -528,7 +575,8 @@ function _create_rc_file(){
 	content += `{\n`;
 	content += `\t"repo": "${init_params.repo}",\n`;
 	content += `\t"pacman": "${init_params.pacman}",\n`;
-	content += `\t"deploy": "${init_params.deploy}"\n`;
+	content += `\t"deploy": "${init_params.deploy}",\n`;
+	content += `\t"docker": "${init_params.docker}"\n`;
 	content += `}`;
 	util_instance.fs.write_file(`${init_params.root}/${jsonfile_path}`, content);
 	util_instance.pretty(`${init_params.root}/${jsonfile_path}`, 'json');

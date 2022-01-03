@@ -42,6 +42,7 @@ const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
+const docker_1 = require("./docker");
 const types_1 = require("../types");
 const alias_1 = require("./alias");
 const title_1 = require("./title");
@@ -56,20 +57,25 @@ function init(params) {
         output_instance = output.create(init_params);
         util_instance = util.create(init_params, output_instance);
         _log_important_params();
-        yield _init_pacman();
-        _update_package_aliases();
-        _update_package_scripts();
         _create_urn_folder();
         _ignore_urn_folder();
         _create_rc_file();
-        _create_client_server_folders();
-        yield _clone_repo();
-        yield _install_repo();
-        _remove_git_files();
-        yield _clone_dot();
-        _copy_dot_files();
-        _remove_tmp();
-        yield _replace_aliases();
+        if (init_params.docker === true) {
+            yield (0, docker_1.docker_build)(init_params);
+        }
+        else {
+            yield _init_pacman();
+            _update_package_aliases();
+            _update_package_scripts();
+            _create_client_server_folders();
+            yield _clone_repo();
+            yield _install_repo();
+            _remove_git_files();
+            yield _clone_dot();
+            _copy_dot_files();
+            _remove_tmp();
+            yield _replace_aliases();
+        }
         output_instance.end_log(`Initialization completed.`);
     });
 }
@@ -194,6 +200,33 @@ function _ask_for_deploy(args) {
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
                 (0, common_1.check_deploy)(answers.deploy);
                 init_params.deploy = answers.deploy;
+                yield _ask_for_docker(args);
+            }));
+        }
+        else {
+            yield _ask_for_docker(args);
+        }
+    });
+}
+function _ask_for_docker(args) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const docker = args.k || args.docker;
+        if (!docker && init_params.force === false) {
+            let confirm_msg = '';
+            confirm_msg += `? Do you want to compile and run inside a docker container?\n`;
+            const suffix = `? Docker need to be installed on your system.`;
+            inquirer_1.default.
+                prompt([
+                {
+                    type: 'confirm',
+                    name: 'docker',
+                    message: confirm_msg,
+                    suffix: suffix
+                }
+            ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
+                if (answers.docker === true) {
+                    init_params.docker = true;
+                }
                 yield init(init_params);
             }));
         }
@@ -410,7 +443,8 @@ function _create_rc_file() {
     content += `{\n`;
     content += `\t"repo": "${init_params.repo}",\n`;
     content += `\t"pacman": "${init_params.pacman}",\n`;
-    content += `\t"deploy": "${init_params.deploy}"\n`;
+    content += `\t"deploy": "${init_params.deploy}",\n`;
+    content += `\t"docker": "${init_params.docker}"\n`;
     content += `}`;
     util_instance.fs.write_file(`${init_params.root}/${defaults_1.jsonfile_path}`, content);
     util_instance.pretty(`${init_params.root}/${defaults_1.jsonfile_path}`, 'json');
