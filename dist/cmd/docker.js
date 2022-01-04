@@ -157,8 +157,11 @@ function docker_create(params, entrypoint) {
         const container_name = _get_container_name();
         const image_name = _get_image_name();
         let cmd = '';
-        // cmd += `docker create -v $(pwd):/app -v /app/node_modules --network="host"`;
-        cmd += `docker create -v $(pwd):/app --network="host"`;
+        cmd += `docker create --network="host"`;
+        cmd += ` -v $(pwd)/src:/app/src`;
+        cmd += ` -v $(pwd)/node_modules:/app/node_modules`;
+        cmd += ` -v $(pwd)/.env:/app/.env`;
+        cmd += ` -v $(pwd)/package.json:/app/package.json`;
         cmd += ` --name ${container_name}`;
         cmd += ` ${image_name}`;
         if (typeof entrypoint === 'string') {
