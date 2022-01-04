@@ -29,6 +29,7 @@ export declare type Params = {
     repo: Repo;
     pacman: PacMan;
     deploy: Deploy;
+    db: DB;
     color_log: string;
     color_verbose: string;
     color_debug: string;

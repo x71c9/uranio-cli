@@ -57,17 +57,17 @@ export async function init(params:Partial<Params>)
 	
 	_log_important_params();
 	_ignore_urn_folder();
+	_create_rc_file();
 	
 	if(init_params.docker === true){
 		
-		_create_docker_folder();
-		_create_docker_rc_file();
+		// _create_docker_folder();
+		// _create_docker_rc_file();
 		await docker_build(init_params);
 		
 	}else{
 		
 		_create_urn_folder();
-		_create_rc_file();
 		await _init_pacman();
 		_update_package_aliases();
 		_update_package_scripts();
@@ -571,23 +571,23 @@ function _create_client_server_folders(){
 	output_instance.done_verbose_log(`Created client folders.`, 'init');
 }
 
-function _create_docker_rc_file(){
-	output_instance.start_loading('Creating rc file...');
-	let content = ``;
-	content += `{\n`;
-	content += `\t"repo": "${init_params.repo}",\n`;
-	content += `\t"pacman": "${init_params.pacman}",\n`;
-	content += `\t"deploy": "${init_params.deploy}",\n`;
-	content += `}`;
-	const docker_rc_file =
-		`${init_params.root}/${defaults.docker_folder}/${defaults.json_filename}`;
-	util_instance.fs.write_file(
-		docker_rc_file,
-		content
-	);
-	util_instance.pretty(docker_rc_file, 'json');
-	output_instance.done_log(`Created file ${docker_rc_file}.`, 'rcfl');
-}
+// function _create_docker_rc_file(){
+//   output_instance.start_loading('Creating rc file...');
+//   let content = ``;
+//   content += `{\n`;
+//   content += `\t"repo": "${init_params.repo}",\n`;
+//   content += `\t"pacman": "${init_params.pacman}",\n`;
+//   content += `\t"deploy": "${init_params.deploy}",\n`;
+//   content += `}`;
+//   const docker_rc_file =
+//     `${init_params.root}/${defaults.docker_folder}/${defaults.json_filename}`;
+//   util_instance.fs.write_file(
+//     docker_rc_file,
+//     content
+//   );
+//   util_instance.pretty(docker_rc_file, 'json');
+//   output_instance.done_log(`Created file ${docker_rc_file}.`, 'rcfl');
+// }
 
 function _create_rc_file(){
 	output_instance.start_loading('Creating rc file...');
@@ -616,9 +616,12 @@ function _ignore_urn_folder(){
 	if(content.indexOf(defaults.log_filepath) === -1){
 		content += `\n${defaults.log_filepath}`;
 	}
+	if(content.indexOf(defaults.json_filename) === -1){
+		content += `\n${defaults.json_filename}`;
+	}
 	util_instance.fs.write_file(gitignore, content);
 	const log_msg =
-		`Added ${defaults.folder} and ${defaults.log_filepath} to .gitignore.`;
+		`Added ${defaults.folder}, ${defaults.log_filepath} and ${defaults.json_filename} to .gitignore.`;
 	output_instance.done_log(log_msg, '.git');
 }
 
@@ -635,18 +638,18 @@ function _create_urn_folder(){
 	output_instance.done_log(`Created folder ${defaults.folder}.`, 'init');
 }
 
-function _create_docker_folder(){
-	output_instance.start_loading(`Creating ${defaults.docker_folder} folder...`);
-	util_instance.fs.remove_directory(
-		`${init_params.root}/${defaults.docker_folder}`,
-		'init'
-	);
-	util_instance.fs.create_directory(
-		`${init_params.root}/${defaults.docker_folder}`,
-		'init'
-	);
-	output_instance.done_log(`Created folder ${defaults.docker_folder}.`, 'init');
-}
+// function _create_docker_folder(){
+//   output_instance.start_loading(`Creating ${defaults.docker_folder} folder...`);
+//   util_instance.fs.remove_directory(
+//     `${init_params.root}/${defaults.docker_folder}`,
+//     'init'
+//   );
+//   util_instance.fs.create_directory(
+//     `${init_params.root}/${defaults.docker_folder}`,
+//     'init'
+//   );
+//   output_instance.done_log(`Created folder ${defaults.docker_folder}.`, 'init');
+// }
 
 function _update_package_scripts(){
 	output_instance.start_loading('Updating scripts...');
