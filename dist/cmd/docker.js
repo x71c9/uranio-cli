@@ -127,17 +127,42 @@ function docker_build(params) {
         cmd += `docker build --ssh default`;
         cmd += ` -t ${image_name}`;
         // cmd += ` -f ${docker_params.root}/${defaults.folder}/.docker/Dockerfile`;
+        // cmd += ` -u $(id -u \${USER}):$(id -g \${USER})`;
         cmd += ` -f ${docker_params.root}/Dockerfile`;
+        // cmd += ` --build-arg user=$(whoami)`;
+        // cmd += ` --build-arg uid=$(id -u \${USER})`;
+        // cmd += ` --build-arg gid=$(id -g \${USER})`;
         cmd += ` --build-arg repo=${docker_params.repo}`;
         cmd += ` --build-arg deploy=${docker_params.deploy}`;
         cmd += ` --build-arg pacman=${docker_params.pacman}`;
         cmd += ` .`;
         yield _execute_spin_verbose(cmd, 'docker', 'building');
         output_instance.done_log(`Docker image built ${docker_params.repo} ${docker_params.deploy}`);
+        yield _copy_compiled();
         yield docker_create(docker_params);
     });
 }
 exports.docker_build = docker_build;
+function _copy_compiled() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const image_name = _get_image_name();
+        const container_name = _get_container_name();
+        let cmd_create = '';
+        // cmd_create += `docker create -u $(id -u \${USER}):$(id -g \${USER}) --name tmp_${container_name} ${image_name}`;
+        cmd_create += `docker create --name tmp_${container_name} ${image_name}`;
+        yield _execute_spin_verbose(cmd_create, 'docker', `creating tmp container tmp_${container_name}`);
+        let cmd_cp_node = '';
+        cmd_cp_node += `docker cp tmp_${container_name}:/app/node_modules node_modules`;
+        yield _execute_spin_verbose(cmd_cp_node, 'docker', `copying node_modules from tmp container tmp_${container_name}`);
+        let cmd_cp_uranio = '';
+        cmd_cp_uranio += `docker cp tmp_${container_name}:/app/.uranio .uranio`;
+        yield _execute_spin_verbose(cmd_cp_uranio, 'docker', `copying .uranio from tmp container tmp_${container_name}`);
+        let cmd_remove = '';
+        cmd_remove += `docker rm tmp_${container_name}`;
+        yield _execute_spin_verbose(cmd_remove, 'docker', `removing tmp container tmp_${container_name}`);
+        output_instance.done_log(`Docker copied files from tmp container tmp_${container_name}`);
+    });
+}
 function docker_unbuild(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
@@ -158,14 +183,18 @@ function docker_create(params, entrypoint) {
         const image_name = _get_image_name();
         let cmd = '';
         cmd += `docker create --network="host"`;
-        cmd += ` -v $(pwd)/src:/app/src`;
-        cmd += ` -v $(pwd)/node_modules:/app/node_modules`;
+        // cmd += ` -u $(id -u \${USER}):$(id -g \${USER})`;
+        cmd += ` -v $(pwd)/src/:/app/src/`;
         cmd += ` -v $(pwd)/.env:/app/.env`;
         cmd += ` -v $(pwd)/package.json:/app/package.json`;
+        cmd += ` -v $(pwd)/node_modules:/app/node_modules`;
+        cmd += ` -v $(pwd)/.uranio:/app/.uranio`;
+        // cmd += ` --mount type=bind,source="$(pwd)/.uranio,target=/app/.uranio"`;
         cmd += ` --name ${container_name}`;
+        // cmd += ` --privileged=true`;
         cmd += ` ${image_name}`;
         if (typeof entrypoint === 'string') {
-            cmd += ` --entrypoint ${entrypoint}`;
+            cmd += ` --entrypoint="${entrypoint}"`;
         }
         yield _execute_log(cmd, 'docker', 'creating');
         output_instance.done_log(`Docker container created ${container_name}`);
