@@ -37,7 +37,7 @@ type DotEnv = {
 	[k:string]: string
 }
 
-import {jsonfile_path} from '../conf/defaults';
+// import {defaults} from '../conf/defaults';
 
 class CMD {
 	
@@ -72,10 +72,10 @@ class CMD {
 	//   }
 	// }
 	
-	public is_initialized()
-			:boolean{
-		return (this.fs.exists(`${this.params.root}/${jsonfile_path}`));
-	}
+	// public is_initialized()
+	//     :boolean{
+	//   return (this.fs.exists(`${this.params.root}/${jsonfile_path}`));
+	// }
 	
 	public async yarn_install()
 			:Promise<any>{

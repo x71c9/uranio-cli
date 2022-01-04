@@ -60,5 +60,7 @@ export const defaults = {
 	wrong_char: '✗',
 } as const;
 
-export const jsonfile_path = `${defaults.folder}/${defaults.json_filename}`;
+// export const jsonfile_path = `${defaults.folder}/${defaults.json_filename}`;
+// export const jsonfile_path = `${defaults.json_filename}`;
+
 

@@ -382,7 +382,7 @@ function _init_params(params:Partial<Params>)
 	
 	util_instance = util.create(docker_params, output_instance);
 	
-	util_instance.must_be_docker_initialized();
+	util_instance.must_be_initialized();
 	
 }
 

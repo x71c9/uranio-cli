@@ -459,10 +459,11 @@ function _create_rc_file() {
     content += `\t"repo": "${init_params.repo}",\n`;
     content += `\t"pacman": "${init_params.pacman}",\n`;
     content += `\t"deploy": "${init_params.deploy}",\n`;
+    content += `\t"docker": "${init_params.docker}",\n`;
     content += `}`;
-    util_instance.fs.write_file(`${init_params.root}/${defaults_1.jsonfile_path}`, content);
-    util_instance.pretty(`${init_params.root}/${defaults_1.jsonfile_path}`, 'json');
-    output_instance.done_log(`Created file ${defaults_1.jsonfile_path}.`, 'rcfl');
+    util_instance.fs.write_file(`${init_params.root}/${defaults_1.defaults.json_filename}`, content);
+    util_instance.pretty(`${init_params.root}/${defaults_1.defaults.json_filename}`, 'json');
+    output_instance.done_log(`Created file ${defaults_1.defaults.json_filename}.`, 'rcfl');
 }
 function _ignore_urn_folder() {
     output_instance.start_loading(`Adding ${defaults_1.defaults.folder} to .gitignore...`);

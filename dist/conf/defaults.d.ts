@@ -29,4 +29,3 @@ export declare const defaults: {
     readonly check_char: "✔";
     readonly wrong_char: "✗";
 };
-export declare const jsonfile_path: string;

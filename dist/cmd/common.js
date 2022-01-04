@@ -14,7 +14,7 @@ const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
 const types_1 = require("../types");
 function read_rc_file(params) {
-    const rcfile_path = `${params.root}/${defaults_1.jsonfile_path}`;
+    const rcfile_path = `${params.root}/${defaults_1.defaults.json_filename}`;
     if (!fs_1.default.existsSync(rcfile_path)) {
         return params;
     }
@@ -25,7 +25,7 @@ function read_rc_file(params) {
         cloned_params.repo = rc_obj.repo;
         cloned_params.pacman = rc_obj.pacman;
         cloned_params.deploy = rc_obj.deploy;
-        // cloned_params.docker = Boolean(rc_obj.docker);
+        cloned_params.docker = Boolean(rc_obj.docker);
         return cloned_params;
     }
     catch (ex) {
