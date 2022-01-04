@@ -56,7 +56,6 @@ const tscw_color = '#734de3';
 const watc_color = '#687a6a';
 function dev(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(params);
         if (params.docker === true) {
             yield (0, docker_1.docker_start)(params);
         }
