@@ -8,7 +8,7 @@ import inquirer from 'inquirer';
 
 import {urn_util} from 'urn-lib';
 
-import {defaults, default_params, jsonfile_path} from '../conf/defaults';
+import {defaults, default_params} from '../conf/defaults';
 
 import * as output from '../output/';
 
@@ -596,10 +596,11 @@ function _create_rc_file(){
 	content += `\t"repo": "${init_params.repo}",\n`;
 	content += `\t"pacman": "${init_params.pacman}",\n`;
 	content += `\t"deploy": "${init_params.deploy}",\n`;
+	content += `\t"docker": "${init_params.docker}",\n`;
 	content += `}`;
-	util_instance.fs.write_file(`${init_params.root}/${jsonfile_path}`, content);
-	util_instance.pretty(`${init_params.root}/${jsonfile_path}`, 'json');
-	output_instance.done_log(`Created file ${jsonfile_path}.`, 'rcfl');
+	util_instance.fs.write_file(`${init_params.root}/${defaults.json_filename}`, content);
+	util_instance.pretty(`${init_params.root}/${defaults.json_filename}`, 'json');
+	output_instance.done_log(`Created file ${defaults.json_filename}.`, 'rcfl');
 }
 
 function _ignore_urn_folder(){

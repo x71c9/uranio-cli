@@ -10,7 +10,7 @@ import {urn_util} from 'urn-lib';
 
 import {Params} from '../types';
 
-import {default_params, jsonfile_path} from '../conf/defaults';
+import {defaults, default_params} from '../conf/defaults';
 
 import {
 	abstract_repos,
@@ -26,7 +26,7 @@ import {
 export function read_rc_file(params:Params):Params;
 export function read_rc_file(params:Partial<Params>):Partial<Params>;
 export function read_rc_file(params:Partial<Params>):Partial<Params>{
-	const rcfile_path = `${params.root}/${jsonfile_path}`;
+	const rcfile_path = `${params.root}/${defaults.json_filename}`;
 	if(!fs.existsSync(rcfile_path)){
 		return params;
 	}
@@ -37,7 +37,7 @@ export function read_rc_file(params:Partial<Params>):Partial<Params>{
 		cloned_params.repo = rc_obj.repo;
 		cloned_params.pacman = rc_obj.pacman;
 		cloned_params.deploy = rc_obj.deploy;
-		// cloned_params.docker = Boolean(rc_obj.docker);
+		cloned_params.docker = Boolean(rc_obj.docker);
 		return cloned_params;
 	}catch(ex){
 		const err = ex as Error;

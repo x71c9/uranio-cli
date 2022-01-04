@@ -16,7 +16,6 @@ declare class CMD {
     fs: fs.FSInstance;
     spawn: spawn.SpawnInstance;
     constructor(params: Params, output: out.OutputInstance);
-    is_initialized(): boolean;
     yarn_install(): Promise<any>;
     install_dep(repo: string, context: string): Promise<any>;
     install_dep_dev(repo: string, context: string): Promise<any>;

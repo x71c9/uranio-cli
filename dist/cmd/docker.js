@@ -300,7 +300,7 @@ function _init_params(params) {
     docker_params = (0, common_1.merge_params)(params);
     output_instance = output.create(docker_params);
     util_instance = util.create(docker_params, output_instance);
-    util_instance.must_be_docker_initialized();
+    util_instance.must_be_initialized();
 }
 // async function _run(args:Arguments):Promise<void>{
 //   const {repo, deploy} = _get_main_args(args);

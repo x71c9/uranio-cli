@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.jsonfile_path = exports.defaults = exports.default_params = void 0;
+exports.defaults = exports.default_params = void 0;
 exports.default_params = {
     force: false,
     verbose: false,
@@ -57,5 +57,6 @@ exports.defaults = {
     check_char: '✔',
     wrong_char: '✗',
 };
-exports.jsonfile_path = `${exports.defaults.folder}/${exports.defaults.json_filename}`;
+// export const jsonfile_path = `${defaults.folder}/${defaults.json_filename}`;
+// export const jsonfile_path = `${defaults.json_filename}`;
 //# sourceMappingURL=defaults.js.map

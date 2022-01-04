@@ -40,7 +40,7 @@ const urn_lib_1 = require("urn-lib");
 // import * as common from '../cmd/common';
 const fs = __importStar(require("./fs"));
 const spawn = __importStar(require("./spawn"));
-const defaults_1 = require("../conf/defaults");
+// import {defaults} from '../conf/defaults';
 class CMD {
     constructor(params, output) {
         this.params = params;
@@ -70,9 +70,10 @@ class CMD {
     //     }
     //   }
     // }
-    is_initialized() {
-        return (this.fs.exists(`${this.params.root}/${defaults_1.jsonfile_path}`));
-    }
+    // public is_initialized()
+    //     :boolean{
+    //   return (this.fs.exists(`${this.params.root}/${jsonfile_path}`));
+    // }
     yarn_install() {
         return __awaiter(this, void 0, void 0, function* () {
             const action = `yarn install`;

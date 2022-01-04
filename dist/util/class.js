@@ -63,7 +63,7 @@ class Util {
         });
     }
     is_initialized() {
-        const is = (this.fs.exists(`${this.params.root}/${defaults_1.jsonfile_path}`));
+        const is = (this.fs.exists(`${this.params.root}/${defaults_1.defaults.json_filename}`));
         if (is) {
             this.output.verbose_log(`Uranio is initialized.`);
         }
@@ -72,16 +72,17 @@ class Util {
         }
         return is;
     }
-    is_docker_initialized() {
-        const is = (this.fs.exists(`${this.params.root}/${defaults_1.defaults.docker_folder}/${defaults_1.defaults.json_filename}`));
-        if (is) {
-            this.output.verbose_log(`Uranio [docker] is initialized.`);
-        }
-        else {
-            this.output.verbose_log(`Uranio [docker] is not initialized.`);
-        }
-        return is;
-    }
+    // public is_docker_initialized(){
+    //   const is = (this.fs.exists(
+    //     `${this.params.root}/${defaults.docker_folder}/${defaults.json_filename}`
+    //   ));
+    //   if(is){
+    //     this.output.verbose_log(`Uranio [docker] is initialized.`);
+    //   }else{
+    //     this.output.verbose_log(`Uranio [docker] is not initialized.`);
+    //   }
+    //   return is;
+    // }
     must_be_initialized() {
         if (!this.is_initialized()) {
             let err_msg = '';
@@ -91,15 +92,15 @@ class Util {
             process.exit(1);
         }
     }
-    must_be_docker_initialized() {
-        if (!this.is_docker_initialized()) {
-            let err_msg = '';
-            err_msg += 'URANIO [docker] must be initialized first.';
-            err_msg += ` Please run \`uranio init\` in order to initialize the repo.`;
-            this.output.wrong_end_log(err_msg);
-            process.exit(1);
-        }
-    }
+    // public must_be_docker_initialized(){
+    //   if(!this.is_docker_initialized()){
+    //     let err_msg = '';
+    //     err_msg += 'URANIO [docker] must be initialized first.';
+    //     err_msg += ` Please run \`uranio init\` in order to initialize the repo.`;
+    //     this.output.wrong_end_log(err_msg);
+    //     process.exit(1);
+    //   }
+    // }
     pretty(filepath, parser = 'typescript') {
         this.output.start_loading(`Prettier [${filepath}]...`);
         const content = this.fs.read_file(filepath, 'utf8');
