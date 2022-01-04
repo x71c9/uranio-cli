@@ -43,7 +43,6 @@ const watc_color = '#687a6a';
 
 export async function dev(params:Partial<Params>)
 		:Promise<void>{
-	console.log(params);
 	if(params.docker === true){
 		
 		await docker_start(params);
