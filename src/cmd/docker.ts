@@ -15,11 +15,11 @@ import {default_params, defaults} from '../conf/defaults';
 import {
 	Params,
 	Arguments,
-	Repo,
-	PacMan,
-	Deploy,
+	// Repo,
+	// PacMan,
+	// Deploy,
 	DB,
-	valid_deploy_repos
+	// valid_deploy_repos
 } from '../types';
 
 let output_instance:output.OutputInstance;
@@ -28,19 +28,19 @@ let util_instance:util.UtilInstance;
 
 import {
 	merge_params,
-	check_repo,
-	check_pacman,
-	check_deploy,
+	// check_repo,
+	// check_pacman,
+	// check_deploy,
 	check_db
 } from './common';
 
 let docker_params = default_params as Params;
 
-type MainArgs = {
-	repo: Repo,
-	deploy: Deploy,
-	pacman: PacMan
-}
+// type MainArgs = {
+//   repo: Repo,
+//   deploy: Deploy,
+//   pacman: PacMan
+// }
 
 // function _get_and_set_main_args(args:Arguments){
 //   const {repo, deploy, pacman} = _get_main_args(args);
@@ -420,38 +420,38 @@ function _init_params(params:Partial<Params>)
 	
 // }
 
-function _get_main_args(args:Arguments):MainArgs{
-	let repo = (args._[2]) as Repo;
-	if(typeof repo === 'undefined' && typeof args.repo === 'string'){
-		repo = args.repo as Repo;
-	}
-	let deploy = (args._[3] || 'express') as Deploy;
-	if(typeof deploy === 'undefined' && typeof args.deploy === 'string'){
-		deploy = args.deploy as Deploy;
-	}
-	let pacman = (args._[4] || 'yarn') as PacMan;
-	if(typeof pacman === 'undefined' && typeof args.pacman === 'string'){
-		pacman = args.pacman as PacMan;
-	}
+// function _get_main_args(args:Arguments):MainArgs{
+//   let repo = (args._[2]) as Repo;
+//   if(typeof repo === 'undefined' && typeof args.repo === 'string'){
+//     repo = args.repo as Repo;
+//   }
+//   let deploy = (args._[3] || 'express') as Deploy;
+//   if(typeof deploy === 'undefined' && typeof args.deploy === 'string'){
+//     deploy = args.deploy as Deploy;
+//   }
+//   let pacman = (args._[4] || 'yarn') as PacMan;
+//   if(typeof pacman === 'undefined' && typeof args.pacman === 'string'){
+//     pacman = args.pacman as PacMan;
+//   }
 	
-	// const branch = (args._[5] || 'master');
+//   // const branch = (args._[5] || 'master');
 	
-	output_instance.log(`Selected repo: ${repo}`, `args`);
-	output_instance.log(`Selected pacman: ${pacman}`, `args`);
-	if(valid_deploy_repos().includes(repo)){
-		output_instance.log(`Selected deploy: ${deploy}`, `args`);
-	}
+//   output_instance.log(`Selected repo: ${repo}`, `args`);
+//   output_instance.log(`Selected pacman: ${pacman}`, `args`);
+//   if(valid_deploy_repos().includes(repo)){
+//     output_instance.log(`Selected deploy: ${deploy}`, `args`);
+//   }
 	
-	check_repo(repo);
-	check_pacman(pacman);
-	check_deploy(deploy);
+//   check_repo(repo);
+//   check_pacman(pacman);
+//   check_deploy(deploy);
 	
-	return {
-		repo,
-		pacman,
-		deploy
-	};
-}
+//   return {
+//     repo,
+//     pacman,
+//     deploy
+//   };
+// }
 
 async function _clone_dot(){
 	output_instance.start_loading(`Cloning dot...`);
