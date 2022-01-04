@@ -10,12 +10,16 @@ Arguments	types.ts	/^export type Arguments = minimist.ParsedArgs;$/;"	t
 BookName	cmd/transpose.ts	/^type BookName = 'atom' | 'dock' | 'bll' | 'routes';$/;"	t
 CMD	util/cmd.ts	/^class CMD {$/;"	c
 CMDInstance	util/cmd.ts	/^export type CMDInstance = InstanceType<typeof CMD>;$/;"	t
+CachedOutput	util/spawn.ts	/^type CachedOutput = {$/;"	t
+DB	types.ts	/^export type DB = keyof typeof abstract_db;$/;"	t
 Deploy	types.ts	/^export type Deploy = keyof typeof abstract_deploy;$/;"	t
+DotEnv	util/cmd.ts	/^type DotEnv = {$/;"	t
 ExpressionList	cmd/transpose.ts	/^type ExpressionList = {$/;"	t
 FS	util/fs.ts	/^class FS {$/;"	c
 FSInstance	util/fs.ts	/^export type FSInstance = InstanceType<typeof FS>;$/;"	t
 FoundSource	cmd/alias.ts	/^type FoundSource = {$/;"	t
 InitParams	cmd/types.ts	/^export type InitParams = Partial<Params> & {$/;"	t
+MainArgs	cmd/docker.ts	/^type MainArgs = {$/;"	t
 ModuleList	cmd/transpose.ts	/^type ModuleList = {$/;"	t
 OnAllCallback	util/types.ts	/^export type OnAllCallback = (event:WatchEvent, path:string) => void;$/;"	t
 OnReadyCallback	util/types.ts	/^export type OnReadyCallback = () => void;$/;"	t
@@ -39,12 +43,14 @@ _add_api_book	cmd/transpose.ts	/^function _add_api_book(book_decl:tsm.VariableDe
 _add_as_const	cmd/transpose.ts	/^function _add_as_const(book_decl:tsm.VariableDeclaration){$/;"	f
 _add_book_from_file	cmd/transpose.ts	/^function _add_book_from_file($/;"	f
 _add_core_books	cmd/transpose.ts	/^function _add_core_books(book_decl:tsm.VariableDeclaration, required_book_name:BookName){$/;"	f
-_add_submodule	cmd/dot.ts	/^async function _add_submodule(origin:string, dest:string, branch:string){$/;"	f
+_add_submodule	cmd/dot.ts	/^async function _add_submodule(repo:Repo, origin:string, dest:string, branch:string){$/;"	f
 _add_trx_book	cmd/transpose.ts	/^function _add_trx_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName){$/;"	f
 _append_required_book	cmd/transpose.ts	/^function _append_required_book(book_decl:tsm.VariableDeclaration, required_book_name:BookName)$/;"	f
 _ask_for_deploy	cmd/init.ts	/^async function _ask_for_deploy(args:Arguments){$/;"	f
+_ask_for_docker	cmd/init.ts	/^async function _ask_for_docker(args:Arguments){$/;"	f
 _ask_for_pacman	cmd/init.ts	/^async function _ask_for_pacman(args:Arguments){$/;"	f
 _ask_for_repo	cmd/init.ts	/^async function _ask_for_repo(args:Arguments){$/;"	f
+_authenticate_hooks	cmd/hooks.ts	/^function _authenticate_hooks(atom_name:string){$/;"	f
 _autoset_is_dot	process.ts	/^function _autoset_is_dot(params:Params, args:Arguments):Params{$/;"	f
 _avoid_import_loop	cmd/transpose.ts	/^function _avoid_import_loop(file_path:string){$/;"	f
 _bold	cmd/info.ts	/^function _bold(str:string){$/;"	f
@@ -55,17 +61,21 @@ _change_to_relative	cmd/alias.ts	/^function _change_to_relative(node:tsm.Node, a
 _change_to_relative_statements	cmd/alias.ts	/^function _change_to_relative_statements(sourceFile:tsm.SourceFile, aliases:Aliases)$/;"	f
 _check_folder	process.ts	/^function _check_folder(folder_path:string){$/;"	f
 _check_if_clean_repo	cmd/dot.ts	/^async function _check_if_clean_repo(){$/;"	f
+_check_if_is_initialized	cmd/info.ts	/^function _check_if_is_initialized(){$/;"	f
 _clean_all_but	cmd/transpose.ts	/^function _clean_all_but(but:string[], var_decl:tsm.VariableDeclaration)$/;"	f
 _clean_chunk	util/spawn.ts	/^function _clean_chunk(chunk:string){$/;"	f
 _clone_adm	cmd/init.ts	/^async function _clone_adm(){$/;"	f
 _clone_api	cmd/init.ts	/^async function _clone_api(){$/;"	f
 _clone_core	cmd/init.ts	/^async function _clone_core(){$/;"	f
+_clone_dot	cmd/docker.ts	/^async function _clone_dot(){$/;"	f
 _clone_dot	cmd/init.ts	/^async function _clone_dot(){$/;"	f
 _clone_repo	cmd/init.ts	/^async function _clone_repo(){$/;"	f
 _clone_repo	util/cmd.ts	/^	private async _clone_repo($/;"	m
 _clone_trx	cmd/init.ts	/^async function _clone_trx(){$/;"	f
+_color_text	output/class.ts	/^	private _color_text(text:string, type:string, color?:string){$/;"	m
 _commit_previous_submodule	cmd/dot.ts	/^async function _commit_previous_submodule(){$/;"	f
 _copy_admin_files	cmd/init.ts	/^function _copy_admin_files(){$/;"	f
+_copy_book	cmd/init.ts	/^function _copy_book(){$/;"	f
 _copy_books_to_dot_src	cmd/transpose.ts	/^function _copy_books_to_dot_src(){$/;"	f
 _copy_core_files	cmd/init.ts	/^function _copy_core_files(){$/;"	f
 _copy_dot_eslint_files	cmd/init.ts	/^function _copy_dot_eslint_files(){$/;"	f
@@ -75,6 +85,7 @@ _copy_express_files	cmd/init.ts	/^function _copy_express_files(){$/;"	f
 _copy_imports	cmd/transpose.ts	/^function _copy_imports(sourceFile:tsm.SourceFile){$/;"	f
 _copy_netlify_files	cmd/init.ts	/^function _copy_netlify_files(){$/;"	f
 _copy_routes_book	cmd/transpose.ts	/^function _copy_routes_book(){$/;"	f
+_copy_sample	cmd/init.ts	/^function _copy_sample(){$/;"	f
 _copy_trx_files	cmd/init.ts	/^function _copy_trx_files(){$/;"	f
 _create_a_book	cmd/transpose.ts	/^function _create_a_book($/;"	f
 _create_a_book_file	cmd/transpose.ts	/^function _create_a_book_file(file_path:string, text:string){$/;"	f
@@ -86,6 +97,7 @@ _create_rc_file	cmd/init.ts	/^function _create_rc_file(){$/;"	f
 _create_routes_book	cmd/transpose.ts	/^function _create_routes_book(sourceFile:tsm.SourceFile, import_statements:string[])$/;"	f
 _create_urn_folder	cmd/init.ts	/^function _create_urn_folder(){$/;"	f
 _deinit	cmd/dot.ts	/^async function _deinit(dest:string){$/;"	f
+_delete_files	cmd/deinit.ts	/^async function _delete_files(){$/;"	f
 _dev_admin_nuxt_express	cmd/dev.ts	/^async function _dev_admin_nuxt_express(){$/;"	f
 _dev_admin_nuxt_netlify	cmd/dev.ts	/^async function _dev_admin_nuxt_netlify(){$/;"	f
 _dev_client	cmd/dev.ts	/^async function _dev_client(){$/;"	f
@@ -94,7 +106,10 @@ _dev_server	cmd/dev.ts	/^async function _dev_server(){$/;"	f
 _dev_trx_client	cmd/dev.ts	/^async function _dev_trx_client(){$/;"	f
 _dev_trx_webpack_express	cmd/dev.ts	/^async function _dev_trx_webpack_express(){$/;"	f
 _dev_trx_webpack_netlify	cmd/dev.ts	/^async function _dev_trx_webpack_netlify(){$/;"	f
+_download_dockerfiles	cmd/docker.ts	/^async function _download_dockerfiles(){$/;"	f
 _execute	cmd/dot.ts	/^async function _execute(cmd:string, context:string, action:string){$/;"	f
+_execute_log	cmd/docker.ts	/^async function _execute_log(cmd:string, context:string, action:string){$/;"	f
+_execute_spin_verbose	cmd/docker.ts	/^async function _execute_spin_verbose(cmd:string, context:string, action:string){$/;"	f
 _fill_empty_docks	cmd/transpose.ts	/^function _fill_empty_docks(sourceFile:tsm.SourceFile){$/;"	f
 _find_atom_book_statement	cmd/transpose.ts	/^function _find_atom_book_statement(sourceFile:tsm.SourceFile)$/;"	f
 _find_book_statement	cmd/transpose.ts	/^function _find_book_statement(sourceFile:tsm.SourceFile, book_name:string)$/;"	f
@@ -109,23 +124,32 @@ _generate_paths_server	cmd/init.ts	/^function _generate_paths_server(repo:Repo, 
 _generate_text	cmd/hooks.ts	/^function _generate_text(){$/;"	f
 _generate_variable_name	cmd/transpose.ts	/^function _generate_variable_name(str:string){$/;"	f
 _get_atom_def_plural	cmd/hooks.ts	/^function _get_atom_def_plural(){$/;"	f
+_get_atom_def_prop	cmd/hooks.ts	/^function _get_atom_def_prop(prop_name:string, type:tsm.SyntaxKind){$/;"	f
 _get_atom_name_from_book	cmd/hooks.ts	/^function _get_atom_name_from_book(book_name:string){$/;"	f
 _get_atom_routes	cmd/hooks.ts	/^function _get_atom_routes(){$/;"	f
 _get_book_atom_def	cmd/hooks.ts	/^function _get_book_atom_def(book_name:string){$/;"	f
 _get_book_atom_def_props	cmd/hooks.ts	/^function _get_book_atom_def_props(book_name:string){$/;"	f
+_get_container_name	cmd/docker.ts	/^function _get_container_name(){$/;"	f
 _get_custom_routes	cmd/hooks.ts	/^function _get_custom_routes(){$/;"	f
+_get_db_container_name	cmd/docker.ts	/^function _get_db_container_name(db:DB){$/;"	f
+_get_image_name	cmd/docker.ts	/^function _get_image_name(){$/;"	f
+_get_main_args	cmd/docker.ts	/^function _get_main_args(args:Arguments):MainArgs{$/;"	f
 _get_parameters_from_url	cmd/hooks.ts	/^function _get_parameters_from_url(url:string){$/;"	f
+_get_project_name	cmd/docker.ts	/^function _get_project_name(){$/;"	f
 _get_project_root	process.ts	/^function _get_project_root()$/;"	f
 _get_required_imports	cmd/transpose.ts	/^function _get_required_imports(import_statements:string[], text:string){$/;"	f
 _get_variable_content	cmd/transpose.ts	/^function _get_variable_content(source:tsm.SourceFile, variable_name:string)$/;"	f
 _go_previous	output/class.ts	/^	private _go_previous(){$/;"	m
+_has_prefix_color	output/class.ts	/^	private _has_prefix_color(text:string):boolean{$/;"	m
 _ignore_urn_folder	cmd/init.ts	/^function _ignore_urn_folder(){$/;"	f
+_info_init	cmd/info.ts	/^function _info_init(params:Params){$/;"	f
 _init_alias	cmd/alias.ts	/^function _init_alias(params:Partial<Params>){$/;"	f
 _init_build	cmd/build.ts	/^function _init_build(params:Partial<Params>)$/;"	f
 _init_dev	cmd/dev.ts	/^function _init_dev(){$/;"	f
 _init_log	process.ts	/^function _init_log(){$/;"	f
 _init_pacman	cmd/init.ts	/^async function _init_pacman(){$/;"	f
 _init_params	cmd/dev.ts	/^function _init_params(params:Partial<Params>)$/;"	f
+_init_params	cmd/docker.ts	/^function _init_params(params:Partial<Params>)$/;"	f
 _init_params	cmd/dot.ts	/^function _init_params(params:Partial<Params>)$/;"	f
 _init_tranpose	cmd/transpose.ts	/^function _init_tranpose(params:Partial<Params>){$/;"	f
 _install_adm_dep	cmd/init.ts	/^async function _install_adm_dep(){$/;"	f
@@ -135,7 +159,9 @@ _install_dep	cmd/init.ts	/^async function _install_dep()$/;"	f
 _install_dependencies	cmd/dot.ts	/^async function _install_dependencies(pacman:PacMan){$/;"	f
 _install_repo	cmd/init.ts	/^async function _install_repo(){$/;"	f
 _install_trx_dep	cmd/init.ts	/^async function _install_trx_dep(){$/;"	f
+_is_auth_atom	cmd/hooks.ts	/^function _is_auth_atom(atom_name:string){$/;"	f
 _is_file_related_to_lambda_function	cmd/dev.ts	/^function _is_file_related_to_lambda_function(_path:string){$/;"	f
+_is_uranio_native	output/class.ts	/^function _is_uranio_native(text:string){$/;"	f
 _keep_only_client_first_level_properties	cmd/transpose.ts	/^function _keep_only_client_first_level_properties(sourceFile:tsm.SourceFile, book_name:BookName, required_props:string[]){$/;"	f
 _keep_only_client_second_level_properties	cmd/transpose.ts	/^function _keep_only_client_second_level_properties(sourceFile:tsm.SourceFile, book_name:BookName, required_props:string[]){$/;"	f
 _log	output/class.ts	/^	private _log(text:string, context='log', out=false){$/;"	m
@@ -145,9 +171,14 @@ _log_root	process.ts	/^function _log_root(){$/;"	f
 _log_to_file	output/class.ts	/^function _log_to_file(text:string)$/;"	f
 _manipulate_and_create_files	cmd/transpose.ts	/^function _manipulate_and_create_files(file_path:string){$/;"	f
 _merge_params	cmd/common.ts	/^function _merge_params(params:Partial<Params>, is_init=false)$/;"	f
+_prefix_color	output/class.ts	/^	private _prefix_color(text:string, color:string){$/;"	m
+_read_color	output/class.ts	/^	private _read_color(text:string):string{$/;"	m
+_remove_color_prefix	output/class.ts	/^function _remove_color_prefix(text:string):string{$/;"	f
 _remove_dock_route_call_implementation	cmd/transpose.ts	/^function _remove_dock_route_call_implementation(sourceFile:tsm.SourceFile){$/;"	f
+_remove_dockers	cmd/deinit.ts	/^async function _remove_dockers()$/;"	f
 _remove_git_files	cmd/init.ts	/^function _remove_git_files(){$/;"	f
 _remove_node_modules_and_lock_files	cmd/dot.ts	/^async function _remove_node_modules_and_lock_files(){$/;"	f
+_remove_tmp	cmd/docker.ts	/^function _remove_tmp(){$/;"	f
 _remove_tmp	cmd/init.ts	/^function _remove_tmp(){$/;"	f
 _remove_type_reference	cmd/transpose.ts	/^function _remove_type_reference(book_decl:tsm.VariableDeclaration){$/;"	f
 _rename_book	cmd/transpose.ts	/^function _rename_book(book_name:BookName, var_decl:tsm.VariableDeclaration)$/;"	f
@@ -160,10 +191,12 @@ _replace_modified_file	cmd/alias.ts	/^function _replace_modified_file(text:strin
 _replace_netlify_function_file	cmd/dev.ts	/^function _replace_netlify_function_file(){$/;"	f
 _replace_root_string	output/class.ts	/^	private _replace_root_string(str:string)$/;"	m
 _replace_uranio_client_dependecy	cmd/transpose.ts	/^function _replace_uranio_client_dependecy(sourceFile:tsm.SourceFile){$/;"	f
+_repo_not_initialized	cmd/info.ts	/^function _repo_not_initialized(){$/;"	f
 _resolve_aliases_in_books	cmd/transpose.ts	/^function _resolve_aliases_in_books(){$/;"	f
 _resolve_path_tree	cmd/transpose.ts	/^function _resolve_path_tree(submodule_name:string){$/;"	f
 _save_to_file	cmd/hooks.ts	/^function _save_to_file(text:string){$/;"	f
 _set_args	process.ts	/^function _set_args(params:Params, args:Arguments)$/;"	f
+_set_root	process.ts	/^function _set_root(args:Arguments){$/;"	f
 _spawn	util/spawn.ts	/^	private _spawn($/;"	m
 _spinner_text_color	output/class.ts	/^	private _spinner_text_color(text?:string):string{$/;"	m
 _switch	cmd/dot.ts	/^async function _switch(args:Arguments):Promise<void>{$/;"	f
@@ -185,20 +218,25 @@ _update_package_aliases	cmd/init.ts	/^function _update_package_aliases(){$/;"	f
 _update_package_scripts	cmd/init.ts	/^function _update_package_scripts(){$/;"	f
 _update_paths	cmd/init.ts	/^function _update_paths(tsconfig_filepath:string, paths:string){$/;"	f
 _update_tsconfig_paths	cmd/init.ts	/^function _update_tsconfig_paths(){$/;"	f
-_uranio_init	cmd/dot.ts	/^async function _uranio_init(){$/;"	f
+_upload_hooks	cmd/hooks.ts	/^function _upload_hooks(){$/;"	f
+_uranio_color	output/class.ts	/^function _uranio_color(text:string){$/;"	f
+_uranio_init	cmd/dot.ts	/^async function _uranio_init(repo:Repo, pacman:PacMan, deploy:Deploy){$/;"	f
 _watch	cmd/dev.ts	/^function _watch(){$/;"	f
 abstract_admin_repos	types.ts	/^export const abstract_admin_repos = {$/;"	v
+abstract_db	types.ts	/^export const abstract_db = {$/;"	v
 abstract_deploy	types.ts	/^export const abstract_deploy = {$/;"	v
 abstract_deploy_repos	types.ts	/^export const abstract_deploy_repos = {$/;"	v
 abstract_hooks_repos	types.ts	/^export const abstract_hooks_repos = {$/;"	v
 abstract_pacman	types.ts	/^export const abstract_pacman = {$/;"	v
 abstract_repos	types.ts	/^export const abstract_repos = {$/;"	v
 alias	cmd/alias.ts	/^export async function alias(params:Partial<Params>, included=false)$/;"	f
+append	util/spawn.ts	/^function append(arr:string[], value:string) {$/;"	f
 build	cmd/build.ts	/^export async function build(params:Params)$/;"	f
 build_client	cmd/build.ts	/^export async function build_client(params:Partial<Params>)$/;"	f
 build_server	cmd/build.ts	/^export async function build_server(params:Partial<Params>)$/;"	f
 chalk	cmd/info.ts	/^import chalk from 'chalk';$/;"	I
 chalk	output/class.ts	/^import chalk from 'chalk';$/;"	I
+check_db	cmd/common.ts	/^export function check_db(db:string)$/;"	f
 check_deploy	cmd/common.ts	/^export function check_deploy(deploy:string)$/;"	f
 check_if_is_dot	cmd/common.ts	/^export function check_if_is_dot(path:string):boolean{$/;"	f
 check_pacman	cmd/common.ts	/^export function check_pacman(pacman:string)$/;"	f
@@ -225,10 +263,24 @@ dateFormat	output/class.ts	/^import dateFormat from 'dateformat';$/;"	I
 debug_log	output/class.ts	/^	public debug_log(text:string, context='dlog', color?:string)$/;"	m
 default_params	conf/defaults.ts	/^export const default_params:Params = {$/;"	v
 defaults	conf/defaults.ts	/^export const defaults = {$/;"	v
+deinit	cmd/deinit.ts	/^export async function deinit(params:Partial<Params>)$/;"	f
 dependency_exists	util/cmd.ts	/^	public dependency_exists(repo:string, package_data?:any)$/;"	m
 dev	cmd/dev.ts	/^export async function dev(params:Partial<Params>):Promise<void>{$/;"	f
 dev_client	cmd/dev.ts	/^export async function dev_client(params:Partial<Params>):Promise<void>{$/;"	f
 dev_server	cmd/dev.ts	/^export async function dev_server(params:Partial<Params>):Promise<void>{$/;"	f
+docker	cmd/docker.ts	/^export async function docker(params:Partial<Params>, args:Arguments)$/;"	f
+docker_build	cmd/docker.ts	/^export async function docker_build(params:Partial<Params>)$/;"	f
+docker_create	cmd/docker.ts	/^export async function docker_create(params:Partial<Params>, entrypoint?:string)$/;"	f
+docker_db_create	cmd/docker.ts	/^export async function docker_db_create(params:Partial<Params>, db:DB)$/;"	f
+docker_db_remove	cmd/docker.ts	/^export async function docker_db_remove(params:Partial<Params>, db:DB)$/;"	f
+docker_db_run	cmd/docker.ts	/^export async function docker_db_run(params:Partial<Params>, db:DB)$/;"	f
+docker_db_start	cmd/docker.ts	/^export async function docker_db_start(params:Partial<Params>, db:DB)$/;"	f
+docker_db_stop	cmd/docker.ts	/^export async function docker_db_stop(params:Partial<Params>, db:DB)$/;"	f
+docker_remove	cmd/docker.ts	/^export async function docker_remove(params:Partial<Params>)$/;"	f
+docker_run	cmd/docker.ts	/^export async function docker_run(params:Partial<Params>, entrypoint?:string)$/;"	f
+docker_start	cmd/docker.ts	/^export async function docker_start(params:Partial<Params>):Promise<void>{$/;"	f
+docker_stop	cmd/docker.ts	/^export async function docker_stop(params:Partial<Params>):Promise<void>{$/;"	f
+docker_unbuild	cmd/docker.ts	/^export async function docker_unbuild(params:Partial<Params>)$/;"	f
 done_log	output/class.ts	/^	public done_log(text:string, context='done')$/;"	m
 done_verbose_log	output/class.ts	/^	public done_verbose_log(text:string, context='vdne')$/;"	m
 dot	cmd/dot.ts	/^export async function dot(params:Partial<Params>, args:Arguments):Promise<void>{$/;"	f
@@ -253,8 +305,6 @@ install_dep	util/cmd.ts	/^	public async install_dep(repo:string, context:string)
 install_dep_dev	util/cmd.ts	/^	public async install_dep_dev(repo:string, context:string)$/;"	m
 is_directory	util/fs.ts	/^	public is_directory(path:string, context?:string){$/;"	m
 is_initialized	util/class.ts	/^	public is_initialized(){$/;"	m
-is_initialized	util/cmd.ts	/^	public is_initialized()$/;"	m
-jsonfile_path	conf/defaults.ts	/^export const jsonfile_path = `${defaults.folder}\/${defaults.json_filename}`;$/;"	v
 log	output/class.ts	/^	public log(text:string, context='log', color?:string)$/;"	m
 log	util/spawn.ts	/^	public log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){$/;"	m
 merge_init_params	cmd/common.ts	/^export function merge_init_params(params:Partial<Params>)$/;"	f
@@ -271,8 +321,10 @@ path	process.ts	/^import path from 'path';$/;"	I
 path	util/fs.ts	/^import path from 'path';$/;"	I
 prettier	util/class.ts	/^import prettier from 'prettier';$/;"	I
 pretty	util/class.ts	/^	public pretty(filepath:string, parser='typescript')$/;"	m
+print_cached_output	util/spawn.ts	/^function print_cached_output(cached:string[], output:out.OutputInstance){$/;"	f
 prompt_init	cmd/init.ts	/^export async function prompt_init(params:Params, args:Arguments)$/;"	f
 read_dir	util/fs.ts	/^	public read_dir(dir_path:string, context='rddi'){$/;"	m
+read_dotenv	util/cmd.ts	/^	public read_dotenv()$/;"	m
 read_file	util/fs.ts	/^	public read_file(file_path:string, encoding?:BufferEncoding, context='rdfl'){$/;"	m
 read_rc_file	cmd/common.ts	/^export function read_rc_file(params:Params):Params;$/;"	f
 read_rc_file	cmd/common.ts	/^export function read_rc_file(params:Partial<Params>):Partial<Params>;$/;"	f
@@ -299,6 +351,7 @@ uninstall_dep	util/cmd.ts	/^	public async uninstall_dep(repo:string, context:str
 uranio_process	process.ts	/^export function uranio_process(args:Arguments)$/;"	f
 valid_admin_repos	types.ts	/^export function valid_admin_repos()$/;"	f
 valid_client_repos	types.ts	/^export function valid_client_repos()$/;"	f
+valid_db	types.ts	/^export function valid_db()$/;"	f
 valid_deploy	types.ts	/^export function valid_deploy()$/;"	f
 valid_deploy_repos	types.ts	/^export function valid_deploy_repos()$/;"	f
 valid_hooks_repos	types.ts	/^export function valid_hooks_repos()$/;"	f

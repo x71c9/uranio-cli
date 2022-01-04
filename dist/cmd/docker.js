@@ -43,43 +43,43 @@ let output_instance;
 let util_instance;
 const common_1 = require("./common");
 let docker_params = defaults_1.default_params;
-function _get_and_set_main_args(args) {
-    const { repo, deploy, pacman } = _get_main_args(args);
-    docker_params.repo = repo;
-    docker_params.deploy = deploy;
-    docker_params.pacman = pacman;
-}
+// function _get_and_set_main_args(args:Arguments){
+//   const {repo, deploy, pacman} = _get_main_args(args);
+//   docker_params.repo = repo;
+//   docker_params.deploy = deploy;
+//   docker_params.pacman = pacman;
+// }
 function docker(params, args) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
         switch (args._[1]) {
             case 'build': {
-                _get_and_set_main_args(args);
+                // _get_and_set_main_args(args);
                 yield docker_build(docker_params);
                 break;
             }
             case 'create': {
-                _get_and_set_main_args(args);
+                // _get_and_set_main_args(args);
                 yield docker_create(docker_params);
                 break;
             }
             case 'start': {
-                _get_and_set_main_args(args);
+                // _get_and_set_main_args(args);
                 yield docker_start(docker_params);
                 break;
             }
             case 'stop': {
-                _get_and_set_main_args(args);
+                // _get_and_set_main_args(args);
                 yield docker_stop(docker_params);
                 break;
             }
             case 'run': {
-                _get_and_set_main_args(args);
+                // _get_and_set_main_args(args);
                 yield docker_run(docker_params);
                 break;
             }
             case 'remove': {
-                _get_and_set_main_args(args);
+                // _get_and_set_main_args(args);
                 yield docker_remove(docker_params);
                 break;
             }

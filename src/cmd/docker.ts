@@ -42,45 +42,46 @@ type MainArgs = {
 	pacman: PacMan
 }
 
-function _get_and_set_main_args(args:Arguments){
-	const {repo, deploy, pacman} = _get_main_args(args);
-	docker_params.repo = repo;
-	docker_params.deploy = deploy;
-	docker_params.pacman = pacman;
-	
-}
-export async function docker(params:Partial<Params>, args:Arguments):Promise<void>{
+// function _get_and_set_main_args(args:Arguments){
+//   const {repo, deploy, pacman} = _get_main_args(args);
+//   docker_params.repo = repo;
+//   docker_params.deploy = deploy;
+//   docker_params.pacman = pacman;
+// }
+
+export async function docker(params:Partial<Params>, args:Arguments)
+		:Promise<void>{
 	
 	_init_params(params);
 	
 	switch(args._[1]){
 		case 'build':{
-			_get_and_set_main_args(args);
+			// _get_and_set_main_args(args);
 			await docker_build(docker_params);
 			break;
 		}
 		case 'create':{
-			_get_and_set_main_args(args);
+			// _get_and_set_main_args(args);
 			await docker_create(docker_params);
 			break;
 		}
 		case 'start':{
-			_get_and_set_main_args(args);
+			// _get_and_set_main_args(args);
 			await docker_start(docker_params);
 			break;
 		}
 		case 'stop':{
-			_get_and_set_main_args(args);
+			// _get_and_set_main_args(args);
 			await docker_stop(docker_params);
 			break;
 		}
 		case 'run':{
-			_get_and_set_main_args(args);
+			// _get_and_set_main_args(args);
 			await docker_run(docker_params);
 			break;
 		}
 		case 'remove':{
-			_get_and_set_main_args(args);
+			// _get_and_set_main_args(args);
 			await docker_remove(docker_params);
 			break;
 		}
