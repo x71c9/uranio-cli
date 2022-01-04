@@ -38,11 +38,15 @@ const urn_lib_1 = require("urn-lib");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const defaults_1 = require("../conf/defaults");
-const types_1 = require("../types");
 let output_instance;
 let util_instance;
 const common_1 = require("./common");
 let docker_params = defaults_1.default_params;
+// type MainArgs = {
+//   repo: Repo,
+//   deploy: Deploy,
+//   pacman: PacMan
+// }
 // function _get_and_set_main_args(args:Arguments){
 //   const {repo, deploy, pacman} = _get_main_args(args);
 //   docker_params.repo = repo;
@@ -323,34 +327,34 @@ function _init_params(params) {
 //   await _execute_spin_verbose(cmd, 'docker', 'building');
 //   output_instance.done_log(`Docker image built ${repo} ${deploy}`);
 // }
-function _get_main_args(args) {
-    let repo = (args._[2]);
-    if (typeof repo === 'undefined' && typeof args.repo === 'string') {
-        repo = args.repo;
-    }
-    let deploy = (args._[3] || 'express');
-    if (typeof deploy === 'undefined' && typeof args.deploy === 'string') {
-        deploy = args.deploy;
-    }
-    let pacman = (args._[4] || 'yarn');
-    if (typeof pacman === 'undefined' && typeof args.pacman === 'string') {
-        pacman = args.pacman;
-    }
-    // const branch = (args._[5] || 'master');
-    output_instance.log(`Selected repo: ${repo}`, `args`);
-    output_instance.log(`Selected pacman: ${pacman}`, `args`);
-    if ((0, types_1.valid_deploy_repos)().includes(repo)) {
-        output_instance.log(`Selected deploy: ${deploy}`, `args`);
-    }
-    (0, common_1.check_repo)(repo);
-    (0, common_1.check_pacman)(pacman);
-    (0, common_1.check_deploy)(deploy);
-    return {
-        repo,
-        pacman,
-        deploy
-    };
-}
+// function _get_main_args(args:Arguments):MainArgs{
+//   let repo = (args._[2]) as Repo;
+//   if(typeof repo === 'undefined' && typeof args.repo === 'string'){
+//     repo = args.repo as Repo;
+//   }
+//   let deploy = (args._[3] || 'express') as Deploy;
+//   if(typeof deploy === 'undefined' && typeof args.deploy === 'string'){
+//     deploy = args.deploy as Deploy;
+//   }
+//   let pacman = (args._[4] || 'yarn') as PacMan;
+//   if(typeof pacman === 'undefined' && typeof args.pacman === 'string'){
+//     pacman = args.pacman as PacMan;
+//   }
+//   // const branch = (args._[5] || 'master');
+//   output_instance.log(`Selected repo: ${repo}`, `args`);
+//   output_instance.log(`Selected pacman: ${pacman}`, `args`);
+//   if(valid_deploy_repos().includes(repo)){
+//     output_instance.log(`Selected deploy: ${deploy}`, `args`);
+//   }
+//   check_repo(repo);
+//   check_pacman(pacman);
+//   check_deploy(deploy);
+//   return {
+//     repo,
+//     pacman,
+//     deploy
+//   };
+// }
 function _clone_dot() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Cloning dot...`);
