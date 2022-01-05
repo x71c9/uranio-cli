@@ -151,6 +151,24 @@ export async function docker_build(params:Partial<Params>)
 	
 }
 
+export async function docker_remove_tmp(params:Partial<Params>, continue_on_fail=false)
+		:Promise<void>{
+	
+	_init_params(params, false);
+	
+	const container_name = _get_container_name();
+	
+	let cmd_rm = '';
+	cmd_rm += `docker rm tmp_${container_name}`;
+	if(continue_on_fail){
+		cmd_rm += ` || true`;
+	}
+	await _execute_spin_verbose(cmd_rm, 'docker', `removing tmp container tmp_${container_name}`);
+	output_instance.done_log(
+		`Docker removed tmp container tmp_${container_name}`
+	);
+}
+
 async function _copy_compiled(){
 	
 	const image_name = _get_image_name();
@@ -178,17 +196,19 @@ async function _copy_compiled(){
 	);
 }
 
-export async function docker_unbuild(params:Partial<Params>)
+export async function docker_unbuild(params:Partial<Params>, continue_on_fail=false)
 		:Promise<void>{
 	
-	_init_params(params);
+	_init_params(params, false);
 	
 	const image_name = _get_image_name();
 	
 	let cmd = '';
 	cmd += `docker image rm`;
 	cmd += ` ${image_name}`;
-	cmd += ` || true`;
+	if(continue_on_fail){
+		cmd += ` || true`;
+	}
 	await _execute_spin_verbose(cmd, 'docker', `removing image ${image_name}`);
 	
 	output_instance.done_log(
@@ -228,16 +248,18 @@ export async function docker_create(params:Partial<Params>, entrypoint?:string)
 	
 }
 
-export async function docker_remove(params:Partial<Params>)
+export async function docker_remove(params:Partial<Params>, continue_on_fail=false)
 		:Promise<void>{
 	
-	_init_params(params);
+	_init_params(params, false);
 	
 	const container_name = _get_container_name();
 	
 	let cmd = '';
-	cmd += `docker container rm ${container_name}`;
-	cmd += ` || true`;
+	cmd += `docker rm ${container_name}`;
+	if(continue_on_fail){
+		cmd += ` || true`;
+	}
 	await _execute_spin_verbose(cmd, 'docker', 'creating');
 	
 	output_instance.done_log(
@@ -262,15 +284,18 @@ export async function docker_start(params:Partial<Params>):Promise<void>{
 	
 }
 
-export async function docker_stop(params:Partial<Params>):Promise<void>{
+export async function docker_stop(params:Partial<Params>, continue_on_fail=false)
+		:Promise<void>{
 	
-	_init_params(params);
+	_init_params(params, false);
 	
 	const container_name = _get_container_name();
 	
 	let cmd = '';
 	cmd += `docker stop ${container_name}`;
-	cmd += ` || true`;
+	if(continue_on_fail){
+		cmd += ` || true`;
+	}
 	await _execute_log(cmd, 'docker', 'stopping');
 	
 	output_instance.done_log(
@@ -334,16 +359,18 @@ export async function docker_db_start(params:Partial<Params>, db:DB)
 	
 }
 
-export async function docker_db_stop(params:Partial<Params>, db:DB)
+export async function docker_db_stop(params:Partial<Params>, db:DB, continue_on_fail=false)
 		:Promise<void>{
 	
-	_init_params(params);
+	_init_params(params, false);
 	
 	const db_container_name = _get_db_container_name(db);
 	
 	let cmd = '';
 	cmd += `docker stop ${db_container_name}`;
-	cmd += ` || true`;
+	if(continue_on_fail){
+		cmd += ` || true`;
+	}
 	await _execute_spin_verbose(cmd, `docker`, `stopping db ${db}`);
 	
 	output_instance.done_log(
@@ -352,16 +379,18 @@ export async function docker_db_stop(params:Partial<Params>, db:DB)
 	
 }
 
-export async function docker_db_remove(params:Partial<Params>, db:DB)
+export async function docker_db_remove(params:Partial<Params>, db:DB, continue_on_fail=false)
 		:Promise<void>{
 	
-	_init_params(params);
+	_init_params(params, false);
 	
 	const db_container_name = _get_db_container_name(db);
 	
 	let cmd = '';
-	cmd += `docker container rm ${db_container_name}`;
-	cmd += ` || true`;
+	cmd += `docker rm ${db_container_name}`;
+	if(continue_on_fail){
+		cmd += ` || true`;
+	}
 	await _execute_spin_verbose(cmd, `docker`, `removing db ${db}`);
 	
 	output_instance.done_log(
@@ -414,7 +443,7 @@ function _get_project_name(){
 	return package_data['name'] || 'uranio-project-001';
 }
 
-function _init_params(params:Partial<Params>)
+function _init_params(params:Partial<Params>, must_be_initialized=true)
 		:void{
 	
 	docker_params = merge_params(params);
@@ -423,7 +452,9 @@ function _init_params(params:Partial<Params>)
 	
 	util_instance = util.create(docker_params, output_instance);
 	
-	util_instance.must_be_initialized();
+	if(must_be_initialized){
+		util_instance.must_be_initialized();
+	}
 	
 }
 
