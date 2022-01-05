@@ -54,6 +54,7 @@ function info(params) {
         console.log(`repo:   ${_bold(info_params.repo)}`);
         console.log(`deploy: ${_bold(info_params.deploy)}`);
         console.log(`pacman: ${_bold(info_params.pacman)}`);
+        console.log(`docker: ${_bold(String(info_params.docker))}`);
         process.exit(0);
     });
 }
@@ -68,10 +69,10 @@ function _repo_not_initialized() {
     process.exit(0);
 }
 function _check_if_is_initialized() {
-    if (!util_instance.fs.exists(`${info_params.root}/${defaults_1.defaults.folder}`)) {
-        _repo_not_initialized();
-    }
-    if (!util_instance.fs.exists(`${info_params.root}/${defaults_1.defaults.folder}/uranio.json`)) {
+    // if(!util_instance.fs.exists(`${info_params.root}/${defaults.folder}`)){
+    //   _repo_not_initialized();
+    // }
+    if (!util_instance.fs.exists(`${info_params.root}/uranio.json`)) {
         _repo_not_initialized();
     }
 }

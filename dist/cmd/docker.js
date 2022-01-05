@@ -128,13 +128,13 @@ function docker_build(params) {
         cmd += ` -t ${image_name}`;
         // cmd += ` -f ${docker_params.root}/${defaults.folder}/.docker/Dockerfile`;
         // cmd += ` -u $(id -u \${USER}):$(id -g \${USER})`;
-        cmd += ` -f ${docker_params.root}/Dockerfile`;
+        cmd += ` -f ${docker_params.root}/${defaults_1.defaults.folder}/${defaults_1.defaults.docker_folder}/Dockerfile`;
         // cmd += ` --build-arg user=$(whoami)`;
         // cmd += ` --build-arg uid=$(id -u \${USER})`;
         // cmd += ` --build-arg gid=$(id -g \${USER})`;
         cmd += ` --build-arg repo=${docker_params.repo}`;
         cmd += ` --build-arg deploy=${docker_params.deploy}`;
-        cmd += ` --build-arg pacman=${docker_params.pacman}`;
+        // cmd += ` --build-arg pacman=${docker_params.pacman}`;
         cmd += ` .`;
         yield _execute_spin_verbose(cmd, 'docker', 'building');
         output_instance.done_log(`Docker image built ${docker_params.repo} ${docker_params.deploy}`);
@@ -155,7 +155,7 @@ function _copy_compiled() {
         cmd_cp_node += `docker cp tmp_${container_name}:/app/node_modules node_modules`;
         yield _execute_spin_verbose(cmd_cp_node, 'docker', `copying node_modules from tmp container tmp_${container_name}`);
         let cmd_cp_uranio = '';
-        cmd_cp_uranio += `docker cp tmp_${container_name}:/app/.uranio .uranio`;
+        cmd_cp_uranio += `docker cp tmp_${container_name}:/app/.uranio/. .uranio/`;
         yield _execute_spin_verbose(cmd_cp_uranio, 'docker', `copying .uranio from tmp container tmp_${container_name}`);
         let cmd_remove = '';
         cmd_remove += `docker rm tmp_${container_name}`;
@@ -187,8 +187,8 @@ function docker_create(params, entrypoint) {
         cmd += ` -v $(pwd)/src/:/app/src/`;
         cmd += ` -v $(pwd)/.env:/app/.env`;
         cmd += ` -v $(pwd)/package.json:/app/package.json`;
-        cmd += ` -v $(pwd)/node_modules:/app/node_modules`;
-        cmd += ` -v $(pwd)/.uranio:/app/.uranio`;
+        cmd += ` -v $(pwd)/node_modules/:/app/node_modules/`;
+        cmd += ` -v $(pwd)/.uranio/:/app/.uranio/`;
         // cmd += ` --mount type=bind,source="$(pwd)/.uranio,target=/app/.uranio"`;
         cmd += ` --name ${container_name}`;
         // cmd += ` --privileged=true`;
@@ -399,8 +399,8 @@ function _clone_dot() {
 function _download_dockerfiles() {
     return __awaiter(this, void 0, void 0, function* () {
         yield _clone_dot();
-        const def_folder = `${docker_params.root}`;
-        const dest_folder = `${def_folder}`;
+        const def_folder = `${docker_params.root}/${defaults_1.defaults.folder}`;
+        const dest_folder = `${def_folder}/${defaults_1.defaults.docker_folder}`;
         if (!util_instance.fs.exists(dest_folder)) {
             util_instance.fs.create_directory(dest_folder, 'docker');
         }

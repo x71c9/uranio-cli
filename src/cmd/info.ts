@@ -8,7 +8,7 @@
 
 import chalk from 'chalk';
 
-import {default_params, defaults} from '../conf/defaults';
+import {default_params} from '../conf/defaults';
 
 import * as output from '../output/';
 
@@ -34,6 +34,7 @@ export async function info(params:Params):Promise<void> {
 	console.log(`repo:   ${_bold(info_params.repo)}`);
 	console.log(`deploy: ${_bold(info_params.deploy)}`);
 	console.log(`pacman: ${_bold(info_params.pacman)}`);
+	console.log(`docker: ${_bold(String(info_params.docker))}`);
 	process.exit(0);
 	
 }
@@ -56,10 +57,10 @@ function _repo_not_initialized(){
 }
 
 function _check_if_is_initialized(){
-	if(!util_instance.fs.exists(`${info_params.root}/${defaults.folder}`)){
-		_repo_not_initialized();
-	}
-	if(!util_instance.fs.exists(`${info_params.root}/${defaults.folder}/uranio.json`)){
+	// if(!util_instance.fs.exists(`${info_params.root}/${defaults.folder}`)){
+	//   _repo_not_initialized();
+	// }
+	if(!util_instance.fs.exists(`${info_params.root}/uranio.json`)){
 		_repo_not_initialized();
 	}
 }
