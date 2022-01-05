@@ -58,6 +58,7 @@ export async function init(params:Partial<Params>)
 	_log_important_params();
 	_ignore_urn_folder();
 	_create_rc_file();
+	_create_urn_folder();
 	
 	if(init_params.docker === true){
 		
@@ -67,7 +68,6 @@ export async function init(params:Partial<Params>)
 		
 	}else{
 		
-		_create_urn_folder();
 		await _init_pacman();
 		_update_package_aliases();
 		_update_package_scripts();

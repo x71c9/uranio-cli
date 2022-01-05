@@ -59,13 +59,13 @@ function init(params) {
         _log_important_params();
         _ignore_urn_folder();
         _create_rc_file();
+        _create_urn_folder();
         if (init_params.docker === true) {
             // _create_docker_folder();
             // _create_docker_rc_file();
             yield (0, docker_1.docker_build)(init_params);
         }
         else {
-            _create_urn_folder();
             yield _init_pacman();
             _update_package_aliases();
             _update_package_scripts();
