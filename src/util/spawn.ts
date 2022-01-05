@@ -156,7 +156,9 @@ class Spawn {
 					return (resolve) ? resolve(true) : true;
 				}
 				default:{
-					print_cached_output(child_outputs[child.pid || 'pid0'], this.output);
+					if(code !== null){
+						print_cached_output(child_outputs[child.pid || 'pid0'], this.output);
+					}
 					this.output.error_log(`Error on: ${command}`, context);
 					this.output.error_log(`Child process exited with code ${code}`, context);
 					// return (reject) ? reject() : false;

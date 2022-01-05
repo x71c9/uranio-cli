@@ -33,7 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.docker_run = exports.docker_db_remove = exports.docker_db_stop = exports.docker_db_start = exports.docker_db_create = exports.docker_db_run = exports.docker_stop = exports.docker_start = exports.docker_remove = exports.docker_create = exports.docker_unbuild = exports.docker_build = exports.docker = void 0;
+exports.docker_run = exports.docker_db_remove = exports.docker_db_stop = exports.docker_db_start = exports.docker_db_create = exports.docker_db_run = exports.docker_stop = exports.docker_start = exports.docker_remove = exports.docker_create = exports.docker_unbuild = exports.docker_remove_tmp = exports.docker_build = exports.docker = void 0;
 const urn_lib_1 = require("urn-lib");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
@@ -143,6 +143,20 @@ function docker_build(params) {
     });
 }
 exports.docker_build = docker_build;
+function docker_remove_tmp(params, continue_on_fail = false) {
+    return __awaiter(this, void 0, void 0, function* () {
+        _init_params(params, false);
+        const container_name = _get_container_name();
+        let cmd_rm = '';
+        cmd_rm += `docker rm tmp_${container_name}`;
+        if (continue_on_fail) {
+            cmd_rm += ` || true`;
+        }
+        yield _execute_spin_verbose(cmd_rm, 'docker', `removing tmp container tmp_${container_name}`);
+        output_instance.done_log(`Docker removed tmp container tmp_${container_name}`);
+    });
+}
+exports.docker_remove_tmp = docker_remove_tmp;
 function _copy_compiled() {
     return __awaiter(this, void 0, void 0, function* () {
         const image_name = _get_image_name();
@@ -163,14 +177,16 @@ function _copy_compiled() {
         output_instance.done_log(`Docker copied files from tmp container tmp_${container_name}`);
     });
 }
-function docker_unbuild(params) {
+function docker_unbuild(params, continue_on_fail = false) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_params(params);
+        _init_params(params, false);
         const image_name = _get_image_name();
         let cmd = '';
         cmd += `docker image rm`;
         cmd += ` ${image_name}`;
-        cmd += ` || true`;
+        if (continue_on_fail) {
+            cmd += ` || true`;
+        }
         yield _execute_spin_verbose(cmd, 'docker', `removing image ${image_name}`);
         output_instance.done_log(`Docker image removed ${image_name}`);
     });
@@ -201,13 +217,15 @@ function docker_create(params, entrypoint) {
     });
 }
 exports.docker_create = docker_create;
-function docker_remove(params) {
+function docker_remove(params, continue_on_fail = false) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_params(params);
+        _init_params(params, false);
         const container_name = _get_container_name();
         let cmd = '';
-        cmd += `docker container rm ${container_name}`;
-        cmd += ` || true`;
+        cmd += `docker rm ${container_name}`;
+        if (continue_on_fail) {
+            cmd += ` || true`;
+        }
         yield _execute_spin_verbose(cmd, 'docker', 'creating');
         output_instance.done_log(`Docker container removed ${container_name}`);
     });
@@ -224,13 +242,15 @@ function docker_start(params) {
     });
 }
 exports.docker_start = docker_start;
-function docker_stop(params) {
+function docker_stop(params, continue_on_fail = false) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_params(params);
+        _init_params(params, false);
         const container_name = _get_container_name();
         let cmd = '';
         cmd += `docker stop ${container_name}`;
-        cmd += ` || true`;
+        if (continue_on_fail) {
+            cmd += ` || true`;
+        }
         yield _execute_log(cmd, 'docker', 'stopping');
         output_instance.done_log(`Docker image stopped ${docker_params.repo} ${docker_params.deploy}`);
     });
@@ -273,25 +293,29 @@ function docker_db_start(params, db) {
     });
 }
 exports.docker_db_start = docker_db_start;
-function docker_db_stop(params, db) {
+function docker_db_stop(params, db, continue_on_fail = false) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_params(params);
+        _init_params(params, false);
         const db_container_name = _get_db_container_name(db);
         let cmd = '';
         cmd += `docker stop ${db_container_name}`;
-        cmd += ` || true`;
+        if (continue_on_fail) {
+            cmd += ` || true`;
+        }
         yield _execute_spin_verbose(cmd, `docker`, `stopping db ${db}`);
         output_instance.done_log(`Docker db container stopped ${db_container_name}`);
     });
 }
 exports.docker_db_stop = docker_db_stop;
-function docker_db_remove(params, db) {
+function docker_db_remove(params, db, continue_on_fail = false) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_params(params);
+        _init_params(params, false);
         const db_container_name = _get_db_container_name(db);
         let cmd = '';
-        cmd += `docker container rm ${db_container_name}`;
-        cmd += ` || true`;
+        cmd += `docker rm ${db_container_name}`;
+        if (continue_on_fail) {
+            cmd += ` || true`;
+        }
         yield _execute_spin_verbose(cmd, `docker`, `removing db ${db}`);
         output_instance.done_log(`Docker db container removed ${db_container_name}`);
     });
@@ -332,11 +356,13 @@ function _get_project_name() {
     const package_data = urn_lib_1.urn_util.json.clean_parse(data);
     return package_data['name'] || 'uranio-project-001';
 }
-function _init_params(params) {
+function _init_params(params, must_be_initialized = true) {
     docker_params = (0, common_1.merge_params)(params);
     output_instance = output.create(docker_params);
     util_instance = util.create(docker_params, output_instance);
-    util_instance.must_be_initialized();
+    if (must_be_initialized) {
+        util_instance.must_be_initialized();
+    }
 }
 // async function _run(args:Arguments):Promise<void>{
 //   const {repo, deploy} = _get_main_args(args);
