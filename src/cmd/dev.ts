@@ -6,6 +6,8 @@
 
 import path from 'path';
 
+import * as esbuild from 'esbuild';
+
 import * as output from '../output/';
 
 import * as util from '../util/';
@@ -102,15 +104,26 @@ async function _dev_server(){
 		
 		const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
 		
+		// const es_cmd = `${cd_cmd} && npx esbuild src/index.ts --bundle --tsconfig=tsconfig.json --outfile=../../dist/server/index.js --platform=node --watch`;
+		
 		// const dotenv_var = `DOTENV_CONFIG_PATH=${dev_params.root}/.env`;
 		const dotenv_part = ` -r dotenv/config`;
 		const dotenv_after = ` dotenv_config_path=${dev_params.root}/.env`;
 		const source_part = ` -r source-map-support/register`;
 		const urn_lib_pre = ` urn_log_prefix_type=true`;
 		
-		const ts_cmd = `npx tsc-watch --onSuccess "node${dotenv_part}${source_part} ../../dist/server/index.js${dotenv_after}${urn_lib_pre}"`;
-		const cmd = `${cd_cmd} && ${ts_cmd}`;
-		util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
+		// const ts_cmd = `npx tsc-watch --onSuccess "node${dotenv_part}${source_part} ../../dist/server/index.js${dotenv_after}${urn_lib_pre}"`;
+		
+		const node_cmd = `cd ${dev_params.root}/dist/server/ && npx nodemon --watch index.js -e ts ${dotenv_part}${source_part} index.js${dotenv_after}${urn_lib_pre}`;
+		
+		// const cmd = `${cd_cmd} && ${ts_cmd}`;
+		// util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
+		
+		const tsc_cmd = `${cd_cmd} && npx tsc -w`;
+		
+		util_instance.spawn.log(node_cmd, 'nodemon', 'developing server', tscw_color);
+		// util_instance.spawn.log(es_cmd, 'esbuild', 'developing server', tscw_color);
+		util_instance.spawn.log(tsc_cmd, 'tscwatch', 'developing server', tscw_color);
 		
 	}
 }
@@ -287,6 +300,15 @@ function _watch(){
 			if(dev_params.deploy === 'netlify' && _is_file_related_to_lambda_function(_path)){
 				_replace_netlify_function_file();
 			}
+			
+			esbuild.buildSync({
+				entryPoints: [`${dev_params.root}/${defaults.folder}/server/src/index.ts`],
+				outfile: `${dev_params.root}/dist/server/index.js`,
+				bundle: true,
+				platform: 'node',
+				sourcemap: true,
+				minify: true
+			});
 			
 		}
 	);
