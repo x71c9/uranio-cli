@@ -56,10 +56,10 @@ function deinit(params) {
 exports.deinit = deinit;
 function _remove_dockers() {
     return __awaiter(this, void 0, void 0, function* () {
-        const dotenv = util_instance.cmd.read_dotenv();
+        // const dotenv = util_instance.cmd.read_dotenv();
         yield (0, docker_1.docker_remove_tmp)(deinit_params, true);
-        yield (0, docker_1.docker_db_stop)(deinit_params, dotenv.URN_DB_TYPE, true);
-        yield (0, docker_1.docker_db_remove)(deinit_params, dotenv.URN_DB_TYPE, true);
+        // await docker_db_stop(deinit_params, dotenv.URN_DB_TYPE as DB, true);
+        // await docker_db_remove(deinit_params, dotenv.URN_DB_TYPE as DB, true);
         yield (0, docker_1.docker_stop)(deinit_params, true);
         yield (0, docker_1.docker_remove)(deinit_params, true);
         yield (0, docker_1.docker_unbuild)(deinit_params, true);
@@ -69,8 +69,9 @@ function _delete_files() {
     return __awaiter(this, void 0, void 0, function* () {
         // util_instance.fs.remove_directory(`${deinit_params.root}/${defaults.folder}`);
         // util_instance.fs.remove_file(`${deinit_params.root}/.urnlog`);
-        util_instance.fs.remove_directory(`${deinit_params.root}/dist/server`);
-        util_instance.fs.remove_directory(`${deinit_params.root}/dist/client`);
+        // util_instance.fs.remove_directory(`${deinit_params.root}/dist/server`);
+        // util_instance.fs.remove_directory(`${deinit_params.root}/dist/client`);
+        util_instance.fs.remove_directory(`${deinit_params.root}/dist`);
         util_instance.fs.remove_directory(`${deinit_params.root}/${defaults_1.defaults.folder}`);
         util_instance.fs.remove_file(`${deinit_params.root}/${defaults_1.defaults.json_filename}`);
         util_instance.fs.remove_directory(`${deinit_params.root}/node_modules`);

@@ -61,8 +61,6 @@ function init(params) {
         _create_rc_file();
         _create_urn_folder();
         if (init_params.docker === true) {
-            // _create_docker_folder();
-            // _create_docker_rc_file();
             yield (0, docker_1.docker_build)(init_params);
         }
         else {
@@ -149,6 +147,33 @@ function _ask_for_pacman(args) {
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
                 (0, common_1.check_pacman)(answers.pacman);
                 init_params.pacman = answers.pacman;
+                yield _ask_for_docker(args);
+            }));
+        }
+        else {
+            yield _ask_for_docker(args);
+        }
+    });
+}
+function _ask_for_docker(args) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const docker = args.k || args.docker;
+        if (!docker && init_params.force === false) {
+            let confirm_msg = '';
+            confirm_msg += `? Do you want to compile and run inside a docker container?\n`;
+            const suffix = `? Docker need to be installed on your system.`;
+            inquirer_1.default.
+                prompt([
+                {
+                    type: 'confirm',
+                    name: 'docker',
+                    message: confirm_msg,
+                    suffix: suffix
+                }
+            ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
+                if (answers.docker === true) {
+                    init_params.docker = true;
+                }
                 yield _ask_for_repo(args);
             }));
         }
@@ -202,33 +227,6 @@ function _ask_for_deploy(args) {
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
                 (0, common_1.check_deploy)(answers.deploy);
                 init_params.deploy = answers.deploy;
-                yield _ask_for_docker(args);
-            }));
-        }
-        else {
-            yield _ask_for_docker(args);
-        }
-    });
-}
-function _ask_for_docker(args) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const docker = args.k || args.docker;
-        if (!docker && init_params.force === false) {
-            let confirm_msg = '';
-            confirm_msg += `? Do you want to compile and run inside a docker container?\n`;
-            const suffix = `? Docker need to be installed on your system.`;
-            inquirer_1.default.
-                prompt([
-                {
-                    type: 'confirm',
-                    name: 'docker',
-                    message: confirm_msg,
-                    suffix: suffix
-                }
-            ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
-                if (answers.docker === true) {
-                    init_params.docker = true;
-                }
                 yield init(init_params);
             }));
         }
@@ -495,18 +493,6 @@ function _create_urn_folder() {
     util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}`, 'init');
     output_instance.done_log(`Created folder ${defaults_1.defaults.folder}.`, 'init');
 }
-// function _create_docker_folder(){
-//   output_instance.start_loading(`Creating ${defaults.docker_folder} folder...`);
-//   util_instance.fs.remove_directory(
-//     `${init_params.root}/${defaults.docker_folder}`,
-//     'init'
-//   );
-//   util_instance.fs.create_directory(
-//     `${init_params.root}/${defaults.docker_folder}`,
-//     'init'
-//   );
-//   output_instance.done_log(`Created folder ${defaults.docker_folder}.`, 'init');
-// }
 function _update_package_scripts() {
     output_instance.start_loading('Updating scripts...');
     const package_json_path = `${init_params.root}/package.json`;

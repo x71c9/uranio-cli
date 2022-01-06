@@ -113,6 +113,13 @@ function _dev_server() {
             util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
         }
         else { // this is valid also if the repo is core.
+            _esbuild_server();
+            // if(!util_instance.fs.exists(`${dev_params.root}/dist`)){
+            //   util_instance.fs.create_directory(`${dev_params.root}/dist`);
+            // }
+            // if(!util_instance.fs.exists(`${dev_params.root}/dist/server`)){
+            //   util_instance.fs.create_directory(`${dev_params.root}/dist/server`);
+            // }
             const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/server`;
             // const es_cmd = `${cd_cmd} && npx esbuild src/index.ts --bundle --tsconfig=tsconfig.json --outfile=../../dist/server/index.js --platform=node --watch`;
             // const dotenv_var = `DOTENV_CONFIG_PATH=${dev_params.root}/.env`;
@@ -156,6 +163,10 @@ function _dev_trx_client() {
 }
 function _dev_trx_webpack_express() {
     return __awaiter(this, void 0, void 0, function* () {
+        if (!util_instance.fs.exists(`${dev_params.root}/dist/client`)) {
+            util_instance.fs.create_directory(`${dev_params.root}/dist/client`);
+        }
+        util_instance.fs.copy_file(`${dev_params.root}/${defaults_1.defaults.folder}/client/src/index.html`, `${dev_params.root}/dist/client/index.html`);
         const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/client`;
         const nu_cmd = `npx webpack serve --open`;
         const cmd = `${cd_cmd} && ${nu_cmd}`;
@@ -214,13 +225,17 @@ function _watch() {
         output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
         watch_src_scanned = true;
     }, (_event, _path) => {
-        if (dev_params.is_dot === true && _path === `${dev_params.root}/src/books`) {
+        if (dev_params.is_dot === true && _path.indexOf(`${dev_params.root}/src/books`) === 0) {
             return false;
         }
         const basename = path_1.default.basename(_path);
         const extension = path_1.default.extname(basename);
-        const not_valid_extensions = ['.swp', '.swo'];
-        if (not_valid_extensions.includes(extension)) {
+        // const not_valid_extensions = ['.swp', '.swo'];
+        // if(not_valid_extensions.includes(extension)){
+        //   return false;
+        // }
+        const valid_extensions = ['.ts'];
+        if (!valid_extensions.includes(extension)) {
             return false;
         }
         output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
@@ -268,17 +283,12 @@ function _watch() {
             }
             output_instance.done_log(`[src watch] Transposed [${_path}].`, 'wtch');
         }
-        if (dev_params.deploy === 'netlify' && _is_file_related_to_lambda_function(_path)) {
+        if ((0, types_1.valid_deploy_repos)().includes(dev_params.repo)
+            && dev_params.deploy === 'netlify'
+            && _is_file_related_to_lambda_function(_path)) {
             _replace_netlify_function_file();
         }
-        esbuild.buildSync({
-            entryPoints: [`${dev_params.root}/${defaults_1.defaults.folder}/server/src/index.ts`],
-            outfile: `${dev_params.root}/dist/server/index.js`,
-            bundle: true,
-            platform: 'node',
-            sourcemap: true,
-            minify: true
-        });
+        _esbuild_server();
     });
     // const lib_path = `${base_path}/server/src/${defaults.repo_folder}/`;
     // output_instance.log(`Watching uranio repo folder [${lib_path}] ...`, 'wtch');
@@ -311,6 +321,16 @@ function _watch() {
     //     _replace_netlify_function_file();
     //   }
     // );
+}
+function _esbuild_server() {
+    esbuild.buildSync({
+        entryPoints: [`${dev_params.root}/${defaults_1.defaults.folder}/server/src/index.ts`],
+        outfile: `${dev_params.root}/dist/server/index.js`,
+        bundle: true,
+        platform: 'node',
+        sourcemap: true,
+        minify: true
+    });
 }
 function _is_file_related_to_lambda_function(_path) {
     if ((0, types_1.valid_admin_repos)().includes(dev_params.repo)
