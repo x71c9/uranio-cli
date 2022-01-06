@@ -56,7 +56,10 @@ export function uranio_process(args:Arguments)
 	
 	process_params.spin = true;
 	
-	_set_root(args);
+	if(!_cmd_that_do_not_need_root(args)){
+		_set_root(args);
+	}
+	
 	
 	process_params = read_rc_file(process_params);
 	
@@ -73,6 +76,23 @@ export function uranio_process(args:Arguments)
 	
 	_switch_command(args);
 	
+}
+
+function _cmd_that_do_not_need_root(args:Arguments){
+	const full_cmd = args._[0] || '';
+	const splitted_cmd = full_cmd.split(':');
+	let cmd = splitted_cmd[0];
+	if (args.version || args.V) {
+		cmd = 'version';
+	}
+	if (args.help || args.h) {
+		cmd = 'help';
+	}
+	const no_root_cmd = ['', 'help', 'version'];
+	if(no_root_cmd.includes(cmd)){
+		return true;
+	}
+	return false;
 }
 
 function _set_root(args:Arguments){
@@ -449,6 +469,21 @@ function _check_folder(folder_path:string){
 	return false;
 }
 
+function _return_version(){
+	if(!process.mainModule || typeof process.mainModule.path !== 'string'){
+		output_instance.error_log(`Invalid mainModule.path [${process.mainModule?.path}].`);
+		process.exit(1);
+	}
+	const data = util_instance.fs.read_file(process.mainModule.path + `/../package.json`);
+	const json_data = urn_util.json.clean_parse(data);
+	const version = json_data.version;
+	if(typeof version !== 'string' || version === ''){
+		output_instance.error_log(`Invalid package.json version.`);
+		process.exit(1);
+	}
+	return version;
+}
+
 function _switch_command(args:Arguments){
 	const full_cmd = args._[0] || '';
 	const splitted_cmd = full_cmd.split(':');
@@ -463,7 +498,7 @@ function _switch_command(args:Arguments){
 		case '':
 		case 'version':{
 			output_instance.stop_loading();
-			output_instance.log('v0.0.1');
+			output_instance.log(_return_version());
 			break;
 		}
 		case 'init':{

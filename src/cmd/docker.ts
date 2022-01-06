@@ -225,8 +225,12 @@ export async function docker_create(params:Partial<Params>, entrypoint?:string)
 	const container_name = _get_container_name();
 	const image_name = _get_image_name();
 	
+	const port_server = 7777;
+	const port_client = 3333;
+	
 	let cmd = '';
-	cmd += `docker create --network="host"`;
+	// cmd += `docker create --network="host"`;
+	cmd += `docker create -p ${port_server}:${port_server} -p ${port_client}:${port_client}`;
 	// cmd += ` -u $(id -u \${USER}):$(id -g \${USER})`;
 	cmd += ` -v $(pwd)/src/:/app/src/`;
 	cmd += ` -v $(pwd)/.env:/app/.env`;
@@ -311,9 +315,12 @@ export async function docker_db_run(params:Partial<Params>, db:DB)
 	
 	const db_container_name = _get_db_container_name(db);
 	
+	const port = 27017;
+	
 	let cmd = '';
 	cmd += `docker run --rm -i --name ${db_container_name}`;
-	cmd += ` -v ~/mongo/data:/data/db --network="host"`;
+	// cmd += ` -v ~/mongo/data:/data/db --network="host"`;
+	cmd += ` -v ~/mongo/data:/data/db -p ${port}:${port}`;
 	cmd += ` mongo:5`;
 	await _execute_log(cmd, 'docker db', 'running db');
 	
@@ -330,9 +337,12 @@ export async function docker_db_create(params:Partial<Params>, db:DB)
 	
 	const db_container_name = _get_db_container_name(db);
 	
+	const port = 27017;
+	
 	let cmd = '';
 	cmd += `docker create --name ${db_container_name}`;
-	cmd += ` -v ~/mongo/data:/data/db --network="host"`;
+	// cmd += ` -v ~/mongo/data:/data/db --network="host"`;
+	cmd += ` -v ~/mongo/data:/data/db -p ${port}:${port}`;
 	cmd += ` mongo:5`;
 	await _execute_spin_verbose(cmd, `docker`, `creating db ${db}`);
 	

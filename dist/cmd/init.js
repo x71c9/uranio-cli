@@ -561,12 +561,6 @@ function _update_package_aliases() {
         output_instance.error_log(`Cannot parse ${package_json_path}.`, 'alias');
     }
 }
-// function _copy_dot_src_folder(){
-//   const dot_src_folder =
-//     `${init_params.root}/${defaults.tmp_folder}/urn-dot/src`;
-//   const dest = `${init_params.root}/src`;
-//   util_instance.fs.copy_directory(dot_src_folder, dest, 'dot');
-// }
 function _copy_book() {
     const book_file = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-dot/assets/book.txt`;
     const dest = `${init_params.root}/src/book.ts`;
@@ -577,9 +571,7 @@ function _copy_book() {
 function _copy_sample() {
     const sample_file = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-dot/sample.env`;
     const dest = `${init_params.root}/sample.env`;
-    // if(!util_instance.fs.exists(dest)){
     util_instance.fs.copy_file(sample_file, dest, 'book');
-    // }
 }
 function _copy_dot_tsconfigs() {
     const dot_tsc_file = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-dot/tsconfig.json`;
@@ -616,13 +608,8 @@ function _copy_netlify_files() {
     util_instance.fs.copy_file(functions_file, functions_dest, 'dot');
 }
 function _copy_admin_files() {
-    // const dot_client_folder =
-    //   `${init_params.root}/${defaults.tmp_folder}/urn-dot/${defaults.folder}/client`;
-    // const nuxt_config_file = `${dot_client_folder}/nuxt.config.js`;
-    // const nuxt_config_dest = `${init_params.root}/${defaults.folder}/client/nuxt.config.js`;
-    // util_instance.fs.copy_file(nuxt_config_file, nuxt_config_dest, 'adm');
     const dot_files_folder = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-dot/assets/`;
-    const nuxt_config_file = `${dot_files_folder}/client/nuxt.config.js`;
+    const nuxt_config_file = `${dot_files_folder}/client/nuxt.config.${init_params.deploy}.js`;
     const nuxt_config_dest = `${init_params.root}/${defaults_1.defaults.folder}/client/nuxt.config.js`;
     util_instance.fs.copy_file(nuxt_config_file, nuxt_config_dest, 'adm');
 }
@@ -633,8 +620,12 @@ function _copy_express_files() {
         util_instance.fs.create_directory(src_folder);
     }
     const index_file = `${dot_deploy_folder}/express/index.txt`;
-    const index_dest = `${src_folder}/express.ts`;
-    util_instance.fs.copy_file(index_file, index_dest, 'xprs');
+    const exp_dest = `${src_folder}/express.ts`;
+    util_instance.fs.copy_file(index_file, exp_dest, 'xprs');
+    const index_dest = `${src_folder}/index.ts`;
+    if (!util_instance.fs.exists(index_dest)) {
+        util_instance.fs.copy_file(index_file, index_dest, 'xprs');
+    }
 }
 function _copy_trx_files() {
     const trx_asset_dir = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-dot/assets/trx`;
@@ -663,8 +654,12 @@ function _copy_core_files() {
         util_instance.fs.create_directory(src_folder);
     }
     const index_file = `${core_assets_dir}/index.txt`;
-    const index_dest = `${src_folder}/core.ts`;
-    util_instance.fs.copy_file(index_file, index_dest, 'core');
+    const index_dest = `${src_folder}/index.ts`;
+    const core_dest = `${src_folder}/core.ts`;
+    util_instance.fs.copy_file(index_file, core_dest, 'core');
+    if (!util_instance.fs.exists(index_dest)) {
+        util_instance.fs.copy_file(index_file, index_dest, 'core');
+    }
 }
 function _clone_core() {
     return __awaiter(this, void 0, void 0, function* () {

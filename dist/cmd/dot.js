@@ -145,9 +145,12 @@ function _check_if_clean_repo() {
 }
 function _commit_previous_submodule() {
     return __awaiter(this, void 0, void 0, function* () {
-        yield _execute('git add .', 'git', 'add');
-        yield _execute(`git commit -m "[updated submodule of previous repo ${dot_params.repo}]"`, 'git', 'commit');
-        output_instance.done_log(`Commited previous repo ${dot_params.repo}.`);
+        const output = child_process_1.default.execSync(`git status --porcelain`).toString();
+        if (output !== '') {
+            yield _execute('git add .', 'git', 'add');
+            yield _execute(`git commit -m "[updated submodule of previous repo ${dot_params.repo}]"`, 'git', 'commit');
+            output_instance.done_log(`Commited previous repo ${dot_params.repo}.`);
+        }
     });
 }
 function _install_dependencies(pacman) {

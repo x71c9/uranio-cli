@@ -118,6 +118,13 @@ function _replace_aliases_client(aliases:Aliases){
 function _traverse_ts_aliases(directory:string, aliases:Aliases) {
 	util_instance.fs.read_dir(directory).forEach((filename) => {
 		const full_path = path.resolve(directory, filename);
+		const def_folder = `${alias_params.root}/${defaults.folder}`;
+		if(full_path.indexOf(`${def_folder}/server/src/uranio/nuxt/static/`) !== -1){
+			return false;
+		}
+		if(full_path.indexOf(`${def_folder}/client/src/uranio/nuxt/static/`) !== -1){
+			return false;
+		}
 		if (util_instance.fs.is_directory(full_path) && filename != '.git') {
 			return _traverse_ts_aliases(full_path, aliases);
 		}else if(filename.split('.').pop() === 'ts'){
