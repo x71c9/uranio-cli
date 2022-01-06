@@ -52,7 +52,7 @@ let docker_params = default_params as Params;
 export async function docker(params:Partial<Params>, args:Arguments)
 		:Promise<void>{
 	
-	_init_params(params);
+	_init_params(params, false);
 	
 	switch(args._[1]){
 		case 'build':{
@@ -307,7 +307,7 @@ export async function docker_stop(params:Partial<Params>, continue_on_fail=false
 export async function docker_db_run(params:Partial<Params>, db:DB)
 		:Promise<void>{
 	
-	_init_params(params);
+	_init_params(params, false);
 	
 	const db_container_name = _get_db_container_name(db);
 	
@@ -326,7 +326,7 @@ export async function docker_db_run(params:Partial<Params>, db:DB)
 export async function docker_db_create(params:Partial<Params>, db:DB)
 		:Promise<void>{
 	
-	_init_params(params);
+	_init_params(params, false);
 	
 	const db_container_name = _get_db_container_name(db);
 	
@@ -345,7 +345,7 @@ export async function docker_db_create(params:Partial<Params>, db:DB)
 export async function docker_db_start(params:Partial<Params>, db:DB)
 		:Promise<void>{
 	
-	_init_params(params);
+	_init_params(params, false);
 	
 	const db_container_name = _get_db_container_name(db);
 	

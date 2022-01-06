@@ -14,7 +14,7 @@ import * as output from '../output/';
 
 import * as util from '../util/';
 
-import { Params } from '../types';
+import { Params, valid_deploy_repos } from '../types';
 
 import {merge_params} from './common';
 
@@ -32,7 +32,9 @@ export async function info(params:Params):Promise<void> {
 	
 	console.log(`root:   ${_bold(info_params.root)}`);
 	console.log(`repo:   ${_bold(info_params.repo)}`);
-	console.log(`deploy: ${_bold(info_params.deploy)}`);
+	if(valid_deploy_repos().includes(info_params.repo)){
+		console.log(`deploy: ${_bold(info_params.deploy)}`);
+	}
 	console.log(`pacman: ${_bold(info_params.pacman)}`);
 	console.log(`docker: ${_bold(String(info_params.docker))}`);
 	process.exit(0);

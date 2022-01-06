@@ -457,6 +457,7 @@ function _switch_command(args) {
         }
         default: {
             // output_instance.wrong_end_log('Command not found.');
+            output_instance.error_log(`Invalid argument [${cmd}]`);
             process.exit(1);
         }
     }

@@ -55,7 +55,7 @@ let docker_params = defaults_1.default_params;
 // }
 function docker(params, args) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_params(params);
+        _init_params(params, false);
         switch (args._[1]) {
             case 'build': {
                 // _get_and_set_main_args(args);
@@ -258,7 +258,7 @@ function docker_stop(params, continue_on_fail = false) {
 exports.docker_stop = docker_stop;
 function docker_db_run(params, db) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_params(params);
+        _init_params(params, false);
         const db_container_name = _get_db_container_name(db);
         let cmd = '';
         cmd += `docker run --rm -i --name ${db_container_name}`;
@@ -271,7 +271,7 @@ function docker_db_run(params, db) {
 exports.docker_db_run = docker_db_run;
 function docker_db_create(params, db) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_params(params);
+        _init_params(params, false);
         const db_container_name = _get_db_container_name(db);
         let cmd = '';
         cmd += `docker create --name ${db_container_name}`;
@@ -284,7 +284,7 @@ function docker_db_create(params, db) {
 exports.docker_db_create = docker_db_create;
 function docker_db_start(params, db) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_params(params);
+        _init_params(params, false);
         const db_container_name = _get_db_container_name(db);
         let cmd = '';
         cmd += `docker start ${db_container_name}`;

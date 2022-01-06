@@ -102,6 +102,15 @@ async function _dev_server(){
 		
 	}else{ // this is valid also if the repo is core.
 		
+		_esbuild_server();
+		
+		// if(!util_instance.fs.exists(`${dev_params.root}/dist`)){
+		//   util_instance.fs.create_directory(`${dev_params.root}/dist`);
+		// }
+		// if(!util_instance.fs.exists(`${dev_params.root}/dist/server`)){
+		//   util_instance.fs.create_directory(`${dev_params.root}/dist/server`);
+		// }
+		
 		const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
 		
 		// const es_cmd = `${cd_cmd} && npx esbuild src/index.ts --bundle --tsconfig=tsconfig.json --outfile=../../dist/server/index.js --platform=node --watch`;
@@ -149,6 +158,15 @@ async function _dev_trx_client(){
 }
 
 async function _dev_trx_webpack_express(){
+	
+	if(!util_instance.fs.exists(`${dev_params.root}/dist/client`)){
+		util_instance.fs.create_directory(`${dev_params.root}/dist/client`);
+	}
+	
+	util_instance.fs.copy_file(
+		`${dev_params.root}/${defaults.folder}/client/src/index.html`,
+		`${dev_params.root}/dist/client/index.html`,
+	);
 	
 	const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/client`;
 	const nu_cmd = `npx webpack serve --open`;
@@ -232,15 +250,22 @@ function _watch(){
 			watch_src_scanned = true;
 		},
 		(_event, _path) => {
-			if(dev_params.is_dot === true && _path === `${dev_params.root}/src/books`){
+			if(dev_params.is_dot === true && _path.indexOf(`${dev_params.root}/src/books`) === 0){
 				return false;
 			}
 			const basename = path.basename(_path);
 			const extension = path.extname(basename);
-			const not_valid_extensions = ['.swp', '.swo'];
-			if(not_valid_extensions.includes(extension)){
+			
+			// const not_valid_extensions = ['.swp', '.swo'];
+			// if(not_valid_extensions.includes(extension)){
+			//   return false;
+			// }
+			
+			const valid_extensions = ['.ts'];
+			if(!valid_extensions.includes(extension)){
 				return false;
 			}
+			
 			output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
 			if(!watch_src_scanned){
 				return false;
@@ -297,18 +322,15 @@ function _watch(){
 				
 			}
 			
-			if(dev_params.deploy === 'netlify' && _is_file_related_to_lambda_function(_path)){
+			if(
+				valid_deploy_repos().includes(dev_params.repo)
+				&& dev_params.deploy === 'netlify'
+				&& _is_file_related_to_lambda_function(_path)
+			){
 				_replace_netlify_function_file();
 			}
 			
-			esbuild.buildSync({
-				entryPoints: [`${dev_params.root}/${defaults.folder}/server/src/index.ts`],
-				outfile: `${dev_params.root}/dist/server/index.js`,
-				bundle: true,
-				platform: 'node',
-				sourcemap: true,
-				minify: true
-			});
+			_esbuild_server();
 			
 		}
 	);
@@ -345,6 +367,17 @@ function _watch(){
 	//   }
 	// );
 	
+}
+
+function _esbuild_server(){
+	esbuild.buildSync({
+		entryPoints: [`${dev_params.root}/${defaults.folder}/server/src/index.ts`],
+		outfile: `${dev_params.root}/dist/server/index.js`,
+		bundle: true,
+		platform: 'node',
+		sourcemap: true,
+		minify: true
+	});
 }
 
 function _is_file_related_to_lambda_function(_path:string){

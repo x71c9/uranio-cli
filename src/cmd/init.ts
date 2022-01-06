@@ -62,8 +62,6 @@ export async function init(params:Partial<Params>)
 	
 	if(init_params.docker === true){
 		
-		// _create_docker_folder();
-		// _create_docker_rc_file();
 		await docker_build(init_params);
 		
 	}else{
@@ -180,6 +178,42 @@ async function _ask_for_pacman(args:Arguments){
 				check_pacman(answers.pacman);
 				init_params.pacman = answers.pacman;
 				
+				await _ask_for_docker(args);
+				
+			});
+		
+	}else{
+		
+		await _ask_for_docker(args);
+		
+	}
+}
+
+async function _ask_for_docker(args:Arguments){
+	
+	const docker = args.k || args.docker;
+	
+	if(!docker && init_params.force === false){
+			
+		let confirm_msg = '';
+		confirm_msg += `? Do you want to compile and run inside a docker container?\n`;
+		
+		const suffix = `? Docker need to be installed on your system.`;
+		
+		inquirer.
+			prompt([
+				{
+					type: 'confirm',
+					name: 'docker',
+					message: confirm_msg,
+					suffix: suffix
+				}
+			]).then(async (answers) => {
+				
+				if(answers.docker === true){
+					init_params.docker = true;
+				}
+				
 				await _ask_for_repo(args);
 				
 			});
@@ -251,42 +285,6 @@ async function _ask_for_deploy(args:Arguments){
 				
 				check_deploy(answers.deploy);
 				init_params.deploy = answers.deploy;
-				
-				await _ask_for_docker(args);
-				
-			});
-		
-	}else{
-		
-		await _ask_for_docker(args);
-		
-	}
-}
-
-async function _ask_for_docker(args:Arguments){
-	
-	const docker = args.k || args.docker;
-	
-	if(!docker && init_params.force === false){
-			
-		let confirm_msg = '';
-		confirm_msg += `? Do you want to compile and run inside a docker container?\n`;
-		
-		const suffix = `? Docker need to be installed on your system.`;
-		
-		inquirer.
-			prompt([
-				{
-					type: 'confirm',
-					name: 'docker',
-					message: confirm_msg,
-					suffix: suffix
-				}
-			]).then(async (answers) => {
-				
-				if(answers.docker === true){
-					init_params.docker = true;
-				}
 				
 				await init(init_params);
 				
@@ -637,19 +635,6 @@ function _create_urn_folder(){
 	);
 	output_instance.done_log(`Created folder ${defaults.folder}.`, 'init');
 }
-
-// function _create_docker_folder(){
-//   output_instance.start_loading(`Creating ${defaults.docker_folder} folder...`);
-//   util_instance.fs.remove_directory(
-//     `${init_params.root}/${defaults.docker_folder}`,
-//     'init'
-//   );
-//   util_instance.fs.create_directory(
-//     `${init_params.root}/${defaults.docker_folder}`,
-//     'init'
-//   );
-//   output_instance.done_log(`Created folder ${defaults.docker_folder}.`, 'init');
-// }
 
 function _update_package_scripts(){
 	output_instance.start_loading('Updating scripts...');
