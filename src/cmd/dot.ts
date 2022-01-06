@@ -164,20 +164,21 @@ async function _check_if_clean_repo(){
 }
 
 async function _commit_previous_submodule(){
-	await _execute('git add .', 'git', 'add');
-	await _execute(
-		`git commit -m "[updated submodule of previous repo ${dot_params.repo}]"`,
-		'git',
-		'commit'
-	);
-	
-	output_instance.done_log(`Commited previous repo ${dot_params.repo}.`);
+	const output = cp.execSync(`git status --porcelain`).toString();
+	if(output !== ''){
+		await _execute('git add .', 'git', 'add');
+		await _execute(
+			`git commit -m "[updated submodule of previous repo ${dot_params.repo}]"`,
+			'git',
+			'commit'
+		);
+		output_instance.done_log(`Commited previous repo ${dot_params.repo}.`);
+	}
 }
 
 async function _install_dependencies(pacman:PacMan){
 	const install_cmd = (pacman === 'yarn') ? `yarn install` : 'npm install';
 	await _execute(install_cmd, 'pacman', 'installing');
-	
 	output_instance.done_log(`Installed dependencies.`);
 }
 
@@ -187,7 +188,6 @@ async function _remove_node_modules_and_lock_files(){
 		'git',
 		`removing node_modules and lock files`,
 	);
-	
 	output_instance.done_log(`Deleted node_modules and lock files.`);
 }
 

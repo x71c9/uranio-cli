@@ -197,8 +197,11 @@ function docker_create(params, entrypoint) {
         _init_params(params);
         const container_name = _get_container_name();
         const image_name = _get_image_name();
+        const port_server = 7777;
+        const port_client = 3333;
         let cmd = '';
-        cmd += `docker create --network="host"`;
+        // cmd += `docker create --network="host"`;
+        cmd += `docker create -p ${port_server}:${port_server} -p ${port_client}:${port_client}`;
         // cmd += ` -u $(id -u \${USER}):$(id -g \${USER})`;
         cmd += ` -v $(pwd)/src/:/app/src/`;
         cmd += ` -v $(pwd)/.env:/app/.env`;
@@ -260,9 +263,11 @@ function docker_db_run(params, db) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params, false);
         const db_container_name = _get_db_container_name(db);
+        const port = 27017;
         let cmd = '';
         cmd += `docker run --rm -i --name ${db_container_name}`;
-        cmd += ` -v ~/mongo/data:/data/db --network="host"`;
+        // cmd += ` -v ~/mongo/data:/data/db --network="host"`;
+        cmd += ` -v ~/mongo/data:/data/db -p ${port}:${port}`;
         cmd += ` mongo:5`;
         yield _execute_log(cmd, 'docker db', 'running db');
         output_instance.done_log(`Docker db container running ${db_container_name}`);
@@ -273,9 +278,11 @@ function docker_db_create(params, db) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params, false);
         const db_container_name = _get_db_container_name(db);
+        const port = 27017;
         let cmd = '';
         cmd += `docker create --name ${db_container_name}`;
-        cmd += ` -v ~/mongo/data:/data/db --network="host"`;
+        // cmd += ` -v ~/mongo/data:/data/db --network="host"`;
+        cmd += ` -v ~/mongo/data:/data/db -p ${port}:${port}`;
         cmd += ` mongo:5`;
         yield _execute_spin_verbose(cmd, `docker`, `creating db ${db}`);
         output_instance.done_log(`Docker db container created ${db_container_name}`);
