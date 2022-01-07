@@ -138,11 +138,22 @@ function docker_build(params) {
         cmd += ` .`;
         yield _execute_spin_verbose(cmd, 'docker', 'building');
         output_instance.done_log(`Docker image built ${docker_params.repo} ${docker_params.deploy}`);
+        yield _create_network();
         yield _copy_compiled();
         yield docker_create(docker_params);
     });
 }
 exports.docker_build = docker_build;
+function _create_network() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const network_name = _get_network_name();
+        let cmd_rm = '';
+        cmd_rm += `docker network create ${network_name}`;
+        cmd_rm += ` || true`;
+        yield _execute_spin_verbose(cmd_rm, 'docker', `creating network ${network_name}`);
+        output_instance.done_log(`Docker created network ${network_name}`);
+    });
+}
 function docker_remove_tmp(params, continue_on_fail = false) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params, false);
@@ -199,9 +210,12 @@ function docker_create(params, entrypoint) {
         const image_name = _get_image_name();
         const port_server = 7777;
         const port_client = 3333;
+        const network_name = _get_network_name();
         let cmd = '';
         // cmd += `docker create --network="host"`;
-        cmd += `docker create -p ${port_server}:${port_server} -p ${port_client}:${port_client}`;
+        cmd += `docker create`;
+        cmd += ` --network ${network_name}`;
+        cmd += ` -p ${port_server}:${port_server} -p ${port_client}:${port_client}`;
         // cmd += ` -u $(id -u \${USER}):$(id -g \${USER})`;
         cmd += ` -v $(pwd)/src/:/app/src/`;
         cmd += ` -v $(pwd)/.env:/app/.env`;
@@ -264,10 +278,14 @@ function docker_db_run(params, db) {
         _init_params(params, false);
         const db_container_name = _get_db_container_name(db);
         const port = 27017;
+        const network_name = _get_network_name();
         let cmd = '';
         cmd += `docker run --rm -i --name ${db_container_name}`;
+        cmd += ` --network ${network_name}`;
         // cmd += ` -v ~/mongo/data:/data/db --network="host"`;
         cmd += ` -v ~/mongo/data:/data/db -p ${port}:${port}`;
+        // cmd += ` -e MONGO_INITDB_ROOT_USERNAME=uranio`;
+        // cmd += ` -e MONGO_INITDB_ROOT_PASSWORD=uranio`;
         cmd += ` mongo:5`;
         yield _execute_log(cmd, 'docker db', 'running db');
         output_instance.done_log(`Docker db container running ${db_container_name}`);
@@ -279,8 +297,10 @@ function docker_db_create(params, db) {
         _init_params(params, false);
         const db_container_name = _get_db_container_name(db);
         const port = 27017;
+        const network_name = _get_network_name();
         let cmd = '';
         cmd += `docker create --name ${db_container_name}`;
+        cmd += ` --network ${network_name}`;
         // cmd += ` -v ~/mongo/data:/data/db --network="host"`;
         cmd += ` -v ~/mongo/data:/data/db -p ${port}:${port}`;
         cmd += ` mongo:5`;
@@ -331,8 +351,11 @@ exports.docker_db_remove = docker_db_remove;
 function docker_run(params, entrypoint) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
+        const network_name = _get_network_name();
         let cmd = '';
-        cmd += `docker run --rm -i -v $(pwd)/src:/app/src --network="host"`;
+        // cmd += `docker run --rm -i -v $(pwd)/src:/app/src --network="host"`;
+        cmd += `docker run --rm -i -v $(pwd)/src:/app/src`;
+        cmd += ` --network=${network_name}`;
         cmd += ` --name uranio_${docker_params.repo}_${docker_params.deploy}_container`;
         cmd += ` uranio-${docker_params.repo}-${docker_params.deploy}`;
         if (typeof entrypoint === 'string') {
@@ -351,6 +374,11 @@ function _get_image_name() {
 function _get_db_container_name(db) {
     const db_container_name = `${db}_${_get_container_name()}`;
     return db_container_name;
+}
+function _get_network_name() {
+    const project_name = _get_project_name();
+    const network_name = `${project_name}_uranio_network`;
+    return network_name;
 }
 function _get_container_name() {
     const project_name = _get_project_name();
