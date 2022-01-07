@@ -71,6 +71,7 @@ function _delete_files() {
         // util_instance.fs.remove_file(`${deinit_params.root}/.urnlog`);
         // util_instance.fs.remove_directory(`${deinit_params.root}/dist/server`);
         // util_instance.fs.remove_directory(`${deinit_params.root}/dist/client`);
+        util_instance.fs.remove_directory(`${deinit_params.root}/.tmp`);
         util_instance.fs.remove_directory(`${deinit_params.root}/dist`);
         util_instance.fs.remove_directory(`${deinit_params.root}/${defaults_1.defaults.folder}`);
         util_instance.fs.remove_file(`${deinit_params.root}/${defaults_1.defaults.json_filename}`);
