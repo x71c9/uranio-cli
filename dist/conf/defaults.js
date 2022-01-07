@@ -43,6 +43,7 @@ exports.defaults = {
     json_filename: `uranio.json`,
     time_format: "yy-mm-dd'T'HH:MM:ss:l",
     dot_repo: `${cloud_address}uranio-dot.git`,
+    assets_repo: `${cloud_address}uranio-assets.git`,
     adm_repo: `${cloud_address}uranio-adm.git`,
     trx_repo: `${cloud_address}uranio-trx.git`,
     api_repo: `${cloud_address}uranio-api.git`,

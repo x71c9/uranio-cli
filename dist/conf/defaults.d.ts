@@ -14,6 +14,7 @@ export declare const defaults: {
     readonly json_filename: "uranio.json";
     readonly time_format: "yy-mm-dd'T'HH:MM:ss:l";
     readonly dot_repo: "git+ssh://git@github.com/nbl7/uranio-dot.git";
+    readonly assets_repo: "git+ssh://git@github.com/nbl7/uranio-assets.git";
     readonly adm_repo: "git+ssh://git@github.com/nbl7/uranio-adm.git";
     readonly trx_repo: "git+ssh://git@github.com/nbl7/uranio-trx.git";
     readonly api_repo: "git+ssh://git@github.com/nbl7/uranio-api.git";

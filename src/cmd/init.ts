@@ -468,7 +468,7 @@ async function _clone_assets_repo(){
 	util_instance.fs.remove_directory(defaults.tmp_folder, 'assets');
 	util_instance.fs.create_directory(defaults.tmp_folder, 'assets');
 	await util_instance.cmd.clone_repo(
-		defaults.dot_repo,
+		defaults.assets_repo,
 		`${init_params.root}/${defaults.tmp_folder}/uranio-assets`,
 		'assets',
 		init_params.branch
