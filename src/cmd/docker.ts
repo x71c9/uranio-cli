@@ -145,10 +145,23 @@ export async function docker_build(params:Partial<Params>)
 		`Docker image built ${docker_params.repo} ${docker_params.deploy}`
 	);
 	
+	await _create_network();
+	
 	await _copy_compiled();
 	
 	await docker_create(docker_params);
 	
+}
+
+async function _create_network(){
+	const network_name = _get_network_name();
+	let cmd_rm = '';
+	cmd_rm += `docker network create ${network_name}`;
+	cmd_rm += ` || true`;
+	await _execute_spin_verbose(cmd_rm, 'docker', `creating network ${network_name}`);
+	output_instance.done_log(
+		`Docker created network ${network_name}`
+	);
 }
 
 export async function docker_remove_tmp(params:Partial<Params>, continue_on_fail=false)
@@ -228,9 +241,13 @@ export async function docker_create(params:Partial<Params>, entrypoint?:string)
 	const port_server = 7777;
 	const port_client = 3333;
 	
+	const network_name = _get_network_name();
+	
 	let cmd = '';
 	// cmd += `docker create --network="host"`;
-	cmd += `docker create -p ${port_server}:${port_server} -p ${port_client}:${port_client}`;
+	cmd += `docker create`;
+	cmd += ` --network ${network_name}`;
+	cmd += ` -p ${port_server}:${port_server} -p ${port_client}:${port_client}`;
 	// cmd += ` -u $(id -u \${USER}):$(id -g \${USER})`;
 	cmd += ` -v $(pwd)/src/:/app/src/`;
 	cmd += ` -v $(pwd)/.env:/app/.env`;
@@ -317,10 +334,15 @@ export async function docker_db_run(params:Partial<Params>, db:DB)
 	
 	const port = 27017;
 	
+	const network_name = _get_network_name();
+	
 	let cmd = '';
 	cmd += `docker run --rm -i --name ${db_container_name}`;
+	cmd += ` --network ${network_name}`;
 	// cmd += ` -v ~/mongo/data:/data/db --network="host"`;
 	cmd += ` -v ~/mongo/data:/data/db -p ${port}:${port}`;
+	// cmd += ` -e MONGO_INITDB_ROOT_USERNAME=uranio`;
+	// cmd += ` -e MONGO_INITDB_ROOT_PASSWORD=uranio`;
 	cmd += ` mongo:5`;
 	await _execute_log(cmd, 'docker db', 'running db');
 	
@@ -339,8 +361,11 @@ export async function docker_db_create(params:Partial<Params>, db:DB)
 	
 	const port = 27017;
 	
+	const network_name = _get_network_name();
+	
 	let cmd = '';
 	cmd += `docker create --name ${db_container_name}`;
+	cmd += ` --network ${network_name}`;
 	// cmd += ` -v ~/mongo/data:/data/db --network="host"`;
 	cmd += ` -v ~/mongo/data:/data/db -p ${port}:${port}`;
 	cmd += ` mongo:5`;
@@ -414,8 +439,12 @@ export async function docker_run(params:Partial<Params>, entrypoint?:string)
 	
 	_init_params(params);
 	
+	const network_name = _get_network_name();
+	
 	let cmd = '';
-	cmd += `docker run --rm -i -v $(pwd)/src:/app/src --network="host"`;
+	// cmd += `docker run --rm -i -v $(pwd)/src:/app/src --network="host"`;
+	cmd += `docker run --rm -i -v $(pwd)/src:/app/src`;
+	cmd += ` --network=${network_name}`;
 	cmd += ` --name uranio_${docker_params.repo}_${docker_params.deploy}_container`;
 	cmd += ` uranio-${docker_params.repo}-${docker_params.deploy}`;
 	if(typeof entrypoint === 'string'){
@@ -438,6 +467,12 @@ function _get_image_name(){
 function _get_db_container_name(db:DB){
 	const db_container_name = `${db}_${_get_container_name()}`;
 	return db_container_name;
+}
+
+function _get_network_name(){
+	const project_name = _get_project_name();
+	const network_name = `${project_name}_uranio_network`;
+	return network_name;
 }
 
 function _get_container_name(){

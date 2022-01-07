@@ -93,6 +93,8 @@ export async function dev_client(params:Partial<Params>):Promise<void>{
 
 async function _dev_server(){
 	
+	_fix_mongodb_saslprep_requirement();
+		
 	if(dev_params.deploy === 'netlify' && valid_deploy_repos().includes(dev_params.repo)){
 		
 		const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
@@ -103,13 +105,6 @@ async function _dev_server(){
 	}else{ // this is valid also if the repo is core.
 		
 		_esbuild_server();
-		
-		// if(!util_instance.fs.exists(`${dev_params.root}/dist`)){
-		//   util_instance.fs.create_directory(`${dev_params.root}/dist`);
-		// }
-		// if(!util_instance.fs.exists(`${dev_params.root}/dist/server`)){
-		//   util_instance.fs.create_directory(`${dev_params.root}/dist/server`);
-		// }
 		
 		const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
 		
@@ -367,6 +362,21 @@ function _watch(){
 	//   }
 	// );
 	
+}
+
+function _fix_mongodb_saslprep_requirement(){
+	
+	const dist_dir = `${dev_params.root}/dist`;
+	if(!util_instance.fs.exists(dist_dir)){
+		util_instance.fs.create_directory(dist_dir);
+	}
+	const saslprep_filename = `code-points.mem`;
+	const saslprep_module_dir = `${dev_params.root}/node_modules/saslprep/`;
+	
+	util_instance.fs.copy_file(
+		`${saslprep_module_dir}/${saslprep_filename}`,
+		`${dist_dir}/${saslprep_filename}`
+	);
 }
 
 function _esbuild_server(){
