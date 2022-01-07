@@ -373,7 +373,7 @@ function _clone_assets_repo() {
         output_instance.start_loading(`Cloning assets...`);
         util_instance.fs.remove_directory(defaults_1.defaults.tmp_folder, 'assets');
         util_instance.fs.create_directory(defaults_1.defaults.tmp_folder, 'assets');
-        yield util_instance.cmd.clone_repo(defaults_1.defaults.dot_repo, `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets`, 'assets', init_params.branch);
+        yield util_instance.cmd.clone_repo(defaults_1.defaults.assets_repo, `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets`, 'assets', init_params.branch);
         output_instance.done_log(`Cloned assets repo.`, 'assets');
     });
 }
