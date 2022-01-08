@@ -306,19 +306,20 @@ function _uranio_color(text) {
         if (index !== -1) {
             processed_text = processed_text.substring(0, index) + processed_text.substring(index + pre.length, processed_text.length);
             switch (pre) {
-                case '[fn_debug]': {
+                case '[--fn_debug--]': {
                     processed_text = chalk_1.default.cyan(processed_text);
                     break;
                 }
-                case '[debug]': {
+                case '[--debug--]': {
                     processed_text = chalk_1.default.blue(processed_text);
                     break;
                 }
-                case '[warn]': {
+                case '[--warn--]': {
                     processed_text = chalk_1.default.yellow(processed_text);
                     break;
                 }
-                case '[error]': {
+                case '[ERROR]':
+                case '[--error--]': {
                     processed_text = chalk_1.default.red(processed_text);
                     break;
                 }

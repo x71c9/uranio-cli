@@ -1417,7 +1417,7 @@ function _keep_only_client_first_level_properties(sourceFile:tsm.SourceFile, boo
 							comma.replaceWithText('');
 						}
 						prop.replaceWithText('');
-						output_instance.verbose_log(`Removed property [${atom_name}][${ide_text}]`, 'clnt');
+						output_instance.verbose_log(`Removed property [ ${atom_name} ][ ${ide_text} ]`, 'clnt');
 					}
 				}
 			}
