@@ -61,6 +61,9 @@ export async function init(params:Partial<Params>)
 	_create_rc_file();
 	_create_urn_folder();
 	
+	await _clone_assets_repo();
+	_copy_assets();
+	
 	if(init_params.docker === true){
 		
 		await docker.build(init_params);
@@ -75,10 +78,7 @@ export async function init(params:Partial<Params>)
 		await _install_repo();
 		_remove_git_files();
 		
-		await _clone_assets_repo();
-		_copy_assets();
-		_remove_tmp();
-		
+		_copy_specific_assets();
 		await _replace_aliases();
 		
 	}
@@ -92,6 +92,8 @@ export async function init(params:Partial<Params>)
 		docker.update_env();
 	}
 	
+	_remove_tmp();
+		
 	output_instance.end_log(`Initialization completed.`);
 }
 
@@ -422,6 +424,12 @@ function _copy_assets(){
 	
 	_copy_eslint_files();
 	
+	_copy_main_files(init_params.repo);
+	
+}
+
+function _copy_specific_assets(){
+	
 	if(valid_deploy_repos().includes(init_params.repo)){
 		if(init_params.deploy === 'netlify'){
 			_copy_netlify_files();
@@ -436,8 +444,6 @@ function _copy_assets(){
 	if(init_params.repo === 'trx'){
 		_copy_trx_files();
 	}
-	
-	_copy_main_files(init_params.repo);
 	
 }
 
