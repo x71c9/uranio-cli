@@ -63,6 +63,10 @@ async function _delete_files(){
 	util_instance.fs.remove_directory(`${deinit_params.root}/${defaults.folder}`);
 	util_instance.fs.remove_file(`${deinit_params.root}/${defaults.json_filename}`);
 	util_instance.fs.remove_directory(`${deinit_params.root}/node_modules`);
-	
+	util_instance.fs.remove_file(`${deinit_params.root}/tsconfig.json`);
+	util_instance.fs.remove_file(`${deinit_params.root}/sample.env`);
+	util_instance.fs.remove_file(`${deinit_params.root}/.eslintrc.js`);
+	util_instance.fs.remove_file(`${deinit_params.root}/.eslinignore`);
+	util_instance.fs.remove_file(`${deinit_params.root}/.stylelintrc.js`);
 }
 

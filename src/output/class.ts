@@ -316,10 +316,10 @@ class Output {
 }
 
 const prefix_types = [
-	'[fn_debug]',
-	'[debug]',
-	'[warn]',
-	'[error]'
+	'[--fn_debug--]',
+	'[--debug--]',
+	'[--warn--]',
+	'[--error--]'
 ];
 
 function _is_uranio_native(text:string){
