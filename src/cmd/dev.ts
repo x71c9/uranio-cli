@@ -251,13 +251,8 @@ function _watch(){
 			const basename = path.basename(_path);
 			const extension = path.extname(basename);
 			
-			// const not_valid_extensions = ['.swp', '.swo'];
-			// if(not_valid_extensions.includes(extension)){
-			//   return false;
-			// }
-			
-			const valid_extensions = ['.ts'];
-			if(!valid_extensions.includes(extension)){
+			const not_valid_extensions = ['.swp', '.swo'];
+			if(not_valid_extensions.includes(extension)){
 				return false;
 			}
 			

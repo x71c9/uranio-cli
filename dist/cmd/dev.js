@@ -225,12 +225,8 @@ function _watch() {
         }
         const basename = path_1.default.basename(_path);
         const extension = path_1.default.extname(basename);
-        // const not_valid_extensions = ['.swp', '.swo'];
-        // if(not_valid_extensions.includes(extension)){
-        //   return false;
-        // }
-        const valid_extensions = ['.ts'];
-        if (!valid_extensions.includes(extension)) {
+        const not_valid_extensions = ['.swp', '.swo'];
+        if (not_valid_extensions.includes(extension)) {
             return false;
         }
         output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);

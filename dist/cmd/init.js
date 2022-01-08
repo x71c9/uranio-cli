@@ -491,23 +491,6 @@ function _create_client_server_folders() {
     util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}/client/src/books`, 'init');
     output_instance.done_verbose_log(`Created client folders.`, 'init');
 }
-// function _create_docker_rc_file(){
-//   output_instance.start_loading('Creating rc file...');
-//   let content = ``;
-//   content += `{\n`;
-//   content += `\t"repo": "${init_params.repo}",\n`;
-//   content += `\t"pacman": "${init_params.pacman}",\n`;
-//   content += `\t"deploy": "${init_params.deploy}",\n`;
-//   content += `}`;
-//   const docker_rc_file =
-//     `${init_params.root}/${defaults.docker_folder}/${defaults.json_filename}`;
-//   util_instance.fs.write_file(
-//     docker_rc_file,
-//     content
-//   );
-//   util_instance.pretty(docker_rc_file, 'json');
-//   output_instance.done_log(`Created file ${docker_rc_file}.`, 'rcfl');
-// }
 function _create_rc_file() {
     output_instance.start_loading('Creating rc file...');
     let content = ``;

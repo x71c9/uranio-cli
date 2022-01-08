@@ -250,7 +250,7 @@ function _set_args(params, args) {
         params.deploy = deploy;
     }
     const db = args.db;
-    if (typeof db === 'string' && db != '') {
+    if (typeof db === 'string' && db !== '') {
         (0, common_1.check_db)(db);
         params.db = db;
     }
