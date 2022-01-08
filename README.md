@@ -17,9 +17,11 @@ Uranio command line interface.
 
 **Uranio** is a framework that helps you build CRUD API.
 
-Uranio can be installed as one of the following module: `core`, `api`, `trx`, `adm`.
+Uranio can be installed as one of the following repo: `core`, `api`, `trx`, `adm`.
 
-Each module includes the previous one.
+Each repo includes the previous one.
+
+![uranio repos](./uranio_repos.jpg)
 
 ##### Core
 
