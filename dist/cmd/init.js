@@ -60,6 +60,8 @@ function init(params) {
         _ignore_urn_folder();
         _create_rc_file();
         _create_urn_folder();
+        yield _clone_assets_repo();
+        _copy_assets();
         if (init_params.docker === true) {
             yield docker.build(init_params);
         }
@@ -71,9 +73,7 @@ function init(params) {
             yield _clone_repo();
             yield _install_repo();
             _remove_git_files();
-            yield _clone_assets_repo();
-            _copy_assets();
-            _remove_tmp();
+            _copy_specific_assets();
             yield _replace_aliases();
         }
         _create_dot_env();
@@ -83,6 +83,7 @@ function init(params) {
             yield docker.db_start(init_params, init_params.db);
             docker.update_env();
         }
+        _remove_tmp();
         output_instance.end_log(`Initialization completed.`);
     });
 }
@@ -321,6 +322,9 @@ function _copy_assets() {
     _copy_tsconfigs();
     _update_tsconfig_paths();
     _copy_eslint_files();
+    _copy_main_files(init_params.repo);
+}
+function _copy_specific_assets() {
     if ((0, types_1.valid_deploy_repos)().includes(init_params.repo)) {
         if (init_params.deploy === 'netlify') {
             _copy_netlify_files();
@@ -333,7 +337,6 @@ function _copy_assets() {
     if (init_params.repo === 'trx') {
         _copy_trx_files();
     }
-    _copy_main_files(init_params.repo);
 }
 function _create_dot_env() {
     const dot_env_path = `${init_params.root}/.env`;
