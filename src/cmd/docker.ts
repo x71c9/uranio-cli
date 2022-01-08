@@ -425,6 +425,19 @@ function _remove_tmp(){
 	);
 }
 
+// async function _execute_spin_log(cmd:string, context:string, action:string){
+//   return new Promise((resolve, reject) => {
+//     util_instance.spawn.spin_and_log(
+//       cmd,
+//       context,
+//       action,
+//       undefined,
+//       resolve,
+//       reject
+//     );
+//   });
+// }
+
 async function _execute_spin_verbose(cmd:string, context:string, action:string){
 	return new Promise((resolve, reject) => {
 		util_instance.spawn.spin_and_verbose_log(

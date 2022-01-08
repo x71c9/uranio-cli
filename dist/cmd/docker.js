@@ -384,6 +384,18 @@ function _remove_tmp() {
     util_instance.fs.remove_directory(`${docker_params.root}/${defaults_1.defaults.tmp_folder}`, 'tmp');
     output_instance.done_verbose_log(`Removed tmp folder [${defaults_1.defaults.tmp_folder}].`, 'tmp');
 }
+// async function _execute_spin_log(cmd:string, context:string, action:string){
+//   return new Promise((resolve, reject) => {
+//     util_instance.spawn.spin_and_log(
+//       cmd,
+//       context,
+//       action,
+//       undefined,
+//       resolve,
+//       reject
+//     );
+//   });
+// }
 function _execute_spin_verbose(cmd, context, action) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
