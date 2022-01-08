@@ -95,7 +95,7 @@ class Spawn {
                     if (verbose) {
                         this.output.verbose_log(plain_text, context, color);
                     }
-                    append(child_outputs[child.pid || 'pid0'], plain_text);
+                    _append(child_outputs[child.pid || 'pid0'], plain_text);
                 }
             });
         }
@@ -118,7 +118,7 @@ class Spawn {
                     if (verbose) {
                         this.output.verbose_log(plain_text, context, color);
                     }
-                    append(child_outputs[child.pid || 'pid0'], plain_text);
+                    _append(child_outputs[child.pid || 'pid0'], plain_text);
                 }
             });
         }
@@ -140,7 +140,7 @@ class Spawn {
                 }
                 default: {
                     if (code !== null) {
-                        print_cached_output(child_outputs[child.pid || 'pid0'], this.output);
+                        _print_cached_output(child_outputs[child.pid || 'pid0'], this.output);
                     }
                     this.output.error_log(`Error on: ${command}`, context);
                     this.output.error_log(`Child process exited with code ${code}`, context);
@@ -153,14 +153,14 @@ class Spawn {
         return child;
     }
 }
-function print_cached_output(cached, output) {
+function _print_cached_output(cached, output) {
     for (const s of cached) {
         output.error_log(s);
     }
 }
-function append(arr, value) {
+function _append(arr, value) {
     arr.push(value);
-    while (arr.length > 5) {
+    while (arr.length > 15) {
         arr.shift();
     }
 }
