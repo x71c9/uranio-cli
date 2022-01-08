@@ -76,6 +76,7 @@ function init(params) {
             _remove_tmp();
             yield _replace_aliases();
         }
+        _create_dot_env();
         if (init_params.docker_db === true) {
             yield docker.network_create(init_params, true);
             yield docker.db_create(init_params, init_params.db);
@@ -333,6 +334,13 @@ function _copy_assets() {
         _copy_trx_files();
     }
     _copy_main_files(init_params.repo);
+}
+function _create_dot_env() {
+    const dot_env_path = `${init_params.root}/.env`;
+    if (util_instance.fs.exists(dot_env_path)) {
+        return;
+    }
+    util_instance.fs.copy_file(`${init_params.root}/sample.env`, dot_env_path);
 }
 function _update_tsconfig_paths() {
     const prefix = init_params.is_dot === true ? '.' : `${defaults_1.defaults.folder}/server`;
