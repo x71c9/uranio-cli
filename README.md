@@ -70,7 +70,7 @@ yarn add --dev uranio-cli
 
 Installing the CLI globally provides access to the `uranio` command.
 
-```sh-session
+```bash
 uranio [command]
 ```
 Run `help` for detailed information about CLI commands
@@ -189,7 +189,7 @@ Then initialize Uranio with:
 uranio init -vu
 ```
 
-The command will prompt with the question regarding the repo you want to initialize.
+The command will prompt with questions regarding the repository you want to initialize.
 
 - Choose the package manager [yarn, npm]
 - Choose if you want to run and compile inside a Docker container.
@@ -214,3 +214,133 @@ Now you can start developing.
 
 ### How to develop
 
+Uranio can work by developing only one file. The file is `/src/book.ts`.
+
+The file `/src/book.ts` must export an object called `atom_book` of type `uranio.types.Book`;
+
+Each key of the object will be a relation in the database.
+
+For example:
+```js
+import uranio from 'uranio';
+
+export const atom_book:uranio.types.Book = {
+	product: {
+		...
+	}
+}
+```
+
+creates a `product` relation and all the API CRUD call for the relation.
+
+Uranio already creates the following relations:
+
+##### Core
+- superuser
+- user
+- group
+- media
+
+##### Api
+- request
+- error
+
+##### Admin
+- setting
+
+
+
+The value of each key is of type: `uranio.types.Book.Definition`.
+
+```ts
+//type Book.Definition
+
+properties: Book.Definition.Properties
+authenticate?: boolean
+connection?: ConnectionName
+plural?: string
+security?: Book.Definition.Security
+
+```
+
+For example:
+```js
+...
+product:{
+	plural: 'products',
+	security: {
+		type: uranio.types.BookSecurityType.UNIFORM,
+		_r: uranio.types.BookPermissionType.NOBODY
+	},
+	properties: {
+		title: {
+			type: uranio.types.BookPropertyType.TEXT,
+			label: 'Title'
+		},
+		price: {
+			type: uranio.types.BookPropertyType.FLOAT,
+			label: 'Price'
+		}
+	}
+}
+```
+
+Type `Book.Definition.Properties` is a list of all the relation key.
+
+Each key is of type `Book.Definition.Property`:
+
+```ts
+//type Book.Definition.Property
+
+Property.ID |
+Property.Text |
+Property.LongText |
+Property.Email |
+Property.Integer |
+Property.Float |
+Property.Binary |
+Property.Encrypted |
+Property.Day |
+Property.Time |
+Property.SetString |
+Property.SetNumber |
+Property.EnumString |
+Property.EnumNumber |
+Property.Atom |
+Property.AtomArray;
+```
+
+Each property type has the following common properties:
+
+```ts
+type: BookPropertyType
+label: string
+optional?: boolean
+hidden?: boolean
+unique?: boolean
+default?: any
+on_error?: (old_value: any) => any
+```
+
+`BookPropertyType` can be one of the following
+
+```ts
+// BookPropertyType
+
+ID = 'ID',
+TEXT = 'TEXT',
+LONG_TEXT = 'LONG_TEXT',
+EMAIL = 'EMAIL',
+INTEGER = 'INTEGER',
+FLOAT = 'FLOAT',
+BINARY = 'BINARY',
+ENCRYPTED = 'ENCRYPTED',
+DAY = 'DAY',
+TIME = 'TIME',
+ENUM_STRING = 'ENUM_STRING',
+ENUM_NUMBER = 'ENUM_NUMBER',
+SET_STRING = 'SET_STRING',
+SET_NUMBER = 'SET_NUMBER',
+ATOM = 'ATOM',
+ATOM_ARRAY = 'ATOM_ARRAY'
+```
