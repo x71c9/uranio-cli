@@ -17,7 +17,8 @@ Uranio command line interface.
 
 **Uranio** is a framework that helps you build CRUD API.
 
-Uranio can be installed as one of the following repo: `core`, `api`, `trx`, `adm`.
+Uranio can be installed as one of the following repo:
+`core`, `api`, `trx`, `adm`.
 
 Each repo includes the previous one.
 
@@ -27,13 +28,15 @@ Each repo includes the previous one.
 
 *Uranio Core* generates classes needed to interact with the database.
 
-Uranio can run the following databases: [MongoDB](https://www.mongodb.com/) // More in the future.
+Uranio can run the following databases:
+[MongoDB](https://www.mongodb.com/) // More in the future.
 
 ##### Api
 
 *Uranio API* run a service with CRUD API.
 
-Uranio can run the API on [Express.js](https://expressjs.com/) or on [Netlify](https://www.netlify.com/).
+Uranio can run the API on [Express.js](https://expressjs.com/) or
+on [Netlify](https://www.netlify.com/).
 
 ##### TRX
 
@@ -47,7 +50,9 @@ Uranio can run the API on [Express.js](https://expressjs.com/) or on [Netlify](h
 
 ### Installation
 
-Uranio CLI requires [Node.js](https://nodejs.org). To install `uranio-cli`, run the following command from any directory in your terminal:
+Uranio CLI requires [Node.js](https://nodejs.org), version 14 or above.
+To install `uranio-cli`, run the following command from any directory
+in your terminal:
 
 ```bash
 npm install uranio-cli -g
@@ -57,8 +62,10 @@ or if you are using yarn
 yarn global add uranio-cli
 ```
 
-When using the CLI in a CI environment we recommend installing it locally as a development dependency, instead of globally.
-To install locally, run the following command from the root directory of your project:
+When using the CLI in a CI environment we recommend installing it locally
+as a development dependency, instead of globally.
+To install locally, run the following command from the root
+directory of your project:
 
 ```bash
 npm install --save-dev uranio-cli
@@ -95,14 +102,18 @@ uranio init
 ```
 ##### Flags
 
-- `-s --root` (*string*) - Set project root. If empty Uranio will auto detect the closest repo.
+- `-s --root` (*string*) - Set project root.
+If empty Uranio will auto detect the closest repo.
 - `-r --repo` (*string*) - Set Uranio repo [core, api, trx, adm]
 - `-f --force` (*boolean*) - Run without prompts.
 - `-d --deploy` (*string*) - Set deploy [express, netlify]
 - `-p --pacman` (*string*) - Set package manager [npm, yarn]
-- `-k --docker` (*boolean*) - Compile and run inside a Docker container - Docker must be installed on the machine.
-- `--docker_db` (*boolean*) - Run a DB in a Docker container - Docker must be installed on the machine.
-- `--db` (*string*) - Set docker DB [mongo] - Docker must be installed on the machine.
+- `-k --docker` (*boolean*) - Compile and run inside a Docker container -
+Docker must be installed on the machine.
+- `--docker_db` (*boolean*) - Run a DB in a Docker container -
+Docker must be installed on the machine.
+- `--db` (*string*) - Set docker DB [mongo] -
+Docker must be installed on the machine.
 
 This command initialize the repository. It will download and install all
 dependencies and copy all the files needed in order to start developing.
@@ -197,14 +208,16 @@ Then initialize Uranio with:
 uranio init -vu
 ```
 
-The command will prompt with questions regarding the repository you want to initialize.
+The command will prompt with questions regarding the repository you
+want to initialize.
 
 - Choose the package manager [yarn, npm]
 - Choose if you want to run and compile inside a Docker container.
 - Choose if you want Uranio to create a Docker container with a database.
 - If the previous answer was affirmative, choose the database type.
 - Choose the uranio module you want to use: [core, api, trx, adm]
-- If the previous answer was `api` or above, choose how you want to deploy the service [express, netlify]
+- If the previous answer was `api` or above, choose how you want to deploy
+the service [express, netlify]
 
 This might take a while, depending on your internet connection.
 
@@ -215,7 +228,8 @@ In order to start developing you will need to create and run a development serve
 ```bash
 uranio dev
 ```
-Here you will see all the logs, also it will print the IP of the client in the case of the `adm` module.
+Here you will see all the logs, also it will print the IP of the client
+in the case of the `adm` module.
 
 Now you can start developing.
 
@@ -224,7 +238,8 @@ Now you can start developing.
 
 Uranio can work by developing only one file. The file is `/src/book.ts`.
 
-The file `/src/book.ts` must export an object called `atom_book` of type `uranio.types.Book`;
+The file `/src/book.ts` must export an object called `atom_book` of type
+`uranio.types.Book`;
 
 Each key of the object will be a relation in the database.
 
