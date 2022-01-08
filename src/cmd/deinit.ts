@@ -57,7 +57,6 @@ async function _remove_dockers()
 }
 
 async function _delete_files(){
-	
 	util_instance.fs.remove_directory(`${deinit_params.root}/.tmp`);
 	util_instance.fs.remove_directory(`${deinit_params.root}/dist`);
 	util_instance.fs.remove_directory(`${deinit_params.root}/${defaults.folder}`);
@@ -67,6 +66,9 @@ async function _delete_files(){
 	util_instance.fs.remove_file(`${deinit_params.root}/sample.env`);
 	util_instance.fs.remove_file(`${deinit_params.root}/.eslintrc.js`);
 	util_instance.fs.remove_file(`${deinit_params.root}/.eslinignore`);
-	util_instance.fs.remove_file(`${deinit_params.root}/.stylelintrc.js`);
+	util_instance.fs.remove_file(`${deinit_params.root}/.stylelintrc.json`);
+	util_instance.fs.remove_file(`${deinit_params.root}/yarn.lock`);
+	util_instance.fs.remove_file(`${deinit_params.root}/yarn-error.log`);
+	util_instance.fs.remove_file(`${deinit_params.root}/package-lock.json`);
 }
 
