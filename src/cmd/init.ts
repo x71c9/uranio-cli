@@ -14,7 +14,7 @@ import * as output from '../output/';
 
 import * as util from '../util/';
 
-import {docker_build} from './docker';
+import * as docker from './docker';
 
 import {
 	Arguments,
@@ -23,6 +23,7 @@ import {
 	abstract_repos,
 	abstract_pacman,
 	abstract_deploy,
+	abstract_db,
 	valid_deploy_repos,
 	valid_admin_repos
 } from '../types';
@@ -62,7 +63,7 @@ export async function init(params:Partial<Params>)
 	
 	if(init_params.docker === true){
 		
-		await docker_build(init_params);
+		await docker.build(init_params);
 		
 	}else{
 		
@@ -80,6 +81,13 @@ export async function init(params:Partial<Params>)
 		
 		await _replace_aliases();
 		
+	}
+	
+	if(init_params.docker_db === true){
+		await docker.network_create(init_params, true);
+		await docker.db_create(init_params, init_params.db);
+		await docker.db_start(init_params, init_params.db);
+		docker.update_env();
 	}
 	
 	output_instance.end_log(`Initialization completed.`);
@@ -215,6 +223,77 @@ async function _ask_for_docker(args:Arguments){
 				if(answers.docker === true){
 					init_params.docker = true;
 				}
+				
+				await _ask_for_docker_db(args);
+				
+			});
+		
+	}else{
+		
+		await _ask_for_docker_db(args);
+		
+	}
+}
+
+async function _ask_for_docker_db(args:Arguments){
+	
+	const docker_db = args.docker_db;
+	
+	if(!docker_db && init_params.force === false){
+			
+		let confirm_msg = '';
+		confirm_msg += `? Do you want to run the db in a docker container?\n`;
+		
+		const suffix = `? Docker need to be installed on your system.`;
+		
+		inquirer.
+			prompt([
+				{
+					type: 'confirm',
+					name: 'docker_db',
+					message: confirm_msg,
+					suffix: suffix
+				}
+			]).then(async (answers) => {
+				
+				if(answers.docker_db === true){
+					
+					init_params.docker_db = true;
+					await _ask_for_db_type(args);
+					
+				}else{
+					
+					await _ask_for_repo(args);
+					
+				}
+				
+			});
+		
+	}else{
+		
+		await _ask_for_repo(args);
+		
+	}
+}
+
+async function _ask_for_db_type(args:Arguments){
+	
+	if(init_params.force === false){
+			
+		let confirm_msg = '';
+		confirm_msg += `Select db:`;
+		
+		inquirer.
+			prompt([
+				{
+					type: 'list',
+					name: 'db',
+					message: confirm_msg,
+					choices: Object.keys(abstract_db)
+				}
+			]).then(async (answers) => {
+				
+				init_params.db = answers.db;
 				
 				await _ask_for_repo(args);
 				
@@ -595,6 +674,8 @@ function _create_rc_file(){
 	content += `\t"pacman": "${init_params.pacman}",\n`;
 	content += `\t"deploy": "${init_params.deploy}",\n`;
 	content += `\t"docker": ${init_params.docker},\n`;
+	content += `\t"docker_db": ${init_params.docker_db},\n`;
+	content += `\t"db": "${init_params.db}",\n`;
 	content += `}`;
 	util_instance.fs.write_file(`${init_params.root}/${defaults.json_filename}`, content);
 	util_instance.pretty(`${init_params.root}/${defaults.json_filename}`, 'json');

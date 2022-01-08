@@ -91,7 +91,7 @@ export function replace_file_aliases(filepath:string, aliases:Aliases, params?:P
 	if(found === true){
 		const modified = sourceFile.print();
 		_replace_modified_file(modified, filepath);
-		util_instance.pretty(filepath);
+		// util_instance.pretty(filepath);
 	}
 }
 

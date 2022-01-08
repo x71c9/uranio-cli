@@ -10,7 +10,7 @@ import path from 'path';
 
 import {urn_util} from 'urn-lib';
 
-import {Arguments, Repo, PacMan, Deploy, Params} from './types';
+import {Arguments, Repo, PacMan, Deploy, Params, DB} from './types';
 
 import * as output from './output/';
 
@@ -41,6 +41,7 @@ import {
 	check_repo,
 	check_deploy,
 	check_pacman,
+	check_db,
 	read_rc_file,
 	check_if_is_dot
 } from './cmd/common';
@@ -260,6 +261,15 @@ function _set_args(params:Params, args:Arguments)
 		params.docker = !args.nodocker;
 	}
 	
+	const docker_db = args.docker_db;
+	
+	if(docker_db == true){
+		params.docker_db = true;
+	}
+	if(typeof args.nodocker_db === 'boolean' && !!args.nodocker_db !== !params.docker_db){
+		params.docker_db = !args.nodocker_db;
+	}
+	
 	// Paramteters with default value = true
 	
 	const filelog = args.l || args.filelog;
@@ -322,6 +332,13 @@ function _set_args(params:Params, args:Arguments)
 	if(typeof deploy === 'string' && deploy != ''){
 		check_deploy(deploy);
 		params.deploy = deploy as Deploy;
+	}
+	
+	const db = args.db;
+	
+	if(typeof db === 'string' && db != ''){
+		check_db(db);
+		params.db = db as DB;
 	}
 	
 	const color_log = args.c || args.color_log;

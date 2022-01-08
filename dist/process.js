@@ -196,6 +196,13 @@ function _set_args(params, args) {
     if (typeof args.nodocker === 'boolean' && !!args.nodocker !== !params.docker) {
         params.docker = !args.nodocker;
     }
+    const docker_db = args.docker_db;
+    if (docker_db == true) {
+        params.docker_db = true;
+    }
+    if (typeof args.nodocker_db === 'boolean' && !!args.nodocker_db !== !params.docker_db) {
+        params.docker_db = !args.nodocker_db;
+    }
     // Paramteters with default value = true
     const filelog = args.l || args.filelog;
     if (filelog == false || filelog == 'false') {
@@ -241,6 +248,11 @@ function _set_args(params, args) {
     if (typeof deploy === 'string' && deploy != '') {
         (0, common_1.check_deploy)(deploy);
         params.deploy = deploy;
+    }
+    const db = args.db;
+    if (typeof db === 'string' && db != '') {
+        (0, common_1.check_db)(db);
+        params.db = db;
     }
     const color_log = args.c || args.color_log;
     if (typeof color_log === 'string' && color_log != '') {

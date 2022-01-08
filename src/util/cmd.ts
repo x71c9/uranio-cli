@@ -157,10 +157,23 @@ class CMD {
 		const dotenv:DotEnv = {};
 		const lines = content.split('\n');
 		for(const line of lines){
+			if(line.trim()[0] === '#'){
+				continue;
+			}
 			const splitted = line.split('=');
 			dotenv[splitted[0]] = splitted[1];
 		}
 		return dotenv;
+	}
+	
+	public write_dotenv(dotenv:DotEnv)
+			:void{
+		const dotenv_path = `${this.params.root}/.env`;
+		let content = ``;
+		for(const [key, value] of Object.entries(dotenv)){
+			content += `${key}=${value}\n`;
+		}
+		this.fs.write_file(dotenv_path, content);
 	}
 	
 	private async _clone_repo(

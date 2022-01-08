@@ -46,7 +46,7 @@ const types_1 = require("../types");
 const transpose_1 = require("./transpose");
 const hooks_1 = require("./hooks");
 const common_1 = require("./common");
-const docker_1 = require("./docker");
+const docker = __importStar(require("./docker"));
 let output_instance;
 let util_instance;
 let dev_params = defaults_1.default_params;
@@ -58,7 +58,7 @@ const watc_color = '#687a6a';
 function dev(params) {
     return __awaiter(this, void 0, void 0, function* () {
         if (params.docker === true) {
-            yield (0, docker_1.docker_start)(params);
+            yield docker.start(params);
         }
         else {
             _init_params(params);
@@ -74,7 +74,7 @@ exports.dev = dev;
 function dev_server(params) {
     return __awaiter(this, void 0, void 0, function* () {
         if (params.docker === true) {
-            yield (0, docker_1.docker_start)(params);
+            yield docker.start(params);
         }
         else {
             _init_params(params);
@@ -87,7 +87,7 @@ exports.dev_server = dev_server;
 function dev_client(params) {
     return __awaiter(this, void 0, void 0, function* () {
         if (params.docker === true) {
-            yield (0, docker_1.docker_start)(dev_params);
+            yield docker.start(dev_params);
         }
         else {
             _init_params(params);

@@ -516,7 +516,7 @@ function _avoid_import_loop(file_path:string){
 		
 		if(is_file_importing_uranio){
 			util_instance.fs.write_file(file_path, with_imports_and_variables);
-			util_instance.pretty(file_path);
+			// util_instance.pretty(file_path);
 		}
 	}
 }
@@ -889,7 +889,7 @@ function _generate_client_book(book_name:BookName, required_props:string[]){
 		const text = required_imports.join('\n') + text_without_imports;
 		const file_path = `${client_books_dir}/${book_name}.ts`;
 		util_instance.fs.write_file(file_path, text);
-		util_instance.pretty(file_path);
+		// util_instance.pretty(file_path);
 		output_instance.done_log(`Generated client book [${book_name}].`, 'clnt');
 	
 	}else{

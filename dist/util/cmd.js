@@ -149,10 +149,21 @@ class CMD {
         const dotenv = {};
         const lines = content.split('\n');
         for (const line of lines) {
+            if (line.trim()[0] === '#') {
+                continue;
+            }
             const splitted = line.split('=');
             dotenv[splitted[0]] = splitted[1];
         }
         return dotenv;
+    }
+    write_dotenv(dotenv) {
+        const dotenv_path = `${this.params.root}/.env`;
+        let content = ``;
+        for (const [key, value] of Object.entries(dotenv)) {
+            content += `${key}=${value}\n`;
+        }
+        this.fs.write_file(dotenv_path, content);
     }
     _clone_repo(address, dest_folder, context = '_clr', branch = 'master', recursive = false) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -25,6 +25,7 @@ declare class CMD {
     get_package_data(package_json_path: string): any;
     dependency_exists(repo: string, package_data?: any): boolean;
     read_dotenv(): DotEnv;
+    write_dotenv(dotenv: DotEnv): void;
     private _clone_repo;
 }
 export declare type CMDInstance = InstanceType<typeof CMD>;

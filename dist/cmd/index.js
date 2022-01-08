@@ -15,6 +15,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.docker = void 0;
 __exportStar(require("./init"), exports);
 __exportStar(require("./alias"), exports);
 __exportStar(require("./build"), exports);
@@ -23,7 +24,8 @@ __exportStar(require("./transpose"), exports);
 __exportStar(require("./hooks"), exports);
 __exportStar(require("./info"), exports);
 __exportStar(require("./help"), exports);
-__exportStar(require("./docker"), exports);
+var docker_1 = require("./docker");
+Object.defineProperty(exports, "docker", { enumerable: true, get: function () { return docker_1.docker; } });
 __exportStar(require("./deinit"), exports);
 __exportStar(require("./dot"), exports);
 //# sourceMappingURL=index.js.map
