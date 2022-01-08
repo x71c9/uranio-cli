@@ -336,7 +336,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const db = args.db;
 	
-	if(typeof db === 'string' && db != ''){
+	if(typeof db === 'string' && db !== ''){
 		check_db(db);
 		params.db = db as DB;
 	}
