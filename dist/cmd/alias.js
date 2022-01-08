@@ -99,7 +99,7 @@ function replace_file_aliases(filepath, aliases, params) {
     if (found === true) {
         const modified = sourceFile.print();
         _replace_modified_file(modified, filepath);
-        util_instance.pretty(filepath);
+        // util_instance.pretty(filepath);
     }
 }
 exports.replace_file_aliases = replace_file_aliases;

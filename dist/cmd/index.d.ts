@@ -11,6 +11,6 @@ export * from './transpose';
 export * from './hooks';
 export * from './info';
 export * from './help';
-export * from './docker';
+export { docker } from './docker';
 export * from './deinit';
 export * from './dot';

@@ -28,7 +28,7 @@ import {hooks} from './hooks';
 
 import {merge_params} from './common';
 
-import {docker_start} from './docker';
+import * as docker from './docker';
 
 let output_instance:output.OutputInstance;
 
@@ -47,7 +47,7 @@ export async function dev(params:Partial<Params>)
 		:Promise<void>{
 	if(params.docker === true){
 		
-		await docker_start(params);
+		await docker.start(params);
 		
 	}else{
 		_init_params(params);
@@ -62,7 +62,7 @@ export async function dev(params:Partial<Params>)
 export async function dev_server(params:Partial<Params>):Promise<void>{
 	if(params.docker === true){
 		
-		await docker_start(params);
+		await docker.start(params);
 		
 	}else{
 		_init_params(params);
@@ -74,7 +74,7 @@ export async function dev_server(params:Partial<Params>):Promise<void>{
 export async function dev_client(params:Partial<Params>):Promise<void>{
 	if(params.docker === true){
 		
-		await docker_start(dev_params);
+		await docker.start(dev_params);
 		
 	}else{
 		_init_params(params);

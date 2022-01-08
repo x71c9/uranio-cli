@@ -24,6 +24,7 @@ export type Params = {
 	context: boolean
 	prefix_color: boolean
 	docker: boolean
+	docker_db: boolean
 	filelog: boolean
 	spin: boolean
 	color_uranio: boolean

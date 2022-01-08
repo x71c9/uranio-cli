@@ -19,6 +19,7 @@ export const default_params:Params = {
 	context: false,
 	prefix_color: false,
 	docker: false,
+	docker_db: false,
 	filelog: true,
 	spin: true,
 	color_uranio:true,

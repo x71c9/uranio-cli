@@ -42,7 +42,7 @@ const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
-const docker_1 = require("./docker");
+const docker = __importStar(require("./docker"));
 const types_1 = require("../types");
 const alias_1 = require("./alias");
 const title_1 = require("./title");
@@ -61,7 +61,7 @@ function init(params) {
         _create_rc_file();
         _create_urn_folder();
         if (init_params.docker === true) {
-            yield (0, docker_1.docker_build)(init_params);
+            yield docker.build(init_params);
         }
         else {
             yield _init_pacman();
@@ -75,6 +75,12 @@ function init(params) {
             _copy_assets();
             _remove_tmp();
             yield _replace_aliases();
+        }
+        if (init_params.docker_db === true) {
+            yield docker.network_create(init_params, true);
+            yield docker.db_create(init_params, init_params.db);
+            yield docker.db_start(init_params, init_params.db);
+            docker.update_env();
         }
         output_instance.end_log(`Initialization completed.`);
     });
@@ -174,6 +180,59 @@ function _ask_for_docker(args) {
                 if (answers.docker === true) {
                     init_params.docker = true;
                 }
+                yield _ask_for_docker_db(args);
+            }));
+        }
+        else {
+            yield _ask_for_docker_db(args);
+        }
+    });
+}
+function _ask_for_docker_db(args) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const docker_db = args.docker_db;
+        if (!docker_db && init_params.force === false) {
+            let confirm_msg = '';
+            confirm_msg += `? Do you want to run the db in a docker container?\n`;
+            const suffix = `? Docker need to be installed on your system.`;
+            inquirer_1.default.
+                prompt([
+                {
+                    type: 'confirm',
+                    name: 'docker_db',
+                    message: confirm_msg,
+                    suffix: suffix
+                }
+            ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
+                if (answers.docker_db === true) {
+                    init_params.docker_db = true;
+                    yield _ask_for_db_type(args);
+                }
+                else {
+                    yield _ask_for_repo(args);
+                }
+            }));
+        }
+        else {
+            yield _ask_for_repo(args);
+        }
+    });
+}
+function _ask_for_db_type(args) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (init_params.force === false) {
+            let confirm_msg = '';
+            confirm_msg += `Select db:`;
+            inquirer_1.default.
+                prompt([
+                {
+                    type: 'list',
+                    name: 'db',
+                    message: confirm_msg,
+                    choices: Object.keys(types_1.abstract_db)
+                }
+            ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
+                init_params.db = answers.db;
                 yield _ask_for_repo(args);
             }));
         }
@@ -457,6 +516,8 @@ function _create_rc_file() {
     content += `\t"pacman": "${init_params.pacman}",\n`;
     content += `\t"deploy": "${init_params.deploy}",\n`;
     content += `\t"docker": ${init_params.docker},\n`;
+    content += `\t"docker_db": ${init_params.docker_db},\n`;
+    content += `\t"db": "${init_params.db}",\n`;
     content += `}`;
     util_instance.fs.write_file(`${init_params.root}/${defaults_1.defaults.json_filename}`, content);
     util_instance.pretty(`${init_params.root}/${defaults_1.defaults.json_filename}`, 'json');
