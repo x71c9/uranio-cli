@@ -47,7 +47,7 @@ Uranio can run the API on [Express.js](https://expressjs.com/) or on [Netlify](h
 
 ### Installation
 
-Uranio CLI requires [Node.js](https://nodejs.org). To install it, run the following command from any directory in your terminal:
+Uranio CLI requires [Node.js](https://nodejs.org). To install `uranio-cli`, run the following command from any directory in your terminal:
 
 ```bash
 npm install uranio-cli -g
@@ -78,6 +78,12 @@ uranio [command]
 Run `help` for detailed information about CLI commands
 ```
 uranio help
+```
+
+##### Shortcut
+
+```
+urn [command]
 ```
 
 ### Commands
