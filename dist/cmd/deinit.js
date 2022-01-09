@@ -59,8 +59,7 @@ function _remove_dockers() {
     return __awaiter(this, void 0, void 0, function* () {
         if (!util_instance.is_initialized()) {
             output_instance.warn_log(`Uranio was not initliazed or is missing \`uranio.json\` file.`);
-            output_instance.warn_log(`Cannot deinit docker for this repo if it was present.`);
-            output_instance.warn_log(`Please check docker with \`docker ps -a\` and manually delete.`);
+            output_instance.warn_log(`Some build artifacts might be still present.`);
             return;
         }
         yield docker.tmp_remove(deinit_params, true);
@@ -85,6 +84,8 @@ function _delete_files() {
         util_instance.fs.remove_file(`${deinit_params.root}/yarn.lock`);
         util_instance.fs.remove_file(`${deinit_params.root}/yarn-error.log`);
         util_instance.fs.remove_file(`${deinit_params.root}/package-lock.json`);
+        util_instance.fs.remove_file(`${deinit_params.root}/netlify.toml`);
+        util_instance.fs.remove_directory(`${deinit_params.root}/.netlify`);
         util_instance.fs.remove_directory(`${deinit_params.root}/${defaults_1.defaults.folder}`);
         util_instance.fs.remove_file(`${deinit_params.root}/${defaults_1.defaults.json_filename}`);
     });

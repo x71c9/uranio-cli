@@ -93,6 +93,15 @@ function docker(params, args) {
                 }
                 break;
             }
+            case 'network': {
+                switch (args._[2]) {
+                    case 'create': {
+                        yield network_create(docker_params);
+                        break;
+                    }
+                }
+                break;
+            }
             default: {
                 output_instance.error_log(`Invalid docker command.`);
                 process.exit(1);
@@ -168,7 +177,7 @@ function stop(params, continue_on_fail = false) {
         if (continue_on_fail) {
             cmd += ` || true`;
         }
-        yield _execute_log(cmd, 'docker', 'stopping');
+        yield _execute_spin_verbose(cmd, 'docker', 'stopping');
         output_instance.done_log(`Docker container stopped ${docker_params.repo} ${docker_params.deploy}`);
     });
 }
@@ -295,7 +304,7 @@ function network_remove(params, continue_on_fail = false) {
             cmd_rm += ` || true`;
         }
         yield _execute_spin_verbose(cmd_rm, 'docker', `creating network ${network_name}`);
-        output_instance.done_log(`Docker created network ${network_name}`);
+        output_instance.done_log(`Docker removed network ${network_name}`);
     });
 }
 exports.network_remove = network_remove;
