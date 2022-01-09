@@ -8,11 +8,9 @@ import {urn_util} from 'urn-lib';
 
 import {Params} from '../types';
 
-// import {merge_params} from '../cmd/common';
+import {defaults} from '../conf/defaults';
 
 import * as out from '../output/';
-
-// import {UtilParams} from './types';
 
 // DO NO CANCEL IT
 // import * as common from '../cmd/common';
@@ -21,23 +19,9 @@ import * as fs from './fs';
 
 import * as spawn from './spawn';
 
-// import {
-//   abstract_repos,
-//   valid_repos,
-//   Repo,
-//   abstract_pacman,
-//   valid_pacman,
-//   PacMan,
-//   abstract_deploy,
-//   valid_deploy,
-//   Deploy,
-// } from '../types';
-
 type DotEnv = {
 	[k:string]: string
 }
-
-// import {defaults} from '../conf/defaults';
 
 class CMD {
 	
@@ -48,34 +32,6 @@ class CMD {
 		this.fs = fs.create(output);
 		this.spawn = spawn.create(output);
 	}
-	
-	// public read_rc_file()
-	//     :void{
-	//   if(!this.is_initialized()){
-	//     let err =  `URANIO was not initialized yet.`;
-	//     err += ` Please run "uranio init" in order to initialize the repo.`;
-	//     this.output.error_log(err, 'init');
-	//     process.exit(1);
-	//   }else{
-	//     const rcfile_path = `${this.params.root}/${jsonfile_path}`;
-	//     try{
-	//       const rc_content = this.fs.read_file(rcfile_path, 'utf8');
-	//       const rc_obj = urn_util.json.clean_parse(rc_content);
-	//       this.set_repo(rc_obj.repo);
-	//       this.params.repo = rc_obj.repo;
-	//       this.params.pacman = rc_obj.pacman;
-	//       this.params.deploy = rc_obj.deploy;
-	//     }catch(ex){
-	//       this.output.wrong_end_log(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
-	//       process.exit(1);
-	//     }
-	//   }
-	// }
-	
-	// public is_initialized()
-	//     :boolean{
-	//   return (this.fs.exists(`${this.params.root}/${jsonfile_path}`));
-	// }
 	
 	public async yarn_install()
 			:Promise<any>{
@@ -174,6 +130,76 @@ class CMD {
 			content += `${key}=${value}\n`;
 		}
 		this.fs.write_file(dotenv_path, content);
+	}
+	
+	public async install_core_dep(){
+		this.output.start_loading(`Installing core dep...`);
+		await this.install_dep(defaults.core_dep_repo, 'core');
+		await this.install_dep_dev(defaults.core_dep_dev_repo, 'core');
+		this.output.done_log(`Installed core dependencies.`, 'core');
+		return true;
+	}
+	
+	public async install_api_dep(){
+		this.output.start_loading(`Installing api dep...`);
+		await this.install_dep(defaults.api_dep_repo, 'api');
+		await this.install_dep_dev(defaults.api_dep_dev_repo, 'api');
+		this.output.done_log(`Installed api dependencies.`, 'api');
+		return true;
+	}
+	
+	public async install_trx_dep(){
+		this.output.start_loading(`Installing trx dep...`);
+		await this.install_dep(defaults.trx_dep_repo, 'trx');
+		await this.install_dep_dev(defaults.trx_dep_dev_repo, 'trx');
+		this.output.done_log(`Installed trx dependencies.`, 'trx');
+		return true;
+	}
+	
+	public async install_adm_dep(){
+		this.output.start_loading(`Installing adm dep...`);
+		await this.install_dep(defaults.adm_dep_repo, 'adm');
+		await this.install_dep_dev(defaults.adm_dep_dev_repo, 'adm');
+		this.output.done_log(`Installed adm dependencies.`, 'adm');
+		return true;
+	}
+	
+	public async uninstall_core_dep(pack_data?:any){
+		await this._uninstall_uranio_dep(defaults.core_dep_repo, 'core', pack_data);
+		await this._uninstall_uranio_dep(defaults.core_dep_dev_repo, 'core', pack_data);
+		return true;
+	}
+	
+	public async uninstall_api_dep(pack_data?:any){
+		await this._uninstall_uranio_dep(defaults.api_dep_repo, 'api', pack_data);
+		await this._uninstall_uranio_dep(defaults.api_dep_dev_repo, 'api', pack_data);
+		return true;
+	}
+	
+	public async uninstall_trx_dep(pack_data?:any){
+		await this._uninstall_uranio_dep(defaults.trx_dep_repo, 'trx', pack_data);
+		await this._uninstall_uranio_dep(defaults.trx_dep_dev_repo, 'trx', pack_data);
+		return true;
+	}
+	
+	public async uninstall_adm_dep(pack_data?:any){
+		await this._uninstall_uranio_dep(defaults.adm_dep_repo, 'adm', pack_data);
+		await this._uninstall_uranio_dep(defaults.adm_dep_dev_repo, 'adm', pack_data);
+		return true;
+	}
+	
+	private async _uninstall_uranio_dep(repo:string, context:string, pack_data?:any){
+		const short_repo =
+			(repo.substr(0,3) === 'ssh' || repo.substr(0,7) === 'git+ssh') ?
+				repo.split('/').slice(-1)[0] : repo;
+		if(this.dependency_exists(short_repo, pack_data)){
+			this.output.start_loading(`Uninstalling ${short_repo} dep...`);
+			const dep_folder = `${this.params.root}/node_modules/${short_repo}`;
+			this.fs.remove_directory(dep_folder, context);
+			await this.uninstall_dep(`${short_repo}`, context);
+			this.output.done_log(`Uninstalled ${short_repo} dependencies.`, context);
+			return true;
+		}
 	}
 	
 	private async _clone_repo(

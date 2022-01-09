@@ -149,3 +149,6 @@ export function check_if_is_dot(path:string):boolean{
 	}
 	return false;
 }
+
+
+

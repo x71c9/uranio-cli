@@ -34,6 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deinit = void 0;
+const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
@@ -47,8 +48,9 @@ function deinit(params) {
         deinit_params = (0, common_1.merge_params)(params);
         output_instance = output.create(deinit_params);
         util_instance = util.create(deinit_params, output_instance);
+        yield _reset_package_json();
         yield _remove_dockers();
-        yield _delete_files();
+        _delete_files();
         output_instance.end_log(`Deinitialization completed.`);
     });
 }
@@ -68,8 +70,6 @@ function _delete_files() {
     return __awaiter(this, void 0, void 0, function* () {
         util_instance.fs.remove_directory(`${deinit_params.root}/.tmp`);
         util_instance.fs.remove_directory(`${deinit_params.root}/dist`);
-        util_instance.fs.remove_directory(`${deinit_params.root}/${defaults_1.defaults.folder}`);
-        util_instance.fs.remove_file(`${deinit_params.root}/${defaults_1.defaults.json_filename}`);
         util_instance.fs.remove_directory(`${deinit_params.root}/node_modules`);
         util_instance.fs.remove_file(`${deinit_params.root}/tsconfig.json`);
         util_instance.fs.remove_file(`${deinit_params.root}/sample.env`);
@@ -79,6 +79,87 @@ function _delete_files() {
         util_instance.fs.remove_file(`${deinit_params.root}/yarn.lock`);
         util_instance.fs.remove_file(`${deinit_params.root}/yarn-error.log`);
         util_instance.fs.remove_file(`${deinit_params.root}/package-lock.json`);
+        util_instance.fs.remove_directory(`${deinit_params.root}/${defaults_1.defaults.folder}`);
+        util_instance.fs.remove_file(`${deinit_params.root}/${defaults_1.defaults.json_filename}`);
     });
+}
+function _reset_package_json() {
+    return __awaiter(this, void 0, void 0, function* () {
+        _remove_package_aliases();
+        _remove_package_scripts();
+        const pack_data = util_instance.cmd.get_package_data(`${deinit_params.root}/package.json`);
+        yield util_instance.cmd.uninstall_core_dep(pack_data);
+        yield util_instance.cmd.uninstall_api_dep(pack_data);
+        yield util_instance.cmd.uninstall_trx_dep(pack_data);
+        yield util_instance.cmd.uninstall_adm_dep(pack_data);
+    });
+}
+function _remove_package_aliases() {
+    output_instance.start_loading('Removinf package.json aliases...');
+    const package_json_path = `${deinit_params.root}/package.json`;
+    const data = util_instance.fs.read_file(package_json_path, 'utf8');
+    try {
+        const uranio_keys = [
+            'uranio',
+            'uranio-books',
+            'uranio-core',
+            'uranio-api',
+            'uranio-trx',
+            'uranio-adm'
+        ];
+        const package_data = urn_lib_1.urn_util.json.clean_parse(data);
+        if (typeof package_data['_moduleAliases'] === 'object') {
+            const module_aliases = Object.assign({}, package_data['_moduleAliases']);
+            for (const [key, _value] of Object.entries(module_aliases)) {
+                if (uranio_keys.includes(key)) {
+                    delete module_aliases[key];
+                }
+            }
+            package_data['_moduleAliases'] = module_aliases;
+        }
+        try {
+            util_instance.fs.write_file(package_json_path, JSON.stringify(package_data, null, '\t'));
+            output_instance.done_log(`Updated package.json module aliases.`, 'alias');
+        }
+        catch (ex) {
+            output_instance.error_log(`Cannot update ${package_json_path}.`, 'alias');
+        }
+    }
+    catch (ex) {
+        output_instance.error_log(`Cannot parse ${package_json_path}.`, 'alias');
+    }
+}
+function _remove_package_scripts() {
+    output_instance.start_loading('Removing scripts...');
+    const package_json_path = `${deinit_params.root}/package.json`;
+    const data = util_instance.fs.read_file(package_json_path, 'utf8');
+    try {
+        const uranio_scripts = [
+            'build',
+            'build:server',
+            'build:client',
+            'dev',
+            'dev:server',
+            'dev:client'
+        ];
+        const package_data = urn_lib_1.urn_util.json.clean_parse(data);
+        const old_scripts = package_data['scripts'] || {};
+        for (const [key, _value] of Object.entries(old_scripts)) {
+            if (uranio_scripts.includes(key)) {
+                delete old_scripts[key];
+            }
+        }
+        package_data['scripts'] = old_scripts;
+        try {
+            util_instance.fs.write_file(package_json_path, JSON.stringify(package_data, null, '\t'));
+            output_instance.done_log(`Updated package.json scripts.`, 'alias');
+        }
+        catch (ex) {
+            output_instance.error_log(`Cannot update ${package_json_path}.`, 'alias');
+        }
+    }
+    catch (ex) {
+        output_instance.error_log(`Cannot parse ${package_json_path}.`, 'alias');
+    }
 }
 //# sourceMappingURL=deinit.js.map

@@ -26,6 +26,15 @@ declare class CMD {
     dependency_exists(repo: string, package_data?: any): boolean;
     read_dotenv(): DotEnv;
     write_dotenv(dotenv: DotEnv): void;
+    install_core_dep(): Promise<boolean>;
+    install_api_dep(): Promise<boolean>;
+    install_trx_dep(): Promise<boolean>;
+    install_adm_dep(): Promise<boolean>;
+    uninstall_core_dep(pack_data?: any): Promise<boolean>;
+    uninstall_api_dep(pack_data?: any): Promise<boolean>;
+    uninstall_trx_dep(pack_data?: any): Promise<boolean>;
+    uninstall_adm_dep(pack_data?: any): Promise<boolean>;
+    private _uninstall_uranio_dep;
     private _clone_repo;
 }
 export declare type CMDInstance = InstanceType<typeof CMD>;
