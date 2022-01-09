@@ -205,7 +205,7 @@ class CMD {
     _uninstall_uranio_dep(repo, context, pack_data) {
         return __awaiter(this, void 0, void 0, function* () {
             const short_repo = (repo.substr(0, 3) === 'ssh' || repo.substr(0, 7) === 'git+ssh') ?
-                repo.split('/').slice(-1)[0] : repo;
+                repo.split('/').slice(-1)[0].replace('uranio', 'urn') : repo;
             if (this.dependency_exists(short_repo, pack_data)) {
                 this.output.start_loading(`Uninstalling ${short_repo} dep...`);
                 const dep_folder = `${this.params.root}/node_modules/${short_repo}`;
