@@ -99,6 +99,10 @@ function docker(params, args) {
                         yield network_create(docker_params);
                         break;
                     }
+                    case 'remove': {
+                        yield network_remove(docker_params);
+                        break;
+                    }
                 }
                 break;
             }
@@ -164,7 +168,7 @@ function start(params) {
         let cmd = '';
         cmd += `docker start -i ${container_name}`;
         yield _execute_log(cmd, 'docker', 'starting');
-        output_instance.done_log(`Docker image started ${docker_params.repo} ${docker_params.deploy}`);
+        output_instance.done_log(`Docker image started ${container_name}`);
     });
 }
 exports.start = start;
@@ -178,7 +182,7 @@ function stop(params, continue_on_fail = false) {
             cmd += ` || true`;
         }
         yield _execute_spin_verbose(cmd, 'docker', 'stopping');
-        output_instance.done_log(`Docker container stopped ${docker_params.repo} ${docker_params.deploy}`);
+        output_instance.done_log(`Docker container stopped ${container_name}`);
     });
 }
 exports.stop = stop;

@@ -64,13 +64,13 @@ function init(params) {
         _copy_assets();
         _create_dot_env();
         _ignore_files();
+        _update_package_aliases();
+        _update_package_scripts();
         if (init_params.docker === true) {
             yield docker.build(init_params);
         }
         else {
             yield _init_pacman();
-            _update_package_aliases();
-            _update_package_scripts();
             yield _clone_repo();
             yield _install_repo();
             _remove_git_files();

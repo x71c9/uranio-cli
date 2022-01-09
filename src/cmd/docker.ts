@@ -91,6 +91,10 @@ export async function docker(params:Partial<Params>, args:Arguments)
 					await network_create(docker_params);
 					break;
 				}
+				case 'remove':{
+					await network_remove(docker_params);
+					break;
+				}
 			}
 			break;
 		}
@@ -168,7 +172,7 @@ export async function start(params:Partial<Params>):Promise<void>{
 	cmd += `docker start -i ${container_name}`;
 	await _execute_log(cmd, 'docker', 'starting');
 	output_instance.done_log(
-		`Docker image started ${docker_params.repo} ${docker_params.deploy}`
+		`Docker image started ${container_name}`
 	);
 }
 
@@ -183,7 +187,7 @@ export async function stop(params:Partial<Params>, continue_on_fail=false)
 	}
 	await _execute_spin_verbose(cmd, 'docker', 'stopping');
 	output_instance.done_log(
-		`Docker container stopped ${docker_params.repo} ${docker_params.deploy}`
+		`Docker container stopped ${container_name}`
 	);
 }
 
