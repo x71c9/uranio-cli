@@ -55,6 +55,11 @@ class Output {
         const error_text = `${chalk_1.default.hex(`#874040`)(`[ERROR] ${text}`)}`;
         this.log(error_text, context);
     }
+    warn_log(text, context = 'errr') {
+        this.stop_loading();
+        const warn_text = `${chalk_1.default.hex(`#d0a800`)(`[WARN] ${text}`)}`;
+        this.log(warn_text, context);
+    }
     end_log(text) {
         this.stop_loading();
         const end_text = `${defaults_1.defaults.check_char} ${text}`;

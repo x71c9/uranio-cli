@@ -47,6 +47,12 @@ export async function deinit(params:Partial<Params>)
 async function _remove_dockers()
 		:Promise<void>{
 	
+	if(!util_instance.is_initialized()){
+		output_instance.warn_log(`Uranio was not initliazed or is missing \`uranio.json\` file.`);
+		output_instance.warn_log(`Cannot deinit docker for this repo if it was present.`);
+		output_instance.warn_log(`Please check docker with \`docker ps -a\` and manually delete.`);
+		return;
+	}
 	await docker.tmp_remove(deinit_params, true);
 	
 	await docker.db_stop(deinit_params, deinit_params.db, true);
@@ -78,6 +84,9 @@ async function _delete_files(){
 async function _reset_package_json(){
 	_remove_package_aliases();
 	_remove_package_scripts();
+	if(!util_instance.is_initialized()){
+		return;
+	}
 	const pack_data = util_instance.cmd.get_package_data(
 		`${deinit_params.root}/package.json`
 	);

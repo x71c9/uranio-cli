@@ -13,6 +13,7 @@ declare class Output {
     done_log(text: string, context?: string): void;
     done_verbose_log(text: string, context?: string): void;
     error_log(text: string, context?: string): void;
+    warn_log(text: string, context?: string): void;
     end_log(text: string): void;
     wrong_end_log(text: string): void;
     start_loading(text: string): void;

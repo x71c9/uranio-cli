@@ -77,6 +77,13 @@ class Output {
 		this.log(error_text, context);
 	}
 	
+	public warn_log(text:string, context='errr')
+			:void{
+		this.stop_loading();
+		const warn_text = `${chalk.hex(`#d0a800`)(`[WARN] ${text}`)}`;
+		this.log(warn_text, context);
+	}
+	
 	public end_log(text:string)
 			:void{
 		this.stop_loading();
