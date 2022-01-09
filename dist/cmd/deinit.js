@@ -57,6 +57,12 @@ function deinit(params) {
 exports.deinit = deinit;
 function _remove_dockers() {
     return __awaiter(this, void 0, void 0, function* () {
+        if (!util_instance.is_initialized()) {
+            output_instance.warn_log(`Uranio was not initliazed or is missing \`uranio.json\` file.`);
+            output_instance.warn_log(`Cannot deinit docker for this repo if it was present.`);
+            output_instance.warn_log(`Please check docker with \`docker ps -a\` and manually delete.`);
+            return;
+        }
         yield docker.tmp_remove(deinit_params, true);
         yield docker.db_stop(deinit_params, deinit_params.db, true);
         yield docker.db_remove(deinit_params, deinit_params.db, true);
@@ -87,6 +93,9 @@ function _reset_package_json() {
     return __awaiter(this, void 0, void 0, function* () {
         _remove_package_aliases();
         _remove_package_scripts();
+        if (!util_instance.is_initialized()) {
+            return;
+        }
         const pack_data = util_instance.cmd.get_package_data(`${deinit_params.root}/package.json`);
         yield util_instance.cmd.uninstall_core_dep(pack_data);
         yield util_instance.cmd.uninstall_api_dep(pack_data);
