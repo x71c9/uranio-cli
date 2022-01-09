@@ -116,6 +116,9 @@ function _remove_package_aliases() {
                 }
             }
             package_data['_moduleAliases'] = module_aliases;
+            if (Object.keys(module_aliases).length === 0) {
+                delete package_data['_moduleAliases'];
+            }
         }
         try {
             util_instance.fs.write_file(package_json_path, JSON.stringify(package_data, null, '\t'));
