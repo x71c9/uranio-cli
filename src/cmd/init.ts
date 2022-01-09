@@ -65,6 +65,8 @@ export async function init(params:Partial<Params>)
 	_copy_assets();
 	_create_dot_env();
 	_ignore_files();
+	_update_package_aliases();
+	_update_package_scripts();
 	
 	if(init_params.docker === true){
 		
@@ -73,8 +75,6 @@ export async function init(params:Partial<Params>)
 	}else{
 		
 		await _init_pacman();
-		_update_package_aliases();
-		_update_package_scripts();
 		await _clone_repo();
 		await _install_repo();
 		_remove_git_files();
