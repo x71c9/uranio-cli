@@ -59,6 +59,7 @@ export async function init(params:Partial<Params>)
 	_log_important_params();
 	_create_rc_file();
 	_create_urn_folder();
+	_create_client_server_folders();
 	
 	await _clone_assets_repo();
 	_copy_assets();
@@ -74,7 +75,6 @@ export async function init(params:Partial<Params>)
 		await _init_pacman();
 		_update_package_aliases();
 		_update_package_scripts();
-		_create_client_server_folders();
 		await _clone_repo();
 		await _install_repo();
 		_remove_git_files();
