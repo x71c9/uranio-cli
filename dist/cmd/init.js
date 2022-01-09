@@ -59,6 +59,7 @@ function init(params) {
         _log_important_params();
         _create_rc_file();
         _create_urn_folder();
+        _create_client_server_folders();
         yield _clone_assets_repo();
         _copy_assets();
         _create_dot_env();
@@ -70,7 +71,6 @@ function init(params) {
             yield _init_pacman();
             _update_package_aliases();
             _update_package_scripts();
-            _create_client_server_folders();
             yield _clone_repo();
             yield _install_repo();
             _remove_git_files();
