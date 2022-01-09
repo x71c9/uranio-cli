@@ -35,12 +35,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = void 0;
 const urn_lib_1 = require("urn-lib");
-// import {UtilParams} from './types';
+const defaults_1 = require("../conf/defaults");
 // DO NO CANCEL IT
 // import * as common from '../cmd/common';
 const fs = __importStar(require("./fs"));
 const spawn = __importStar(require("./spawn"));
-// import {defaults} from '../conf/defaults';
 class CMD {
     constructor(params, output) {
         this.params = params;
@@ -48,32 +47,6 @@ class CMD {
         this.fs = fs.create(output);
         this.spawn = spawn.create(output);
     }
-    // public read_rc_file()
-    //     :void{
-    //   if(!this.is_initialized()){
-    //     let err =  `URANIO was not initialized yet.`;
-    //     err += ` Please run "uranio init" in order to initialize the repo.`;
-    //     this.output.error_log(err, 'init');
-    //     process.exit(1);
-    //   }else{
-    //     const rcfile_path = `${this.params.root}/${jsonfile_path}`;
-    //     try{
-    //       const rc_content = this.fs.read_file(rcfile_path, 'utf8');
-    //       const rc_obj = urn_util.json.clean_parse(rc_content);
-    //       this.set_repo(rc_obj.repo);
-    //       this.params.repo = rc_obj.repo;
-    //       this.params.pacman = rc_obj.pacman;
-    //       this.params.deploy = rc_obj.deploy;
-    //     }catch(ex){
-    //       this.output.wrong_end_log(`Cannot parse rcfile ${rcfile_path}. ${ex.message}`);
-    //       process.exit(1);
-    //     }
-    //   }
-    // }
-    // public is_initialized()
-    //     :boolean{
-    //   return (this.fs.exists(`${this.params.root}/${jsonfile_path}`));
-    // }
     yarn_install() {
         return __awaiter(this, void 0, void 0, function* () {
             const action = `yarn install`;
@@ -164,6 +137,84 @@ class CMD {
             content += `${key}=${value}\n`;
         }
         this.fs.write_file(dotenv_path, content);
+    }
+    install_core_dep() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.output.start_loading(`Installing core dep...`);
+            yield this.install_dep(defaults_1.defaults.core_dep_repo, 'core');
+            yield this.install_dep_dev(defaults_1.defaults.core_dep_dev_repo, 'core');
+            this.output.done_log(`Installed core dependencies.`, 'core');
+            return true;
+        });
+    }
+    install_api_dep() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.output.start_loading(`Installing api dep...`);
+            yield this.install_dep(defaults_1.defaults.api_dep_repo, 'api');
+            yield this.install_dep_dev(defaults_1.defaults.api_dep_dev_repo, 'api');
+            this.output.done_log(`Installed api dependencies.`, 'api');
+            return true;
+        });
+    }
+    install_trx_dep() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.output.start_loading(`Installing trx dep...`);
+            yield this.install_dep(defaults_1.defaults.trx_dep_repo, 'trx');
+            yield this.install_dep_dev(defaults_1.defaults.trx_dep_dev_repo, 'trx');
+            this.output.done_log(`Installed trx dependencies.`, 'trx');
+            return true;
+        });
+    }
+    install_adm_dep() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.output.start_loading(`Installing adm dep...`);
+            yield this.install_dep(defaults_1.defaults.adm_dep_repo, 'adm');
+            yield this.install_dep_dev(defaults_1.defaults.adm_dep_dev_repo, 'adm');
+            this.output.done_log(`Installed adm dependencies.`, 'adm');
+            return true;
+        });
+    }
+    uninstall_core_dep(pack_data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this._uninstall_uranio_dep(defaults_1.defaults.core_dep_repo, 'core', pack_data);
+            yield this._uninstall_uranio_dep(defaults_1.defaults.core_dep_dev_repo, 'core', pack_data);
+            return true;
+        });
+    }
+    uninstall_api_dep(pack_data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this._uninstall_uranio_dep(defaults_1.defaults.api_dep_repo, 'api', pack_data);
+            yield this._uninstall_uranio_dep(defaults_1.defaults.api_dep_dev_repo, 'api', pack_data);
+            return true;
+        });
+    }
+    uninstall_trx_dep(pack_data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this._uninstall_uranio_dep(defaults_1.defaults.trx_dep_repo, 'trx', pack_data);
+            yield this._uninstall_uranio_dep(defaults_1.defaults.trx_dep_dev_repo, 'trx', pack_data);
+            return true;
+        });
+    }
+    uninstall_adm_dep(pack_data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this._uninstall_uranio_dep(defaults_1.defaults.adm_dep_repo, 'adm', pack_data);
+            yield this._uninstall_uranio_dep(defaults_1.defaults.adm_dep_dev_repo, 'adm', pack_data);
+            return true;
+        });
+    }
+    _uninstall_uranio_dep(repo, context, pack_data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const short_repo = (repo.substr(0, 3) === 'ssh' || repo.substr(0, 7) === 'git+ssh') ?
+                repo.split('/').slice(-1)[0] : repo;
+            if (this.dependency_exists(short_repo, pack_data)) {
+                this.output.start_loading(`Uninstalling ${short_repo} dep...`);
+                const dep_folder = `${this.params.root}/node_modules/${short_repo}`;
+                this.fs.remove_directory(dep_folder, context);
+                yield this.uninstall_dep(`${short_repo}`, context);
+                this.output.done_log(`Uninstalled ${short_repo} dependencies.`, context);
+                return true;
+            }
+        });
     }
     _clone_repo(address, dest_folder, context = '_clr', branch = 'master', recursive = false) {
         return __awaiter(this, void 0, void 0, function* () {

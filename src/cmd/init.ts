@@ -57,12 +57,13 @@ export async function init(params:Partial<Params>)
 	util_instance = util.create(init_params, output_instance);
 	
 	_log_important_params();
-	_ignore_urn_folder();
 	_create_rc_file();
 	_create_urn_folder();
 	
 	await _clone_assets_repo();
 	_copy_assets();
+	_create_dot_env();
+	_ignore_files();
 	
 	if(init_params.docker === true){
 		
@@ -82,8 +83,6 @@ export async function init(params:Partial<Params>)
 		await _replace_aliases();
 		
 	}
-	
-	_create_dot_env();
 	
 	if(init_params.docker_db === true){
 		await docker.network_create(init_params, true);
@@ -683,8 +682,8 @@ function _create_rc_file(){
 	output_instance.done_log(`Created file ${defaults.json_filename}.`, 'rcfl');
 }
 
-function _ignore_urn_folder(){
-	output_instance.start_loading(`Adding ${defaults.folder} to .gitignore...`);
+function _ignore_files(){
+	output_instance.start_loading(`Adding entries to .gitignore...`);
 	const gitignore = `${init_params.root}/.gitignore`;
 	if(!util_instance.fs.exists(gitignore)){
 		util_instance.fs.create_file(gitignore, 'giti');
@@ -696,12 +695,14 @@ function _ignore_urn_folder(){
 	if(content.indexOf(defaults.log_filepath) === -1){
 		content += `\n${defaults.log_filepath}`;
 	}
-	if(content.indexOf(defaults.json_filename) === -1){
-		content += `\n${defaults.json_filename}`;
+	// if(content.indexOf(defaults.json_filename) === -1){
+	//   content += `\n${defaults.json_filename}`;
+	// }
+	if(content.indexOf(`.env`) === -1){
+		content += `\n.env`;
 	}
 	util_instance.fs.write_file(gitignore, content);
-	const log_msg =
-		`Added ${defaults.folder}, ${defaults.log_filepath} and ${defaults.json_filename} to .gitignore.`;
+	const log_msg = `Added entries to .gitignore.`;
 	output_instance.done_log(log_msg, '.git');
 }
 
@@ -989,25 +990,25 @@ async function _install_dep()
 	const pack_data = util_instance.cmd.get_package_data(
 		`${init_params.root}/package.json`
 	);
-	await _uninstall_core_dep(pack_data);
-	await _uninstall_api_dep(pack_data);
-	await _uninstall_trx_dep(pack_data);
-	await _uninstall_adm_dep(pack_data);
+	await util_instance.cmd.uninstall_core_dep(pack_data);
+	await util_instance.cmd.uninstall_api_dep(pack_data);
+	await util_instance.cmd.uninstall_trx_dep(pack_data);
+	await util_instance.cmd.uninstall_adm_dep(pack_data);
 	switch(init_params.repo){
 		case 'core':{
-			await _install_core_dep();
+			await util_instance.cmd.install_core_dep();
 			return true;
 		}
 		case 'api':{
-			await _install_api_dep();
+			await util_instance.cmd.install_api_dep();
 			return true;
 		}
 		case 'trx':{
-			await _install_trx_dep();
+			await util_instance.cmd.install_trx_dep();
 			return true;
 		}
 		case 'adm':{
-			await _install_adm_dep();
+			await util_instance.cmd.install_adm_dep();
 			return true;
 		}
 		default:{
@@ -1020,72 +1021,3 @@ async function _install_dep()
 	}
 }
 
-async function _uninstall_core_dep(pack_data?:any){
-	await _uninstall_dep(defaults.core_dep_repo, 'core', pack_data);
-	await _uninstall_dep(defaults.core_dep_dev_repo, 'core', pack_data);
-	return true;
-}
-
-async function _uninstall_api_dep(pack_data?:any){
-	await _uninstall_dep(defaults.api_dep_repo, 'api', pack_data);
-	await _uninstall_dep(defaults.api_dep_dev_repo, 'api', pack_data);
-	return true;
-}
-
-async function _uninstall_trx_dep(pack_data?:any){
-	await _uninstall_dep(defaults.trx_dep_repo, 'trx', pack_data);
-	await _uninstall_dep(defaults.trx_dep_dev_repo, 'trx', pack_data);
-	return true;
-}
-
-async function _uninstall_adm_dep(pack_data?:any){
-	await _uninstall_dep(defaults.adm_dep_repo, 'adm', pack_data);
-	await _uninstall_dep(defaults.adm_dep_dev_repo, 'adm', pack_data);
-	return true;
-}
-
-async function _uninstall_dep(repo:string, context:string, pack_data?:any){
-	const short_repo =
-		(repo.substr(0,3) === 'ssh' || repo.substr(0,7) === 'git+ssh') ?
-			repo.split('/').slice(-1)[0] : repo;
-	if(util_instance.cmd.dependency_exists(short_repo, pack_data)){
-		output_instance.start_loading(`Uninstalling ${short_repo} dep...`);
-		const dep_folder = `${init_params.root}/node_modules/${short_repo}`;
-		util_instance.fs.remove_directory(dep_folder, context);
-		await util_instance.cmd.uninstall_dep(`${short_repo}`, context);
-		output_instance.done_log(`Uninstalled ${short_repo} dependencies.`, context);
-		return true;
-	}
-}
-
-async function _install_core_dep(){
-	output_instance.start_loading(`Installing core dep...`);
-	await util_instance.cmd.install_dep(defaults.core_dep_repo, 'core');
-	await util_instance.cmd.install_dep_dev(defaults.core_dep_dev_repo, 'core');
-	output_instance.done_log(`Installed core dependencies.`, 'core');
-	return true;
-}
-
-async function _install_api_dep(){
-	output_instance.start_loading(`Installing api dep...`);
-	await util_instance.cmd.install_dep(defaults.api_dep_repo, 'api');
-	await util_instance.cmd.install_dep_dev(defaults.api_dep_dev_repo, 'api');
-	output_instance.done_log(`Installed api dependencies.`, 'api');
-	return true;
-}
-
-async function _install_trx_dep(){
-	output_instance.start_loading(`Installing trx dep...`);
-	await util_instance.cmd.install_dep(defaults.trx_dep_repo, 'trx');
-	await util_instance.cmd.install_dep_dev(defaults.trx_dep_dev_repo, 'trx');
-	output_instance.done_log(`Installed trx dependencies.`, 'trx');
-	return true;
-}
-
-async function _install_adm_dep(){
-	output_instance.start_loading(`Installing adm dep...`);
-	await util_instance.cmd.install_dep(defaults.adm_dep_repo, 'adm');
-	await util_instance.cmd.install_dep_dev(defaults.adm_dep_dev_repo, 'adm');
-	output_instance.done_log(`Installed adm dependencies.`, 'adm');
-	return true;
-}
