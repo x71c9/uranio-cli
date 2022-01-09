@@ -85,6 +85,15 @@ export async function docker(params:Partial<Params>, args:Arguments)
 			}
 			break;
 		}
+		case 'network':{
+			switch(args._[2]){
+				case 'create':{
+					await network_create(docker_params);
+					break;
+				}
+			}
+			break;
+		}
 		default:{
 			output_instance.error_log(`Invalid docker command.`);
 			process.exit(1);
@@ -172,7 +181,7 @@ export async function stop(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd += ` || true`;
 	}
-	await _execute_log(cmd, 'docker', 'stopping');
+	await _execute_spin_verbose(cmd, 'docker', 'stopping');
 	output_instance.done_log(
 		`Docker container stopped ${docker_params.repo} ${docker_params.deploy}`
 	);
@@ -310,7 +319,7 @@ export async function network_remove(params:Partial<Params>, continue_on_fail=fa
 	}
 	await _execute_spin_verbose(cmd_rm, 'docker', `creating network ${network_name}`);
 	output_instance.done_log(
-		`Docker created network ${network_name}`
+		`Docker removed network ${network_name}`
 	);
 }
 

@@ -816,18 +816,20 @@ function _copy_sample(){
 }
 
 function _copy_tsconfigs(){
-	const dot_tsc_file =
-		`${init_params.root}/${defaults.tmp_folder}/uranio-assets/typescript/root/tsconfig.json`;
+	
+	const ass_dir = `${init_params.root}/${defaults.tmp_folder}/uranio-assets`;
+	const ts_dir = `${ass_dir}/typescript`;
+	const dot_tsc_file = `${ts_dir}/root/tsconfig.json`;
 	const dest = `${init_params.root}/tsconfig.json`;
 	util_instance.fs.copy_file(dot_tsc_file, dest, 'tsco');
 	
 	const dot_tsc_file_server =
-		`${init_params.root}/${defaults.tmp_folder}/uranio-assets/typescript/server/tsconfig.json`;
+		`${ts_dir}/server/${init_params.deploy}/tsconfig.json`;
 	const dest_server = `${init_params.root}/.uranio/server/tsconfig.json`;
 	util_instance.fs.copy_file(dot_tsc_file_server, dest_server, 'tscs');
 	
 	const dot_tsc_file_client =
-		`${init_params.root}/${defaults.tmp_folder}/uranio-assets/typescript/client/tsconfig.json`;
+		`${ts_dir}/client/tsconfig.json`;
 	const dest_client = `${init_params.root}/.uranio/client/tsconfig.json`;
 	util_instance.fs.copy_file(dot_tsc_file_client, dest_client, 'tscc');
 }
