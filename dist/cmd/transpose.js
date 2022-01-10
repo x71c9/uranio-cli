@@ -46,11 +46,32 @@ const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const alias = __importStar(require("./alias"));
 const common_1 = require("./common");
-const atom_book_required_properties = ['properties', 'plural', 'connection', 'security'];
-const dock_book_required_properties = ['dock', 'plural'];
-const bll_book_required_properties = ['bll'];
-const atom_book_required_client_first_props = ['properties', 'plural', 'connection', 'authenticate'];
-const dock_book_required_client_second_props = ['url', 'routes', 'auth_url'];
+const atom_book_required_properties = [
+    'properties',
+    'plural',
+    'connection',
+    'security',
+    'read_only'
+];
+const dock_book_required_properties = [
+    'dock',
+    'plural'
+];
+const bll_book_required_properties = [
+    'bll'
+];
+const atom_book_required_client_first_props = [
+    'properties',
+    'plural',
+    'connection',
+    'authenticate',
+    'read_only'
+];
+const dock_book_required_client_second_props = [
+    'url',
+    'routes',
+    'auth_url'
+];
 const submodules = ['core', 'api', 'trx'];
 let output_instance;
 let util_instance;
