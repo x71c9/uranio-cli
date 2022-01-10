@@ -85,6 +85,7 @@ async function _delete_files(){
 async function _reset_package_json(){
 	_remove_package_aliases();
 	_remove_package_scripts();
+	_remove_package_resolutions();
 	if(!util_instance.is_initialized()){
 		return;
 	}
@@ -169,5 +170,34 @@ function _remove_package_scripts(){
 		}
 	}catch(ex){
 		output_instance.error_log(`Cannot parse ${package_json_path}.`, 'alias');
+	}
+}
+
+function _remove_package_resolutions(){
+	output_instance.start_loading('Removing resolutions...');
+	const package_json_path = `${deinit_params.root}/package.json`;
+	const package_data = util_instance.cmd.get_package_data(package_json_path);
+	const uranio_resolutions = [
+		'@oclif/plugin-help',
+		'colors',
+	];
+	const old_resolutions = package_data['resolutions'] || {};
+	for(const [key, _value] of Object.entries(old_resolutions)){
+		if(uranio_resolutions.includes(key)){
+			delete old_resolutions[key];
+		}
+	}
+	package_data['resolutions'] = old_resolutions;
+	if(Object.keys(old_resolutions).length === 0){
+		delete package_data['resolutions'];
+	}
+	try{
+		util_instance.fs.write_file(
+			package_json_path,
+			JSON.stringify(package_data, null, '\t')
+		);
+		output_instance.done_log(`Updated package.json resolutions.`, 'alias');
+	}catch(ex){
+		output_instance.error_log(`Cannot update ${package_json_path}.`, 'alias');
 	}
 }

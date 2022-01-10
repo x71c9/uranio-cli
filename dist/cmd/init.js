@@ -66,6 +66,7 @@ function init(params) {
         _ignore_files();
         _update_package_aliases();
         _update_package_scripts();
+        _update_resolutions();
         if (init_params.docker === true) {
             yield docker.build(init_params);
         }
@@ -556,14 +557,28 @@ function _update_package_scripts() {
         package_data['scripts'] = Object.assign(Object.assign({}, old_scripts), { 'build': `uranio build`, 'build:server': `uranio build:client`, 'build:client': `uranio build:client`, 'dev': `uranio dev`, 'dev:server': `uranio dev:server`, 'dev:client': `uranio dev:client` });
         try {
             util_instance.fs.write_file(package_json_path, JSON.stringify(package_data, null, '\t'));
-            output_instance.done_log(`Updated package.json scripts.`, 'alias');
+            output_instance.done_log(`Updated package.json scripts.`, 'scripts');
         }
         catch (ex) {
-            output_instance.error_log(`Cannot update ${package_json_path}.`, 'alias');
+            output_instance.error_log(`Cannot update ${package_json_path}.`, 'scripts');
         }
     }
     catch (ex) {
-        output_instance.error_log(`Cannot parse ${package_json_path}.`, 'alias');
+        output_instance.error_log(`Cannot parse ${package_json_path}.`, 'scripts');
+    }
+}
+function _update_resolutions() {
+    output_instance.start_loading('Updating resolutions...');
+    const package_json_path = `${init_params.root}/package.json`;
+    const package_data = util_instance.cmd.get_package_data(package_json_path);
+    const old_scripts = package_data['resolutions'] || {};
+    package_data['resolutions'] = Object.assign(Object.assign({}, old_scripts), { "@oclif/plugin-help": "3.2.14", "colors": "1.4.0" });
+    try {
+        util_instance.fs.write_file(package_json_path, JSON.stringify(package_data, null, '\t'));
+        output_instance.done_log(`Updated package.json resolutions.`, 'packdata');
+    }
+    catch (ex) {
+        output_instance.error_log(`Cannot update ${package_json_path}.`, 'packdata');
     }
 }
 function _update_package_aliases() {
@@ -700,32 +715,68 @@ function _copy_main_files(repo) {
 function _clone_core() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Cloning core...`);
-        yield util_instance.cmd.clone_repo(defaults_1.defaults.core_repo, `${init_params.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}`, 'core', init_params.branch);
-        yield util_instance.cmd.clone_repo(defaults_1.defaults.core_repo, `${init_params.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}`, 'core', init_params.branch);
+        const def_folder = `${init_params.root}/${defaults_1.defaults.folder}`;
+        const server_uranio_dir = `${def_folder}/server/src/${defaults_1.defaults.repo_folder}`;
+        const client_uranio_dir = `${def_folder}/client/src/${defaults_1.defaults.repo_folder}`;
+        yield util_instance.cmd.clone_repo(defaults_1.defaults.core_repo, server_uranio_dir, 'core', init_params.branch);
+        util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
+        // await util_instance.cmd.clone_repo(
+        //   defaults.core_repo,
+        //   `${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
+        //   'core',
+        //   init_params.branch
+        // );
         output_instance.done_verbose_log(`Cloned core repo.`, 'core');
     });
 }
 function _clone_api() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Cloning api...`);
-        yield util_instance.cmd.clone_repo_recursive(defaults_1.defaults.api_repo, `${init_params.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}`, 'api', init_params.branch);
-        yield util_instance.cmd.clone_repo_recursive(defaults_1.defaults.api_repo, `${init_params.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}`, 'api', init_params.branch);
+        const def_folder = `${init_params.root}/${defaults_1.defaults.folder}`;
+        const server_uranio_dir = `${def_folder}/server/src/${defaults_1.defaults.repo_folder}`;
+        const client_uranio_dir = `${def_folder}/client/src/${defaults_1.defaults.repo_folder}`;
+        yield util_instance.cmd.clone_repo_recursive(defaults_1.defaults.api_repo, server_uranio_dir, 'api', init_params.branch);
+        util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
+        // await util_instance.cmd.clone_repo_recursive(
+        //   defaults.api_repo,
+        //   `${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
+        //   'api',
+        //   init_params.branch
+        // );
         output_instance.done_verbose_log(`Cloned api repo.`, 'api');
     });
 }
 function _clone_trx() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Cloning trx...`);
-        yield util_instance.cmd.clone_repo_recursive(defaults_1.defaults.trx_repo, `${init_params.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}`, 'trx', init_params.branch);
-        yield util_instance.cmd.clone_repo_recursive(defaults_1.defaults.trx_repo, `${init_params.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}`, 'trx', init_params.branch);
+        const def_folder = `${init_params.root}/${defaults_1.defaults.folder}`;
+        const server_uranio_dir = `${def_folder}/server/src/${defaults_1.defaults.repo_folder}`;
+        const client_uranio_dir = `${def_folder}/client/src/${defaults_1.defaults.repo_folder}`;
+        yield util_instance.cmd.clone_repo_recursive(defaults_1.defaults.trx_repo, server_uranio_dir, 'trx', init_params.branch);
+        util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
+        // await util_instance.cmd.clone_repo_recursive(
+        //   defaults.trx_repo,
+        //   `${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
+        //   'trx',
+        //   init_params.branch
+        // );
         output_instance.done_verbose_log(`Cloned trx repo.`, 'trx');
     });
 }
 function _clone_adm() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Cloning adm...`);
-        yield util_instance.cmd.clone_repo_recursive(defaults_1.defaults.adm_repo, `${init_params.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}`, 'adm', init_params.branch);
-        yield util_instance.cmd.clone_repo_recursive(defaults_1.defaults.adm_repo, `${init_params.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}`, 'adm', init_params.branch);
+        const def_folder = `${init_params.root}/${defaults_1.defaults.folder}`;
+        const server_uranio_dir = `${def_folder}/server/src/${defaults_1.defaults.repo_folder}`;
+        const client_uranio_dir = `${def_folder}/client/src/${defaults_1.defaults.repo_folder}`;
+        yield util_instance.cmd.clone_repo_recursive(defaults_1.defaults.adm_repo, server_uranio_dir, 'adm', init_params.branch);
+        util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
+        // await util_instance.cmd.clone_repo_recursive(
+        //   defaults.adm_repo,
+        //   `${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
+        //   'adm',
+        //   init_params.branch
+        // );
         output_instance.done_verbose_log(`Cloned adm repo.`, 'adm');
     });
 }
