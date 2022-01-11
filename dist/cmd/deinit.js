@@ -69,6 +69,7 @@ function _remove_dockers() {
         yield docker.stop(deinit_params, true);
         yield docker.remove(deinit_params, true);
         yield docker.unbuild(deinit_params, true);
+        yield docker.prune(deinit_params, true);
     });
 }
 function _delete_files() {

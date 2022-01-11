@@ -98,6 +98,10 @@ export async function docker(params:Partial<Params>, args:Arguments)
 			}
 			break;
 		}
+		case 'prune':{
+			await prune(docker_params);
+			break;
+		}
 		default:{
 			output_instance.error_log(`Invalid docker command.`);
 			process.exit(1);
@@ -158,7 +162,7 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 	if(typeof entrypoint === 'string'){
 		cmd += ` --entrypoint="${entrypoint}"`;
 	}
-	await _execute_log(cmd, 'docker', 'creating');
+	await _execute_spin_verbose(cmd, 'docker', 'creating');
 	
 	output_instance.done_log(
 		`Docker container created ${container_name}`
@@ -324,6 +328,20 @@ export async function network_remove(params:Partial<Params>, continue_on_fail=fa
 	await _execute_spin_verbose(cmd_rm, 'docker', `creating network ${network_name}`);
 	output_instance.done_log(
 		`Docker removed network ${network_name}`
+	);
+}
+
+export async function prune(params:Partial<Params>, continue_on_fail=false)
+		:Promise<void>{
+	_init_params(params);
+	let cmd_prune = '';
+	cmd_prune += `docker builder prune -af`;
+	if(continue_on_fail){
+		cmd_prune += ` || true`;
+	}
+	await _execute_spin_verbose(cmd_prune, 'docker', `deleteing builder cache`);
+	output_instance.done_log(
+		`Docker builder cache deleted.`
 	);
 }
 

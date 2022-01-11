@@ -33,7 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.update_env = exports.network_remove = exports.network_create = exports.tmp_remove = exports.db_remove = exports.db_stop = exports.db_start = exports.db_create = exports.unbuild = exports.remove = exports.stop = exports.start = exports.create = exports.build = exports.docker = void 0;
+exports.update_env = exports.prune = exports.network_remove = exports.network_create = exports.tmp_remove = exports.db_remove = exports.db_stop = exports.db_start = exports.db_create = exports.unbuild = exports.remove = exports.stop = exports.start = exports.create = exports.build = exports.docker = void 0;
 const urn_lib_1 = require("urn-lib");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
@@ -106,6 +106,10 @@ function docker(params, args) {
                 }
                 break;
             }
+            case 'prune': {
+                yield prune(docker_params);
+                break;
+            }
             default: {
                 output_instance.error_log(`Invalid docker command.`);
                 process.exit(1);
@@ -156,7 +160,7 @@ function create(params, entrypoint) {
         if (typeof entrypoint === 'string') {
             cmd += ` --entrypoint="${entrypoint}"`;
         }
-        yield _execute_log(cmd, 'docker', 'creating');
+        yield _execute_spin_verbose(cmd, 'docker', 'creating');
         output_instance.done_log(`Docker container created ${container_name}`);
     });
 }
@@ -312,6 +316,19 @@ function network_remove(params, continue_on_fail = false) {
     });
 }
 exports.network_remove = network_remove;
+function prune(params, continue_on_fail = false) {
+    return __awaiter(this, void 0, void 0, function* () {
+        _init_params(params);
+        let cmd_prune = '';
+        cmd_prune += `docker builder prune -af`;
+        if (continue_on_fail) {
+            cmd_prune += ` || true`;
+        }
+        yield _execute_spin_verbose(cmd_prune, 'docker', `deleteing builder cache`);
+        output_instance.done_log(`Docker builder cache deleted.`);
+    });
+}
+exports.prune = prune;
 function _copy_compiled() {
     return __awaiter(this, void 0, void 0, function* () {
         const image_name = _get_image_name();

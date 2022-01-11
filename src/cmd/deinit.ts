@@ -62,6 +62,8 @@ async function _remove_dockers()
 	await docker.stop(deinit_params, true);
 	await docker.remove(deinit_params, true);
 	await docker.unbuild(deinit_params, true);
+	
+	await docker.prune(deinit_params, true);
 }
 
 async function _delete_files(){
