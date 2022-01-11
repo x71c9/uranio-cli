@@ -108,28 +108,19 @@ async function _dev_server(){
 		
 		_esbuild_server();
 		
-		const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
-		
-		// const es_cmd = `${cd_cmd} && npx esbuild src/index.ts --bundle --tsconfig=tsconfig.json --outfile=../../dist/server/index.js --platform=node --watch`;
-		
-		// const dotenv_var = `DOTENV_CONFIG_PATH=${dev_params.root}/.env`;
 		const dotenv_part = ` -r dotenv/config`;
-		const dotenv_after = ` dotenv_config_path=${dev_params.root}/.env`;
 		const source_part = ` -r source-map-support/register`;
-		const urn_lib_pre = ` urn_log_prefix_type=true`;
 		
-		// const ts_cmd = `npx tsc-watch --onSuccess "node${dotenv_part}${source_part} ../../dist/server/index.js${dotenv_after}${urn_lib_pre}"`;
+		const dotenv_after = ` dotenv_config_path=${dev_params.root}/.env`;
+		const urn_lib_pre = ` urn_log_prefix_type=true`;
 		
 		const node_cmd = `cd ${dev_params.root}/dist/server/ && npx nodemon --watch index.js -e ts ${dotenv_part}${source_part} index.js${dotenv_after}${urn_lib_pre}`;
 		
-		// const cmd = `${cd_cmd} && ${ts_cmd}`;
-		// util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
-		
-		const tsc_cmd = `${cd_cmd} && npx tsc -w`;
+		// const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
+		// const tsc_cmd = `${cd_cmd} && npx tsc -w`;
 		
 		util_instance.spawn.log(node_cmd, 'nodemon', 'developing server', tscw_color);
-		// util_instance.spawn.log(es_cmd, 'esbuild', 'developing server', tscw_color);
-		util_instance.spawn.log(tsc_cmd, 'tscwatch', 'developing server', tscw_color);
+		// util_instance.spawn.log(tsc_cmd, 'tscwatch', 'developing server', tscw_color);
 		
 	}
 }
@@ -245,7 +236,7 @@ function _watch(){
 			output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
 			watch_src_scanned = true;
 		},
-		(_event, _path) => {
+		async (_event, _path) => {
 			if(dev_params.is_dot === true && _path.indexOf(`${dev_params.root}/src/books`) === 0){
 				return false;
 			}
@@ -257,7 +248,8 @@ function _watch(){
 				return false;
 			}
 			
-			output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
+			// output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
+			output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
 			if(!watch_src_scanned){
 				return false;
 			}
@@ -304,7 +296,7 @@ function _watch(){
 				
 			}else{
 				
-				transpose_one(_path, dev_params, true);
+				await transpose_one(_path, dev_params, true);
 				
 				if(valid_hooks_repos().includes(dev_params.repo)){
 					hooks(dev_params, true);

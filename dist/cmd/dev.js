@@ -116,21 +116,15 @@ function _dev_server() {
         }
         else { // this is valid also if the repo is core.
             _esbuild_server();
-            const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/server`;
-            // const es_cmd = `${cd_cmd} && npx esbuild src/index.ts --bundle --tsconfig=tsconfig.json --outfile=../../dist/server/index.js --platform=node --watch`;
-            // const dotenv_var = `DOTENV_CONFIG_PATH=${dev_params.root}/.env`;
             const dotenv_part = ` -r dotenv/config`;
-            const dotenv_after = ` dotenv_config_path=${dev_params.root}/.env`;
             const source_part = ` -r source-map-support/register`;
+            const dotenv_after = ` dotenv_config_path=${dev_params.root}/.env`;
             const urn_lib_pre = ` urn_log_prefix_type=true`;
-            // const ts_cmd = `npx tsc-watch --onSuccess "node${dotenv_part}${source_part} ../../dist/server/index.js${dotenv_after}${urn_lib_pre}"`;
             const node_cmd = `cd ${dev_params.root}/dist/server/ && npx nodemon --watch index.js -e ts ${dotenv_part}${source_part} index.js${dotenv_after}${urn_lib_pre}`;
-            // const cmd = `${cd_cmd} && ${ts_cmd}`;
-            // util_instance.spawn.log(cmd, 'tscw', 'developing server', tscw_color);
-            const tsc_cmd = `${cd_cmd} && npx tsc -w`;
+            // const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
+            // const tsc_cmd = `${cd_cmd} && npx tsc -w`;
             util_instance.spawn.log(node_cmd, 'nodemon', 'developing server', tscw_color);
-            // util_instance.spawn.log(es_cmd, 'esbuild', 'developing server', tscw_color);
-            util_instance.spawn.log(tsc_cmd, 'tscwatch', 'developing server', tscw_color);
+            // util_instance.spawn.log(tsc_cmd, 'tscwatch', 'developing server', tscw_color);
         }
     });
 }
@@ -222,7 +216,7 @@ function _watch() {
     util_instance.watch(src_path, `watching \`src\` folder.`, () => {
         output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
         watch_src_scanned = true;
-    }, (_event, _path) => {
+    }, (_event, _path) => __awaiter(this, void 0, void 0, function* () {
         if (dev_params.is_dot === true && _path.indexOf(`${dev_params.root}/src/books`) === 0) {
             return false;
         }
@@ -232,7 +226,8 @@ function _watch() {
         if (not_valid_extensions.includes(extension)) {
             return false;
         }
-        output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
+        // output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
+        output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
         if (!watch_src_scanned) {
             return false;
         }
@@ -271,7 +266,7 @@ function _watch() {
             }
         }
         else {
-            (0, transpose_1.transpose_one)(_path, dev_params, true);
+            yield (0, transpose_1.transpose_one)(_path, dev_params, true);
             if ((0, types_1.valid_hooks_repos)().includes(dev_params.repo)) {
                 (0, hooks_1.hooks)(dev_params, true);
             }
@@ -288,7 +283,7 @@ function _watch() {
         else {
             _esbuild_server();
         }
-    });
+    }));
 }
 function _fix_mongodb_saslprep_requirement() {
     const dist_dir = `${dev_params.root}/dist`;
