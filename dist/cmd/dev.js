@@ -62,7 +62,7 @@ function dev(params) {
         }
         else {
             _init_params(params);
-            _init_dev();
+            yield _init_dev();
             yield _dev_server();
             if ((0, types_1.valid_client_repos)().includes(dev_params.repo)) {
                 yield _dev_client();
@@ -78,7 +78,7 @@ function dev_server(params) {
         }
         else {
             _init_params(params);
-            _init_dev();
+            yield _init_dev();
             yield _dev_server();
         }
     });
@@ -93,7 +93,7 @@ function dev_client(params) {
             _init_params(params);
             if ((0, types_1.valid_client_repos)().includes(dev_params.repo)) {
                 if (params.native != true) {
-                    _init_dev();
+                    yield _init_dev();
                 }
                 yield _dev_client();
             }
@@ -207,11 +207,13 @@ function _init_params(params) {
     util_instance.must_be_initialized();
 }
 function _init_dev() {
-    (0, transpose_1.transpose)(dev_params, true);
-    if ((0, types_1.valid_hooks_repos)().includes(dev_params.repo)) {
-        (0, hooks_1.hooks)(dev_params, true);
-    }
-    _watch();
+    return __awaiter(this, void 0, void 0, function* () {
+        yield (0, transpose_1.transpose)(dev_params, true);
+        if ((0, types_1.valid_hooks_repos)().includes(dev_params.repo)) {
+            (0, hooks_1.hooks)(dev_params, true);
+        }
+        _watch();
+    });
 }
 function _watch() {
     const src_path = `${dev_params.root}/src/`;

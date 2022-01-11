@@ -77,7 +77,7 @@ export async function transpose(params:Partial<Params>, included=false)
 		:Promise<void>{
 	_init_tranpose(params);
 	
-	_transpose_all(included);
+	await _transpose_all(included);
 	
 }
 
@@ -93,11 +93,11 @@ export async function transpose_one(full_path:string, params:Partial<Params>, in
 		
 	if(util_instance.fs.is_directory(full_path)){
 		
-		_transpose_folder(full_path, included);
+		await _transpose_folder(full_path, included);
 		
 	}else{
 		
-		_transpose_file(full_path, included);
+		await _transpose_file(full_path, included);
 		
 	}
 }
@@ -114,17 +114,9 @@ function _init_tranpose(params:Partial<Params>){
 	
 }
 
-function _transpose_all(included=false){
+async function _transpose_all(included=false){
 	
-	// _copy_from_src_into_uranio_folder();
-	
-	// _transpose_book();
-	
-	// _resolve_aliases();
-	
-	// _replace_import_to_avoid_loops();
-	
-	_transpose_folder(path.join(transpose_params.root, 'src'), true);
+	await _transpose_folder(path.join(transpose_params.root, 'src'), true);
 	
 	if(included){
 		output_instance.done_log(`Transpose completed.`);
@@ -134,7 +126,7 @@ function _transpose_all(included=false){
 	
 }
 
-function _transpose_file(file_path:string, included=false){
+async function _transpose_file(file_path:string, included=false){
 	
 	const basename = path.basename(file_path);
 	const extension = path.extname(basename);
@@ -155,7 +147,7 @@ function _transpose_file(file_path:string, included=false){
 	
 	if(file_path === `${transpose_params.root}/src/book.ts`){
 		
-		_transpose_book();
+		await _transpose_book();
 		
 		if(!included){
 			output_instance.done_log(`Transpose book completed.`);
@@ -187,14 +179,14 @@ function _transpose_file(file_path:string, included=false){
 			util_instance.fs.copy_file(file_path, uranio_server_target, 'trsp');
 			
 			if(path.extname(file_path) === '.ts'){
-				alias.replace_file_aliases(
+				await alias.replace_file_aliases(
 					uranio_server_target,
 					alias.get_aliases(
 						`${base_folder}/server/tsconfig.json`,
 						transpose_params
 					)
 				);
-				_avoid_import_loop(uranio_server_target);
+				await _avoid_import_loop(uranio_server_target);
 				output_instance.done_verbose_log(
 					`Transposed uranio server file [${file_path}] [${uranio_server_target}].`,
 					'trsp'
@@ -208,14 +200,14 @@ function _transpose_file(file_path:string, included=false){
 			util_instance.fs.copy_file(file_path, uranio_client_target, 'trsp');
 			
 			if(path.extname(file_path) === '.ts'){
-				alias.replace_file_aliases(
+				await alias.replace_file_aliases(
 					uranio_client_target,
 					alias.get_aliases(
 						`${base_folder}/client/tsconfig.json`,
 						transpose_params
 					)
 				);
-				_avoid_import_loop(uranio_client_target);
+				await _avoid_import_loop(uranio_client_target);
 				output_instance.done_verbose_log(
 					`Transposed uranio client file [${file_path}] [${uranio_client_target}].`,
 					'trsp'
@@ -235,14 +227,14 @@ function _transpose_file(file_path:string, included=false){
 			util_instance.fs.copy_file(file_path, frontend_target, 'trsp');
 			
 			if(path.extname(file_path) === '.ts'){
-				alias.replace_file_aliases(
+				await alias.replace_file_aliases(
 					frontend_target,
 					alias.get_aliases(
 						`${base_folder}/client/tsconfig.json`,
 						transpose_params
 					)
 				);
-				_avoid_import_loop(frontend_target);
+				await _avoid_import_loop(frontend_target);
 				output_instance.done_verbose_log(
 					`Transposed frontend file [${file_path}] [${frontend_target}].`,
 					'trsp'
@@ -261,14 +253,14 @@ function _transpose_file(file_path:string, included=false){
 			util_instance.fs.copy_file(file_path, frontend_target, 'trsp');
 			
 			if(path.extname(file_path) === '.ts'){
-				alias.replace_file_aliases(
+				await alias.replace_file_aliases(
 					frontend_target,
 					alias.get_aliases(
 						`${base_folder}/client/tsconfig.json`,
 						transpose_params
 					)
 				);
-				_avoid_import_loop(frontend_target);
+				await _avoid_import_loop(frontend_target);
 				output_instance.done_verbose_log(
 					`Transposed frontend file [${file_path}] [${frontend_target}].`,
 					'trsp'
@@ -290,22 +282,27 @@ function _transpose_file(file_path:string, included=false){
 			util_instance.fs.copy_file(file_path, new_path_client, 'trsp');
 			
 			if(path.extname(file_path) === '.ts'){
-				alias.replace_file_aliases(
+				
+				const alias_srv_promise = alias.replace_file_aliases(
 					new_path_server,
 					alias.get_aliases(
 						`${base_folder}/server/tsconfig.json`,
 						transpose_params
 					)
 				);
-				alias.replace_file_aliases(
+				const alias_cln_promise = alias.replace_file_aliases(
 					new_path_client,
 					alias.get_aliases(
 						`${base_folder}/client/tsconfig.json`,
 						transpose_params
 					)
 				);
-				_avoid_import_loop(new_path_server);
-				_avoid_import_loop(new_path_client);
+				await Promise.all([alias_srv_promise, alias_cln_promise]);
+				
+				const srv_promise = _avoid_import_loop(new_path_server);
+				const cln_promise = _avoid_import_loop(new_path_client);
+				await Promise.all([srv_promise, cln_promise]);
+				
 				output_instance.done_verbose_log(
 					`Transposed file [${file_path}].`,
 					'trsp'
@@ -326,7 +323,7 @@ function _transpose_file(file_path:string, included=false){
 	}
 }
 
-function _transpose_book(){
+async function _transpose_book(){
 	
 	const tmp_book_folder = `${transpose_params.root}/${defaults.folder}/.tmp`;
 	
@@ -339,27 +336,28 @@ function _transpose_book(){
 		'bkp'
 	);
 	
-	_manipulate_and_create_files(`${tmp_book_folder}/book.ts`);
+	await _manipulate_and_create_files(`${tmp_book_folder}/book.ts`);
 	
-	_generate_client_books();
+	await _generate_client_books();
 	
-	_resolve_aliases_in_books();
+	await _resolve_aliases_in_books();
 	
-	_replace_imports_to_avoid_loops_in_books();
+	await _replace_imports_to_avoid_loops_in_books();
 	
 	util_instance.fs.remove_directory(tmp_book_folder, 'trbo');
 	
 }
 
-function _transpose_folder(dir_path:string, included=false){
-	util_instance.fs.read_dir(dir_path).forEach((filename) => {
+async function _transpose_folder(dir_path:string, included=false){
+	const entries = util_instance.fs.read_dir(dir_path);
+	for(const filename of entries){
 		const full_path = path.resolve(dir_path, filename);
 		if (util_instance.fs.is_directory(full_path) && filename !== '.git'){
-			return _transpose_folder(full_path, true);
+			await _transpose_folder(full_path, true);
 		}else{
-			return _transpose_file(full_path, true);
+			await _transpose_file(full_path, true);
 		}
-	});
+	}
 	if(!included){
 		output_instance.done_log(`Transpose folder completed.`);
 	}
@@ -373,172 +371,170 @@ type ExpressionList = {
 	[k:string]: string[]
 }
 
-function _avoid_import_loop(file_path:string){
+async function _avoid_import_loop(file_path:string){
 	
-	const modules:ModuleList = {};
-	const expressions:ExpressionList = {};
+	return new Promise((resolve, _reject) => {
 	
-	let uranio_import_state = '';
-	
-	const _project = new tsm.Project(_project_option);
-	const sourceFile = _project.addSourceFileAtPath(`${file_path}`);
-	const import_decls = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.ImportDeclaration);
-	let uranio_var_name = '';
-	
-	let is_file_importing_uranio = false;
-	
-	for(const import_decl of import_decls){
-		const str_lit = import_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.StringLiteral);
-		const module_name = str_lit.getText();
-		const repo_length = defaults.repo_folder.length;
+		const modules:ModuleList = {};
+		const expressions:ExpressionList = {};
 		
-		let is_importing_uranio = false;
+		let uranio_import_state = '';
 		
-		const module_with_slash = module_name.substr(-1 * (repo_length + 3));
-		const module_with_no_slash = module_name.substr(-1 * (repo_length + 2));
-		const module_with_client = module_name.substr(-1 * (repo_length + 9));
+		const _project = new tsm.Project(_project_option);
+		const sourceFile = _project.addSourceFileAtPath(`${file_path}`);
+		const import_decls = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.ImportDeclaration);
+		let uranio_var_name = '';
 		
-		if(
-			module_with_slash === `/${defaults.repo_folder}/"` ||
-			module_with_slash === `/${defaults.repo_folder}/'`
-		){
-			is_importing_uranio = true;
-		}
-		if(
-			module_with_no_slash === `/${defaults.repo_folder}"` ||
-			module_with_no_slash === `/${defaults.repo_folder}'`
-		){
-			is_importing_uranio = true;
-		}
-		if(
-			module_with_client === `/${defaults.repo_folder}/client"` ||
-			module_with_client === `/${defaults.repo_folder}/client'`
-		){
-			is_importing_uranio = true;
-		}
+		let is_file_importing_uranio = false;
 		
-		if(is_importing_uranio){
-			is_file_importing_uranio = true;
-			uranio_import_state = import_decl.getText();
-			const identif = import_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
-			uranio_var_name = identif.getText();
-			const prop_access_exps = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.PropertyAccessExpression) as tsm.Node[];
-			const qualified_name = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.QualifiedName) as tsm.Node[];
-			const nodes_to_check:tsm.Node[] = prop_access_exps.concat(qualified_name);
-			// loop all methods or variable with module.module.methods syntax
-			for(const prop_access_exp of nodes_to_check){
-				const prop_text = prop_access_exp.getText();
-				const exploded_text = prop_text.split('.');
-				// if the first is different than `uranio` continue.
-				if(exploded_text[0] !== uranio_var_name){
-					continue;
-				}
-				exploded_text.shift();
-				let parent_module = uranio_var_name;
-				// skipping uranio submodule
-				while(submodules.includes(exploded_text[0])){
-					parent_module = exploded_text[0];
-					exploded_text.shift();
-				}
-				// skipping all node longer than the only module that need to be imported
-				// this is because in the loop there are, for example,
-				// `bll.auth.create`, `bll.auth` and `bll` from the same node
-				// we want only `bll`
-				if(exploded_text.length !== 1){
-					continue;
-				}
-				const module_name = exploded_text[0];
-				if(!modules[parent_module]){
-					modules[parent_module] = [];
-				}
-				if(!modules[parent_module].includes(module_name)){
-					modules[parent_module].push(module_name);
-				}
-				if(!expressions[module_name]){
-					expressions[module_name] = [];
-				}
-				if(!expressions[module_name].includes(prop_text)){
-					expressions[module_name].push(prop_text);
-				}
-			}
-		}
-	}
-	
-	const import_states:string[] = [];
-	
-	const is_server_folder = (file_path.includes(`${transpose_params.root}/${defaults.folder}/server/`));
-	// const is_client_folder = (file_path.includes(`${transpose_params.root}/${defaults.folder}/client/`));
-	
-	const parent_folder = (is_server_folder) ? 'server' : 'client';
-	
-	const folderpath = path.parse(file_path).dir;
-	const lib_path = `${transpose_params.root}/${defaults.folder}/${parent_folder}/src/${defaults.repo_folder}/`;
-	let relative_root = path.relative(folderpath, lib_path);
-	if(relative_root[0] !== '.'){
-		relative_root = './' + relative_root;
-	}
-	
-	const clnsrv_folder = (is_server_folder) ? 'srv' : 'cln';
-	
-	/**
-	 * NOTE:
-	 * This need to be updated if new first level
-	 * functions are defined.
-	 */
-	const first_level_core_methods = ['init'];
-	const path_by_method = {
-		'init': 'init'
-	};
-	
-	let relative_path = '';
-	for(const submodule_name in modules){
-		for(const module_name of modules[submodule_name]){
+		for(const import_decl of import_decls){
+			const str_lit = import_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.StringLiteral);
+			const module_name = str_lit.getText();
+			const repo_length = defaults.repo_folder.length;
+			
+			let is_importing_uranio = false;
+			
+			const module_with_slash = module_name.substr(-1 * (repo_length + 3));
+			const module_with_no_slash = module_name.substr(-1 * (repo_length + 2));
+			const module_with_client = module_name.substr(-1 * (repo_length + 9));
 			
 			if(
-				// transpose_params.repo === 'core'
-				first_level_core_methods.includes(module_name)
-				&& urn_util.object.has_key(path_by_method, module_name)
-			){ // case for first level methods like `init`, etc.
-				
-				const submod_tree = _resolve_path_tree(submodule_name);
-				relative_path = `${relative_root}/${submod_tree}${path_by_method[module_name]}`;
-				const import_state = `import {${module_name} as ${_generate_variable_name(module_name)}} from '${relative_path}';`;
-				import_states.push(import_state);
-				
-			}else{
-				
-				if(module_name === 'types'){
-					relative_path = `${relative_root}/${clnsrv_folder}/types`;
-				}else{
-					const submod_tree = _resolve_path_tree(submodule_name);
-					relative_path = `${relative_root}/${submod_tree}${module_name}`;
+				module_with_slash === `/${defaults.repo_folder}/"` ||
+				module_with_slash === `/${defaults.repo_folder}/'`
+			){
+				is_importing_uranio = true;
+			}
+			if(
+				module_with_no_slash === `/${defaults.repo_folder}"` ||
+				module_with_no_slash === `/${defaults.repo_folder}'`
+			){
+				is_importing_uranio = true;
+			}
+			if(
+				module_with_client === `/${defaults.repo_folder}/client"` ||
+				module_with_client === `/${defaults.repo_folder}/client'`
+			){
+				is_importing_uranio = true;
+			}
+			
+			if(is_importing_uranio){
+				is_file_importing_uranio = true;
+				uranio_import_state = import_decl.getText();
+				const identif = import_decl.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
+				uranio_var_name = identif.getText();
+				const prop_access_exps = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.PropertyAccessExpression) as tsm.Node[];
+				const qualified_name = sourceFile.getDescendantsOfKind(tsm.SyntaxKind.QualifiedName) as tsm.Node[];
+				const nodes_to_check:tsm.Node[] = prop_access_exps.concat(qualified_name);
+				// loop all methods or variable with module.module.methods syntax
+				for(const prop_access_exp of nodes_to_check){
+					const prop_text = prop_access_exp.getText();
+					const exploded_text = prop_text.split('.');
+					// if the first is different than `uranio` continue.
+					if(exploded_text[0] !== uranio_var_name){
+						continue;
+					}
+					exploded_text.shift();
+					let parent_module = uranio_var_name;
+					// skipping uranio submodule
+					while(submodules.includes(exploded_text[0])){
+						parent_module = exploded_text[0];
+						exploded_text.shift();
+					}
+					// skipping all node longer than the only module that need to be imported
+					// this is because in the loop there are, for example,
+					// `bll.auth.create`, `bll.auth` and `bll` from the same node
+					// we want only `bll`
+					if(exploded_text.length !== 1){
+						continue;
+					}
+					const module_name = exploded_text[0];
+					if(!modules[parent_module]){
+						modules[parent_module] = [];
+					}
+					if(!modules[parent_module].includes(module_name)){
+						modules[parent_module].push(module_name);
+					}
+					if(!expressions[module_name]){
+						expressions[module_name] = [];
+					}
+					if(!expressions[module_name].includes(prop_text)){
+						expressions[module_name].push(prop_text);
+					}
 				}
-				const import_state = `import * as ${_generate_variable_name(module_name)} from '${relative_path}';`;
-				import_states.push(import_state);
+			}
+		}
+		
+		const import_states:string[] = [];
+		const is_server_folder = (file_path.includes(`${transpose_params.root}/${defaults.folder}/server/`));
+		// const is_client_folder = (file_path.includes(`${transpose_params.root}/${defaults.folder}/client/`));
+		const parent_folder = (is_server_folder) ? 'server' : 'client';
+		const folderpath = path.parse(file_path).dir;
+		const lib_path = `${transpose_params.root}/${defaults.folder}/${parent_folder}/src/${defaults.repo_folder}/`;
+		let relative_root = path.relative(folderpath, lib_path);
+		if(relative_root[0] !== '.'){
+			relative_root = './' + relative_root;
+		}
+		
+		const clnsrv_folder = (is_server_folder) ? 'srv' : 'cln';
+		/**
+		 * NOTE:
+		 * This need to be updated if new first level
+		 * functions are defined.
+		 */
+		const first_level_core_methods = ['init'];
+		const path_by_method = {
+			'init': 'init'
+		};
+		let relative_path = '';
+		for(const submodule_name in modules){
+			for(const module_name of modules[submodule_name]){
 				
+				if(
+					// transpose_params.repo === 'core'
+					first_level_core_methods.includes(module_name)
+					&& urn_util.object.has_key(path_by_method, module_name)
+				){ // case for first level methods like `init`, etc.
+					
+					const submod_tree = _resolve_path_tree(submodule_name);
+					relative_path = `${relative_root}/${submod_tree}${path_by_method[module_name]}`;
+					const import_state = `import {${module_name} as ${_generate_variable_name(module_name)}} from '${relative_path}';`;
+					import_states.push(import_state);
+					
+				}else{
+					
+					if(module_name === 'types'){
+						relative_path = `${relative_root}/${clnsrv_folder}/types`;
+					}else{
+						const submod_tree = _resolve_path_tree(submodule_name);
+						relative_path = `${relative_root}/${submod_tree}${module_name}`;
+					}
+					const import_state = `import * as ${_generate_variable_name(module_name)} from '${relative_path}';`;
+					import_states.push(import_state);
+					
+				}
 			}
 		}
-	}
-	
-	const file_content = sourceFile.print();
-	
-	if(uranio_import_state !== ''){
-		const regex = new RegExp(`${uranio_import_state}`);
-		const with_imports = file_content.replace(regex, import_states.join('\n'));
-		
-		let with_imports_and_variables = with_imports;
-		for(const module_name in expressions){
-			for(const expression of expressions[module_name]){
-				const regex = new RegExp(`\\b${expression.replace(".","\\.")}\\b`,'g');
-				with_imports_and_variables = with_imports_and_variables.replace(regex, _generate_variable_name(module_name));
+		const file_content = sourceFile.print();
+		if(uranio_import_state !== ''){
+			const regex = new RegExp(`${uranio_import_state}`);
+			const with_imports = file_content.replace(regex, import_states.join('\n'));
+			
+			let with_imports_and_variables = with_imports;
+			for(const module_name in expressions){
+				for(const expression of expressions[module_name]){
+					const regex = new RegExp(`\\b${expression.replace(".","\\.")}\\b`,'g');
+					with_imports_and_variables = with_imports_and_variables.replace(regex, _generate_variable_name(module_name));
+				}
+			}
+			
+			if(is_file_importing_uranio){
+				util_instance.fs.write_file(file_path, with_imports_and_variables);
+				// util_instance.pretty(file_path);
 			}
 		}
 		
-		if(is_file_importing_uranio){
-			util_instance.fs.write_file(file_path, with_imports_and_variables);
-			// util_instance.pretty(file_path);
-		}
-	}
+		resolve(true);
+	});
 }
 
 function _resolve_path_tree(submodule_name:string){
@@ -583,62 +579,19 @@ function _generate_variable_name(str:string){
 }
 
 
-// function _resolve_aliases(){
-//   output_instance.start_loading(`Replacing aliases with relative paths...`);
-//   const base_folder = `${transpose_params.root}/${defaults.folder}`;
-	
-//   const tsconfig_server = `${base_folder}/server/tsconfig.json`;
-//   const aliases_server = alias.get_aliases(tsconfig_server, transpose_params);
-//   const server_dir = `${transpose_params.root}/${defaults.folder}/server/src/`;
-//   _traverse_ts_resolve_aliases(server_dir, aliases_server);
-//   output_instance.done_log(`Server aliases replaced.`, 'alias');
-	
-//   const tsconfig_client = `${base_folder}/client/tsconfig.json`;
-//   const aliases_client = alias.get_aliases(tsconfig_client, transpose_params);
-//   const client_dir = `${transpose_params.root}/${defaults.folder}/client/src/`;
-//   _traverse_ts_resolve_aliases(client_dir, aliases_client);
-//   output_instance.done_log(`Client aliases replaced.`, 'alias');
-// }
-
-// function _replace_import_to_avoid_loops(){
-//   const server_dir = `${transpose_params.root}/${defaults.folder}/server/`;
-//   if(util_instance.fs.exists(server_dir)){
-//     _traverse_ts_avoid_import_loop(server_dir);
-//   }
-//   const client_dir = `${transpose_params.root}/${defaults.folder}/client/`;
-//   if(util_instance.fs.exists(client_dir)){
-//     _traverse_ts_avoid_import_loop(client_dir);
-//   }
-// }
-
-// function _traverse_ts_resolve_aliases(directory:string, aliases:Aliases) {
-//   util_instance.fs.read_dir(directory).forEach((filename) => {
-//     const full_path = path.resolve(directory, filename);
-//     if (
-//       util_instance.fs.is_directory(full_path)
-//       && filename !== '.git'
-//       && filename !== 'books'
-//       // && filename !== 'uranio'
-//     ){
-//       return _traverse_ts_resolve_aliases(full_path, aliases);
-//     }else if(filename.split('.').pop() === 'ts'){
-//       alias.replace_file_aliases(full_path, aliases, transpose_params);
-//     }
-//   });
-// }
-
-function _traverse_ts_avoid_import_loop(directory:string) {
-	util_instance.fs.read_dir(directory).forEach((filename) => {
+async function _traverse_ts_avoid_import_loop(directory:string) {
+	const entries = util_instance.fs.read_dir(directory);
+	for(const filename of entries){
 		const full_path = path.resolve(directory, filename);
 		if (util_instance.fs.is_directory(full_path) && filename !== '.git'){
-			return _traverse_ts_avoid_import_loop(full_path);
+			await _traverse_ts_avoid_import_loop(full_path);
 		}else if(filename.split('.').pop() === 'ts'){
-			_avoid_import_loop(full_path);
+			await _avoid_import_loop(full_path);
 		}
-	});
+	}
 }
 
-function _manipulate_and_create_files(file_path:string){
+async function _manipulate_and_create_files(file_path:string){
 	const action = `manipulating [src/book.ts]`;
 	
 	output_instance.start_loading(`${action[0].toUpperCase()}${action.substr(1)}...`);
@@ -657,10 +610,12 @@ function _manipulate_and_create_files(file_path:string){
 	let import_statements = _copy_imports(sourceFile);
 	import_statements = _change_import_statements_relative_path(import_statements);
 	
-	_create_atom_book(sourceFile, import_statements);
-	_create_bll_book(sourceFile, import_statements);
-	_create_dock_book(sourceFile, import_statements);
+	const atom_promise = _create_atom_book(sourceFile, import_statements);
+	const bll_promise = _create_bll_book(sourceFile, import_statements);
+	const dock_promise = _create_dock_book(sourceFile, import_statements);
 	// _create_routes_book(sourceFile, import_statements);
+	
+	await Promise.all([atom_promise, bll_promise, dock_promise]);
 	
 	if(transpose_params.is_dot){
 		_copy_books_to_dot_src();
@@ -708,30 +663,33 @@ function _copy_hooks_to_dot_src(){
 	output_instance.done_log(`Copied hooks to uranio-dot/src.`, 'dot');
 }
 
-function _generate_client_books(){
+async function _generate_client_books(){
 	output_instance.start_loading(`Generating client books...`);
 	
-	_generate_client_book('dock', dock_book_required_client_second_props);
-	_generate_client_book('atom', atom_book_required_client_first_props);
+	const dock_promise = _generate_client_book('dock', dock_book_required_client_second_props);
+	const atom_promise = _generate_client_book('atom', atom_book_required_client_first_props);
+	
+	await Promise.all([dock_promise, atom_promise]);
 	
 	// _copy_routes_book();
 	
 	output_instance.done_verbose_log(`Client books generated.`, 'client');
 }
 
-function _resolve_aliases_in_books(){
+async function _resolve_aliases_in_books(){
 	output_instance.start_loading(`Replacing book aliases...`);
 	const base_folder = `${transpose_params.root}/${defaults.folder}`;
 	
 	const books_dir_server = `${base_folder}/server/src/books`;
 	const tsconfig_server = `${base_folder}/server/tsconfig.json`;
 	const aliases_server = alias.get_aliases(tsconfig_server, transpose_params);
-	alias.replace_file_aliases(
+	
+	const atom_promise = alias.replace_file_aliases(
 		`${books_dir_server}/atom.ts`,
 		aliases_server,
 		transpose_params
 	);
-	alias.replace_file_aliases(
+	const dock_promise = alias.replace_file_aliases(
 		`${books_dir_server}/dock.ts`,
 		aliases_server,
 		transpose_params
@@ -741,22 +699,24 @@ function _resolve_aliases_in_books(){
 	//   aliases_server,
 	//   transpose_params
 	// );
-	alias.replace_file_aliases(
+	const bll_promise = alias.replace_file_aliases(
 		`${books_dir_server}/bll.ts`,
 		aliases_server,
 		transpose_params
 	);
+	
+	await Promise.all([atom_promise, dock_promise, bll_promise]);
 	output_instance.done_log(`Server books aliases replaced.`, 'alias');
 	
 	const books_dir_client = `${base_folder}/client/src/books`;
 	const tsconfig_client = `${base_folder}/client/tsconfig.json`;
 	const aliases_client = alias.get_aliases(tsconfig_client, transpose_params);
-	alias.replace_file_aliases(
+	const client_atom_promise = alias.replace_file_aliases(
 		`${books_dir_client}/atom.ts`,
 		aliases_client,
 		transpose_params
 	);
-	alias.replace_file_aliases(
+	const client_dock_promise = alias.replace_file_aliases(
 		`${books_dir_client}/dock.ts`,
 		aliases_client,
 		transpose_params
@@ -766,21 +726,25 @@ function _resolve_aliases_in_books(){
 	//   aliases_client,
 	//   transpose_params
 	// );
+	await Promise.all([client_atom_promise, client_dock_promise]);
 	output_instance.done_log(`Client books aliases replaced.`, 'alias');
 	
 }
 
-function _replace_imports_to_avoid_loops_in_books(){
+async function _replace_imports_to_avoid_loops_in_books(){
 	const server_dir =
 		`${transpose_params.root}/${defaults.folder}/server/src/books/`;
+	let server_promise = new Promise<void>(r => r());
+	let client_promise = new Promise<void>(r => r());
 	if(util_instance.fs.exists(server_dir)){
-		_traverse_ts_avoid_import_loop(server_dir);
+		server_promise = _traverse_ts_avoid_import_loop(server_dir);
 	}
 	const client_dir =
 		`${transpose_params.root}/${defaults.folder}/client/src/books/`;
 	if(util_instance.fs.exists(client_dir)){
-		_traverse_ts_avoid_import_loop(client_dir);
+		client_promise = _traverse_ts_avoid_import_loop(client_dir);
 	}
+	await Promise.all([server_promise, client_promise]);
 }
 
 function _replace_comments(sourceFile:tsm.SourceFile)
@@ -838,43 +802,51 @@ function _change_import_statements_relative_path(import_statements:string[])
 }
 
 function _create_atom_book(sourceFile:tsm.SourceFile, import_statements:string[])
-		:tsm.SourceFile{
-	return _create_a_book(
-		sourceFile,
-		import_statements,
-		'atom',
-		atom_book_required_properties,
-		'atom'
-	);
+		:Promise<tsm.SourceFile>{
+	return new Promise((resolve, _reject) => {
+		const created = _create_a_book(
+			sourceFile,
+			import_statements,
+			'atom',
+			atom_book_required_properties,
+			'atom'
+		);
+		resolve(created);
+	});
 }
 
 function _create_bll_book(sourceFile:tsm.SourceFile, import_statements:string[])
-		:tsm.SourceFile{
-	return _create_a_book(
-		sourceFile,
-		import_statements,
-		'bll',
-		bll_book_required_properties,
-		'bll'
-	);
+		:Promise<tsm.SourceFile>{
+	return new Promise((resolve, _reject) => {
+		const created = _create_a_book(
+			sourceFile,
+			import_statements,
+			'bll',
+			bll_book_required_properties,
+			'bll'
+		);
+		resolve(created);
+	});
 }
 
 function _create_dock_book(sourceFile:tsm.SourceFile, import_statements:string[])
-		:tsm.SourceFile{
-	let source_file = _create_a_book(
-		sourceFile,
-		import_statements,
-		'dock',
-		dock_book_required_properties,
-		'dock'
-	);
-	source_file = _fill_empty_docks(source_file);
-	source_file = _remove_request_type(source_file);
-	
-	const file_path = `${transpose_params.root}/${defaults.folder}/server/src/books/dock.ts`;
-	_create_a_book_file(file_path, source_file.getText());
-	
-	return source_file;
+		:Promise<tsm.SourceFile>{
+	return new Promise((resolve, _reject) => {
+		let source_file = _create_a_book(
+			sourceFile,
+			import_statements,
+			'dock',
+			dock_book_required_properties,
+			'dock'
+		);
+		source_file = _fill_empty_docks(source_file);
+		source_file = _remove_request_type(source_file);
+			
+		const file_path = `${transpose_params.root}/${defaults.folder}/server/src/books/dock.ts`;
+		_create_a_book_file(file_path, source_file.getText());
+		
+		resolve(source_file);
+	});
 }
 
 // function _create_routes_book(sourceFile:tsm.SourceFile, import_statements:string[])
@@ -895,50 +867,57 @@ function _create_dock_book(sourceFile:tsm.SourceFile, import_statements:string[]
 //   return source_file;
 // }
 
-function _generate_client_book(book_name:BookName, required_props:string[]){
-	const folder_path = `${transpose_params.root}/${defaults.folder}`;
-	const server_books_dir = `${folder_path}/server/src/books`;
-	const client_books_dir = `${folder_path}/client/src/books`;
+async function _generate_client_book(book_name:BookName, required_props:string[]){
 	
-	const _project = new tsm.Project(_project_option);
-	let sourceFile = _project.addSourceFileAtPath(`${server_books_dir}/${book_name}.ts`);
-	
-	sourceFile = _replace_uranio_client_dependecy(sourceFile);
-	
-	if(book_name === 'atom'){
-		sourceFile = _keep_only_client_first_level_properties(sourceFile, book_name, required_props);
-	}else{
-		sourceFile = _keep_only_client_second_level_properties(sourceFile, book_name, required_props);
-	}
-	if(book_name === 'dock'){
-		sourceFile = _remove_dock_route_call_implementation(sourceFile);
-	}
-	
-	const book_state = _find_book_statement(sourceFile, `${book_name}_book`);
-	
-	if(book_state){
+	return new Promise((resolve, _reject) => {
 		
-		const atom_book_state_text = book_state.getText();
+		const folder_path = `${transpose_params.root}/${defaults.folder}`;
+		const server_books_dir = `${folder_path}/server/src/books`;
+		const client_books_dir = `${folder_path}/client/src/books`;
+		
 		const _project = new tsm.Project(_project_option);
-		const cloned_book_source = _project.createSourceFile(
-			`${transpose_params.root}/${defaults.folder}/client/src/books/tmp_${book_name}.ts`,
-			atom_book_state_text,
-			{ overwrite: true }
-		);
-		const text_without_imports = cloned_book_source.getText();
-		const imports = _copy_imports(sourceFile);
-		const required_imports = _get_required_imports(imports, text_without_imports);
-		const text = required_imports.join('\n') + text_without_imports;
-		const file_path = `${client_books_dir}/${book_name}.ts`;
-		util_instance.fs.write_file(file_path, text);
-		// util_instance.pretty(file_path);
-		output_instance.done_log(`Generated client book [${book_name}].`, 'clnt');
-	
-	}else{
+		let sourceFile = _project.addSourceFileAtPath(`${server_books_dir}/${book_name}.ts`);
 		
-		output_instance.error_log(`Cannot find client book statements for [${book_name}]`, 'err');
+		sourceFile = _replace_uranio_client_dependecy(sourceFile);
 		
-	}
+		if(book_name === 'atom'){
+			sourceFile = _keep_only_client_first_level_properties(sourceFile, book_name, required_props);
+		}else{
+			sourceFile = _keep_only_client_second_level_properties(sourceFile, book_name, required_props);
+		}
+		if(book_name === 'dock'){
+			sourceFile = _remove_dock_route_call_implementation(sourceFile);
+		}
+		
+		const book_state = _find_book_statement(sourceFile, `${book_name}_book`);
+		
+		if(book_state){
+			
+			const atom_book_state_text = book_state.getText();
+			const _project = new tsm.Project(_project_option);
+			const cloned_book_source = _project.createSourceFile(
+				`${transpose_params.root}/${defaults.folder}/client/src/books/tmp_${book_name}.ts`,
+				atom_book_state_text,
+				{ overwrite: true }
+			);
+			const text_without_imports = cloned_book_source.getText();
+			const imports = _copy_imports(sourceFile);
+			const required_imports = _get_required_imports(imports, text_without_imports);
+			const text = required_imports.join('\n') + text_without_imports;
+			const file_path = `${client_books_dir}/${book_name}.ts`;
+			util_instance.fs.write_file(file_path, text);
+			// util_instance.pretty(file_path);
+			output_instance.done_log(`Generated client book [${book_name}].`, 'clnt');
+		
+		}else{
+			
+			output_instance.error_log(`Cannot find client book statements for [${book_name}]`, 'err');
+			
+		}
+		
+		resolve(true);
+		
+	});
 }
 
 function _create_a_book(

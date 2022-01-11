@@ -51,7 +51,7 @@ export async function dev(params:Partial<Params>)
 		
 	}else{
 		_init_params(params);
-		_init_dev();
+		await _init_dev();
 		await _dev_server();
 		if(valid_client_repos().includes(dev_params.repo)){
 			await _dev_client();
@@ -66,7 +66,7 @@ export async function dev_server(params:Partial<Params>):Promise<void>{
 		
 	}else{
 		_init_params(params);
-		_init_dev();
+		await _init_dev();
 		await _dev_server();
 	}
 }
@@ -80,7 +80,7 @@ export async function dev_client(params:Partial<Params>):Promise<void>{
 		_init_params(params);
 		if(valid_client_repos().includes(dev_params.repo)){
 			if(params.native != true){
-				_init_dev();
+				await _init_dev();
 			}
 			await _dev_client();
 		}else{
@@ -220,16 +220,15 @@ function _init_params(params:Partial<Params>)
 	
 }
 
-function _init_dev(){
+async function _init_dev(){
 	
-	transpose(dev_params, true);
+	await transpose(dev_params, true);
 	
 	if(valid_hooks_repos().includes(dev_params.repo)){
 		hooks(dev_params, true);
 	}
 	
 	_watch();
-	
 }
 
 function _watch(){
