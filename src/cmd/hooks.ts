@@ -58,9 +58,7 @@ export async function hooks(params:Partial<Params>, included=false)
 	output_instance.start_loading('Generating TRX Hooks...');
 	
 	const text = _generate_text();
-	
 	_save_to_file(text);
-	
 	if(included){
 		output_instance.done_log(`TRX Hooks generated.`, 'hooks');
 	}else{
@@ -237,7 +235,9 @@ function _get_atom_def_plural(){
 	if(!atom_def_props){
 		return plural_by_atom;
 	}
+	// first:
 	for(const atom_name in atom_def_props){
+		second:
 		for(const atom_prop of atom_def_props[atom_name]){
 			const atom_prop_id = atom_prop.getFirstDescendantByKindOrThrow(tsm.SyntaxKind.Identifier);
 			const atom_prop_name = atom_prop_id.getText();
@@ -248,6 +248,7 @@ function _get_atom_def_plural(){
 					atom_prop_value = string_lits[0].getText();
 				}
 				plural_by_atom[atom_name] = (atom_prop_value as string).slice(1, -1);
+				break second;
 			}
 		}
 	}
@@ -393,12 +394,13 @@ function _save_to_file(text:string){
 	
 	const filepath_server = `${hooks_path_server}/hooks/hooks.ts`;
 	util_instance.fs.write_file(filepath_server, text);
-	util_instance.pretty(filepath_server);
+	// util_instance.pretty(filepath_server);
 	output_instance.done_verbose_log(`Created hooks file [${filepath_server}].`, 'hooks');
 	
 	const filepath_client = `${hooks_path_client}/hooks/hooks.ts`;
-	util_instance.fs.write_file(filepath_client, text);
-	util_instance.pretty(filepath_client);
+	// util_instance.fs.write_file(filepath_client, text);
+	// util_instance.pretty(filepath_client);
+	util_instance.fs.copy_file(filepath_server, filepath_client);
 	output_instance.done_verbose_log(`Created hooks file [${filepath_client}].`, 'hooks');
 	
 }
