@@ -51,16 +51,19 @@ export async function alias(params:Partial<Params>, included=false)
 		const aliases_server = get_aliases(tsconfig_path_server);
 		const aliases_client = get_aliases(tsconfig_path_client);
 		
-		_replace_aliases_server(aliases_server);
-		_replace_aliases_client(aliases_client);
+		const srv_promise = _replace_aliases_server(aliases_server);
+		const cln_promise = _replace_aliases_client(aliases_client);
 		
-		if(!included){
-			output_instance.end_log(`Aliases updated.`);
-		}else{
-			output_instance.done_log(`Alias updated.`, 'alis');
-		}
+		Promise.all([srv_promise, cln_promise]).then(() => {
 		
-		resolve();
+			if(!included){
+				output_instance.end_log(`Aliases updated.`);
+			}else{
+				output_instance.done_log(`Alias updated.`, 'alis');
+			}
+			resolve();
+			
+		});
 		
 	});
 }
@@ -89,7 +92,6 @@ export async function replace_file_aliases(filepath:string, aliases:Aliases, par
 		if(typeof params !== 'undefined'){
 			_init_alias(params);
 		}
-		
 		const _project = new tsm.Project(_project_option);
 		let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
 		const {found, source} = _change_to_relative_statements(sourceFile, aliases);
@@ -115,30 +117,46 @@ function _init_alias(params:Partial<Params>){
 	
 }
 
-function _replace_aliases_server(aliases:Aliases){
-	_traverse_ts_aliases(`${alias_params.root}/${defaults.folder}/server/src/`, aliases);
+async function _replace_aliases_server(aliases:Aliases){
+	return new Promise((resolve, _reject) => {
+		_traverse_ts_aliases(
+			`${alias_params.root}/${defaults.folder}/server/src/`,
+			aliases
+		);
+		resolve(true);
+	});
 }
 
 function _replace_aliases_client(aliases:Aliases){
-	_traverse_ts_aliases(`${alias_params.root}/${defaults.folder}/client/src/`, aliases);
+	return new Promise((resolve, _reject) => {
+		_traverse_ts_aliases(
+			`${alias_params.root}/${defaults.folder}/client/src/`,
+			aliases
+		);
+		resolve(true);
+	});
 }
 
 async function _traverse_ts_aliases(directory:string, aliases:Aliases) {
 	const entries = util_instance.fs.read_dir(directory);
+	const promises:Promise<void>[] = [];
 	for(const filename of entries){
 		const full_path = path.resolve(directory, filename);
 		const def_folder = `${alias_params.root}/${defaults.folder}`;
 		if(full_path.indexOf(`${def_folder}/server/src/uranio/nuxt/static/`) !== -1){
-			return false;
+			continue;
 		}
 		if(full_path.indexOf(`${def_folder}/client/src/uranio/nuxt/static/`) !== -1){
-			return false;
+			continue;
 		}
 		if (util_instance.fs.is_directory(full_path) && filename != '.git') {
-			await _traverse_ts_aliases(full_path, aliases);
+			const traverse_promise = _traverse_ts_aliases(full_path, aliases);
+			promises.push(traverse_promise);
 		}else if(filename.split('.').pop() === 'ts'){
-			await replace_file_aliases(full_path, aliases);
+			const file_promise = replace_file_aliases(full_path, aliases);
+			promises.push(file_promise);
 		}
+		await Promise.all(promises);
 	}
 }
 

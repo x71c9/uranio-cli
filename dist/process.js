@@ -315,7 +315,7 @@ function _folder_is_valid(folder_path) {
             try {
                 const content = fs_1.default.readFileSync(package_json_path, 'utf8');
                 const pack = urn_lib_1.urn_util.json.clean_parse(content);
-                if (pack.name === 'urn-cli' || (pack.name === 'uranio' && pack.uranio == true)) {
+                if (pack.name === 'uranio-cli' || (pack.name === 'uranio' && pack.uranio == true)) {
                     return false;
                 }
                 return true;
