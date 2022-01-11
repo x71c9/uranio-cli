@@ -56,24 +56,20 @@ const _project_option = {
 };
 function alias(params, included = false) {
     return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve, _reject) => {
-            _init_alias(params);
-            const tsconfig_path_server = `${alias_params.root}/${defaults_1.defaults.folder}/server/tsconfig.json`;
-            const tsconfig_path_client = `${alias_params.root}/${defaults_1.defaults.folder}/client/tsconfig.json`;
-            const aliases_server = get_aliases(tsconfig_path_server);
-            const aliases_client = get_aliases(tsconfig_path_client);
-            const srv_promise = _replace_aliases_server(aliases_server);
-            const cln_promise = _replace_aliases_client(aliases_client);
-            Promise.all([srv_promise, cln_promise]).then(() => {
-                if (!included) {
-                    output_instance.end_log(`Aliases updated.`);
-                }
-                else {
-                    output_instance.done_log(`Alias updated.`, 'alis');
-                }
-                resolve();
-            });
-        });
+        _init_alias(params);
+        const tsconfig_path_server = `${alias_params.root}/${defaults_1.defaults.folder}/server/tsconfig.json`;
+        const tsconfig_path_client = `${alias_params.root}/${defaults_1.defaults.folder}/client/tsconfig.json`;
+        const aliases_server = get_aliases(tsconfig_path_server);
+        const aliases_client = get_aliases(tsconfig_path_client);
+        const srv_promise = _replace_aliases_server(aliases_server);
+        const cln_promise = _replace_aliases_client(aliases_client);
+        yield Promise.all([srv_promise, cln_promise]);
+        if (!included) {
+            output_instance.end_log(`Aliases updated.`);
+        }
+        else {
+            output_instance.done_log(`Alias updated.`, 'alis');
+        }
     });
 }
 exports.alias = alias;
@@ -121,16 +117,12 @@ function _init_alias(params) {
 }
 function _replace_aliases_server(aliases) {
     return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve, _reject) => {
-            _traverse_ts_aliases(`${alias_params.root}/${defaults_1.defaults.folder}/server/src/`, aliases);
-            resolve(true);
-        });
+        yield _traverse_ts_aliases(`${alias_params.root}/${defaults_1.defaults.folder}/server/src/`, aliases);
     });
 }
 function _replace_aliases_client(aliases) {
-    return new Promise((resolve, _reject) => {
-        _traverse_ts_aliases(`${alias_params.root}/${defaults_1.defaults.folder}/client/src/`, aliases);
-        resolve(true);
+    return __awaiter(this, void 0, void 0, function* () {
+        yield _traverse_ts_aliases(`${alias_params.root}/${defaults_1.defaults.folder}/client/src/`, aliases);
     });
 }
 function _traverse_ts_aliases(directory, aliases) {
