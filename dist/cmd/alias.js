@@ -62,15 +62,17 @@ function alias(params, included = false) {
             const tsconfig_path_client = `${alias_params.root}/${defaults_1.defaults.folder}/client/tsconfig.json`;
             const aliases_server = get_aliases(tsconfig_path_server);
             const aliases_client = get_aliases(tsconfig_path_client);
-            _replace_aliases_server(aliases_server);
-            _replace_aliases_client(aliases_client);
-            if (!included) {
-                output_instance.end_log(`Aliases updated.`);
-            }
-            else {
-                output_instance.done_log(`Alias updated.`, 'alis');
-            }
-            resolve();
+            const srv_promise = _replace_aliases_server(aliases_server);
+            const cln_promise = _replace_aliases_client(aliases_client);
+            Promise.all([srv_promise, cln_promise]).then(() => {
+                if (!included) {
+                    output_instance.end_log(`Aliases updated.`);
+                }
+                else {
+                    output_instance.done_log(`Alias updated.`, 'alis');
+                }
+                resolve();
+            });
         });
     });
 }
@@ -118,29 +120,41 @@ function _init_alias(params) {
     util_instance.must_be_initialized();
 }
 function _replace_aliases_server(aliases) {
-    _traverse_ts_aliases(`${alias_params.root}/${defaults_1.defaults.folder}/server/src/`, aliases);
+    return __awaiter(this, void 0, void 0, function* () {
+        return new Promise((resolve, _reject) => {
+            _traverse_ts_aliases(`${alias_params.root}/${defaults_1.defaults.folder}/server/src/`, aliases);
+            resolve(true);
+        });
+    });
 }
 function _replace_aliases_client(aliases) {
-    _traverse_ts_aliases(`${alias_params.root}/${defaults_1.defaults.folder}/client/src/`, aliases);
+    return new Promise((resolve, _reject) => {
+        _traverse_ts_aliases(`${alias_params.root}/${defaults_1.defaults.folder}/client/src/`, aliases);
+        resolve(true);
+    });
 }
 function _traverse_ts_aliases(directory, aliases) {
     return __awaiter(this, void 0, void 0, function* () {
         const entries = util_instance.fs.read_dir(directory);
+        const promises = [];
         for (const filename of entries) {
             const full_path = path_1.default.resolve(directory, filename);
             const def_folder = `${alias_params.root}/${defaults_1.defaults.folder}`;
             if (full_path.indexOf(`${def_folder}/server/src/uranio/nuxt/static/`) !== -1) {
-                return false;
+                continue;
             }
             if (full_path.indexOf(`${def_folder}/client/src/uranio/nuxt/static/`) !== -1) {
-                return false;
+                continue;
             }
             if (util_instance.fs.is_directory(full_path) && filename != '.git') {
-                yield _traverse_ts_aliases(full_path, aliases);
+                const traverse_promise = _traverse_ts_aliases(full_path, aliases);
+                promises.push(traverse_promise);
             }
             else if (filename.split('.').pop() === 'ts') {
-                yield replace_file_aliases(full_path, aliases);
+                const file_promise = replace_file_aliases(full_path, aliases);
+                promises.push(file_promise);
             }
+            yield Promise.all(promises);
         }
     });
 }

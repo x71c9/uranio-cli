@@ -126,7 +126,7 @@ async function _transpose_all(included=false){
 	
 }
 
-async function _transpose_file(file_path:string, included=false){
+async function _transpose_file(file_path:string, included=false):Promise<void>{
 	
 	const basename = path.basename(file_path);
 	const extension = path.extname(basename);
@@ -142,7 +142,7 @@ async function _transpose_file(file_path:string, included=false){
 	
 	const dot_book_dir = `${transpose_params.root}/src/books`;
 	if(transpose_params.is_dot && file_path.includes(dot_book_dir)){
-		return false;
+		return;
 	}
 	
 	if(file_path === `${transpose_params.root}/src/book.ts`){
@@ -350,14 +350,18 @@ async function _transpose_book(){
 
 async function _transpose_folder(dir_path:string, included=false){
 	const entries = util_instance.fs.read_dir(dir_path);
+	const promises:Promise<void>[] = [];
 	for(const filename of entries){
 		const full_path = path.resolve(dir_path, filename);
 		if (util_instance.fs.is_directory(full_path) && filename !== '.git'){
-			await _transpose_folder(full_path, true);
+			const folder_promise = _transpose_folder(full_path, true);
+			promises.push(folder_promise);
 		}else{
-			await _transpose_file(full_path, true);
+			const file_promise = _transpose_file(full_path, true);
+			promises.push(file_promise);
 		}
 	}
+	await Promise.all(promises);
 	if(!included){
 		output_instance.done_log(`Transpose folder completed.`);
 	}

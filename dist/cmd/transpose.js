@@ -135,7 +135,7 @@ function _transpose_file(file_path, included = false) {
         }
         const dot_book_dir = `${transpose_params.root}/src/books`;
         if (transpose_params.is_dot && file_path.includes(dot_book_dir)) {
-            return false;
+            return;
         }
         if (file_path === `${transpose_params.root}/src/book.ts`) {
             yield _transpose_book();
@@ -230,15 +230,19 @@ function _transpose_book() {
 function _transpose_folder(dir_path, included = false) {
     return __awaiter(this, void 0, void 0, function* () {
         const entries = util_instance.fs.read_dir(dir_path);
+        const promises = [];
         for (const filename of entries) {
             const full_path = path_1.default.resolve(dir_path, filename);
             if (util_instance.fs.is_directory(full_path) && filename !== '.git') {
-                yield _transpose_folder(full_path, true);
+                const folder_promise = _transpose_folder(full_path, true);
+                promises.push(folder_promise);
             }
             else {
-                yield _transpose_file(full_path, true);
+                const file_promise = _transpose_file(full_path, true);
+                promises.push(file_promise);
             }
         }
+        yield Promise.all(promises);
         if (!included) {
             output_instance.done_log(`Transpose folder completed.`);
         }

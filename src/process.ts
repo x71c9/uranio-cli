@@ -61,7 +61,6 @@ export function uranio_process(args:Arguments)
 		_set_root(args);
 	}
 	
-	
 	process_params = read_rc_file(process_params);
 	
 	process_params = _set_args(process_params, args);
@@ -415,7 +414,7 @@ function _folder_is_valid(folder_path:string){
 			try{
 				const content = fs.readFileSync(package_json_path,'utf8');
 				const pack = urn_util.json.clean_parse(content);
-				if(pack.name === 'urn-cli' || (pack.name === 'uranio' && pack.uranio == true)){
+				if(pack.name === 'uranio-cli' || (pack.name === 'uranio' && pack.uranio == true)){
 					return false;
 				}
 				return true;
