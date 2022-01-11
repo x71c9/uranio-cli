@@ -56,19 +56,22 @@ const _project_option = {
 };
 function alias(params, included = false) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_alias(params);
-        const tsconfig_path_server = `${alias_params.root}/${defaults_1.defaults.folder}/server/tsconfig.json`;
-        const tsconfig_path_client = `${alias_params.root}/${defaults_1.defaults.folder}/client/tsconfig.json`;
-        const aliases_server = get_aliases(tsconfig_path_server);
-        const aliases_client = get_aliases(tsconfig_path_client);
-        _replace_aliases_server(aliases_server);
-        _replace_aliases_client(aliases_client);
-        if (!included) {
-            output_instance.end_log(`Aliases updated.`);
-        }
-        else {
-            output_instance.done_log(`Alias updated.`, 'alis');
-        }
+        return new Promise((resolve, _reject) => {
+            _init_alias(params);
+            const tsconfig_path_server = `${alias_params.root}/${defaults_1.defaults.folder}/server/tsconfig.json`;
+            const tsconfig_path_client = `${alias_params.root}/${defaults_1.defaults.folder}/client/tsconfig.json`;
+            const aliases_server = get_aliases(tsconfig_path_server);
+            const aliases_client = get_aliases(tsconfig_path_client);
+            _replace_aliases_server(aliases_server);
+            _replace_aliases_client(aliases_client);
+            if (!included) {
+                output_instance.end_log(`Aliases updated.`);
+            }
+            else {
+                output_instance.done_log(`Alias updated.`, 'alis');
+            }
+            resolve();
+        });
     });
 }
 exports.alias = alias;
@@ -89,18 +92,23 @@ function get_aliases(tsconfig_path, params) {
 }
 exports.get_aliases = get_aliases;
 function replace_file_aliases(filepath, aliases, params) {
-    if (typeof params !== 'undefined') {
-        _init_alias(params);
-    }
-    const _project = new tsm.Project(_project_option);
-    let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
-    const { found, source } = _change_to_relative_statements(sourceFile, aliases);
-    sourceFile = source;
-    if (found === true) {
-        const modified = sourceFile.print();
-        _replace_modified_file(modified, filepath);
-        // util_instance.pretty(filepath);
-    }
+    return __awaiter(this, void 0, void 0, function* () {
+        return new Promise((resolve, _reject) => {
+            if (typeof params !== 'undefined') {
+                _init_alias(params);
+            }
+            const _project = new tsm.Project(_project_option);
+            let sourceFile = _project.addSourceFileAtPath(`${filepath}`);
+            const { found, source } = _change_to_relative_statements(sourceFile, aliases);
+            sourceFile = source;
+            if (found === true) {
+                const modified = sourceFile.print();
+                _replace_modified_file(modified, filepath);
+                // util_instance.pretty(filepath);
+            }
+            resolve();
+        });
+    });
 }
 exports.replace_file_aliases = replace_file_aliases;
 function _init_alias(params) {
@@ -116,20 +124,23 @@ function _replace_aliases_client(aliases) {
     _traverse_ts_aliases(`${alias_params.root}/${defaults_1.defaults.folder}/client/src/`, aliases);
 }
 function _traverse_ts_aliases(directory, aliases) {
-    util_instance.fs.read_dir(directory).forEach((filename) => {
-        const full_path = path_1.default.resolve(directory, filename);
-        const def_folder = `${alias_params.root}/${defaults_1.defaults.folder}`;
-        if (full_path.indexOf(`${def_folder}/server/src/uranio/nuxt/static/`) !== -1) {
-            return false;
-        }
-        if (full_path.indexOf(`${def_folder}/client/src/uranio/nuxt/static/`) !== -1) {
-            return false;
-        }
-        if (util_instance.fs.is_directory(full_path) && filename != '.git') {
-            return _traverse_ts_aliases(full_path, aliases);
-        }
-        else if (filename.split('.').pop() === 'ts') {
-            replace_file_aliases(full_path, aliases);
+    return __awaiter(this, void 0, void 0, function* () {
+        const entries = util_instance.fs.read_dir(directory);
+        for (const filename of entries) {
+            const full_path = path_1.default.resolve(directory, filename);
+            const def_folder = `${alias_params.root}/${defaults_1.defaults.folder}`;
+            if (full_path.indexOf(`${def_folder}/server/src/uranio/nuxt/static/`) !== -1) {
+                return false;
+            }
+            if (full_path.indexOf(`${def_folder}/client/src/uranio/nuxt/static/`) !== -1) {
+                return false;
+            }
+            if (util_instance.fs.is_directory(full_path) && filename != '.git') {
+                yield _traverse_ts_aliases(full_path, aliases);
+            }
+            else if (filename.split('.').pop() === 'ts') {
+                yield replace_file_aliases(full_path, aliases);
+            }
         }
     });
 }
@@ -190,28 +201,4 @@ function _replace_modified_file(text, filename) {
     util_instance.fs.write_file(filename, text);
     output_instance.done_verbose_log(`File replaced [${filename}].`, 'alias');
 }
-// export const alias = {
-//   run: (options?:Partial<Options>):void => {
-//     common.init_run(options);
-//     alias.command();
-//   },
-//   command: ():void => {
-//     output_instance.start_loading('Updating aliases...');
-//     util.read_rc_file();
-//     const tsconfig_path_server = `${conf.root}/.uranio/server/tsconfig.json`;
-//     const tsconfig_path_client = `${conf.root}/.uranio/client/tsconfig.json`;
-//     const aliases_server = get_aliases(tsconfig_path_server);
-//     const aliases_client = get_aliases(tsconfig_path_client);
-//     _replace_aliases_server(aliases_server);
-//     _replace_aliases_client(aliases_client);
-//     output_instance.end_log(`Aliases updated.`);
-//   },
-//   include: ():void => {
-//     const is_hidden = conf.hide;
-//     conf.hide = true;
-//     alias.command();
-//     conf.hide = is_hidden;
-//     output_instance.done_log(`Aliases updated.`, 'alias');
-//   }
-// };
 //# sourceMappingURL=alias.js.map
