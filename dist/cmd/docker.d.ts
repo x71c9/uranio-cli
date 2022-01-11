@@ -18,4 +18,5 @@ export declare function db_remove(params: Partial<Params>, db: DB, continue_on_f
 export declare function tmp_remove(params: Partial<Params>, continue_on_fail?: boolean): Promise<void>;
 export declare function network_create(params: Partial<Params>, continue_on_fail?: boolean): Promise<void>;
 export declare function network_remove(params: Partial<Params>, continue_on_fail?: boolean): Promise<void>;
+export declare function prune(params: Partial<Params>, continue_on_fail?: boolean): Promise<void>;
 export declare function update_env(): void;
