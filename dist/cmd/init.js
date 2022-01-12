@@ -303,15 +303,13 @@ function _ask_for_deploy(args) {
     });
 }
 function _add_admin_files() {
-    return __awaiter(this, void 0, void 0, function* () {
-        output_instance.start_loading(`Adding admin files...`);
-        const fix_file_nuxt_types = `${init_params.root}/node_modules/@nuxt/types/node_modules/index.d.ts`;
-        if (!util_instance.fs.exists(fix_file_nuxt_types)) {
-            // util_instance.spawn.exec_sync(`touch ${fix_file_nuxt_types}`);
-            yield util_instance.spawn.spin(`touch ${fix_file_nuxt_types}`, 'adm', `adding nuxt file.`);
-        }
-        output_instance.done_verbose_log('Added admin files.', 'adm');
-    });
+    output_instance.start_loading(`Adding admin files...`);
+    const fix_file_nuxt_types = `${init_params.root}/node_modules/@nuxt/types/node_modules/index.d.ts`;
+    if (!util_instance.fs.exists(fix_file_nuxt_types)) {
+        util_instance.spawn.exec_sync(`touch ${fix_file_nuxt_types}`);
+        // await util_instance.spawn.spin(`touch ${fix_file_nuxt_types}`, 'adm', `adding nuxt file.`);
+    }
+    output_instance.done_verbose_log('Added admin files.', 'adm');
 }
 function _replace_aliases() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -342,7 +340,7 @@ function _copy_specific_assets() {
             }
         }
         if ((0, types_1.valid_admin_repos)().includes(init_params.repo)) {
-            yield _add_admin_files();
+            _add_admin_files();
             _copy_admin_files();
         }
         if (init_params.repo === 'trx') {
