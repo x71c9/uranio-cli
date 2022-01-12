@@ -1,1 +1,0 @@
-{"version":3,"file":"test.js","sourceRoot":"","sources":["../../src/cmd/test.ts"],"names":[],"mappings":";AAAA;;;;GAIG;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAEH,mDAAqC;AAErC,+CAAiC;AAEpB,QAAA,IAAI,GAAG;IAEnB,OAAO,EAAE,GAAuB,EAAE;QAEjC,MAAM,CAAC,YAAY,EAAE,CAAC;QAEtB,IAAI,CAAC,YAAY,EAAE,CAAC;QAEpB,MAAM,CAAC,WAAW,CAAC,iBAAiB,CAAC,CAAC;IAEvC,CAAC,CAAA;CAED,CAAC"}
