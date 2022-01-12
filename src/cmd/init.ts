@@ -76,17 +76,17 @@ export async function init(params:Partial<Params>)
 		await _init_pacman();
 		await _clone_repo();
 		await _install_repo();
-		_remove_git_files();
+		await _remove_git_files();
 		
-		_copy_specific_assets();
+		await _copy_specific_assets();
 		await _replace_aliases();
 		
 	}
 	
 	if(init_params.docker_db === true){
 		await docker.network_create(init_params, true);
-		await docker.db_create(init_params, init_params.db);
-		await docker.db_start(init_params, init_params.db);
+		await docker.db_create(init_params);
+		await docker.db_start(init_params);
 		docker.update_env();
 	}
 	
@@ -308,13 +308,13 @@ async function _ask_for_deploy(args:Arguments){
 	}
 }
 
-function _add_admin_files(){
+async function _add_admin_files(){
 	output_instance.start_loading(`Adding admin files...`);
 	const fix_file_nuxt_types =
 		`${init_params.root}/node_modules/@nuxt/types/node_modules/index.d.ts`;
 	if(!util_instance.fs.exists(fix_file_nuxt_types)){
 		// util_instance.spawn.exec_sync(`touch ${fix_file_nuxt_types}`);
-		util_instance.spawn.spin(`touch ${fix_file_nuxt_types}`, 'adm', `adding nuxt file.`);
+		await util_instance.spawn.spin(`touch ${fix_file_nuxt_types}`, 'adm', `adding nuxt file.`);
 	}
 	output_instance.done_verbose_log('Added admin files.', 'adm');
 }
@@ -348,7 +348,7 @@ function _copy_assets(){
 	_copy_main_files(init_params.repo);
 }
 
-function _copy_specific_assets(){
+async function _copy_specific_assets(){
 	output_instance.start_loading(`Copying assets...`);
 	if(valid_deploy_repos().includes(init_params.repo)){
 		if(init_params.deploy === 'netlify'){
@@ -356,7 +356,7 @@ function _copy_specific_assets(){
 		}
 	}
 	if(valid_admin_repos().includes(init_params.repo)){
-		_add_admin_files();
+		await _add_admin_files();
 		_copy_admin_files();
 	}
 	if(init_params.repo === 'trx'){
@@ -489,7 +489,7 @@ async function _clone_assets_repo(){
 	output_instance.done_log(`Cloned assets repo.`, 'assets');
 }
 
-function _remove_git_files(){
+async function _remove_git_files(){
 	output_instance.start_loading(`Removing git files...`);
 	const cloned_server_repo_path =
 		`${init_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}`;
@@ -497,14 +497,15 @@ function _remove_git_files(){
 	// util_instance.spawn.exec_sync(
 	//   `( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`
 	// );
-	util_instance.spawn.spin(srv_cmd, '.git', `removing srv .git files.`);
+	const srv_promise = util_instance.spawn.spin(srv_cmd, '.git', `removing srv .git files.`);
 	const cloned_client_repo_path =
 		`${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`;
 	const cln_cmd = `( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`;
 	// util_instance.spawn.exec_sync(
 	//   `( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`
 	// );
-	util_instance.spawn.spin(cln_cmd, '.git', `removing cln .git files.`);
+	const cln_promise = util_instance.spawn.spin(cln_cmd, '.git', `removing cln .git files.`);
+	await Promise.all([srv_promise, cln_promise]);
 	output_instance.done_log(`Removed uranio .git files.`, '.git');
 }
 

@@ -63,8 +63,8 @@ function _remove_dockers() {
             return;
         }
         yield docker.tmp_remove(deinit_params, true);
-        yield docker.db_stop(deinit_params, deinit_params.db, true);
-        yield docker.db_remove(deinit_params, deinit_params.db, true);
+        yield docker.db_stop(deinit_params, true);
+        yield docker.db_remove(deinit_params, true);
         yield docker.network_remove(deinit_params, true);
         yield docker.stop(deinit_params, true);
         yield docker.remove(deinit_params, true);
