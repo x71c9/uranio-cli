@@ -68,6 +68,8 @@ function init(params) {
         _update_resolutions();
         if (init_params.docker === true) {
             yield docker.build(init_params);
+            yield docker.network_create(init_params);
+            yield docker.create(init_params);
         }
         else {
             yield _init_pacman();
@@ -78,7 +80,9 @@ function init(params) {
             yield _replace_aliases();
         }
         if (init_params.docker_db === true) {
-            yield docker.network_create(init_params);
+            if (init_params.docker === false) {
+                yield docker.network_create(init_params);
+            }
             yield docker.db_create(init_params);
             yield docker.db_start(init_params);
             docker.update_env();
