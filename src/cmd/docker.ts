@@ -127,9 +127,7 @@ export async function build(params:Partial<Params>)
 		`Docker image built ${image_name}`
 	);
 	
-	await network_create(docker_params);
 	await _copy_compiled();
-	await create(docker_params);
 	
 }
 
