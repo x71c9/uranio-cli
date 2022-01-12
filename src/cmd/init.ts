@@ -70,6 +70,8 @@ export async function init(params:Partial<Params>)
 	if(init_params.docker === true){
 		
 		await docker.build(init_params);
+		await docker.network_create(init_params);
+		await docker.create(init_params);
 		
 	}else{
 		
@@ -84,7 +86,9 @@ export async function init(params:Partial<Params>)
 	}
 	
 	if(init_params.docker_db === true){
-		await docker.network_create(init_params);
+		if(init_params.docker === false){
+			await docker.network_create(init_params);
+		}
 		await docker.db_create(init_params);
 		await docker.db_start(init_params);
 		docker.update_env();
