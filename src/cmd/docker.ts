@@ -67,19 +67,19 @@ export async function docker(params:Partial<Params>, args:Arguments)
 			
 			switch(args._[2]){
 				case 'create':{
-					await db_create(docker_params, db);
+					await db_create(docker_params);
 					break;
 				}
 				case 'start':{
-					await db_start(docker_params, db);
+					await db_start(docker_params);
 					break;
 				}
 				case 'stop':{
-					await db_stop(docker_params, db);
+					await db_stop(docker_params);
 					break;
 				}
 				case 'remove':{
-					await db_remove(docker_params, db);
+					await db_remove(docker_params);
 					break;
 				}
 			}
@@ -226,7 +226,7 @@ export async function unbuild(params:Partial<Params>, continue_on_fail=false)
 	);
 }
 
-export async function db_create(params:Partial<Params>, db:DB)
+export async function db_create(params:Partial<Params>)
 		:Promise<void>{
 	_init_params(params);
 	const project_name = _get_project_name();
@@ -238,25 +238,25 @@ export async function db_create(params:Partial<Params>, db:DB)
 	cmd += ` --network ${network_name}`;
 	cmd += ` -v ~/mongo/data-${project_name}:/data/db -p ${port}:${port}`;
 	cmd += ` mongo:5`;
-	await _execute_spin_verbose(cmd, `docker`, `creating db ${db}`);
+	await _execute_spin_verbose(cmd, `docker`, `creating db ${docker_params.db}`);
 	output_instance.done_log(
 		`Docker db container created ${db_container_name}`
 	);
 }
 
-export async function db_start(params:Partial<Params>, db:DB)
+export async function db_start(params:Partial<Params>)
 		:Promise<void>{
 	_init_params(params);
 	const db_container_name = _get_db_container_name();
 	let cmd = '';
 	cmd += `docker start ${db_container_name}`;
-	await _execute_spin_verbose(cmd, `docker`, `starting db ${db}`);
+	await _execute_spin_verbose(cmd, `docker`, `starting db ${docker_params.db}`);
 	output_instance.done_log(
 		`Docker db container started ${db_container_name}`
 	);
 }
 
-export async function db_stop(params:Partial<Params>, db:DB, continue_on_fail=false)
+export async function db_stop(params:Partial<Params>, continue_on_fail=false)
 		:Promise<void>{
 	_init_params(params);
 	const db_container_name = _get_db_container_name();
@@ -265,13 +265,13 @@ export async function db_stop(params:Partial<Params>, db:DB, continue_on_fail=fa
 	if(continue_on_fail){
 		cmd += ` || true`;
 	}
-	await _execute_spin_verbose(cmd, `docker`, `stopping db ${db}`);
+	await _execute_spin_verbose(cmd, `docker`, `stopping db ${docker_params.db}`);
 	output_instance.done_log(
 		`Docker db container stopped ${db_container_name}`
 	);
 }
 
-export async function db_remove(params:Partial<Params>, db:DB, continue_on_fail=false)
+export async function db_remove(params:Partial<Params>, continue_on_fail=false)
 		:Promise<void>{
 	_init_params(params);
 	const db_container_name = _get_db_container_name();
@@ -280,7 +280,7 @@ export async function db_remove(params:Partial<Params>, db:DB, continue_on_fail=
 	if(continue_on_fail){
 		cmd += ` || true`;
 	}
-	await _execute_spin_verbose(cmd, `docker`, `removing db ${db}`);
+	await _execute_spin_verbose(cmd, `docker`, `removing db ${docker_params.db}`);
 	output_instance.done_log(
 		`Docker db container removed ${db_container_name}`
 	);

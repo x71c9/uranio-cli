@@ -75,19 +75,19 @@ function docker(params, args) {
                 (0, common_1.check_db)(db);
                 switch (args._[2]) {
                     case 'create': {
-                        yield db_create(docker_params, db);
+                        yield db_create(docker_params);
                         break;
                     }
                     case 'start': {
-                        yield db_start(docker_params, db);
+                        yield db_start(docker_params);
                         break;
                     }
                     case 'stop': {
-                        yield db_stop(docker_params, db);
+                        yield db_stop(docker_params);
                         break;
                     }
                     case 'remove': {
-                        yield db_remove(docker_params, db);
+                        yield db_remove(docker_params);
                         break;
                     }
                 }
@@ -219,7 +219,7 @@ function unbuild(params, continue_on_fail = false) {
     });
 }
 exports.unbuild = unbuild;
-function db_create(params, db) {
+function db_create(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
         const project_name = _get_project_name();
@@ -231,23 +231,23 @@ function db_create(params, db) {
         cmd += ` --network ${network_name}`;
         cmd += ` -v ~/mongo/data-${project_name}:/data/db -p ${port}:${port}`;
         cmd += ` mongo:5`;
-        yield _execute_spin_verbose(cmd, `docker`, `creating db ${db}`);
+        yield _execute_spin_verbose(cmd, `docker`, `creating db ${docker_params.db}`);
         output_instance.done_log(`Docker db container created ${db_container_name}`);
     });
 }
 exports.db_create = db_create;
-function db_start(params, db) {
+function db_start(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
         const db_container_name = _get_db_container_name();
         let cmd = '';
         cmd += `docker start ${db_container_name}`;
-        yield _execute_spin_verbose(cmd, `docker`, `starting db ${db}`);
+        yield _execute_spin_verbose(cmd, `docker`, `starting db ${docker_params.db}`);
         output_instance.done_log(`Docker db container started ${db_container_name}`);
     });
 }
 exports.db_start = db_start;
-function db_stop(params, db, continue_on_fail = false) {
+function db_stop(params, continue_on_fail = false) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
         const db_container_name = _get_db_container_name();
@@ -256,12 +256,12 @@ function db_stop(params, db, continue_on_fail = false) {
         if (continue_on_fail) {
             cmd += ` || true`;
         }
-        yield _execute_spin_verbose(cmd, `docker`, `stopping db ${db}`);
+        yield _execute_spin_verbose(cmd, `docker`, `stopping db ${docker_params.db}`);
         output_instance.done_log(`Docker db container stopped ${db_container_name}`);
     });
 }
 exports.db_stop = db_stop;
-function db_remove(params, db, continue_on_fail = false) {
+function db_remove(params, continue_on_fail = false) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
         const db_container_name = _get_db_container_name();
@@ -270,7 +270,7 @@ function db_remove(params, db, continue_on_fail = false) {
         if (continue_on_fail) {
             cmd += ` || true`;
         }
-        yield _execute_spin_verbose(cmd, `docker`, `removing db ${db}`);
+        yield _execute_spin_verbose(cmd, `docker`, `removing db ${docker_params.db}`);
         output_instance.done_log(`Docker db container removed ${db_container_name}`);
     });
 }

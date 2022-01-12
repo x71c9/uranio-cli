@@ -54,8 +54,8 @@ async function _remove_dockers()
 	}
 	await docker.tmp_remove(deinit_params, true);
 	
-	await docker.db_stop(deinit_params, deinit_params.db, true);
-	await docker.db_remove(deinit_params, deinit_params.db, true);
+	await docker.db_stop(deinit_params, true);
+	await docker.db_remove(deinit_params, true);
 	
 	await docker.network_remove(deinit_params, true);
 	
