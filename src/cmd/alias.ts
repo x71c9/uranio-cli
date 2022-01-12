@@ -41,6 +41,8 @@ export async function alias(params:Partial<Params>, included=false)
 	
 	_init_alias(params);
 	
+	output_instance.start_loading(`Updating aliases...`);
+	
 	const tsconfig_path_server =
 		`${alias_params.root}/${defaults.folder}/server/tsconfig.json`;
 	const tsconfig_path_client =

@@ -57,6 +57,7 @@ const _project_option = {
 function alias(params, included = false) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_alias(params);
+        output_instance.start_loading(`Updating aliases...`);
         const tsconfig_path_server = `${alias_params.root}/${defaults_1.defaults.folder}/server/tsconfig.json`;
         const tsconfig_path_client = `${alias_params.root}/${defaults_1.defaults.folder}/client/tsconfig.json`;
         const aliases_server = get_aliases(tsconfig_path_server);

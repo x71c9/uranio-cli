@@ -10,19 +10,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = void 0;
 const dateformat_1 = __importDefault(require("dateformat"));
-// import ora from 'ora';
 const chalk_1 = __importDefault(require("chalk"));
 const fs_1 = __importDefault(require("fs"));
 const defaults_1 = require("../conf/defaults");
-// import {merge_params} from '../cmd/common';
 const spinner_1 = require("./spinner");
-// import {OutputParams} from './types';
+let spinner_current = '';
 class Output {
-    // public spinner:ora.Ora
-    // public spinner_texts:string[]
     constructor(params) {
-        // this.spinner = ora({text: 'Loading...', color: 'magenta', interval: 40});
-        // this.spinner_texts = [];
         this.params = params;
     }
     log(text, context = 'log', color) {
@@ -45,8 +39,10 @@ class Output {
         this.log(`${defaults_1.defaults.check_char} ${text}`, context);
     }
     done_verbose_log(text, context = 'vdne') {
-        this._go_previous();
-        this.verbose_log(`${text}`, context);
+        if (this.params.verbose) {
+            this._go_previous();
+            this.verbose_log(`${text}`, context);
+        }
     }
     error_log(text, context = 'errr') {
         this.stop_loading();
@@ -77,6 +73,7 @@ class Output {
         if (this.params.blank === true) {
             spinner_1.spinner.color = 'white';
         }
+        spinner_current = text;
         spinner_1.spinner_texts.push(text);
         this.spinner_text(text);
         if (this.params.spin === true && !spinner_1.spinner.isSpinning) {
@@ -87,7 +84,8 @@ class Output {
         spinner_1.spinner.stop();
     }
     spinner_text(text) {
-        spinner_1.spinner.text = this._spinner_text_color(text);
+        const text_with_current = `${spinner_current} ${text}`;
+        spinner_1.spinner.text = this._spinner_text_color(text_with_current);
         if (spinner_1.spinner.text.length > process.stdout.columns) {
             spinner_1.spinner.text = spinner_1.spinner.text.substr(0, process.stdout.columns - 4);
         }
@@ -242,11 +240,13 @@ class Output {
         let removed_prefix = '';
         if (match.index === 0 && text.substring(0, 3) === '[c#') { // Regex match also with another random char in front
             color_prefix = text.substring(0, match.index + 10);
-            removed_prefix = text.substring(0, match.index) + text.substring(match.index + 10, text.length);
+            removed_prefix =
+                text.substring(0, match.index) + text.substring(match.index + 10, text.length);
         }
         else { // text might have something else in from "s6728 [c#666666]"
             color_prefix = text.substring(match.index + 1, match.index + 11);
-            removed_prefix = text.substring(0, match.index + 1) + text.substring(match.index + 11, text.length);
+            removed_prefix =
+                text.substring(0, match.index + 1) + text.substring(match.index + 11, text.length);
         }
         const hexa_color = color_prefix.substring(2, 9);
         processed_text = chalk_1.default.hex(hexa_color)(removed_prefix);

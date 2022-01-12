@@ -46,6 +46,7 @@ class CMD {
 			:Promise<any>{
 		const action = `installing dependencies [${repo}]`;
 		this.output.verbose_log(`Started ${action}`, context);
+		this.output.start_loading(`Installing dep [${repo}]...`);
 		return new Promise((resolve, reject) => {
 			this.spawn.spin(_pacman_commands.install[this.params.pacman](repo), context, action, undefined, resolve, reject);
 		});
@@ -55,6 +56,7 @@ class CMD {
 			:Promise<any>{
 		const action = `installing dev dependencies [${repo}]`;
 		this.output.verbose_log(`Started ${action}`, context);
+		this.output.start_loading(`Installing dep dev [${repo}]...`);
 		return new Promise((resolve, reject) => {
 			this.spawn.spin(_pacman_commands.install_dev[this.params.pacman](repo), context, action, undefined, resolve, reject);
 		});
