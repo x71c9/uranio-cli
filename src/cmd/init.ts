@@ -39,8 +39,6 @@ import {
 	check_pacman
 } from './common';
 
-// import {InitParams} from './types';
-
 let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
@@ -115,9 +113,7 @@ export async function prompt_init(params:Params, args:Arguments)
 		let confirm_msg = '';
 		confirm_msg += `It appears the repo is already initialized.\n`;
 		confirm_msg += `? Are you sure you want to proceed?\n`;
-		
 		const suffix = `? All data will be lost and replaced.`;
-		
 		inquirer.
 			prompt([
 				{
@@ -128,17 +124,13 @@ export async function prompt_init(params:Params, args:Arguments)
 				}
 			]).then(async (answer) => {
 				if(answer.proceed && answer.proceed === true){
-					
 					await _ask_for_pacman(args);
-					
 				}else{
 					process.exit(0);
 				}
 			});
 	}else{
-		
 		await _ask_for_pacman(args);
-		
 	}
 	
 }
@@ -165,20 +157,18 @@ function _log_important_params(){
 }
 
 async function _init_pacman(){
+	output_instance.start_loading(`Initializing pacman...`);
 	const yarn_lock = `${init_params.root}/yarn.lock`;
 	if(init_params.pacman === 'yarn' && !util_instance.fs.exists(yarn_lock)){
 		await util_instance.cmd.yarn_install();
 	}
+	output_instance.done_verbose_log(`Pacman initialized.`, 'pacman');
 }
 
 async function _ask_for_pacman(args:Arguments){
-	
 	const pacman = args.p || args.pacman;
-	
 	if(!pacman && init_params.force === false){
-			
 		// output.stop_loading();
-		
 		inquirer.
 			prompt([
 				{
@@ -188,32 +178,21 @@ async function _ask_for_pacman(args:Arguments){
 					choices: Object.keys(abstract_pacman)
 				}
 			]).then(async (answers) => {
-				
 				check_pacman(answers.pacman);
 				init_params.pacman = answers.pacman;
-				
 				await _ask_for_docker(args);
-				
 			});
-		
 	}else{
-		
 		await _ask_for_docker(args);
-		
 	}
 }
 
 async function _ask_for_docker(args:Arguments){
-	
 	const docker = args.k || args.docker;
-	
 	if(!docker && init_params.force === false){
-			
 		let confirm_msg = '';
 		confirm_msg += `? Do you want to compile and run inside a docker container?\n`;
-		
 		const suffix = `? Docker need to be installed on your system.`;
-		
 		inquirer.
 			prompt([
 				{
@@ -223,33 +202,22 @@ async function _ask_for_docker(args:Arguments){
 					suffix: suffix
 				}
 			]).then(async (answers) => {
-				
 				if(answers.docker === true){
 					init_params.docker = true;
 				}
-				
 				await _ask_for_docker_db(args);
-				
 			});
-		
 	}else{
-		
 		await _ask_for_docker_db(args);
-		
 	}
 }
 
 async function _ask_for_docker_db(args:Arguments){
-	
 	const docker_db = args.docker_db;
-	
 	if(!docker_db && init_params.force === false){
-			
 		let confirm_msg = '';
 		confirm_msg += `? Do you want to run the db in a docker container?\n`;
-		
 		const suffix = `? Docker need to be installed on your system.`;
-		
 		inquirer.
 			prompt([
 				{
@@ -259,34 +227,22 @@ async function _ask_for_docker_db(args:Arguments){
 					suffix: suffix
 				}
 			]).then(async (answers) => {
-				
 				if(answers.docker_db === true){
-					
 					init_params.docker_db = true;
 					await _ask_for_db_type(args);
-					
 				}else{
-					
 					await _ask_for_repo(args);
-					
 				}
-				
 			});
-		
 	}else{
-		
 		await _ask_for_repo(args);
-		
 	}
 }
 
 async function _ask_for_db_type(args:Arguments){
-	
 	if(init_params.force === false){
-			
 		let confirm_msg = '';
 		confirm_msg += `Select db:`;
-		
 		inquirer.
 			prompt([
 				{
@@ -296,28 +252,18 @@ async function _ask_for_db_type(args:Arguments){
 					choices: Object.keys(abstract_db)
 				}
 			]).then(async (answers) => {
-				
 				init_params.db = answers.db;
-				
 				await _ask_for_repo(args);
-				
 			});
-		
 	}else{
-		
 		await _ask_for_repo(args);
-		
 	}
 }
 
 async function _ask_for_repo(args:Arguments){
-	
 	const repo = args.r || args.repo;
-	
 	if(!repo && init_params.force === false){
-			
 		// output.stop_loading();
-		
 		inquirer.
 			prompt([
 				{
@@ -327,37 +273,23 @@ async function _ask_for_repo(args:Arguments){
 					choices: Object.keys(abstract_repos)
 				}
 			]).then(async (answers) => {
-				
 				check_repo(answers.repo);
 				init_params.repo = answers.repo;
-				
 				if(answers.repo !== 'core'){
-					
 					await _ask_for_deploy(args);
-					
 				}else{
-					
 					await init(init_params);
-					
 				}
-				
 			});
-		
 	}else{
-		
 		await _ask_for_deploy(args);
-		
 	}
 }
 
 async function _ask_for_deploy(args:Arguments){
-	
 	const deploy = args.d || args.deploy;
-	
 	if(!deploy && init_params.force === false){
-			
 		// output.stop_loading();
-		
 		inquirer.
 			prompt([
 				{
@@ -367,18 +299,12 @@ async function _ask_for_deploy(args:Arguments){
 					choices: Object.keys(abstract_deploy)
 				}
 			]).then(async (answers) => {
-				
 				check_deploy(answers.deploy);
 				init_params.deploy = answers.deploy;
-				
 				await init(init_params);
-				
 			});
-		
 	}else{
-		
 		await init(init_params);
-		
 	}
 }
 
@@ -413,38 +339,29 @@ function _remove_tmp(){
 }
 
 function _copy_assets(){
-	
 	_copy_book();
-	
 	_copy_sample();
-	
 	_copy_tsconfigs();
-	
 	_update_tsconfig_paths();
-	
 	_copy_eslint_files();
-	
 	_copy_main_files(init_params.repo);
-	
 }
 
 function _copy_specific_assets(){
-	
+	output_instance.start_loading(`Copying assets...`);
 	if(valid_deploy_repos().includes(init_params.repo)){
 		if(init_params.deploy === 'netlify'){
 			_copy_netlify_files();
 		}
 	}
-	
 	if(valid_admin_repos().includes(init_params.repo)){
 		_add_admin_files();
 		_copy_admin_files();
 	}
-	
 	if(init_params.repo === 'trx'){
 		_copy_trx_files();
 	}
-	
+	output_instance.done_log(`Copied assets.`, 'assetes');
 }
 
 function _create_dot_env(){
@@ -463,13 +380,10 @@ function _update_tsconfig_paths(){
 	const main_paths = _generate_paths_server(init_params.repo, prefix);
 	const real_paths_server = _generate_paths_server(init_params.repo, `.`);
 	const real_paths_client = _generate_paths_client(init_params.repo, `.`);
-	
 	const main_tsconfig = `tsconfig.json`;
 	_update_paths(main_tsconfig, main_paths);
-	
 	const real_tsconfig_server = `.uranio/server/tsconfig.json`;
 	_update_paths(real_tsconfig_server, real_paths_server);
-	
 	const real_tsconfig_client = `.uranio/client/tsconfig.json`;
 	_update_paths(real_tsconfig_client, real_paths_client);
 }
@@ -578,14 +492,18 @@ function _remove_git_files(){
 	output_instance.start_loading(`Removing git files...`);
 	const cloned_server_repo_path =
 		`${init_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}`;
-	util_instance.spawn.exec_sync(
-		`( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`
-	);
+	const srv_cmd = `( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`;
+	// util_instance.spawn.exec_sync(
+	//   `( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`
+	// );
+	util_instance.spawn.spin(srv_cmd, '.git', `removing srv .git files.`);
 	const cloned_client_repo_path =
 		`${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`;
-	util_instance.spawn.exec_sync(
-		`( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`
-	);
+	const cln_cmd = `( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`;
+	// util_instance.spawn.exec_sync(
+	//   `( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`
+	// );
+	util_instance.spawn.spin(cln_cmd, '.git', `removing cln .git files.`);
 	output_instance.done_log(`Removed uranio .git files.`, '.git');
 }
 
@@ -906,10 +824,8 @@ function _copy_admin_files(){
 }
 
 function _copy_trx_files(){
-	
 	const assets_dir = `${init_params.root}/${defaults.tmp_folder}/uranio-assets/`;
 	const trx_main_dir = `${assets_dir}/main/trx`;
-	
 	const dist_folder = `${init_params.root}/dist`;
 	if(!util_instance.fs.exists(dist_folder)){
 		util_instance.fs.create_directory(dist_folder, 'trx');
@@ -917,12 +833,9 @@ function _copy_trx_files(){
 	const html_file = `${trx_main_dir}/index.html`;
 	const html_dest = `${dist_folder}/index.html`;
 	util_instance.fs.copy_file(html_file, html_dest, 'trx');
-	
 	const webpack_config = `${assets_dir}/webpack/webpack.config.js`;
 	const webpack_dest = `${init_params.root}/${defaults.folder}/client/webpack.config.js`;
-	
 	util_instance.fs.copy_file(webpack_config, webpack_dest, 'trx');
-	
 }
 
 function _copy_main_files(repo:Repo){
@@ -953,12 +866,6 @@ async function _clone_core(){
 		init_params.branch
 	);
 	util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
-	// await util_instance.cmd.clone_repo(
-	//   defaults.core_repo,
-	//   `${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
-	//   'core',
-	//   init_params.branch
-	// );
 	output_instance.done_verbose_log(`Cloned core repo.`, 'core');
 }
 
@@ -974,12 +881,6 @@ async function _clone_api(){
 		init_params.branch
 	);
 	util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
-	// await util_instance.cmd.clone_repo_recursive(
-	//   defaults.api_repo,
-	//   `${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
-	//   'api',
-	//   init_params.branch
-	// );
 	output_instance.done_verbose_log(`Cloned api repo.`, 'api');
 }
 
@@ -995,12 +896,6 @@ async function _clone_trx(){
 		init_params.branch
 	);
 	util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
-	// await util_instance.cmd.clone_repo_recursive(
-	//   defaults.trx_repo,
-	//   `${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
-	//   'trx',
-	//   init_params.branch
-	// );
 	output_instance.done_verbose_log(`Cloned trx repo.`, 'trx');
 }
 
@@ -1016,14 +911,15 @@ async function _clone_adm(){
 		init_params.branch
 	);
 	util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
-	// await util_instance.cmd.clone_repo_recursive(
-	//   defaults.adm_repo,
-	//   `${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`,
-	//   'adm',
-	//   init_params.branch
-	// );
+	// await sleep(3000);
 	output_instance.done_verbose_log(`Cloned adm repo.`, 'adm');
 }
+
+// function sleep(ms:number) {
+//   return new Promise((resolve) => {
+//     setTimeout(resolve, ms);
+//   });
+// }
 
 async function _install_dep()
 		:Promise<true>{

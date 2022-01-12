@@ -74,7 +74,7 @@ class Spawn {
 		resolve?:Resolve,
 		reject?:Reject
 	){
-		if(spin){
+		if(spin && verbose){
 			this.output.start_loading(command);
 		}
 		if(log){

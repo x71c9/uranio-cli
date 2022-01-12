@@ -6,8 +6,6 @@
 
 import dateFormat from 'dateformat';
 
-// import ora from 'ora';
-
 import chalk from 'chalk';
 
 import fs from 'fs';
@@ -16,22 +14,13 @@ import {defaults} from '../conf/defaults';
 
 import {Params} from '../types';
 
-// import {merge_params} from '../cmd/common';
-
 import {spinner, spinner_texts} from './spinner';
 
-// import {OutputParams} from './types';
+let spinner_current = '';
 
 class Output {
 	
-	// public spinner:ora.Ora
-	
-	// public spinner_texts:string[]
-	
 	constructor(public params:Params){
-		
-		// this.spinner = ora({text: 'Loading...', color: 'magenta', interval: 40});
-		// this.spinner_texts = [];
 		
 	}
 	
@@ -64,8 +53,10 @@ class Output {
 	
 	public done_verbose_log(text:string, context='vdne')
 			:void{
-		this._go_previous();
-		this.verbose_log(`${text}`, context);
+		if(this.params.verbose){
+			this._go_previous();
+			this.verbose_log(`${text}`, context);
+		}
 	}
 	
 	public error_log(text:string, context='errr')
@@ -106,6 +97,7 @@ class Output {
 		if(this.params.blank === true){
 			spinner.color = 'white';
 		}
+		spinner_current = text;
 		spinner_texts.push(text);
 		this.spinner_text(text);
 		if(this.params.spin === true && !spinner.isSpinning){
@@ -120,7 +112,8 @@ class Output {
 	
 	public spinner_text(text:string)
 			:void{
-		spinner.text = this._spinner_text_color(text);
+		const text_with_current = `${spinner_current} ${text}`;
+		spinner.text = this._spinner_text_color(text_with_current);
 		if(spinner.text.length > process.stdout.columns){
 			spinner.text = spinner.text.substr(0, process.stdout.columns - 4);
 		}
@@ -281,12 +274,14 @@ class Output {
 		if(match.index === 0 && text.substring(0,3) === '[c#'){ // Regex match also with another random char in front
 			
 			color_prefix = text.substring(0, match.index + 10);
-			removed_prefix = text.substring(0, match.index) + text.substring(match.index + 10, text.length);
+			removed_prefix =
+				text.substring(0, match.index) + text.substring(match.index + 10, text.length);
 			
 		}else{ // text might have something else in from "s6728 [c#666666]"
 			
 			color_prefix = text.substring(match.index + 1, match.index + 11);
-			removed_prefix = text.substring(0, match.index + 1) + text.substring(match.index + 11, text.length);
+			removed_prefix =
+				text.substring(0, match.index + 1) + text.substring(match.index + 11, text.length);
 			
 		}
 		const hexa_color = color_prefix.substring(2,9);

@@ -101,7 +101,7 @@ async function _reset_package_json(){
 }
 
 function _remove_package_aliases(){
-	output_instance.start_loading('Removinf package.json aliases...');
+	output_instance.start_loading('Removing package.json aliases...');
 	const package_json_path = `${deinit_params.root}/package.json`;
 	const data = util_instance.fs.read_file(package_json_path, 'utf8');
 	try{

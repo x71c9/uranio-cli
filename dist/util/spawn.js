@@ -66,7 +66,7 @@ class Spawn {
         return this._spawn(command, context, action, true, false, true, color, resolve, reject);
     }
     _spawn(command, context, action, spin, log, verbose, color, resolve, reject) {
-        if (spin) {
+        if (spin && verbose) {
             this.output.start_loading(command);
         }
         if (log) {
