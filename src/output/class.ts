@@ -10,6 +10,8 @@ import chalk from 'chalk';
 
 import fs from 'fs';
 
+import isDocker from 'is-docker';
+
 import {defaults} from '../conf/defaults';
 
 import {Params} from '../types';
@@ -17,6 +19,8 @@ import {Params} from '../types';
 import {spinner, spinner_texts} from './spinner';
 
 let spinner_current = '';
+
+const is_docker = isDocker();
 
 class Output {
 	
@@ -112,7 +116,7 @@ class Output {
 	
 	public spinner_text(text:string)
 			:void{
-		const text_with_current = `${spinner_current} ${text}`;
+		const text_with_current = (is_docker) ? text : `${spinner_current} ${text}`;
 		spinner.text = this._spinner_text_color(text_with_current);
 		if(spinner.text.length > process.stdout.columns){
 			spinner.text = spinner.text.substr(0, process.stdout.columns - 4);

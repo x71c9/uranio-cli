@@ -12,9 +12,11 @@ exports.create = void 0;
 const dateformat_1 = __importDefault(require("dateformat"));
 const chalk_1 = __importDefault(require("chalk"));
 const fs_1 = __importDefault(require("fs"));
+const is_docker_1 = __importDefault(require("is-docker"));
 const defaults_1 = require("../conf/defaults");
 const spinner_1 = require("./spinner");
 let spinner_current = '';
+const is_docker = (0, is_docker_1.default)();
 class Output {
     constructor(params) {
         this.params = params;
@@ -84,7 +86,7 @@ class Output {
         spinner_1.spinner.stop();
     }
     spinner_text(text) {
-        const text_with_current = `${spinner_current} ${text}`;
+        const text_with_current = (is_docker) ? text : `${spinner_current} ${text}`;
         spinner_1.spinner.text = this._spinner_text_color(text_with_current);
         if (spinner_1.spinner.text.length > process.stdout.columns) {
             spinner_1.spinner.text = spinner_1.spinner.text.substr(0, process.stdout.columns - 4);
