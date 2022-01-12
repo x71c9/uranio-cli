@@ -132,9 +132,7 @@ function build(params) {
         cmd += ` .`;
         yield _execute_spin_verbose(cmd, 'docker', 'building');
         output_instance.done_log(`Docker image built ${image_name}`);
-        yield network_create(docker_params);
         yield _copy_compiled();
-        yield create(docker_params);
     });
 }
 exports.build = build;
