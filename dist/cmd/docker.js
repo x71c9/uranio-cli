@@ -71,8 +71,8 @@ function docker(params, args) {
                 break;
             }
             case 'db': {
-                const db = args._[3];
-                (0, common_1.check_db)(db);
+                // const db = args._[3] as DB;
+                // check_db(db);
                 switch (args._[2]) {
                     case 'create': {
                         yield db_create(docker_params);

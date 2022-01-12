@@ -313,10 +313,17 @@ function _watch(){
 				_replace_netlify_function_file();
 			}
 			
-			if(dev_params.deploy === 'netlify'){
-				// _esbuild_netlify();
-			}else{
-				_esbuild_server();
+			try{
+					
+				if(dev_params.deploy === 'netlify'){
+					// _esbuild_netlify();
+				}else{
+					_esbuild_server();
+				}
+				
+			}catch(err){
+				const e = err as Error;
+				output_instance.error_log(e.message);
 			}
 			
 		}

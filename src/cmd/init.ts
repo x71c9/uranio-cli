@@ -84,7 +84,7 @@ export async function init(params:Partial<Params>)
 	}
 	
 	if(init_params.docker_db === true){
-		await docker.network_create(init_params, true);
+		await docker.network_create(init_params);
 		await docker.db_create(init_params);
 		await docker.db_start(init_params);
 		docker.update_env();
@@ -349,7 +349,7 @@ function _copy_assets(){
 }
 
 async function _copy_specific_assets(){
-	output_instance.start_loading(`Copying assets...`);
+	output_instance.start_loading(`Copying specific assets...`);
 	if(valid_deploy_repos().includes(init_params.repo)){
 		if(init_params.deploy === 'netlify'){
 			_copy_netlify_files();
@@ -362,7 +362,7 @@ async function _copy_specific_assets(){
 	if(init_params.repo === 'trx'){
 		_copy_trx_files();
 	}
-	output_instance.done_log(`Copied assets.`, 'assetes');
+	output_instance.done_log(`Copied specific assets.`, 'assetes');
 }
 
 function _create_dot_env(){
@@ -493,19 +493,19 @@ async function _remove_git_files(){
 	output_instance.start_loading(`Removing git files...`);
 	const cloned_server_repo_path =
 		`${init_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}`;
-	const srv_cmd = `( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`;
-	// util_instance.spawn.exec_sync(
-	//   `( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`
-	// );
-	const srv_promise = util_instance.spawn.spin(srv_cmd, '.git', `removing srv .git files.`);
+	// const srv_cmd = `( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`;
+	util_instance.spawn.exec_sync(
+		`( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`
+	);
+	// const srv_promise = util_instance.spawn.spin(srv_cmd, '.git', `removing srv .git files.`);
 	const cloned_client_repo_path =
 		`${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`;
-	const cln_cmd = `( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`;
-	// util_instance.spawn.exec_sync(
-	//   `( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`
-	// );
-	const cln_promise = util_instance.spawn.spin(cln_cmd, '.git', `removing cln .git files.`);
-	await Promise.all([srv_promise, cln_promise]);
+	// const cln_cmd = `( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`;
+	util_instance.spawn.exec_sync(
+		`( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`
+	);
+	// const cln_promise = util_instance.spawn.spin(cln_cmd, '.git', `removing cln .git files.`);
+	// await Promise.all([srv_promise, cln_promise]);
 	output_instance.done_log(`Removed uranio .git files.`, '.git');
 }
 

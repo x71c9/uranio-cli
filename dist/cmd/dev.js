@@ -277,11 +277,17 @@ function _watch() {
             && _is_file_related_to_lambda_function(_path)) {
             _replace_netlify_function_file();
         }
-        if (dev_params.deploy === 'netlify') {
-            // _esbuild_netlify();
+        try {
+            if (dev_params.deploy === 'netlify') {
+                // _esbuild_netlify();
+            }
+            else {
+                _esbuild_server();
+            }
         }
-        else {
-            _esbuild_server();
+        catch (err) {
+            const e = err;
+            output_instance.error_log(e.message);
         }
     }));
 }
