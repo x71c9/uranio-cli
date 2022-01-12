@@ -15,7 +15,6 @@ import {default_params, defaults} from '../conf/defaults';
 import {
 	Params,
 	Arguments,
-	DB,
 } from '../types';
 
 let output_instance:output.OutputInstance;
@@ -24,7 +23,6 @@ let util_instance:util.UtilInstance;
 
 import {
 	merge_params,
-	check_db
 } from './common';
 
 let docker_params = default_params as Params;
@@ -62,8 +60,8 @@ export async function docker(params:Partial<Params>, args:Arguments)
 		
 		case 'db':{
 			
-			const db = args._[3] as DB;
-			check_db(db);
+			// const db = args._[3] as DB;
+			// check_db(db);
 			
 			switch(args._[2]){
 				case 'create':{
