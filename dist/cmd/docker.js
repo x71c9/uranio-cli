@@ -222,13 +222,14 @@ exports.unbuild = unbuild;
 function db_create(params, db) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
+        const project_name = _get_project_name();
         const db_container_name = _get_db_container_name();
         const port = 27017;
         const network_name = _get_network_name();
         let cmd = '';
         cmd += `docker create --name ${db_container_name}`;
         cmd += ` --network ${network_name}`;
-        cmd += ` -v ~/mongo/data:/data/db -p ${port}:${port}`;
+        cmd += ` -v ~/mongo/data-${project_name}:/data/db -p ${port}:${port}`;
         cmd += ` mongo:5`;
         yield _execute_spin_verbose(cmd, `docker`, `creating db ${db}`);
         output_instance.done_log(`Docker db container created ${db_container_name}`);
