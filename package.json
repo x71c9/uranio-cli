@@ -1,6 +1,6 @@
 {
 	"name": "uranio-cli",
-	"version": "0.0.33",
+	"version": "0.0.34",
 	"description": "Uranio command line interface",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -22,7 +22,7 @@
 	"engines": {
 		"node": ">=14"
 	},
-	"engineStrict" : true,
+	"engineStrict": true,
 	"repository": {
 		"type": "git",
 		"url": "git+ssh://git@github.com/nbl7/uranio-cli.git"
@@ -48,6 +48,7 @@
 		"dateformat": "^4.5.1",
 		"esbuild": "^0.14.10",
 		"inquirer": "^8.0.0",
+		"is-docker": "^3.0.0",
 		"minimist": "^1.2.5",
 		"nodemon": "^2.0.15",
 		"ora": "^5.3.0",
