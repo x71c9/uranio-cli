@@ -302,7 +302,8 @@ function _add_admin_files() {
     output_instance.start_loading(`Adding admin files...`);
     const fix_file_nuxt_types = `${init_params.root}/node_modules/@nuxt/types/node_modules/index.d.ts`;
     if (!util_instance.fs.exists(fix_file_nuxt_types)) {
-        util_instance.spawn.exec_sync(`touch ${fix_file_nuxt_types}`);
+        // util_instance.spawn.exec_sync(`touch ${fix_file_nuxt_types}`);
+        util_instance.spawn.spin(`touch ${fix_file_nuxt_types}`, 'adm', `adding nuxt file.`);
     }
     output_instance.done_verbose_log('Added admin files.', 'adm');
 }
