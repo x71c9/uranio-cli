@@ -121,10 +121,11 @@ function _dev_server() {
             const dotenv_after = ` dotenv_config_path=${dev_params.root}/.env`;
             const urn_lib_pre = ` urn_log_prefix_type=true`;
             const node_cmd = `cd ${dev_params.root}/dist/server/ && npx nodemon --watch index.js -e ts ${dotenv_part}${source_part} index.js${dotenv_after}${urn_lib_pre}`;
-            // const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
-            // const tsc_cmd = `${cd_cmd} && npx tsc -w`;
+            const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/server`;
+            const tsc_cmd = `${cd_cmd} && npx tsc -w`;
+            // const tsc_cmd = `npx tsc -w`;
             util_instance.spawn.log(node_cmd, 'nodemon', 'developing server', tscw_color);
-            // util_instance.spawn.log(tsc_cmd, 'tscwatch', 'developing server', tscw_color);
+            util_instance.spawn.log(tsc_cmd, 'tscwatch', 'developing server', tscw_color);
         }
     });
 }
@@ -217,7 +218,7 @@ function _watch() {
         output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
         watch_src_scanned = true;
     }, (_event, _path) => __awaiter(this, void 0, void 0, function* () {
-        if (dev_params.is_dot === true && _path.indexOf(`${dev_params.root}/src/books`) === 0) {
+        if (!_check_dot_file(dev_params, _path)) {
             return false;
         }
         const basename = path_1.default.basename(_path);
@@ -351,5 +352,20 @@ function _replace_netlify_function_file() {
     }
     util_instance.fs.write_file(api_file_path, new_content, 'utf8');
     output_instance.done_verbose_log(`Replaced Netlify serverless function file.`, 'less');
+}
+function _check_dot_file(params, _path) {
+    if (params.is_dot === true) {
+        const do_not_dot_watch_paths = [
+            `${params.root}/src/books`,
+            `${params.root}/src/uranio/trx/hooks`,
+            `${params.root}/src/uranio/hooks`,
+        ];
+        for (const invalid_path of do_not_dot_watch_paths) {
+            if (_path.indexOf(invalid_path) === 0) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 //# sourceMappingURL=dev.js.map

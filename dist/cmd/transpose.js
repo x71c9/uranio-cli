@@ -455,9 +455,9 @@ function _manipulate_and_create_files(file_path) {
         // sourceFile = _change_realtive_imports(sourceFile);
         let import_statements = _copy_imports(sourceFile);
         import_statements = _change_import_statements_relative_path(import_statements);
+        const dock_promise = _create_dock_book(sourceFile, import_statements);
         const atom_promise = _create_atom_book(sourceFile, import_statements);
         const bll_promise = _create_bll_book(sourceFile, import_statements);
-        const dock_promise = _create_dock_book(sourceFile, import_statements);
         // _create_routes_book(sourceFile, import_statements);
         yield Promise.all([atom_promise, bll_promise, dock_promise]);
         if (transpose_params.is_dot) {
