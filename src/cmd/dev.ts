@@ -116,11 +116,13 @@ async function _dev_server(){
 		
 		const node_cmd = `cd ${dev_params.root}/dist/server/ && npx nodemon --watch index.js -e ts ${dotenv_part}${source_part} index.js${dotenv_after}${urn_lib_pre}`;
 		
-		// const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
-		// const tsc_cmd = `${cd_cmd} && npx tsc -w`;
+		const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
+		const tsc_cmd = `${cd_cmd} && npx tsc -w`;
+		
+		// const tsc_cmd = `npx tsc -w`;
 		
 		util_instance.spawn.log(node_cmd, 'nodemon', 'developing server', tscw_color);
-		// util_instance.spawn.log(tsc_cmd, 'tscwatch', 'developing server', tscw_color);
+		util_instance.spawn.log(tsc_cmd, 'tscwatch', 'developing server', tscw_color);
 		
 	}
 }
@@ -237,9 +239,11 @@ function _watch(){
 			watch_src_scanned = true;
 		},
 		async (_event, _path) => {
-			if(dev_params.is_dot === true && _path.indexOf(`${dev_params.root}/src/books`) === 0){
+			
+			if(!_check_dot_file(dev_params, _path)){
 				return false;
 			}
+			
 			const basename = path.basename(_path);
 			const extension = path.extname(basename);
 			
@@ -408,3 +412,18 @@ function _replace_netlify_function_file(){
 	output_instance.done_verbose_log(`Replaced Netlify serverless function file.`, 'less');
 }
 
+function _check_dot_file(params:Partial<Params>, _path:string):boolean{
+	if(params.is_dot === true){
+		const do_not_dot_watch_paths = [
+			`${params.root}/src/books`,
+			`${params.root}/src/uranio/trx/hooks`,
+			`${params.root}/src/uranio/hooks`,
+		];
+		for(const invalid_path of do_not_dot_watch_paths){
+			if(_path.indexOf(invalid_path) === 0){
+				return false;
+			}
+		}
+	}
+	return true;
+}

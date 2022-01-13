@@ -126,13 +126,13 @@ function _generate_text() {
             }
             text += `\t\t\t...options\n`;
             text += `\t\t};\n`;
-            text += `\t\tlet current_token:string|undefined;`;
-            text += `\t\tif(typeof hook_token === 'string' && hook_token !== ''){`;
-            text += `\t\t\tcurrent_token = hook_token;`;
-            text += `\t\t}`;
-            text += `\t\tif(typeof token === 'string' && token !== ''){`;
-            text += `\t\t\tcurrent_token = token;`;
-            text += `\t\t}`;
+            text += `\t\tlet current_token:string|undefined;\n`;
+            text += `\t\tif(typeof hook_token === 'string' && hook_token !== ''){\n`;
+            text += `\t\t\tcurrent_token = hook_token;\n`;
+            text += `\t\t}\n`;
+            text += `\t\tif(typeof token === 'string' && token !== ''){\n`;
+            text += `\t\t\tcurrent_token = token;\n`;
+            text += `\t\t}\n`;
             text += `\t\treturn await uranio.base.create('${atom_name}',current_token).hook<'${route_name}',D>('${route_name}')(args);\n`;
             text += `\t},\n`;
         }
@@ -273,11 +273,18 @@ function _get_book_atom_def_props(book_name) {
     return atom_def_by_atom;
 }
 function _text_args_for_url(url) {
-    const params = _get_parameters_from_url(url);
+    let checked_url = url;
+    if (url[0] === "'" && url[url.length - 1] === "'") {
+        checked_url = url.substring(1, url.length - 1);
+    }
+    const params = _get_parameters_from_url(checked_url);
     return _generate_args(params);
 }
 function _get_parameters_from_url(url) {
     const url_params = [];
+    if (typeof url !== 'string') {
+        return url_params;
+    }
     const splitted_url = url.split('/');
     for (const split_url of splitted_url) {
         if (split_url.includes(':')) {
@@ -361,7 +368,14 @@ function _get_custom_routes() {
 }
 function _text_lines_in_args_params(url) {
     const lines = [];
-    const url_params = _get_parameters_from_url(url);
+    if (typeof url !== 'string') {
+        return lines;
+    }
+    let checked_url = url;
+    if (url[0] === "'" && url[url.length - 1] === "'") {
+        checked_url = url.substring(1, url.length - 1);
+    }
+    const url_params = _get_parameters_from_url(checked_url);
     for (const p of url_params) {
         lines.push(`${p}: ${p},`);
     }
