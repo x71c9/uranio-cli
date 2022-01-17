@@ -115,12 +115,15 @@ export async function build(params:Partial<Params>)
 	await _download_dockerfiles();
 	
 	const image_name = _get_image_name();
+	const project_name = _get_project_name();
+	
 	let cmd = '';
 	cmd += `docker build --ssh default`;
 	cmd += ` -t ${image_name}`;
 	cmd += ` -f ${docker_params.root}/${defaults.folder}/${defaults.docker_folder}/Dockerfile`;
 	cmd += ` --build-arg repo=${docker_params.repo}`;
 	cmd += ` --build-arg deploy=${docker_params.deploy}`;
+	cmd += ` --build-arg project=${project_name}`;
 	cmd += ` .`;
 	await _execute_spin_verbose(cmd, 'docker', 'building');
 	output_instance.done_log(
@@ -331,8 +334,9 @@ export async function network_remove(params:Partial<Params>, continue_on_fail=fa
 export async function prune(params:Partial<Params>, continue_on_fail=false)
 		:Promise<void>{
 	_init_params(params);
+	const project_name = _get_project_name();
 	let cmd_prune = '';
-	cmd_prune += `docker builder prune -af`;
+	cmd_prune += `docker builder prune -af --filter "label=project=${project_name}"`;
 	if(continue_on_fail){
 		cmd_prune += ` || true`;
 	}

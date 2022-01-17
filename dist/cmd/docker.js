@@ -123,12 +123,14 @@ function build(params) {
         _init_params(params);
         yield _download_dockerfiles();
         const image_name = _get_image_name();
+        const project_name = _get_project_name();
         let cmd = '';
         cmd += `docker build --ssh default`;
         cmd += ` -t ${image_name}`;
         cmd += ` -f ${docker_params.root}/${defaults_1.defaults.folder}/${defaults_1.defaults.docker_folder}/Dockerfile`;
         cmd += ` --build-arg repo=${docker_params.repo}`;
         cmd += ` --build-arg deploy=${docker_params.deploy}`;
+        cmd += ` --build-arg project=${project_name}`;
         cmd += ` .`;
         yield _execute_spin_verbose(cmd, 'docker', 'building');
         output_instance.done_log(`Docker image built ${image_name}`);
@@ -318,8 +320,9 @@ exports.network_remove = network_remove;
 function prune(params, continue_on_fail = false) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
+        const project_name = _get_project_name();
         let cmd_prune = '';
-        cmd_prune += `docker builder prune -af`;
+        cmd_prune += `docker builder prune -af --filter "label=project=${project_name}"`;
         if (continue_on_fail) {
             cmd_prune += ` || true`;
         }
