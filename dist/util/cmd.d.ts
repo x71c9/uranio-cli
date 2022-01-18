@@ -25,6 +25,7 @@ declare class CMD {
     get_package_data(package_json_path: string): any;
     dependency_exists(repo: string, package_data?: any): boolean;
     read_dotenv(): DotEnv;
+    client_env_variables_to_command_string(): string;
     write_dotenv(dotenv: DotEnv): void;
     install_core_dep(): Promise<boolean>;
     install_api_dep(): Promise<boolean>;
