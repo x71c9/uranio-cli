@@ -8,6 +8,8 @@ import path from 'path';
 
 import * as esbuild from 'esbuild';
 
+import * as recast from 'recast';
+
 import * as output from '../output/';
 
 import * as util from '../util/';
@@ -158,8 +160,10 @@ async function _dev_trx_webpack_express(){
 		`${dev_params.root}/dist/client/index.html`,
 	);
 	
+	const client_env_string = util_instance.cmd.client_env_variables_to_command_string();
+	
 	const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/client`;
-	const nu_cmd = `npx webpack serve --open`;
+	const nu_cmd = `${client_env_string} npx webpack serve --open`;
 	const cmd = `${cd_cmd} && ${nu_cmd}`;
 	
 	util_instance.spawn.log(cmd, 'webpack', 'developing client', nuxt_color);
@@ -181,10 +185,192 @@ async function _dev_client_adm(){
 	}
 }
 
+function _update_nuxt_config(){
+	const dotenv = util_instance.cmd.read_dotenv();
+	const protocol = dotenv.URN_SERVICE_PROTOCOL || 'https';
+	const domain = dotenv.URN_SERVICE_DOMAIN || 'localhost';
+	const port = Number(dotenv.URN_SERVICE_PORT) || 7777;
+	const prefix = dotenv.URN_PREFIX_API || '/uranio/api';
+	const service_url = `${protocol}://${domain}:${port}${prefix}`;
+	
+	const client_domain = dotenv.URN_CLIENT_DOMAIN || 'localhost';
+	const client_port = Number(dotenv.URN_CLIENT_PORT) || 4444;
+	
+	let ts_ast = _nuxt_tree();
+	ts_ast = _update_nuxt_server(ts_ast, client_domain, client_port);
+	ts_ast = _update_nuxt_proxy(ts_ast, service_url);
+	_save_nuxt_config(ts_ast);
+}
+
+function _save_nuxt_config(ts_ast:any){
+	const nuxt_config_path =
+		`${dev_params.root}/${defaults.folder}/client/nuxt.config.js`;
+	// const printed = recast.prettyPrint(ts_ast, {tabWidth: 2}).code;
+	const printed = recast.print(ts_ast, {useTabs: true}).code;
+	util_instance.fs.write_file(nuxt_config_path, printed);
+}
+
+function _nuxt_tree(){
+	const nuxt_config_path =
+		`${dev_params.root}/${defaults.folder}/client/nuxt.config.js`;
+	const source = util_instance.fs.read_file(nuxt_config_path);
+	return recast.parse(source, {
+		parser: require("recast/parsers/typescript")
+	});
+}
+
+function _update_nuxt_server(ts_ast:any, domain:string, port:number){
+	const all = ts_ast.program.body;
+	for(const node of all){
+		if(node.type === 'ExportDefaultDeclaration'){
+			const obj_declaration = node.declaration as recast.types.namedTypes.ObjectExpression;
+			if(obj_declaration.type === 'ObjectExpression'){
+				const config_props = obj_declaration.properties || []; // alias: {}, components: {}, ...
+				for(const prop of config_props){
+					if(prop.type === 'ObjectProperty' && prop.key.type === 'Identifier'){
+						if(prop.key.name === 'server' && prop.value.type === 'ObjectExpression'){
+							prop.value.properties = _nuxt_server_props(domain, port);
+							return ts_ast;
+						}
+					}
+				}
+				_add_server_to_nuxt_properties(obj_declaration, domain, port);
+			}
+			return ts_ast;
+		}
+	}
+	return ts_ast;
+}
+
+function _update_nuxt_proxy(ts_ast:any, service_url:string){
+	const all = ts_ast.program.body;
+	for(const node of all){
+		if(node.type === 'ExportDefaultDeclaration'){
+			const obj_declaration = node.declaration as recast.types.namedTypes.ObjectExpression;
+			if(obj_declaration.type === 'ObjectExpression'){
+				const config_props = obj_declaration.properties || []; // alias: {}, components: {}, ...
+				for(const prop of config_props){
+					if(prop.type === 'ObjectProperty' && prop.key.type === 'Identifier'){
+						if(prop.key.name === 'proxy'){
+							_replace_proxy(prop, service_url);
+							return ts_ast;
+						}
+					}
+				}
+				_add_proxy_to_properties(obj_declaration, service_url);
+			}
+			return ts_ast;
+		}
+	}
+	return ts_ast;
+}
+
+function _replace_proxy(
+	prop:recast.types.namedTypes.ObjectProperty,
+	service_url:string
+){ // proxy: {...}
+	if(prop.value.type === 'ObjectExpression'){ // {'/uranio/api': {...}}
+		const props = prop.value.properties;
+		for(const p of props){
+			if(p.type === 'ObjectProperty' && p.key.type === 'StringLiteral'){
+				if(p.key.value === '/uranio/api'){
+					p.value = _uranio_proxy_object_expression(service_url);
+					return true;
+				}
+			}
+		}
+		_add_uranio_proxy(prop, service_url);
+	}
+}
+
+function _add_uranio_proxy(
+	prop:recast.types.namedTypes.ObjectProperty,
+	service_url:string
+){
+	const b = recast.types.builders;
+	if(prop.value.type === 'ObjectExpression'){ // {'/some/path': {...}}
+		const props = prop.value.properties;
+		const uranio_prop = b.objectProperty(
+			b.stringLiteral('/uranio/api'),
+			_uranio_proxy_object_expression(service_url)
+		);
+		props.push(uranio_prop);
+	}
+}
+
+function _uranio_proxy_object_expression(service_url:string)
+		:recast.types.namedTypes.ObjectExpression{
+	const b = recast.types.builders;
+	return b.objectExpression([
+		b.objectProperty(
+			b.identifier('target'),
+			b.stringLiteral(service_url)
+		),
+		b.objectProperty(
+			b.identifier('pathRewrite'),
+			b.objectExpression([
+				b.objectProperty(
+					b.stringLiteral('^/uranio/api'),
+					b.stringLiteral('')
+				)
+			])
+		)
+	]);
+}
+
+function _nuxt_server_props(domain:string, port:number){
+	const host = (domain === 'localhost') ? '0.0.0.0' : domain;
+	const b = recast.types.builders;
+	return [
+		b.objectProperty(
+			b.identifier('host'),
+			b.stringLiteral(host)
+		),
+		b.objectProperty(
+			b.identifier('port'),
+			b.numericLiteral(port)
+		)
+	];
+}
+
+function _add_server_to_nuxt_properties(
+	obj_decl: recast.types.namedTypes.ObjectExpression,
+	domain: string,
+	port: number
+){
+	const b = recast.types.builders;
+	const proxy_prop = b.objectProperty(
+		b.identifier('server'),
+		b.objectExpression(_nuxt_server_props(domain, port))
+	);
+	obj_decl.properties.push(proxy_prop);
+}
+
+function _add_proxy_to_properties(
+	obj_decl:recast.types.namedTypes.ObjectExpression,
+	service_url:string
+){
+	const b = recast.types.builders;
+	const proxy_prop = b.objectProperty(
+		b.identifier('proxy'),
+		b.objectExpression([
+			b.objectProperty(
+				b.stringLiteral('/uranio/api'),
+				_uranio_proxy_object_expression(service_url)
+			)
+		])
+	);
+	obj_decl.properties.push(proxy_prop);
+}
+
 async function _dev_admin_nuxt_express(){
 	
+	_update_nuxt_config();
+	
+	const client_env_string = util_instance.cmd.client_env_variables_to_command_string();
+	
 	const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/client`;
-	const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
+	const nu_cmd = `${client_env_string} npx nuxt dev -c ./nuxt.config.js`;
 	const cmd = `${cd_cmd} && ${nu_cmd}`;
 	
 	util_instance.spawn.log(cmd, 'nuxt', 'developing client', nuxt_color);
@@ -252,11 +438,15 @@ function _watch(){
 				return false;
 			}
 			
-			// output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
-			output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
 			if(!watch_src_scanned){
+				if(_event === 'add' || _event === 'addDir'){
+					output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
+				}
 				return false;
 			}
+			
+			output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
+			
 			const base_path_server = `${base_path}/server/src`;
 			const base_path_client = `${base_path}/client/src`;
 			const relative_path_to_src = _path.replace(`${dev_params.root}/src/`, '');

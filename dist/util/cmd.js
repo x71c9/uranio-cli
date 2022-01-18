@@ -120,6 +120,10 @@ class CMD {
     }
     read_dotenv() {
         const dotenv_path = `${this.params.root}/.env`;
+        if (!this.fs.exists(dotenv_path)) {
+            this.output.error_log(`Missing .env file.`);
+            process.exit(1);
+        }
         const content = this.fs.read_file(dotenv_path);
         const dotenv = {};
         const lines = content.split('\n');
@@ -131,6 +135,17 @@ class CMD {
             dotenv[splitted[0]] = splitted[1];
         }
         return dotenv;
+    }
+    client_env_variables_to_command_string() {
+        const dotenv_obj = this.read_dotenv();
+        const client_env_var = [];
+        for (const [key, value] of Object.entries(dotenv_obj)) {
+            if (key.substring(0, 11) === 'URN_CLIENT_') {
+                client_env_var.push(`${key}=${value}`);
+            }
+        }
+        const env_string = client_env_var.join(' ');
+        return env_string;
     }
     write_dotenv(dotenv) {
         const dotenv_path = `${this.params.root}/.env`;
