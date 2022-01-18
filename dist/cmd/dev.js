@@ -189,11 +189,14 @@ function _update_nuxt_config() {
     const port = Number(dotenv.URN_SERVICE_PORT) || 7777;
     const prefix = dotenv.URN_PREFIX_API || '/uranio/api';
     const service_url = `${protocol}://${domain}:${port}${prefix}`;
+    const client_protocol = dotenv.URN_CLIENT_PROTOCOL || 'http';
     const client_domain = dotenv.URN_CLIENT_DOMAIN || 'localhost';
     const client_port = Number(dotenv.URN_CLIENT_PORT) || 4444;
+    const client_url = `${client_protocol}://${client_domain}:${client_port}`;
     let ts_ast = _nuxt_tree();
     ts_ast = _update_nuxt_server(ts_ast, client_domain, client_port);
     ts_ast = _update_nuxt_proxy(ts_ast, service_url);
+    ts_ast = _update_nuxt_build_hook(ts_ast, client_url);
     _save_nuxt_config(ts_ast);
 }
 function _save_nuxt_config(ts_ast) {
@@ -208,6 +211,69 @@ function _nuxt_tree() {
     return recast.parse(source, {
         parser: require("recast/parsers/typescript")
     });
+}
+function _get_nuxt_hook_console(url) {
+    const b = recast.types.builders;
+    const len = url.length;
+    const lin = Array(len).fill('─').join('');
+    const spa = Array(len).fill(' ').join('');
+    let conso = '';
+    conso += `\t\t\t\tconsole.log('╭─────────────────────${lin}──╮');`;
+    conso += `\t\t\t\tconsole.log('│                     ${spa}  │');`;
+    conso += `\t\t\t\tconsole.log('│ Client listening on ${url}  │');`;
+    conso += `\t\t\t\tconsole.log('│                     ${spa}  │');`;
+    conso += `\t\t\t\tconsole.log('╰─────────────────────${lin}──╯');`;
+    const conso_ast = recast.parse(conso, {
+        parser: require("recast/parsers/typescript")
+    });
+    const all = conso_ast.program.body;
+    const expressions = [];
+    for (const node of all) {
+        const n = node;
+        delete n.loc;
+        const exp = b.expressionStatement(n.expression);
+        expressions.push(exp);
+    }
+    return expressions;
+}
+function _update_nuxt_build_hook(ts_ast, client_url) {
+    const all = ts_ast.program.body;
+    for (const node of all) {
+        if (node.type === 'ExportDefaultDeclaration') {
+            const obj_declaration = node.declaration;
+            if (obj_declaration.type === 'ObjectExpression') {
+                const config_props = obj_declaration.properties || []; // alias: {}, components: {}, ...
+                for (const prop of config_props) {
+                    if (prop.type === 'ObjectProperty' && prop.key.type === 'Identifier') {
+                        if (prop.key.name === 'hooks' && prop.value.type === 'ObjectExpression') {
+                            for (const hook_prop of prop.value.properties) {
+                                if (hook_prop.type === 'ObjectProperty' && hook_prop.key.type === 'Identifier') {
+                                    if (hook_prop.key.name === 'build' && hook_prop.value.type === 'ObjectExpression') {
+                                        for (const build_prop of hook_prop.value.properties) {
+                                            if (build_prop.type === 'ObjectMethod' && build_prop.key.type === 'Identifier') {
+                                                if (build_prop.key.name === 'compiled') {
+                                                    const conso_nodes = _get_nuxt_hook_console(client_url);
+                                                    // for(const cn of conso_nodes.reverse()){
+                                                    //   build_prop.body.body.unshift(cn);
+                                                    // }
+                                                    build_prop.body.body = conso_nodes;
+                                                    return ts_ast;
+                                                }
+                                            }
+                                        }
+                                        return ts_ast;
+                                    }
+                                }
+                            }
+                            return ts_ast;
+                        }
+                    }
+                }
+            }
+            return ts_ast;
+        }
+    }
+    return ts_ast;
 }
 function _update_nuxt_server(ts_ast, domain, port) {
     const all = ts_ast.program.body;
