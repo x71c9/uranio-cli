@@ -571,7 +571,7 @@ function _update_package_scripts() {
     try {
         const package_data = urn_lib_1.urn_util.json.clean_parse(data);
         const old_scripts = package_data['scripts'] || {};
-        package_data['scripts'] = Object.assign(Object.assign({}, old_scripts), { 'build': `uranio build`, 'build:server': `uranio build:client`, 'build:client': `uranio build:client`, 'dev': `uranio dev`, 'dev:server': `uranio dev:server`, 'dev:client': `uranio dev:client` });
+        package_data['scripts'] = Object.assign(Object.assign({}, old_scripts), common_1.package_scripts);
         try {
             util_instance.fs.write_file(package_json_path, JSON.stringify(package_data, null, '\t'));
             output_instance.done_log(`Updated package.json scripts.`, 'scripts');

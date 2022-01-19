@@ -48,6 +48,9 @@ function deinit(params) {
         deinit_params = (0, common_1.merge_params)(params);
         output_instance = output.create(deinit_params);
         util_instance = util.create(deinit_params, output_instance);
+        if (!util_instance.is_initialized()) {
+            return;
+        }
         yield _reset_package_json();
         yield _remove_dockers();
         _delete_files();
@@ -96,9 +99,6 @@ function _reset_package_json() {
         _remove_package_aliases();
         _remove_package_scripts();
         _remove_package_resolutions();
-        if (!util_instance.is_initialized()) {
-            return;
-        }
         const pack_data = util_instance.cmd.get_package_data(`${deinit_params.root}/package.json`);
         yield util_instance.cmd.uninstall_core_dep(pack_data);
         yield util_instance.cmd.uninstall_api_dep(pack_data);
@@ -149,18 +149,11 @@ function _remove_package_scripts() {
     const package_json_path = `${deinit_params.root}/package.json`;
     const data = util_instance.fs.read_file(package_json_path, 'utf8');
     try {
-        const uranio_scripts = [
-            'build',
-            'build:server',
-            'build:client',
-            'dev',
-            'dev:server',
-            'dev:client'
-        ];
         const package_data = urn_lib_1.urn_util.json.clean_parse(data);
         const old_scripts = package_data['scripts'] || {};
-        for (const [key, _value] of Object.entries(old_scripts)) {
-            if (uranio_scripts.includes(key)) {
+        for (const [key, value] of Object.entries(old_scripts)) {
+            if (urn_lib_1.urn_util.object.has_key(common_1.package_scripts, key)
+                && common_1.package_scripts[key] === value) {
                 delete old_scripts[key];
             }
         }
