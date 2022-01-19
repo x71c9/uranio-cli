@@ -142,8 +142,10 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 	const container_name = _get_container_name();
 	const image_name = _get_image_name();
 	
-	const port_server = 7777;
-	const port_client = 4444;
+	const dotenv = util_instance.cmd.read_dotenv();
+	
+	const port_server = dotenv.URN_SERVICE_PORT;
+	const port_client = dotenv.URN_CLIENT_PORT;
 	
 	const network_name = _get_network_name();
 	
