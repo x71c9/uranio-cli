@@ -14,6 +14,7 @@ export const default_params:Params = {
 	blank: false,
 	fullwidth: false,
 	native: false,
+	inside_ntl: false,
 	is_dot: false,
 	time: false,
 	context: false,

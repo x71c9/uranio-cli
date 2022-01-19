@@ -19,6 +19,7 @@ export type Params = {
 	blank: boolean
 	fullwidth: boolean
 	native: boolean
+	inside_ntl: boolean
 	is_dot: boolean
 	time: boolean
 	context: boolean

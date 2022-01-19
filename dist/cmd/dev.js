@@ -93,7 +93,7 @@ function dev_client(params) {
         else {
             _init_params(params);
             if ((0, types_1.valid_client_repos)().includes(dev_params.repo)) {
-                if (params.native != true) {
+                if (params.inside_ntl != true) {
                     yield _init_dev();
                 }
                 yield _dev_client();
@@ -145,12 +145,28 @@ function _dev_client() {
 }
 function _dev_trx_client() {
     return __awaiter(this, void 0, void 0, function* () {
-        if (dev_params.deploy === 'express' || dev_params.native === true) {
+        if (dev_params.inside_ntl === true) {
+            yield _dev_trx_webpack_inside_netlify();
+        }
+        else if (dev_params.deploy === 'express') {
             yield _dev_trx_webpack_express();
         }
         else if (dev_params.deploy === 'netlify') {
             yield _dev_trx_webpack_netlify();
         }
+    });
+}
+function _dev_trx_webpack_inside_netlify() {
+    return __awaiter(this, void 0, void 0, function* () {
+        _update_nuxt_config();
+        if (!util_instance.fs.exists(`${dev_params.root}/dist/client`)) {
+            util_instance.fs.create_directory(`${dev_params.root}/dist/client`);
+        }
+        util_instance.fs.copy_file(`${dev_params.root}/${defaults_1.defaults.folder}/client/src/index.html`, `${dev_params.root}/dist/client/index.html`);
+        const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/client`;
+        const nu_cmd = `npx webpack serve --open`;
+        const cmd = `${cd_cmd} && ${nu_cmd}`;
+        util_instance.spawn.log(cmd, 'webpack', 'developing client', nuxt_color);
     });
 }
 function _dev_trx_webpack_express() {
@@ -174,7 +190,10 @@ function _dev_trx_webpack_netlify() {
 }
 function _dev_client_adm() {
     return __awaiter(this, void 0, void 0, function* () {
-        if (dev_params.deploy === 'express' || dev_params.native === true) {
+        if (dev_params.inside_ntl === true) {
+            yield _dev_admin_nuxt_inside_ntl();
+        }
+        else if (dev_params.deploy === 'express') {
             yield _dev_admin_nuxt_express();
         }
         else if (dev_params.deploy === 'netlify') {
@@ -369,6 +388,14 @@ function _add_proxy_to_properties(obj_decl, service_url) {
         b.objectProperty(b.stringLiteral('/uranio/api'), _uranio_proxy_object_expression(service_url))
     ]));
     obj_decl.properties.push(proxy_prop);
+}
+function _dev_admin_nuxt_inside_ntl() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const cd_cmd = `cd ${dev_params.root}/${defaults_1.defaults.folder}/client`;
+        const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
+        const cmd = `${cd_cmd} && ${nu_cmd}`;
+        util_instance.spawn.log(cmd, 'nuxt', 'developing client', nuxt_color);
+    });
 }
 function _dev_admin_nuxt_express() {
     return __awaiter(this, void 0, void 0, function* () {
