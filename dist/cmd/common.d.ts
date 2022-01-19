@@ -13,3 +13,11 @@ export declare function check_pacman(pacman: string): void;
 export declare function check_deploy(deploy: string): void;
 export declare function check_db(db: string): void;
 export declare function check_if_is_dot(path: string): boolean;
+export declare const package_scripts: {
+    build: string;
+    'build:server': string;
+    'build:client': string;
+    dev: string;
+    'dev:server': string;
+    'dev:client': string;
+};

@@ -8,7 +8,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.check_if_is_dot = exports.check_db = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_init_params = exports.merge_params = exports.read_rc_file = void 0;
+exports.package_scripts = exports.check_if_is_dot = exports.check_db = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_init_params = exports.merge_params = exports.read_rc_file = void 0;
 const fs_1 = __importDefault(require("fs"));
 const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
@@ -132,4 +132,12 @@ function check_if_is_dot(path) {
     return false;
 }
 exports.check_if_is_dot = check_if_is_dot;
+exports.package_scripts = {
+    'build': `uranio build`,
+    'build:server': `uranio build:client`,
+    'build:client': `uranio build:client`,
+    'dev': `uranio dev`,
+    'dev:server': `uranio dev:server`,
+    'dev:client': `uranio dev:client`
+};
 //# sourceMappingURL=common.js.map

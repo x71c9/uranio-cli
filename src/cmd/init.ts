@@ -36,7 +36,8 @@ import {
 	merge_init_params,
 	check_repo,
 	check_deploy,
-	check_pacman
+	check_pacman,
+	package_scripts
 } from './common';
 
 let output_instance:output.OutputInstance;
@@ -653,12 +654,7 @@ function _update_package_scripts(){
 		const old_scripts = package_data['scripts'] || {};
 		package_data['scripts'] = {
 			...old_scripts,
-			'build': `uranio build`,
-			'build:server': `uranio build:client`,
-			'build:client': `uranio build:client`,
-			'dev': `uranio dev`,
-			'dev:server': `uranio dev:server`,
-			'dev:client': `uranio dev:client`
+			...package_scripts
 		};
 		try{
 			util_instance.fs.write_file(
