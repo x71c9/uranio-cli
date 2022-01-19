@@ -89,7 +89,7 @@ class Output {
         const text_with_current = (is_docker) ? text : `${spinner_current} ${text}`;
         spinner_1.spinner.text = this._spinner_text_color(text_with_current);
         if (spinner_1.spinner.text.length > process.stdout.columns) {
-            spinner_1.spinner.text = spinner_1.spinner.text.substr(0, process.stdout.columns - 4);
+            spinner_1.spinner.text = spinner_1.spinner.text.substr(0, process.stdout.columns - 2);
         }
     }
     _log(text, context = 'log', out = false) {
