@@ -90,6 +90,10 @@ function docker(params, args) {
                         yield db_remove(docker_params);
                         break;
                     }
+                    default: {
+                        output_instance.error_log(`Invalid uranio docker db command. Try [create, start, stop, remove]`);
+                        process.exit(1);
+                    }
                 }
                 break;
             }
@@ -103,6 +107,10 @@ function docker(params, args) {
                         yield network_remove(docker_params);
                         break;
                     }
+                    default: {
+                        output_instance.error_log(`Invalid uranio docker network command. Try [create, remove]`);
+                        process.exit(1);
+                    }
                 }
                 break;
             }
@@ -110,8 +118,21 @@ function docker(params, args) {
                 yield prune(docker_params);
                 break;
             }
+            case 'env': {
+                switch (args._[2]) {
+                    case 'update': {
+                        yield update_env(docker_params);
+                        break;
+                    }
+                    default: {
+                        output_instance.error_log(`Invalid uranio docker env command. Try [update]`);
+                        process.exit(1);
+                    }
+                }
+                break;
+            }
             default: {
-                output_instance.error_log(`Invalid docker command.`);
+                output_instance.error_log(`Invalid uranio docker command.`);
                 process.exit(1);
             }
         }
@@ -443,28 +464,38 @@ function _execute_log(cmd, context, action) {
         });
     });
 }
-function update_env() {
-    const dot_env = util_instance.cmd.read_dotenv();
+function update_env(params) {
+    if (params) {
+        _init_params(params);
+    }
+    const dotenv_path = `${docker_params.root}/.env`;
+    if (!util_instance.fs.exists(dotenv_path)) {
+        output_instance.error_log(`Missing .env file.`);
+        process.exit(1);
+    }
     const new_dot_env = {};
-    let comments = ``;
-    for (const [key, value] of Object.entries(dot_env)) {
-        if (key === 'URN_MONGO_MAIN_CONNECTION'
-            || key === 'URN_MONGO_LOG_CONNECTION'
-            || key === 'URN_MONGO_TRASH_CONNECTION') {
-            comments += `#${key}=${value}\n`;
+    new_dot_env['URN_MONGO_MAIN_CONNECTION'] =
+        `mongodb://${_get_db_container_name()}.${_get_network_name()}:27017`;
+    new_dot_env['URN_MONGO_TRASH_CONNECTION'] =
+        `mongodb://${_get_db_container_name()}.${_get_network_name()}:27017`;
+    new_dot_env['URN_MONGO_LOG_CONNECTION'] =
+        `mongodb://${_get_db_container_name()}.${_get_network_name()}:27017`;
+    const content = util_instance.fs.read_file(dotenv_path);
+    const lines = content.split('\n');
+    const new_lines = [];
+    for (const line of lines) {
+        const splitted = line.split('=');
+        if (splitted.length === 2
+            && typeof new_dot_env[splitted[0]] !== 'undefined'
+            && splitted[1] !== new_dot_env[splitted[0]]) {
+            new_lines.push(`#${line}`);
+            new_lines.push(`${splitted[0]}=${new_dot_env[splitted[0]]}`);
         }
-        else if (typeof key === 'string' && key !== '') {
-            new_dot_env[key] = value;
+        else {
+            new_lines.push(line);
         }
     }
-    new_dot_env['URN_MONGO_MAIN_CONNECTION'] = `mongodb://${_get_db_container_name()}.${_get_network_name()}:27017`;
-    new_dot_env['URN_MONGO_TRASH_CONNECTION'] = `mongodb://${_get_db_container_name()}.${_get_network_name()}:27017`;
-    new_dot_env['URN_MONGO_LOG_CONNECTION'] = `mongodb://${_get_db_container_name()}.${_get_network_name()}:27017`;
-    util_instance.cmd.write_dotenv(new_dot_env);
-    const env_filepath = `${docker_params.root}/.env`;
-    let env_content = util_instance.fs.read_file(env_filepath);
-    env_content += comments;
-    util_instance.fs.write_file(env_filepath, env_content);
+    util_instance.fs.write_file(dotenv_path, new_lines.join('\n'));
 }
 exports.update_env = update_env;
 //# sourceMappingURL=docker.js.map

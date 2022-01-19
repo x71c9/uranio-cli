@@ -81,7 +81,7 @@ export async function dev_client(params:Partial<Params>):Promise<void>{
 	}else{
 		_init_params(params);
 		if(valid_client_repos().includes(dev_params.repo)){
-			if(params.native != true){
+			if(params.inside_ntl != true){
 				await _init_dev();
 			}
 			await _dev_client();
@@ -142,11 +142,34 @@ async function _dev_client(){
 }
 
 async function _dev_trx_client(){
-	if(dev_params.deploy === 'express' || dev_params.native === true){
+	if(dev_params.inside_ntl === true){
+		await _dev_trx_webpack_inside_netlify();
+	}else if(dev_params.deploy === 'express'){
 		await _dev_trx_webpack_express();
 	}else if(dev_params.deploy === 'netlify'){
 		await _dev_trx_webpack_netlify();
 	}
+}
+
+async function _dev_trx_webpack_inside_netlify(){
+	
+	_update_nuxt_config();
+	
+	if(!util_instance.fs.exists(`${dev_params.root}/dist/client`)){
+		util_instance.fs.create_directory(`${dev_params.root}/dist/client`);
+	}
+	
+	util_instance.fs.copy_file(
+		`${dev_params.root}/${defaults.folder}/client/src/index.html`,
+		`${dev_params.root}/dist/client/index.html`,
+	);
+	
+	const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/client`;
+	const nu_cmd = `npx webpack serve --open`;
+	const cmd = `${cd_cmd} && ${nu_cmd}`;
+	
+	util_instance.spawn.log(cmd, 'webpack', 'developing client', nuxt_color);
+	
 }
 
 async function _dev_trx_webpack_express(){
@@ -178,7 +201,9 @@ async function _dev_trx_webpack_netlify(){
 }
 
 async function _dev_client_adm(){
-	if(dev_params.deploy === 'express' || dev_params.native === true){
+	if(dev_params.inside_ntl === true){
+		await _dev_admin_nuxt_inside_ntl();
+	}else if(dev_params.deploy === 'express'){
 		await _dev_admin_nuxt_express();
 	}else if(dev_params.deploy === 'netlify'){
 		await _dev_admin_nuxt_netlify();
@@ -437,6 +462,16 @@ function _add_proxy_to_properties(
 		])
 	);
 	obj_decl.properties.push(proxy_prop);
+}
+
+async function _dev_admin_nuxt_inside_ntl(){
+	
+	const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/client`;
+	const nu_cmd = `npx nuxt dev -c ./nuxt.config.js`;
+	const cmd = `${cd_cmd} && ${nu_cmd}`;
+	
+	util_instance.spawn.log(cmd, 'nuxt', 'developing client', nuxt_color);
+	
 }
 
 async function _dev_admin_nuxt_express(){

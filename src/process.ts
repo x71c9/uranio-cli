@@ -218,6 +218,15 @@ function _set_args(params:Params, args:Arguments)
 		params.native = !args.nonative;
 	}
 	
+	const inside_ntl = args.inside_ntl;
+	
+	if(inside_ntl == true){
+		params.inside_ntl = true;
+	}
+	if(typeof args.noinside_ntl === 'boolean' && !!args.noinside_ntl !== !params.inside_ntl){
+		params.inside_ntl = !args.noinside_ntl;
+	}
+	
 	const is_dot = args.is_dot;
 	
 	if(is_dot == true){
