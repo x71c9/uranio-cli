@@ -86,7 +86,10 @@ class Output {
         spinner_1.spinner.stop();
     }
     spinner_text(text) {
-        const text_with_current = (is_docker) ? text : `${spinner_current} ${text}`;
+        const chopped_current = (spinner_current.length > process.stdout.columns / 2) ?
+            spinner_current.substring(0, Math.floor(process.stdout.columns / 2)) + '...' :
+            spinner_current;
+        const text_with_current = (is_docker) ? text : `${chopped_current} ${text}`;
         spinner_1.spinner.text = this._spinner_text_color(text_with_current);
         if (spinner_1.spinner.text.length > process.stdout.columns) {
             spinner_1.spinner.text = spinner_1.spinner.text.substr(0, process.stdout.columns - 2);
