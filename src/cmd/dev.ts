@@ -545,7 +545,7 @@ function _watch(){
 			const extension = path.extname(basename);
 			
 			const not_valid_extensions = ['.swp', '.swo'];
-			if(not_valid_extensions.includes(extension)){
+			if(not_valid_extensions.includes(extension) || not_valid_extensions.includes(basename)){
 				return false;
 			}
 			
