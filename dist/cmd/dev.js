@@ -443,7 +443,7 @@ function _watch() {
         const basename = path_1.default.basename(_path);
         const extension = path_1.default.extname(basename);
         const not_valid_extensions = ['.swp', '.swo'];
-        if (not_valid_extensions.includes(extension)) {
+        if (not_valid_extensions.includes(extension) || not_valid_extensions.includes(basename)) {
             return false;
         }
         if (!watch_src_scanned) {
