@@ -1,6 +1,6 @@
 {
 	"name": "uranio-cli",
-	"version": "0.0.43",
+	"version": "0.0.44",
 	"description": "Uranio command line interface",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -10,7 +10,7 @@
 		"transpose": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js transpose -w\"",
 		"help": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -h -x\"",
 		"test": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js test -vbwf --noblank\"",
-		"version": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v\"",
+		"ver": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v\"",
 		"dev": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js dev\"",
 		"ubuild": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js build\"",
 		"server:dev": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js server:dev\"",
