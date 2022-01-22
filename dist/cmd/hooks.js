@@ -76,6 +76,9 @@ function hooks(params, included = false) {
         else {
             output_instance.end_log(`TRX Hooks generated.`);
         }
+        if (hooks_params.is_dot) {
+            _copy_hooks_to_dot_src();
+        }
     });
 }
 exports.hooks = hooks;
@@ -108,6 +111,7 @@ function _generate_text() {
         }
         if (atom_name === 'media') {
             text += _upload_hooks();
+            text += _presigned_hooks();
         }
         for (const route_name in atom_routes[atom_name]) {
             const text_args = _text_args_for_url(atom_routes[atom_name][route_name].url);
@@ -160,6 +164,25 @@ function _upload_hooks() {
     text += `\t\t\tcurrent_token = token;\n`;
     text += `\t\t}\n`;
     text += `\t\treturn await uranio.media.create(current_token).upload<D>(file, current_token);\n`;
+    text += `\t},\n`;
+    return text;
+}
+function _presigned_hooks() {
+    let text = '';
+    text += `\tpresigned: async(\n`;
+    text += `\t\tfilename: string,\n`;
+    text += `\t\tsize?: number,\n`;
+    text += `\t\ttype?: string,\n`;
+    text += `\t\ttoken?: string\n`;
+    text += `\t): Promise<urn_response.General<string>> => {\n`;
+    text += `\t\tlet current_token: string | undefined;\n`;
+    text += `\t\tif (typeof hook_token === "string" && hook_token !== "") {\n`;
+    text += `\t\t\tcurrent_token = hook_token;\n`;
+    text += `\t\t}\n`;
+    text += `\t\tif (typeof token === "string" && token !== "") {\n`;
+    text += `\t\t\tcurrent_token = token;\n`;
+    text += `\t\t}\n`;
+    text += `\t\treturn await uranio.media.create(current_token).presigned(filename, size, type, current_token);\n`;
     text += `\t},\n`;
     return text;
 }
@@ -404,5 +427,24 @@ function _save_to_file(text) {
     // util_instance.pretty(filepath_client);
     util_instance.fs.copy_file(filepath_server, filepath_client);
     output_instance.done_verbose_log(`Created hooks file [${filepath_client}].`, 'hooks');
+}
+function _copy_hooks_to_dot_src() {
+    output_instance.start_loading(`Copying hooks to uranio-dot/src...`);
+    let dot_hooks_dir = `${hooks_params.root}/${defaults_1.defaults.folder}/server/src/uranio/trx/hooks`;
+    let src_hooks_dir = `${hooks_params.root}/src/uranio/trx/hooks/`;
+    switch (hooks_params.repo) {
+        case 'adm': {
+            dot_hooks_dir = `${hooks_params.root}/${defaults_1.defaults.folder}/server/src/uranio/trx/hooks/`;
+            src_hooks_dir = `${hooks_params.root}/src/uranio/trx/hooks/`;
+            break;
+        }
+        case 'trx': {
+            dot_hooks_dir = `${hooks_params.root}/${defaults_1.defaults.folder}/server/src/uranio/hooks/`;
+            src_hooks_dir = `${hooks_params.root}/src/uranio/hooks/`;
+            break;
+        }
+    }
+    util_instance.fs.copy_directory(dot_hooks_dir, src_hooks_dir);
+    output_instance.done_log(`Copied hooks to uranio-dot/src.`, 'dot');
 }
 //# sourceMappingURL=hooks.js.map
