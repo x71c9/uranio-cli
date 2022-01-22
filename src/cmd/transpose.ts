@@ -623,7 +623,6 @@ async function _manipulate_and_create_files(file_path:string){
 	
 	if(transpose_params.is_dot){
 		_copy_books_to_dot_src();
-		_copy_hooks_to_dot_src();
 	}
 	
 	// sourceFile = _manipulate_atom_book(sourceFile);
@@ -645,26 +644,6 @@ function _copy_books_to_dot_src(){
 	const dot_book_dir = `${transpose_params.root}/src/books`;
 	util_instance.fs.copy_directory(server_book_dir, dot_book_dir);
 	output_instance.done_log(`Copied books to uranio-dot/src.`, 'dot');
-}
-
-function _copy_hooks_to_dot_src(){
-	output_instance.start_loading(`Copying hooks to uranio-dot/src...`);
-	let dot_hooks_dir = `${transpose_params.root}/${defaults.folder}/server/src/uranio/trx/hooks`;
-	let src_hooks_dir = `${transpose_params.root}/src/uranio/trx/hooks/`;
-	switch(transpose_params.repo){
-		case 'adm':{
-			dot_hooks_dir = `${transpose_params.root}/${defaults.folder}/server/src/uranio/trx/hooks/`;
-			src_hooks_dir = `${transpose_params.root}/src/uranio/trx/hooks/`;
-			break;
-		}
-		case 'trx':{
-			dot_hooks_dir = `${transpose_params.root}/${defaults.folder}/server/src/uranio/hooks/`;
-			src_hooks_dir = `${transpose_params.root}/src/uranio/hooks/`;
-			break;
-		}
-	}
-	util_instance.fs.copy_directory(dot_hooks_dir, src_hooks_dir);
-	output_instance.done_log(`Copied hooks to uranio-dot/src.`, 'dot');
 }
 
 async function _generate_client_books(){
