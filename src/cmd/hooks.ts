@@ -21,13 +21,13 @@ import {merge_params} from './common';
 // import {HooksParams} from './types';
 
 const default_routes = {
-	count: {url: '/count'},
-	find: {url: '/'},
-	find_id: {url: '/:id'},
-	find_one: {url: '/'},
-	insert: {url: '/'},
-	update: {url: '/:id'},
-	delete: {url: '/:id'}
+	count: {url: '/count', method: 'GET'},
+	find: {url: '/', method: 'GET'},
+	find_id: {url: '/:id', method: 'GET'},
+	find_one: {url: '/', method: 'GET'},
+	insert: {url: '/', method: 'POST'},
+	update: {url: '/:id', method: 'POST'},
+	delete: {url: '/:id', method: 'GET'}
 };
 
 const _project_option = {
@@ -105,8 +105,9 @@ function _generate_text(){
 		}
 		for(const route_name in atom_routes[atom_name]){
 			const text_args = _text_args_for_url(atom_routes[atom_name][route_name].url);
+			const body_arg = _body_arg_for_route(atom_routes, atom_name, route_name);
 			text += `\t${route_name}: async <D extends uranio.types.Depth>(\n`;
-			text += `\t\t${text_args}options?:uranio.types.Hook.Arguments<'${atom_name}', '${route_name}', D>,\n`;
+			text += `\t\t${text_args}${body_arg}options?:uranio.types.Hook.Arguments<'${atom_name}', '${route_name}', D>,\n`;
 			text += `\t\ttoken?:string\n`;
 			text += `\t):Promise<uranio.types.Hook.Response<'${atom_name}', '${route_name}', D>>  => {\n`;
 			text += `\t\tconst args:uranio.types.Hook.Arguments<'${atom_name}', '${route_name}', D> = {\n`;
@@ -117,6 +118,9 @@ function _generate_text(){
 					text += `\t\t\t\t${line}\n`;
 				}
 				text += `\t\t\t},\n`;
+			}
+			if(body_arg !== ''){
+				text += `\t\t\tbody: body,\n`;
 			}
 			text += `\t\t\t...options\n`;
 			text += `\t\t};\n`;
@@ -301,6 +305,13 @@ function _get_book_atom_def_props(book_name:string){
 	return atom_def_by_atom;
 }
 
+function _body_arg_for_route(routes:AnyByAtom, atom_name: string, route_name:string){
+	if(routes[atom_name]?.[route_name]?.method === 'POST'){
+		return `body:uranio.types.Hook.Body<'${atom_name}', '${route_name}'>,\n\t\t`;
+	}
+	return '';
+}
+
 function _text_args_for_url(url:string){
 	let checked_url = url;
 	if(url[0] === "'" && url[url.length-1] === "'"){
@@ -327,10 +338,21 @@ function _get_parameters_from_url(url:string){
 	return url_params;
 }
 
+// function _generate_arg(atom_name:string, route_name:string){
+//   let body_type = 'any';
+//   const atom_routes = ['insert', 'update'];
+//   if(atom_routes.includes(route_name)){
+//     body_type = `AtomShape<'${atom_name}>'`;
+//   }
+//   let body_arg = '';
+//   body_arg += `body:${body_type}, `;
+//   return body_arg;
+// }
+
 function _generate_args(params:string[]){
 	const param_text:string[] = [];
 	for(const p of params){
-		param_text.push(`${p}:string, `);
+		param_text.push(`${p}:string,\n\t\t`);
 	}
 	return param_text.join('');
 }
