@@ -5,19 +5,12 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
-		"build": "tsc -b",
-		"init": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js init -fvw -r api -x [CL]\"",
-		"transpose": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js transpose -w\"",
-		"help": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -h -x\"",
-		"test": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js test -vbwf --noblank\"",
-		"ver": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v\"",
-		"dev": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js dev\"",
-		"ubuild": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js build\"",
-		"server:dev": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js server:dev\"",
-		"client:dev": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js client:dev\"",
-		"alias": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js alias -uv\"",
-		"hooks": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js hooks -wv\"",
-		"watch": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/test.js\""
+		"init": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js init -fvw -r api -x [CL] --branch new\"",
+		"build": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js build -fvw -r api -x [CL] --branch new\"",
+		"dev": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js dev --branch new\"",
+		"help": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -h -x --branch new\"",
+		"version": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v --branch new\"",
+		"watch": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -vu --branch new\""
 	},
 	"engines": {
 		"node": ">=14"

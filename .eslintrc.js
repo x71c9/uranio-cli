@@ -6,7 +6,8 @@ module.exports = {
 		es6: true
 	},
 	extends: [
-		'eslint:recommended'
+		'eslint:recommended',
+		'plugin:json/recommended'
 	],
 	parserOptions: {
 		ecmaVersion: 2020,

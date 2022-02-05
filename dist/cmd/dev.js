@@ -437,9 +437,9 @@ function _watch() {
         output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
         watch_src_scanned = true;
     }, (_event, _path) => __awaiter(this, void 0, void 0, function* () {
-        if (!_check_dot_file(dev_params, _path)) {
-            return false;
-        }
+        // if(!_check_dot_file(dev_params, _path)){
+        //   return false;
+        // }
         const basename = path_1.default.basename(_path);
         const extension = path_1.default.extname(basename);
         const not_valid_extensions = ['.swp', '.swo'];
@@ -574,19 +574,19 @@ function _replace_netlify_function_file() {
     util_instance.fs.write_file(api_file_path, new_content, 'utf8');
     output_instance.done_verbose_log(`Replaced Netlify serverless function file.`, 'less');
 }
-function _check_dot_file(params, _path) {
-    if (params.is_dot === true) {
-        const do_not_dot_watch_paths = [
-            `${params.root}/src/books`,
-            `${params.root}/src/uranio/trx/hooks`,
-            `${params.root}/src/uranio/hooks`,
-        ];
-        for (const invalid_path of do_not_dot_watch_paths) {
-            if (_path.indexOf(invalid_path) === 0) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
+// function _check_dot_file(params:Partial<Params>, _path:string):boolean{
+//   if(params.is_dot === true){
+//     const do_not_dot_watch_paths = [
+//       `${params.root}/src/books`,
+//       `${params.root}/src/uranio/trx/hooks`,
+//       `${params.root}/src/uranio/hooks`,
+//     ];
+//     for(const invalid_path of do_not_dot_watch_paths){
+//       if(_path.indexOf(invalid_path) === 0){
+//         return false;
+//       }
+//     }
+//   }
+//   return true;
+// }
 //# sourceMappingURL=dev.js.map

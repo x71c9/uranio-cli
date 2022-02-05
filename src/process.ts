@@ -21,16 +21,11 @@ import {
 	dev,
 	dev_server,
 	dev_client,
-	transpose,
-	transpose_one,
 	build,
 	build_server,
 	build_client,
-	alias,
-	hooks,
 	help,
 	info,
-	dot,
 	docker,
 	deinit
 } from './cmd/';
@@ -43,7 +38,7 @@ import {
 	check_pacman,
 	check_db,
 	read_rc_file,
-	check_if_is_dot
+	// check_if_is_dot
 } from './cmd/common';
 
 let output_instance:output.OutputInstance;
@@ -67,7 +62,7 @@ export function uranio_process(args:Arguments)
 	
 	process.chdir(process_params.root);
 	
-	process_params = _autoset_is_dot(process_params, args);
+	// process_params = _autoset_is_dot(process_params, args);
 	
 	output_instance = output.create(process_params);
 	util_instance = util.create(process_params, output_instance);
@@ -117,12 +112,12 @@ function _set_root(args:Arguments){
 		
 }
 
-function _autoset_is_dot(params:Params, args:Arguments):Params{
-	if(typeof args.is_dot === 'undefined' && check_if_is_dot(params.root)){
-		params.is_dot = true;
-	}
-	return params;
-}
+// function _autoset_is_dot(params:Params, args:Arguments):Params{
+//   if(typeof args.is_dot === 'undefined' && check_if_is_dot(params.root)){
+//     params.is_dot = true;
+//   }
+//   return params;
+// }
 
 function _init_log(){
 	
@@ -130,10 +125,6 @@ function _init_log(){
 	if(!util_instance.fs.exists(log_file_path)){
 		util_instance.fs.create_file(log_file_path);
 	}
-	// if(!fs.existsSync(log_file_path)){
-	//   fs.writeFileSync(log_file_path, '');
-	// }
-	
 	_log_arguments(process_params);
 	_log_root();
 	
@@ -227,11 +218,11 @@ function _set_args(params:Params, args:Arguments)
 		params.inside_ntl = !args.noinside_ntl;
 	}
 	
-	const is_dot = args.is_dot;
+	// const is_dot = args.is_dot;
 	
-	if(is_dot == true){
-		params.is_dot = true;
-	}
+	// if(is_dot == true){
+	//   params.is_dot = true;
+	// }
 	
 	const time = args.t || args.time;
 	
@@ -530,22 +521,6 @@ function _switch_command(args:Arguments){
 			prompt_init(process_params, args);
 			break;
 		}
-		case 'transpose':{
-			if(args._.length > 1 && typeof args._[1] === 'string'){
-				transpose_one(args._[1], process_params);
-			}else{
-				transpose(process_params);
-			}
-			break;
-		}
-		case 'alias':{
-			alias(process_params);
-			break;
-		}
-		case 'hooks':{
-			hooks(process_params);
-			break;
-		}
 		case 'dev':{
 			switch(splitted_cmd[1]){
 				case 'server':{
@@ -590,10 +565,6 @@ function _switch_command(args:Arguments){
 			help();
 			break;
 		}
-		case 'dot':{
-			dot(process_params, args);
-			break;
-		}
 		case 'docker':{
 			docker(process_params, args);
 			break;
@@ -602,29 +573,9 @@ function _switch_command(args:Arguments){
 			deinit(process_params);
 			break;
 		}
-		case 'test':{
-			// test.command();
-			break;
-		}
 		default:{
-			// output_instance.wrong_end_log('Command not found.');
 			output_instance.error_log(`Invalid argument [${cmd}]`);
 			process.exit(1);
 		}
 	}
 }
-
-// function _relative_to_absolute_path(path:string)
-//     :string{
-//   if(path[path.length-1] === '/'){
-//     path = path.substr(0,path.length-1);
-//   }
-//   if(path[0] !== '/'){
-//     if(path.substr(0,2) === './'){
-//       path = path.substr(2);
-//     }
-//     path = `${conf.root}/${path}`;
-//   }
-//   return path;
-// }
-

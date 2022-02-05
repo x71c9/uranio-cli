@@ -6,15 +6,15 @@
 
 export * from './init';
 
-export * from './alias';
+// export * from './alias';
 
 export * from './build';
 
 export * from './dev';
 
-export * from './transpose';
+// export * from './transpose';
 
-export * from './hooks';
+// export * from './hooks';
 
 export * from './info';
 
@@ -24,4 +24,4 @@ export {docker} from './docker';
 
 export * from './deinit';
 
-export * from './dot';
+// export * from './dot';

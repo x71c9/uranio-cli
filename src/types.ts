@@ -20,7 +20,7 @@ export type Params = {
 	fullwidth: boolean
 	native: boolean
 	inside_ntl: boolean
-	is_dot: boolean
+	// is_dot: boolean
 	time: boolean
 	context: boolean
 	prefix_color: boolean
