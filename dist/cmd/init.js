@@ -38,13 +38,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.prompt_init = exports.init = void 0;
 const inquirer_1 = __importDefault(require("inquirer"));
-const urn_lib_1 = require("urn-lib");
+// import {urn_util} from 'urn-lib';
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const docker = __importStar(require("./docker"));
 const types_1 = require("../types");
-const alias_1 = require("./alias");
+// import {alias} from './alias';
 const title_1 = require("./title");
 const common_1 = require("./common");
 let output_instance;
@@ -58,13 +58,13 @@ function init(params) {
         _log_important_params();
         _create_rc_file();
         _create_urn_folder();
-        _create_client_server_folders();
+        // _create_client_server_folders();
         yield _clone_assets_repo();
         _copy_assets();
         _create_dot_env();
         _ignore_files();
-        _update_package_aliases();
-        _update_package_scripts();
+        // _update_package_aliases();
+        // _update_package_scripts();
         _update_resolutions();
         if (init_params.docker === true) {
             yield docker.build(init_params);
@@ -73,11 +73,12 @@ function init(params) {
         }
         else {
             yield _init_pacman();
-            yield _clone_repo();
-            yield _install_repo();
-            yield _remove_git_files();
+            yield _install_package();
+            // await _clone_repo();
+            // await _install_repo();
+            // await _remove_git_files();
             yield _copy_specific_assets();
-            yield _replace_aliases();
+            // await _replace_aliases();
         }
         if (init_params.docker_db === true) {
             if (init_params.docker === false) {
@@ -127,24 +128,6 @@ function prompt_init(params, args) {
     });
 }
 exports.prompt_init = prompt_init;
-function _log_important_params() {
-    output_instance.verbose_log(`$URNROOT$Project root: [${init_params.root}]`, 'root');
-    output_instance.verbose_log(`Selected repository: [${init_params.repo}]`, 'repo');
-    output_instance.verbose_log(`Selected pacman: [${init_params.pacman}]`, 'repo');
-    if ((0, types_1.valid_deploy_repos)().includes(init_params.repo)) {
-        output_instance.verbose_log(`Selected deploy: [${init_params.deploy}]`, 'dply');
-    }
-}
-function _init_pacman() {
-    return __awaiter(this, void 0, void 0, function* () {
-        output_instance.start_loading(`Initializing pacman...`);
-        const yarn_lock = `${init_params.root}/yarn.lock`;
-        if (init_params.pacman === 'yarn' && !util_instance.fs.exists(yarn_lock)) {
-            yield util_instance.cmd.yarn_install();
-        }
-        output_instance.done_verbose_log(`Pacman initialized.`, 'pacman');
-    });
-}
 function _ask_for_pacman(args) {
     return __awaiter(this, void 0, void 0, function* () {
         const pacman = args.p || args.pacman;
@@ -302,6 +285,24 @@ function _ask_for_deploy(args) {
         }
     });
 }
+function _log_important_params() {
+    output_instance.verbose_log(`$URNROOT$Project root: [${init_params.root}]`, 'root');
+    output_instance.verbose_log(`Selected repository: [${init_params.repo}]`, 'repo');
+    output_instance.verbose_log(`Selected pacman: [${init_params.pacman}]`, 'repo');
+    if ((0, types_1.valid_deploy_repos)().includes(init_params.repo)) {
+        output_instance.verbose_log(`Selected deploy: [${init_params.deploy}]`, 'dply');
+    }
+}
+function _init_pacman() {
+    return __awaiter(this, void 0, void 0, function* () {
+        output_instance.start_loading(`Initializing pacman...`);
+        const yarn_lock = `${init_params.root}/yarn.lock`;
+        if (init_params.pacman === 'yarn' && !util_instance.fs.exists(yarn_lock)) {
+            yield util_instance.cmd.yarn_install();
+        }
+        output_instance.done_verbose_log(`Pacman initialized.`, 'pacman');
+    });
+}
 function _add_admin_files() {
     output_instance.start_loading(`Adding admin files...`);
     const fix_file_nuxt_types = `${init_params.root}/node_modules/@nuxt/types/node_modules/index.d.ts`;
@@ -311,23 +312,21 @@ function _add_admin_files() {
     }
     output_instance.done_verbose_log('Added admin files.', 'adm');
 }
-function _replace_aliases() {
-    return __awaiter(this, void 0, void 0, function* () {
-        output_instance.start_loading(`Updating relative paths aliases...`);
-        yield (0, alias_1.alias)(init_params, true);
-        output_instance.done_verbose_log('Updated relative paths aliases.', 'alias');
-    });
-}
+// async function _replace_aliases(){
+//   output_instance.start_loading(`Updating relative paths aliases...`);
+//   await alias(init_params, true);
+//   output_instance.done_verbose_log('Updated relative paths aliases.', 'alias');
+// }
 function _remove_tmp() {
     output_instance.start_loading(`Removing tmp folder [${defaults_1.defaults.tmp_folder}]...`);
     util_instance.fs.remove_directory(`${init_params.root}/${defaults_1.defaults.tmp_folder}`, 'tmp');
     output_instance.done_verbose_log(`Removed tmp folder [${defaults_1.defaults.tmp_folder}].`, 'tmp');
 }
 function _copy_assets() {
-    _copy_book();
+    // _copy_book();
     _copy_sample();
     _copy_tsconfigs();
-    _update_tsconfig_paths();
+    // _update_tsconfig_paths();
     _copy_eslint_files();
     _copy_main_files(init_params.repo);
 }
@@ -356,99 +355,103 @@ function _create_dot_env() {
     }
     util_instance.fs.copy_file(`${init_params.root}/sample.env`, dot_env_path);
 }
-function _update_tsconfig_paths() {
-    const prefix = init_params.is_dot === true ? '.' : `${defaults_1.defaults.folder}/server`;
-    const main_paths = _generate_paths_server(init_params.repo, prefix);
-    const real_paths_server = _generate_paths_server(init_params.repo, `.`);
-    const real_paths_client = _generate_paths_client(init_params.repo, `.`);
-    const main_tsconfig = `tsconfig.json`;
-    _update_paths(main_tsconfig, main_paths);
-    const real_tsconfig_server = `.uranio/server/tsconfig.json`;
-    _update_paths(real_tsconfig_server, real_paths_server);
-    const real_tsconfig_client = `.uranio/client/tsconfig.json`;
-    _update_paths(real_tsconfig_client, real_paths_client);
-}
-function _update_paths(tsconfig_filepath, paths) {
-    if (!util_instance.fs.exists(tsconfig_filepath)) {
-        util_instance.fs.write_file(tsconfig_filepath, '');
-    }
-    const content = util_instance.fs.read_file(tsconfig_filepath, 'utf8');
-    const tsdata = JSON.parse(content);
-    if (!tsdata.compilerOptions) {
-        tsdata.compilerOptions = {};
-    }
-    if (!tsdata.compilerOptions.paths) {
-        tsdata.compilerOptions.paths = [];
-    }
-    tsdata.compilerOptions.paths = paths;
-    util_instance.fs.write_file(tsconfig_filepath, JSON.stringify(tsdata, null, '\t'));
-}
-function _generate_paths_server(repo, prefix) {
-    const paths = {};
-    paths['uranio'] = [`${prefix}/src/uranio`];
-    paths['uranio-books'] = [`${prefix}/src/books`];
-    paths['uranio-books/*'] = [`${prefix}/src/books/*`];
-    switch (repo) {
-        case 'core': {
-            break;
-        }
-        case 'api': {
-            paths['uranio-core'] = [`${prefix}/src/uranio/core`];
-            paths['uranio-core/*'] = [`${prefix}/src/uranio/core/*`];
-            break;
-        }
-        case 'trx': {
-            paths['uranio-core'] = [`${prefix}/src/uranio/api/core`];
-            paths['uranio-core/*'] = [`${prefix}/src/uranio/api/core/*`];
-            paths['uranio-api'] = [`${prefix}/src/uranio/api`];
-            paths['uranio-api/*'] = [`${prefix}/src/uranio/api/*`];
-            break;
-        }
-        case 'adm': {
-            paths['uranio-core'] = [`${prefix}/src/uranio/trx/api/core`];
-            paths['uranio-core/*'] = [`${prefix}/src/uranio/trx/api/core/*`];
-            paths['uranio-api'] = [`${prefix}/src/uranio/trx/api`];
-            paths['uranio-api/*'] = [`${prefix}/src/uranio/trx/api/*`];
-            paths['uranio-trx'] = [`${prefix}/src/uranio/trx`];
-            paths['uranio-trx/*'] = [`${prefix}/src/uranio/trx/*`];
-            break;
-        }
-    }
-    return paths;
-}
-function _generate_paths_client(repo, prefix) {
-    const paths = {};
-    paths['uranio'] = [`${prefix}/src/uranio/client`];
-    paths['uranio-books'] = [`${prefix}/src/books`];
-    paths['uranio-books/*'] = [`${prefix}/src/books/*`];
-    switch (repo) {
-        case 'core': {
-            break;
-        }
-        case 'api': {
-            paths['uranio-core'] = [`${prefix}/src/uranio/core`];
-            paths['uranio-core/*'] = [`${prefix}/src/uranio/core/*`];
-            break;
-        }
-        case 'trx': {
-            paths['uranio-core'] = [`${prefix}/src/uranio/api/core`];
-            paths['uranio-core/*'] = [`${prefix}/src/uranio/api/core/*`];
-            paths['uranio-api'] = [`${prefix}/src/uranio/api`];
-            paths['uranio-api/*'] = [`${prefix}/src/uranio/api/*`];
-            break;
-        }
-        case 'adm': {
-            paths['uranio-core'] = [`${prefix}/src/uranio/trx/api/core`];
-            paths['uranio-core/*'] = [`${prefix}/src/uranio/trx/api/core/*`];
-            paths['uranio-api'] = [`${prefix}/src/uranio/trx/api`];
-            paths['uranio-api/*'] = [`${prefix}/src/uranio/trx/api/*`];
-            paths['uranio-trx'] = [`${prefix}/src/uranio/trx`];
-            paths['uranio-trx/*'] = [`${prefix}/src/uranio/trx/*`];
-            break;
-        }
-    }
-    return paths;
-}
+// function _update_tsconfig_paths(){
+//   // const prefix = init_params.is_dot === true ? '.' : `${defaults.folder}/server`;
+//   const prefix = `${defaults.folder}/server`;
+//   const main_paths = _generate_paths_server(init_params.repo, prefix);
+//   const real_paths_server = _generate_paths_server(init_params.repo, `.`);
+//   const real_paths_client = _generate_paths_client(init_params.repo, `.`);
+//   const main_tsconfig = `tsconfig.json`;
+//   _update_paths(main_tsconfig, main_paths);
+//   const real_tsconfig_server = `.uranio/server/tsconfig.json`;
+//   _update_paths(real_tsconfig_server, real_paths_server);
+//   const real_tsconfig_client = `.uranio/client/tsconfig.json`;
+//   _update_paths(real_tsconfig_client, real_paths_client);
+// }
+// function _update_paths(tsconfig_filepath:string, paths:string){
+//   if(!util_instance.fs.exists(tsconfig_filepath)){
+//     util_instance.fs.write_file(tsconfig_filepath, '');
+//   }
+//   const content = util_instance.fs.read_file(tsconfig_filepath, 'utf8');
+//   const tsdata = JSON.parse(content);
+//   if(!tsdata.compilerOptions){
+//     tsdata.compilerOptions = {};
+//   }
+//   if(!tsdata.compilerOptions.paths){
+//     tsdata.compilerOptions.paths = [];
+//   }
+//   tsdata.compilerOptions.paths = paths;
+//   util_instance.fs.write_file(
+//     tsconfig_filepath,
+//     JSON.stringify(tsdata, null, '\t')
+//   );
+// }
+// function _generate_paths_server(repo:Repo, prefix:string){
+//   const paths = {} as any;
+//   paths['uranio'] = [`${prefix}/src/uranio`];
+//   paths['uranio-books'] = [`${prefix}/src/books`];
+//   paths['uranio-books/*'] = [`${prefix}/src/books/*`];
+//   switch(repo){
+//     case 'core':{
+//       break;
+//     }
+//     case 'api':{
+//       paths['uranio-core'] = [`${prefix}/src/uranio/core`];
+//       paths['uranio-core/*'] = [`${prefix}/src/uranio/core/*`];
+//       break;
+//     }
+//     case 'trx':{
+//       paths['uranio-core'] = [`${prefix}/src/uranio/api/core`];
+//       paths['uranio-core/*'] = [`${prefix}/src/uranio/api/core/*`];
+//       paths['uranio-api'] = [`${prefix}/src/uranio/api`];
+//       paths['uranio-api/*'] = [`${prefix}/src/uranio/api/*`];
+//       break;
+//     }
+//     case 'adm':{
+//       paths['uranio-core'] = [`${prefix}/src/uranio/trx/api/core`];
+//       paths['uranio-core/*'] = [`${prefix}/src/uranio/trx/api/core/*`];
+//       paths['uranio-api'] = [`${prefix}/src/uranio/trx/api`];
+//       paths['uranio-api/*'] = [`${prefix}/src/uranio/trx/api/*`];
+//       paths['uranio-trx'] = [`${prefix}/src/uranio/trx`];
+//       paths['uranio-trx/*'] = [`${prefix}/src/uranio/trx/*`];
+//       break;
+//     }
+//   }
+//   return paths;
+// }
+// function _generate_paths_client(repo:Repo, prefix:string){
+//   const paths = {} as any;
+//   paths['uranio'] = [`${prefix}/src/uranio/client`];
+//   paths['uranio-books'] = [`${prefix}/src/books`];
+//   paths['uranio-books/*'] = [`${prefix}/src/books/*`];
+//   switch(repo){
+//     case 'core':{
+//       break;
+//     }
+//     case 'api':{
+//       paths['uranio-core'] = [`${prefix}/src/uranio/core`];
+//       paths['uranio-core/*'] = [`${prefix}/src/uranio/core/*`];
+//       break;
+//     }
+//     case 'trx':{
+//       paths['uranio-core'] = [`${prefix}/src/uranio/api/core`];
+//       paths['uranio-core/*'] = [`${prefix}/src/uranio/api/core/*`];
+//       paths['uranio-api'] = [`${prefix}/src/uranio/api`];
+//       paths['uranio-api/*'] = [`${prefix}/src/uranio/api/*`];
+//       break;
+//     }
+//     case 'adm':{
+//       paths['uranio-core'] = [`${prefix}/src/uranio/trx/api/core`];
+//       paths['uranio-core/*'] = [`${prefix}/src/uranio/trx/api/core/*`];
+//       paths['uranio-api'] = [`${prefix}/src/uranio/trx/api`];
+//       paths['uranio-api/*'] = [`${prefix}/src/uranio/trx/api/*`];
+//       paths['uranio-trx'] = [`${prefix}/src/uranio/trx`];
+//       paths['uranio-trx/*'] = [`${prefix}/src/uranio/trx/*`];
+//       break;
+//     }
+//   }
+//   return paths;
+// }
 function _clone_assets_repo() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Cloning assets...`);
@@ -458,68 +461,112 @@ function _clone_assets_repo() {
         output_instance.done_log(`Cloned assets repo.`, 'assets');
     });
 }
-function _remove_git_files() {
-    return __awaiter(this, void 0, void 0, function* () {
-        output_instance.start_loading(`Removing git files...`);
-        const cloned_server_repo_path = `${init_params.root}/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}`;
-        // const srv_cmd = `( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`;
-        util_instance.spawn.exec_sync(`( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`);
-        // const srv_promise = util_instance.spawn.spin(srv_cmd, '.git', `removing srv .git files.`);
-        const cloned_client_repo_path = `${init_params.root}/${defaults_1.defaults.folder}/client/src/${defaults_1.defaults.repo_folder}`;
-        // const cln_cmd = `( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`;
-        util_instance.spawn.exec_sync(`( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`);
-        // const cln_promise = util_instance.spawn.spin(cln_cmd, '.git', `removing cln .git files.`);
-        // await Promise.all([srv_promise, cln_promise]);
-        output_instance.done_log(`Removed uranio .git files.`, '.git');
-    });
-}
-function _clone_repo() {
-    return __awaiter(this, void 0, void 0, function* () {
-        output_instance.start_loading(`Cloning [${init_params.repo}]...`);
-        switch (init_params.repo) {
-            case 'core': {
-                yield _clone_core();
-                break;
-            }
-            case 'api': {
-                yield _clone_api();
-                break;
-            }
-            case 'trx': {
-                yield _clone_trx();
-                break;
-            }
-            case 'adm': {
-                yield _clone_adm();
-                break;
-            }
-            default: {
-                output_instance.error_log(`Selected repo is not valid. [${init_params.repo}]`, 'init');
-                process.exit(1);
-            }
-        }
-        output_instance.done_log(`Cloned repo [${init_params.repo}].`, 'repo');
-    });
-}
-function _install_repo() {
+// async function _remove_git_files(){
+//   output_instance.start_loading(`Removing git files...`);
+//   const cloned_server_repo_path =
+//     `${init_params.root}/${defaults.folder}/server/src/${defaults.repo_folder}`;
+//   // const srv_cmd = `( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`;
+//   util_instance.spawn.exec_sync(
+//     `( find ${cloned_server_repo_path} -name ".git*" ) | xargs rm -rf`
+//   );
+//   // const srv_promise = util_instance.spawn.spin(srv_cmd, '.git', `removing srv .git files.`);
+//   const cloned_client_repo_path =
+//     `${init_params.root}/${defaults.folder}/client/src/${defaults.repo_folder}`;
+//   // const cln_cmd = `( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`;
+//   util_instance.spawn.exec_sync(
+//     `( find ${cloned_client_repo_path} -name ".git*" ) | xargs rm -rf`
+//   );
+//   // const cln_promise = util_instance.spawn.spin(cln_cmd, '.git', `removing cln .git files.`);
+//   // await Promise.all([srv_promise, cln_promise]);
+//   output_instance.done_log(`Removed uranio .git files.`, '.git');
+// }
+// async function _clone_repo(){
+//   output_instance.start_loading(
+//     `Cloning [${init_params.repo}]...`
+//   );
+//   switch(init_params.repo){
+//     case 'core':{
+//       await _clone_core();
+//       break;
+//     }
+//     case 'api':{
+//       await _clone_api();
+//       break;
+//     }
+//     case 'trx':{
+//       await _clone_trx();
+//       break;
+//     }
+//     case 'adm':{
+//       await _clone_adm();
+//       break;
+//     }
+//     default:{
+//       output_instance.error_log(
+//         `Selected repo is not valid. [${init_params.repo}]`,
+//         'init'
+//       );
+//       process.exit(1);
+//     }
+//   }
+//   output_instance.done_log(
+//     `Cloned repo [${init_params.repo}].`,
+//     'repo'
+//   );
+// }
+function _install_package() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Intalling [${init_params.repo}]...`);
-        yield _install_dep();
-        output_instance.done_log(`Installed repo [${init_params.repo}].`, 'repo');
+        yield _install_repo_package(init_params.repo);
+        output_instance.done_log(`Installed package [${init_params.repo}].`, 'repo');
     });
 }
-function _create_client_server_folders() {
-    output_instance.start_loading(`Creating server folder...`);
-    util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}/server`, 'init');
-    util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}/server/src`, 'init');
-    util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}/server/src/books`, 'init');
-    output_instance.done_verbose_log(`Created server folders.`, 'init');
-    output_instance.start_loading(`Creating client folder...`);
-    util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}/client`, 'init');
-    util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}/client/src`, 'init');
-    util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}/client/src/books`, 'init');
-    output_instance.done_verbose_log(`Created client folders.`, 'init');
+function _install_repo_package(repo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const package_url = defaults_1.defaults[`${repo}_repo`];
+        return yield util_instance.cmd.install_package(`uranio@${package_url}`);
+    });
 }
+// async function _install_repo(){
+//   output_instance.start_loading(
+//     `Intalling [${init_params.repo}]...`
+//   );
+//   await _install_dep();
+//   output_instance.done_log(
+//     `Installed repo [${init_params.repo}].`,
+//     'repo'
+//   );
+// }
+// function _create_client_server_folders(){
+//   output_instance.start_loading(`Creating server folder...`);
+//   util_instance.fs.create_directory(
+//     `${init_params.root}/${defaults.folder}/server`,
+//     'init'
+//   );
+//   util_instance.fs.create_directory(
+//     `${init_params.root}/${defaults.folder}/server/src`,
+//     'init'
+//   );
+//   util_instance.fs.create_directory(
+//     `${init_params.root}/${defaults.folder}/server/src/books`,
+//     'init'
+//   );
+//   output_instance.done_verbose_log(`Created server folders.`, 'init');
+//   output_instance.start_loading(`Creating client folder...`);
+//   util_instance.fs.create_directory(
+//     `${init_params.root}/${defaults.folder}/client`,
+//     'init'
+//   );
+//   util_instance.fs.create_directory(
+//     `${init_params.root}/${defaults.folder}/client/src`,
+//     'init'
+//   );
+//   util_instance.fs.create_directory(
+//     `${init_params.root}/${defaults.folder}/client/src/books`,
+//     'init'
+//   );
+//   output_instance.done_verbose_log(`Created client folders.`, 'init');
+// }
 function _create_rc_file() {
     output_instance.start_loading('Creating rc file...');
     let content = ``;
@@ -564,26 +611,30 @@ function _create_urn_folder() {
     util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}`, 'init');
     output_instance.done_log(`Created folder ${defaults_1.defaults.folder}.`, 'init');
 }
-function _update_package_scripts() {
-    output_instance.start_loading('Updating scripts...');
-    const package_json_path = `${init_params.root}/package.json`;
-    const data = util_instance.fs.read_file(package_json_path, 'utf8');
-    try {
-        const package_data = urn_lib_1.urn_util.json.clean_parse(data);
-        const old_scripts = package_data['scripts'] || {};
-        package_data['scripts'] = Object.assign(Object.assign({}, old_scripts), common_1.package_scripts);
-        try {
-            util_instance.fs.write_file(package_json_path, JSON.stringify(package_data, null, '\t'));
-            output_instance.done_log(`Updated package.json scripts.`, 'scripts');
-        }
-        catch (ex) {
-            output_instance.error_log(`Cannot update ${package_json_path}.`, 'scripts');
-        }
-    }
-    catch (ex) {
-        output_instance.error_log(`Cannot parse ${package_json_path}.`, 'scripts');
-    }
-}
+// function _update_package_scripts(){
+//   output_instance.start_loading('Updating scripts...');
+//   const package_json_path = `${init_params.root}/package.json`;
+//   const data = util_instance.fs.read_file(package_json_path, 'utf8');
+//   try{
+//     const package_data = urn_util.json.clean_parse(data);
+//     const old_scripts = package_data['scripts'] || {};
+//     package_data['scripts'] = {
+//       ...old_scripts,
+//       ...package_scripts
+//     };
+//     try{
+//       util_instance.fs.write_file(
+//         package_json_path,
+//         JSON.stringify(package_data, null, '\t')
+//       );
+//       output_instance.done_log(`Updated package.json scripts.`, 'scripts');
+//     }catch(ex){
+//       output_instance.error_log(`Cannot update ${package_json_path}.`, 'scripts');
+//     }
+//   }catch(ex){
+//     output_instance.error_log(`Cannot parse ${package_json_path}.`, 'scripts');
+//   }
+// }
 function _update_resolutions() {
     output_instance.start_loading('Updating resolutions...');
     const package_json_path = `${init_params.root}/package.json`;
@@ -598,61 +649,63 @@ function _update_resolutions() {
         output_instance.error_log(`Cannot update ${package_json_path}.`, 'packdata');
     }
 }
-function _update_package_aliases() {
-    output_instance.start_loading('Updating package.json aliases...');
-    const package_json_path = `${init_params.root}/package.json`;
-    const data = util_instance.fs.read_file(package_json_path, 'utf8');
-    try {
-        const package_data = urn_lib_1.urn_util.json.clean_parse(data);
-        package_data['_moduleAliases'] = {
-            'uranio': `./dist/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/`,
-            'uranio-books': `./dist/${defaults_1.defaults.folder}/server/src/books/`,
-        };
-        switch (init_params.repo) {
-            case 'adm': {
-                package_data['_moduleAliases']['uranio-trx'] =
-                    `./dist/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/trx/`;
-                package_data['_moduleAliases']['uranio-api'] =
-                    `./dist/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/trx/api/`;
-                package_data['_moduleAliases']['uranio-core'] =
-                    `./dist/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/trx/api/core/`;
-                break;
-            }
-            case 'trx': {
-                package_data['_moduleAliases']['uranio-api'] =
-                    `./dist/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/api/`;
-                package_data['_moduleAliases']['uranio-core'] =
-                    `./dist/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/api/core/`;
-                break;
-            }
-            case 'api': {
-                package_data['_moduleAliases']['uranio-core'] =
-                    `./dist/${defaults_1.defaults.folder}/server/src/${defaults_1.defaults.repo_folder}/api/core/`;
-                break;
-            }
-            case 'core': {
-                break;
-            }
-        }
-        try {
-            util_instance.fs.write_file(package_json_path, JSON.stringify(package_data, null, '\t'));
-            output_instance.done_log(`Updated package.json module aliases.`, 'alias');
-        }
-        catch (ex) {
-            output_instance.error_log(`Cannot update ${package_json_path}.`, 'alias');
-        }
-    }
-    catch (ex) {
-        output_instance.error_log(`Cannot parse ${package_json_path}.`, 'alias');
-    }
-}
-function _copy_book() {
-    const book_file = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets/main/book.txt`;
-    const dest = `${init_params.root}/src/book.ts`;
-    if (!util_instance.fs.exists(dest)) {
-        util_instance.fs.copy_file(book_file, dest, 'book');
-    }
-}
+// function _update_package_aliases(){
+//   output_instance.start_loading('Updating package.json aliases...');
+//   const package_json_path = `${init_params.root}/package.json`;
+//   const data = util_instance.fs.read_file(package_json_path, 'utf8');
+//   try{
+//     const package_data = urn_util.json.clean_parse(data);
+//     package_data['_moduleAliases'] = {
+//       'uranio': `./dist/${defaults.folder}/server/src/${defaults.repo_folder}/`,
+//       'uranio-books': `./dist/${defaults.folder}/server/src/books/`,
+//     };
+//     switch(init_params.repo){
+//       case 'adm':{
+//         package_data['_moduleAliases']['uranio-trx'] =
+//           `./dist/${defaults.folder}/server/src/${defaults.repo_folder}/trx/`;
+//         package_data['_moduleAliases']['uranio-api'] =
+//           `./dist/${defaults.folder}/server/src/${defaults.repo_folder}/trx/api/`;
+//         package_data['_moduleAliases']['uranio-core'] =
+//           `./dist/${defaults.folder}/server/src/${defaults.repo_folder}/trx/api/core/`;
+//         break;
+//       }
+//       case 'trx':{
+//         package_data['_moduleAliases']['uranio-api'] =
+//           `./dist/${defaults.folder}/server/src/${defaults.repo_folder}/api/`;
+//         package_data['_moduleAliases']['uranio-core'] =
+//           `./dist/${defaults.folder}/server/src/${defaults.repo_folder}/api/core/`;
+//         break;
+//       }
+//       case 'api':{
+//         package_data['_moduleAliases']['uranio-core'] =
+//           `./dist/${defaults.folder}/server/src/${defaults.repo_folder}/api/core/`;
+//         break;
+//       }
+//       case 'core':{
+//         break;
+//       }
+//     }
+//     try{
+//       util_instance.fs.write_file(
+//         package_json_path,
+//         JSON.stringify(package_data, null, '\t')
+//       );
+//       output_instance.done_log(`Updated package.json module aliases.`, 'alias');
+//     }catch(ex){
+//       output_instance.error_log(`Cannot update ${package_json_path}.`, 'alias');
+//     }
+//   }catch(ex){
+//     output_instance.error_log(`Cannot parse ${package_json_path}.`, 'alias');
+//   }
+// }
+// function _copy_book(){
+//   const book_file =
+//     `${init_params.root}/${defaults.tmp_folder}/uranio-assets/main/book.txt`;
+//   const dest = `${init_params.root}/src/book.ts`;
+//   if(!util_instance.fs.exists(dest)){
+//     util_instance.fs.copy_file(book_file, dest, 'book');
+//   }
+// }
 function _copy_sample() {
     const sample_file = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets/env/sample.env`;
     const dest = `${init_params.root}/sample.env`;
@@ -664,19 +717,30 @@ function _copy_tsconfigs() {
     const dot_tsc_file = `${ts_dir}/root/tsconfig.json`;
     const dest = `${init_params.root}/tsconfig.json`;
     util_instance.fs.copy_file(dot_tsc_file, dest, 'tsco');
-    const dot_tsc_file_server = `${ts_dir}/server/${init_params.deploy}/tsconfig.json`;
-    const dest_server = `${init_params.root}/.uranio/server/tsconfig.json`;
-    util_instance.fs.copy_file(dot_tsc_file_server, dest_server, 'tscs');
-    const dot_tsc_file_client = `${ts_dir}/client/tsconfig.json`;
-    const dest_client = `${init_params.root}/.uranio/client/tsconfig.json`;
-    util_instance.fs.copy_file(dot_tsc_file_client, dest_client, 'tscc');
+    // const dot_tsc_file_server =
+    //   `${ts_dir}/server/${init_params.deploy}/tsconfig.json`;
+    // const dest_server = `${init_params.root}/.uranio/server/tsconfig.json`;
+    // util_instance.fs.copy_file(dot_tsc_file_server, dest_server, 'tscs');
+    // const dot_tsc_file_client =
+    //   `${ts_dir}/client/tsconfig.json`;
+    // const dest_client = `${init_params.root}/.uranio/client/tsconfig.json`;
+    // util_instance.fs.copy_file(dot_tsc_file_client, dest_client, 'tscc');
 }
 function _copy_eslint_files() {
     const eslint_dir = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets/eslint`;
     const dest_dir = `${init_params.root}`;
-    util_instance.fs.copy_file(`${eslint_dir}/.eslintignore`, `${dest_dir}/.eslintignore`, 'esln');
-    util_instance.fs.copy_file(`${eslint_dir}/.eslintrc.js`, `${dest_dir}/.eslintrc.js`, 'esln');
-    util_instance.fs.copy_file(`${eslint_dir}/.stylelintrc.json`, `${dest_dir}/.stylelintrc.json`, 'esln');
+    const dest_ignore = `${dest_dir}/.eslintignore`;
+    const dest_esrc = `${dest_dir}/.eslintrc.js`;
+    const dest_style = `${dest_dir}/.stylelintrc.json`;
+    if (!util_instance.fs.exists(dest_ignore)) {
+        util_instance.fs.copy_file(`${eslint_dir}/.eslintignore`, dest_ignore, 'esln');
+    }
+    if (!util_instance.fs.exists(dest_esrc)) {
+        util_instance.fs.copy_file(`${eslint_dir}/.eslintrc.js`, dest_esrc, 'esln');
+    }
+    if (!util_instance.fs.exists(dest_style)) {
+        util_instance.fs.copy_file(`${eslint_dir}/.stylelintrc.json`, dest_style, 'esln');
+    }
 }
 function _copy_netlify_files() {
     const netlify_dir = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets/netlify`;
@@ -729,85 +793,101 @@ function _copy_main_files(repo) {
         util_instance.fs.copy_file(index_file, index_dest, 'core');
     }
 }
-function _clone_core() {
-    return __awaiter(this, void 0, void 0, function* () {
-        output_instance.start_loading(`Cloning core...`);
-        const def_folder = `${init_params.root}/${defaults_1.defaults.folder}`;
-        const server_uranio_dir = `${def_folder}/server/src/${defaults_1.defaults.repo_folder}`;
-        const client_uranio_dir = `${def_folder}/client/src/${defaults_1.defaults.repo_folder}`;
-        yield util_instance.cmd.clone_repo(defaults_1.defaults.core_repo, server_uranio_dir, 'core', init_params.branch);
-        util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
-        output_instance.done_verbose_log(`Cloned core repo.`, 'core');
-    });
-}
-function _clone_api() {
-    return __awaiter(this, void 0, void 0, function* () {
-        output_instance.start_loading(`Cloning api...`);
-        const def_folder = `${init_params.root}/${defaults_1.defaults.folder}`;
-        const server_uranio_dir = `${def_folder}/server/src/${defaults_1.defaults.repo_folder}`;
-        const client_uranio_dir = `${def_folder}/client/src/${defaults_1.defaults.repo_folder}`;
-        yield util_instance.cmd.clone_repo_recursive(defaults_1.defaults.api_repo, server_uranio_dir, 'api', init_params.branch);
-        util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
-        output_instance.done_verbose_log(`Cloned api repo.`, 'api');
-    });
-}
-function _clone_trx() {
-    return __awaiter(this, void 0, void 0, function* () {
-        output_instance.start_loading(`Cloning trx...`);
-        const def_folder = `${init_params.root}/${defaults_1.defaults.folder}`;
-        const server_uranio_dir = `${def_folder}/server/src/${defaults_1.defaults.repo_folder}`;
-        const client_uranio_dir = `${def_folder}/client/src/${defaults_1.defaults.repo_folder}`;
-        yield util_instance.cmd.clone_repo_recursive(defaults_1.defaults.trx_repo, server_uranio_dir, 'trx', init_params.branch);
-        util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
-        output_instance.done_verbose_log(`Cloned trx repo.`, 'trx');
-    });
-}
-function _clone_adm() {
-    return __awaiter(this, void 0, void 0, function* () {
-        output_instance.start_loading(`Cloning adm...`);
-        const def_folder = `${init_params.root}/${defaults_1.defaults.folder}`;
-        const server_uranio_dir = `${def_folder}/server/src/${defaults_1.defaults.repo_folder}`;
-        const client_uranio_dir = `${def_folder}/client/src/${defaults_1.defaults.repo_folder}`;
-        yield util_instance.cmd.clone_repo_recursive(defaults_1.defaults.adm_repo, server_uranio_dir, 'adm', init_params.branch);
-        util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
-        // await sleep(3000);
-        output_instance.done_verbose_log(`Cloned adm repo.`, 'adm');
-    });
-}
+// async function _clone_core(){
+//   output_instance.start_loading(`Cloning core...`);
+//   const def_folder = `${init_params.root}/${defaults.folder}`;
+//   const server_uranio_dir = `${def_folder}/server/src/${defaults.repo_folder}`;
+//   const client_uranio_dir = `${def_folder}/client/src/${defaults.repo_folder}`;
+//   await util_instance.cmd.clone_repo(
+//     defaults.core_repo,
+//     server_uranio_dir,
+//     'core',
+//     init_params.branch
+//   );
+//   util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
+//   output_instance.done_verbose_log(`Cloned core repo.`, 'core');
+// }
+// async function _clone_api(){
+//   output_instance.start_loading(`Cloning api...`);
+//   const def_folder = `${init_params.root}/${defaults.folder}`;
+//   const server_uranio_dir = `${def_folder}/server/src/${defaults.repo_folder}`;
+//   const client_uranio_dir = `${def_folder}/client/src/${defaults.repo_folder}`;
+//   await util_instance.cmd.clone_repo_recursive(
+//     defaults.api_repo,
+//     server_uranio_dir,
+//     'api',
+//     init_params.branch
+//   );
+//   util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
+//   output_instance.done_verbose_log(`Cloned api repo.`, 'api');
+// }
+// async function _clone_trx(){
+//   output_instance.start_loading(`Cloning trx...`);
+//   const def_folder = `${init_params.root}/${defaults.folder}`;
+//   const server_uranio_dir = `${def_folder}/server/src/${defaults.repo_folder}`;
+//   const client_uranio_dir = `${def_folder}/client/src/${defaults.repo_folder}`;
+//   await util_instance.cmd.clone_repo_recursive(
+//     defaults.trx_repo,
+//     server_uranio_dir,
+//     'trx',
+//     init_params.branch
+//   );
+//   util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
+//   output_instance.done_verbose_log(`Cloned trx repo.`, 'trx');
+// }
+// async function _clone_adm(){
+//   output_instance.start_loading(`Cloning adm...`);
+//   const def_folder = `${init_params.root}/${defaults.folder}`;
+//   const server_uranio_dir = `${def_folder}/server/src/${defaults.repo_folder}`;
+//   const client_uranio_dir = `${def_folder}/client/src/${defaults.repo_folder}`;
+//   await util_instance.cmd.clone_repo_recursive(
+//     defaults.adm_repo,
+//     server_uranio_dir,
+//     'adm',
+//     init_params.branch
+//   );
+//   util_instance.fs.copy_directory(server_uranio_dir, client_uranio_dir);
+//   // await sleep(3000);
+//   output_instance.done_verbose_log(`Cloned adm repo.`, 'adm');
+// }
 // function sleep(ms:number) {
 //   return new Promise((resolve) => {
 //     setTimeout(resolve, ms);
 //   });
 // }
-function _install_dep() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const pack_data = util_instance.cmd.get_package_data(`${init_params.root}/package.json`);
-        yield util_instance.cmd.uninstall_core_dep(pack_data);
-        yield util_instance.cmd.uninstall_api_dep(pack_data);
-        yield util_instance.cmd.uninstall_trx_dep(pack_data);
-        yield util_instance.cmd.uninstall_adm_dep(pack_data);
-        switch (init_params.repo) {
-            case 'core': {
-                yield util_instance.cmd.install_core_dep();
-                return true;
-            }
-            case 'api': {
-                yield util_instance.cmd.install_api_dep();
-                return true;
-            }
-            case 'trx': {
-                yield util_instance.cmd.install_trx_dep();
-                return true;
-            }
-            case 'adm': {
-                yield util_instance.cmd.install_adm_dep();
-                return true;
-            }
-            default: {
-                output_instance.log(`Selected repo is not valid. [${init_params.repo}]`, 'init');
-                process.exit(1);
-            }
-        }
-    });
-}
+// async function _install_dep()
+//     :Promise<true>{
+//   const pack_data = util_instance.cmd.get_package_data(
+//     `${init_params.root}/package.json`
+//   );
+//   await util_instance.cmd.uninstall_core_dep(pack_data);
+//   await util_instance.cmd.uninstall_api_dep(pack_data);
+//   await util_instance.cmd.uninstall_trx_dep(pack_data);
+//   await util_instance.cmd.uninstall_adm_dep(pack_data);
+//   switch(init_params.repo){
+//     case 'core':{
+//       await util_instance.cmd.install_core_dep();
+//       return true;
+//     }
+//     case 'api':{
+//       await util_instance.cmd.install_api_dep();
+//       return true;
+//     }
+//     case 'trx':{
+//       await util_instance.cmd.install_trx_dep();
+//       return true;
+//     }
+//     case 'adm':{
+//       await util_instance.cmd.install_adm_dep();
+//       return true;
+//     }
+//     default:{
+//       output_instance.log(
+//         `Selected repo is not valid. [${init_params.repo}]`,
+//         'init'
+//       );
+//       process.exit(1);
+//     }
+//   }
+// }
 //# sourceMappingURL=init.js.map

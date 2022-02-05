@@ -133,10 +133,10 @@ function _transpose_file(file_path, included = false) {
         if (not_valid_extensions.includes(extension)) {
             return;
         }
-        const dot_book_dir = `${transpose_params.root}/src/books`;
-        if (transpose_params.is_dot && file_path.includes(dot_book_dir)) {
-            return;
-        }
+        // const dot_book_dir = `${transpose_params.root}/src/books`;
+        // if(transpose_params.is_dot && file_path.includes(dot_book_dir)){
+        //   return;
+        // }
         if (file_path === `${transpose_params.root}/src/book.ts`) {
             yield _transpose_book();
             if (!included) {
@@ -460,9 +460,9 @@ function _manipulate_and_create_files(file_path) {
         const bll_promise = _create_bll_book(sourceFile, import_statements);
         // _create_routes_book(sourceFile, import_statements);
         yield Promise.all([atom_promise, bll_promise, dock_promise]);
-        if (transpose_params.is_dot) {
-            _copy_books_to_dot_src();
-        }
+        // if(transpose_params.is_dot){
+        //   _copy_books_to_dot_src();
+        // }
         // sourceFile = _manipulate_atom_book(sourceFile);
         // const modified = sourceFile.print();
         // _create_manipulated_file(modified);
@@ -471,13 +471,13 @@ function _manipulate_and_create_files(file_path) {
         output_instance.done_log(`Manipulated book and created files.`, 'book');
     });
 }
-function _copy_books_to_dot_src() {
-    output_instance.start_loading(`Copying books to uranio-dot/src...`);
-    const server_book_dir = `${transpose_params.root}/${defaults_1.defaults.folder}/server/src/books`;
-    const dot_book_dir = `${transpose_params.root}/src/books`;
-    util_instance.fs.copy_directory(server_book_dir, dot_book_dir);
-    output_instance.done_log(`Copied books to uranio-dot/src.`, 'dot');
-}
+// function _copy_books_to_dot_src(){
+//   output_instance.start_loading(`Copying books to uranio-dot/src...`);
+//   const server_book_dir = `${transpose_params.root}/${defaults.folder}/server/src/books`;
+//   const dot_book_dir = `${transpose_params.root}/src/books`;
+//   util_instance.fs.copy_directory(server_book_dir, dot_book_dir);
+//   output_instance.done_log(`Copied books to uranio-dot/src.`, 'dot');
+// }
 function _generate_client_books() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Generating client books...`);

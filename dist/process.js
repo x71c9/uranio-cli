@@ -47,7 +47,7 @@ function uranio_process(args) {
     process_params = (0, common_1.read_rc_file)(process_params);
     process_params = _set_args(process_params, args);
     process.chdir(process_params.root);
-    process_params = _autoset_is_dot(process_params, args);
+    // process_params = _autoset_is_dot(process_params, args);
     output_instance = output.create(process_params);
     util_instance = util.create(process_params, output_instance);
     _init_log();
@@ -90,20 +90,17 @@ function _set_root(args) {
         process_params.root = _get_project_root();
     }
 }
-function _autoset_is_dot(params, args) {
-    if (typeof args.is_dot === 'undefined' && (0, common_1.check_if_is_dot)(params.root)) {
-        params.is_dot = true;
-    }
-    return params;
-}
+// function _autoset_is_dot(params:Params, args:Arguments):Params{
+//   if(typeof args.is_dot === 'undefined' && check_if_is_dot(params.root)){
+//     params.is_dot = true;
+//   }
+//   return params;
+// }
 function _init_log() {
     const log_file_path = `${process_params.root}/${defaults_1.defaults.log_filepath}`;
     if (!util_instance.fs.exists(log_file_path)) {
         util_instance.fs.create_file(log_file_path);
     }
-    // if(!fs.existsSync(log_file_path)){
-    //   fs.writeFileSync(log_file_path, '');
-    // }
     _log_arguments(process_params);
     _log_root();
 }
@@ -171,10 +168,10 @@ function _set_args(params, args) {
     if (typeof args.noinside_ntl === 'boolean' && !!args.noinside_ntl !== !params.inside_ntl) {
         params.inside_ntl = !args.noinside_ntl;
     }
-    const is_dot = args.is_dot;
-    if (is_dot == true) {
-        params.is_dot = true;
-    }
+    // const is_dot = args.is_dot;
+    // if(is_dot == true){
+    //   params.is_dot = true;
+    // }
     const time = args.t || args.time;
     if (time == true) {
         params.time = true;
@@ -430,23 +427,6 @@ function _switch_command(args) {
             (0, cmd_1.prompt_init)(process_params, args);
             break;
         }
-        case 'transpose': {
-            if (args._.length > 1 && typeof args._[1] === 'string') {
-                (0, cmd_1.transpose_one)(args._[1], process_params);
-            }
-            else {
-                (0, cmd_1.transpose)(process_params);
-            }
-            break;
-        }
-        case 'alias': {
-            (0, cmd_1.alias)(process_params);
-            break;
-        }
-        case 'hooks': {
-            (0, cmd_1.hooks)(process_params);
-            break;
-        }
         case 'dev': {
             switch (splitted_cmd[1]) {
                 case 'server': {
@@ -491,10 +471,6 @@ function _switch_command(args) {
             (0, cmd_1.help)();
             break;
         }
-        case 'dot': {
-            (0, cmd_1.dot)(process_params, args);
-            break;
-        }
         case 'docker': {
             (0, cmd_1.docker)(process_params, args);
             break;
@@ -503,28 +479,10 @@ function _switch_command(args) {
             (0, cmd_1.deinit)(process_params);
             break;
         }
-        case 'test': {
-            // test.command();
-            break;
-        }
         default: {
-            // output_instance.wrong_end_log('Command not found.');
             output_instance.error_log(`Invalid argument [${cmd}]`);
             process.exit(1);
         }
     }
 }
-// function _relative_to_absolute_path(path:string)
-//     :string{
-//   if(path[path.length-1] === '/'){
-//     path = path.substr(0,path.length-1);
-//   }
-//   if(path[0] !== '/'){
-//     if(path.substr(0,2) === './'){
-//       path = path.substr(2);
-//     }
-//     path = `${conf.root}/${path}`;
-//   }
-//   return path;
-// }
 //# sourceMappingURL=process.js.map

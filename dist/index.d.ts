@@ -1,10 +1,7 @@
-import { init, alias, build, transpose, hooks, help } from './cmd/';
+import { init, build, deinit } from './cmd/';
 declare const _default: {
     init: typeof init;
-    alias: typeof alias;
     build: typeof build;
-    transpose: typeof transpose;
-    hooks: typeof hooks;
-    help: typeof help;
+    deinit: typeof deinit;
 };
 export default _default;

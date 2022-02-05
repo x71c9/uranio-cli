@@ -537,9 +537,9 @@ function _watch(){
 		},
 		async (_event, _path) => {
 			
-			if(!_check_dot_file(dev_params, _path)){
-				return false;
-			}
+			// if(!_check_dot_file(dev_params, _path)){
+			//   return false;
+			// }
 			
 			const basename = path.basename(_path);
 			const extension = path.extname(basename);
@@ -713,18 +713,18 @@ function _replace_netlify_function_file(){
 	output_instance.done_verbose_log(`Replaced Netlify serverless function file.`, 'less');
 }
 
-function _check_dot_file(params:Partial<Params>, _path:string):boolean{
-	if(params.is_dot === true){
-		const do_not_dot_watch_paths = [
-			`${params.root}/src/books`,
-			`${params.root}/src/uranio/trx/hooks`,
-			`${params.root}/src/uranio/hooks`,
-		];
-		for(const invalid_path of do_not_dot_watch_paths){
-			if(_path.indexOf(invalid_path) === 0){
-				return false;
-			}
-		}
-	}
-	return true;
-}
+// function _check_dot_file(params:Partial<Params>, _path:string):boolean{
+//   if(params.is_dot === true){
+//     const do_not_dot_watch_paths = [
+//       `${params.root}/src/books`,
+//       `${params.root}/src/uranio/trx/hooks`,
+//       `${params.root}/src/uranio/hooks`,
+//     ];
+//     for(const invalid_path of do_not_dot_watch_paths){
+//       if(_path.indexOf(invalid_path) === 0){
+//         return false;
+//       }
+//     }
+//   }
+//   return true;
+// }

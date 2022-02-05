@@ -1,17 +1,11 @@
 import {
 	init,
-	alias,
 	build,
-	transpose,
-	hooks,
-	help
+	deinit
 } from './cmd/';
 
 export default {
 	init,
-	alias,
 	build,
-	transpose,
-	hooks,
-	help
+	deinit
 };
