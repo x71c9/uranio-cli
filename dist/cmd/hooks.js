@@ -41,6 +41,7 @@ const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const common_1 = require("./common");
+// import {HooksParams} from './types';
 const default_routes = {
     count: { url: '/count', method: 'GET' },
     find: { url: '/', method: 'GET' },
@@ -48,10 +49,7 @@ const default_routes = {
     find_one: { url: '/', method: 'GET' },
     insert: { url: '/', method: 'POST' },
     update: { url: '/:id', method: 'POST' },
-    delete: { url: '/:id', method: 'DELETE' },
-    insert_multiple: { url: '/multiple', method: 'POST' },
-    update_multiple: { url: '/multiple/:ids', method: 'POST', params: { ids: { array: true } } },
-    delete_multiple: { url: '/multiple/:ids', method: 'DELETE', params: { ids: { array: true } } }
+    delete: { url: '/:id', method: 'GET' }
 };
 const _project_option = {
     manipulationSettings: {
@@ -116,15 +114,14 @@ function _generate_text() {
             text += _presigned_hooks();
         }
         for (const route_name in atom_routes[atom_name]) {
-            const params_type = atom_routes[atom_name][route_name]['params'];
-            const text_args = _text_args_for_url(atom_routes[atom_name][route_name].url, params_type);
+            const text_args = _text_args_for_url(atom_routes[atom_name][route_name].url);
             const body_arg = _body_arg_for_route(atom_routes, atom_name, route_name);
             text += `\t${route_name}: async <D extends uranio.types.Depth>(\n`;
             text += `\t\t${text_args}${body_arg}options?:uranio.types.Hook.Arguments<'${atom_name}', '${route_name}', D>,\n`;
             text += `\t\ttoken?:string\n`;
             text += `\t):Promise<uranio.types.Hook.Response<'${atom_name}', '${route_name}', D>>  => {\n`;
             text += `\t\tconst args:uranio.types.Hook.Arguments<'${atom_name}', '${route_name}', D> = {\n`;
-            const lines = _text_lines_in_args_params(atom_routes[atom_name][route_name].url, params_type);
+            const lines = _text_lines_in_args_params(atom_routes[atom_name][route_name].url);
             if (lines.length > 0) {
                 text += `\t\t\tparams: {\n`;
                 for (const line of lines) {
@@ -309,13 +306,13 @@ function _body_arg_for_route(routes, atom_name, route_name) {
     }
     return '';
 }
-function _text_args_for_url(url, params_type) {
+function _text_args_for_url(url) {
     let checked_url = url;
     if (url[0] === "'" && url[url.length - 1] === "'") {
         checked_url = url.substring(1, url.length - 1);
     }
     const params = _get_parameters_from_url(checked_url);
-    return _generate_args(params, params_type);
+    return _generate_args(params);
 }
 function _get_parameters_from_url(url) {
     const url_params = [];
@@ -343,15 +340,10 @@ function _get_parameters_from_url(url) {
 //   body_arg += `body:${body_type}, `;
 //   return body_arg;
 // }
-function _generate_args(params, params_type) {
-    var _a;
+function _generate_args(params) {
     const param_text = [];
     for (const p of params) {
-        let p_type = 'string';
-        if (params_type && ((_a = params_type[p]) === null || _a === void 0 ? void 0 : _a.array) === true) {
-            p_type = `string[]`;
-        }
-        param_text.push(`${p}:${p_type},\n\t\t`);
+        param_text.push(`${p}:string,\n\t\t`);
     }
     return param_text.join('');
 }
@@ -418,8 +410,7 @@ function _get_custom_routes() {
     }
     return routes_by_atom;
 }
-function _text_lines_in_args_params(url, params_type) {
-    var _a;
+function _text_lines_in_args_params(url) {
     const lines = [];
     if (typeof url !== 'string') {
         return lines;
@@ -430,12 +421,7 @@ function _text_lines_in_args_params(url, params_type) {
     }
     const url_params = _get_parameters_from_url(checked_url);
     for (const p of url_params) {
-        if (params_type && ((_a = params_type[p]) === null || _a === void 0 ? void 0 : _a.array) === true) {
-            lines.push(`${p}: ${p}.join(',')`);
-        }
-        else {
-            lines.push(`${p}: ${p},`);
-        }
+        lines.push(`${p}: ${p},`);
     }
     return lines;
 }
