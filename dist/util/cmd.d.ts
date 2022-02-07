@@ -18,6 +18,7 @@ declare class CMD {
     constructor(params: Params, output: out.OutputInstance);
     yarn_install(): Promise<any>;
     install_package(pack: string, context?: string): Promise<any>;
+    install_package_dev(pack: string, context?: string): Promise<any>;
     install_dep(repo: string, context: string): Promise<any>;
     install_dep_dev(repo: string, context: string): Promise<any>;
     uninstall_dep(repo: string, context: string): Promise<any>;

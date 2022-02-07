@@ -66,6 +66,23 @@ class CMD {
 		});
 	}
 	
+	public async install_package_dev(pack:string, context?:string)
+			:Promise<any>{
+		const action = `installing dev package [${pack}]`;
+		this.output.verbose_log(`Started ${action}`, context);
+		this.output.start_loading(`Installing dev package [${pack}]...`);
+		return new Promise((resolve, reject) => {
+			this.spawn.spin(
+				_pacman_commands.install_dev[this.params.pacman](pack),
+				context || 'install',
+				action,
+				undefined,
+				resolve,
+				reject
+			);
+		});
+	}
+	
 	public async install_dep(repo:string, context:string)
 			:Promise<any>{
 		const action = `installing dependencies [${repo}]`;

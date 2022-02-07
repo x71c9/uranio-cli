@@ -18,6 +18,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.docker = void 0;
 __exportStar(require("./init"), exports);
 // export * from './alias';
+__exportStar(require("./generate"), exports);
 __exportStar(require("./build"), exports);
 __exportStar(require("./dev"), exports);
 // export * from './transpose';

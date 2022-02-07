@@ -36,7 +36,7 @@ export const default_params:Params = {
 	root: '.',
 };
 
-const cloud_address = 'git+ssh://git@github.com/nbl7/';
+const cloud_address = 'git+ssh://git@github.com/nbl7';
 
 export const defaults = {
 	folder: '.uranio',
@@ -44,22 +44,24 @@ export const defaults = {
 	repo_folder: 'uranio',
 	tmp_folder: '.tmp',
 	log_filepath: '.urnlog',
-	json_filename: `uranio.json`,
+	json_filename: `uranio.init.json`,
 	time_format: "yy-mm-dd'T'HH:MM:ss:l",
-	dot_repo: `${cloud_address}uranio-dot.git`,
-	assets_repo: `${cloud_address}uranio-assets.git`,
-	adm_repo: `${cloud_address}uranio-adm.git`,
-	trx_repo: `${cloud_address}uranio-trx.git`,
-	api_repo: `${cloud_address}uranio-api.git`,
-	core_repo: `${cloud_address}uranio-core.git`,
-	adm_dep_repo: `${cloud_address}uranio-adm-dep`,
-	adm_dep_dev_repo: `${cloud_address}uranio-adm-dep-dev`,
-	trx_dep_repo: `${cloud_address}uranio-trx-dep`,
-	trx_dep_dev_repo: `${cloud_address}uranio-trx-dep-dev`,
-	api_dep_repo: `${cloud_address}uranio-api-dep`,
-	api_dep_dev_repo: `${cloud_address}uranio-api-dep-dev`,
-	core_dep_repo: `${cloud_address}uranio-core-dep`,
-	core_dep_dev_repo: `${cloud_address}uranio-core-dep-dev`,
+	dot_repo: `${cloud_address}/uranio-dot.git`,
+	dev_repo: `${cloud_address}/uranio-dev.git`,
+	lib_repo: `${cloud_address}/uranio-lib.git`,
+	assets_repo: `${cloud_address}/uranio-assets.git`,
+	adm_repo: `${cloud_address}/uranio-adm.git`,
+	trx_repo: `${cloud_address}/uranio-trx.git`,
+	api_repo: `${cloud_address}/uranio-api.git`,
+	core_repo: `${cloud_address}/uranio-core.git`,
+	adm_dep_repo: `${cloud_address}/uranio-adm-dep`,
+	adm_dep_dev_repo: `${cloud_address}/uranio-adm-dep-dev`,
+	trx_dep_repo: `${cloud_address}/uranio-trx-dep`,
+	trx_dep_dev_repo: `${cloud_address}/uranio-trx-dep-dev`,
+	api_dep_repo: `${cloud_address}/uranio-api-dep`,
+	api_dep_dev_repo: `${cloud_address}/uranio-api-dep-dev`,
+	core_dep_repo: `${cloud_address}/uranio-core-dep`,
+	core_dep_dev_repo: `${cloud_address}/uranio-core-dep-dev`,
 	check_char: '✔',
 	wrong_char: '✗',
 } as const;

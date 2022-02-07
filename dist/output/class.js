@@ -75,9 +75,12 @@ class Output {
         if (this.params.blank === true) {
             spinner_1.spinner.color = 'white';
         }
-        spinner_current = text;
-        spinner_1.spinner_texts.push(text);
-        this.spinner_text(text);
+        let noroot_text = text;
+        const regex = new RegExp(`${this.params.root}`, 'g');
+        noroot_text = text.replace(regex, '__root');
+        spinner_current = noroot_text;
+        spinner_1.spinner_texts.push(noroot_text);
+        this.spinner_text(noroot_text);
         if (this.params.spin === true && !spinner_1.spinner.isSpinning) {
             spinner_1.spinner.start();
         }
@@ -86,10 +89,13 @@ class Output {
         spinner_1.spinner.stop();
     }
     spinner_text(text) {
+        let noroot_text = text;
+        const regex = new RegExp(`${this.params.root}`, 'g');
+        noroot_text = text.replace(regex, '__root');
         const chopped_current = (spinner_current.length > process.stdout.columns / 2) ?
             spinner_current.substring(0, Math.floor(process.stdout.columns / 2)) + '...' :
             spinner_current;
-        const text_with_current = (is_docker) ? text : `${chopped_current} ${text}`;
+        const text_with_current = (is_docker) ? noroot_text : `${chopped_current} ${noroot_text}`;
         spinner_1.spinner.text = this._spinner_text_color(text_with_current);
         if (spinner_1.spinner.text.length > process.stdout.columns) {
             spinner_1.spinner.text = spinner_1.spinner.text.substr(0, process.stdout.columns - 2);
