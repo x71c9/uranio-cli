@@ -66,6 +66,16 @@ class CMD {
             });
         });
     }
+    install_package_dev(pack, context) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const action = `installing dev package [${pack}]`;
+            this.output.verbose_log(`Started ${action}`, context);
+            this.output.start_loading(`Installing dev package [${pack}]...`);
+            return new Promise((resolve, reject) => {
+                this.spawn.spin(_pacman_commands.install_dev[this.params.pacman](pack), context || 'install', action, undefined, resolve, reject);
+            });
+        });
+    }
     install_dep(repo, context) {
         return __awaiter(this, void 0, void 0, function* () {
             const action = `installing dependencies [${repo}]`;

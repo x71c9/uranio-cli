@@ -60,6 +60,8 @@ function init(params) {
         _create_urn_folder();
         // _create_client_server_folders();
         yield _clone_assets_repo();
+        _create_schema_dir();
+        _create_src_dir();
         _copy_assets();
         _create_dot_env();
         _ignore_files();
@@ -73,12 +75,13 @@ function init(params) {
         }
         else {
             yield _init_pacman();
-            yield _install_package();
+            yield _install_packages();
             // await _clone_repo();
             // await _install_repo();
             // await _remove_git_files();
             yield _copy_specific_assets();
             // await _replace_aliases();
+            yield _generate_base_schema();
         }
         if (init_params.docker_db === true) {
             if (init_params.docker === false) {
@@ -293,6 +296,38 @@ function _log_important_params() {
         output_instance.verbose_log(`Selected deploy: [${init_params.deploy}]`, 'dply');
     }
 }
+function _generate_base_schema() {
+    return __awaiter(this, void 0, void 0, function* () {
+        output_instance.verbose_log(`Started generating base types.`, `dts`);
+        yield _promise_base_schema();
+        output_instance.done_log(`Generated base types.`, `dts`);
+    });
+}
+function _promise_base_schema() {
+    return new Promise((resolve, reject) => {
+        const schema_path = `${init_params.root}/node_modules/uranio-schema/`;
+        const relative_new = `../../${defaults_1.defaults.folder}/schema/index.d.ts`;
+        const npm_dts = `npx npm-dts generate -r ${schema_path} -o ${relative_new} -L debug`;
+        util_instance.spawn.spin(npm_dts, 'dts', 'generating base types', undefined, resolve, reject);
+    });
+}
+function _create_src_dir() {
+    const src_folder = `${init_params.root}/src`;
+    const atoms_folder = `${src_folder}/atoms`;
+    if (!util_instance.fs.exists(src_folder)) {
+        util_instance.fs.create_directory(src_folder);
+    }
+    if (!util_instance.fs.exists(atoms_folder)) {
+        util_instance.fs.create_directory(atoms_folder);
+    }
+}
+function _create_schema_dir() {
+    const schema_dir = `${init_params.root}/${defaults_1.defaults.folder}/schema`;
+    if (util_instance.fs.exists(schema_dir)) {
+        util_instance.fs.remove_directory(schema_dir);
+    }
+    util_instance.fs.create_directory(schema_dir);
+}
 function _init_pacman() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Initializing pacman...`);
@@ -323,6 +358,7 @@ function _remove_tmp() {
     output_instance.done_verbose_log(`Removed tmp folder [${defaults_1.defaults.tmp_folder}].`, 'tmp');
 }
 function _copy_assets() {
+    _copy_generate();
     // _copy_book();
     _copy_sample();
     _copy_tsconfigs();
@@ -514,17 +550,30 @@ function _clone_assets_repo() {
 //     'repo'
 //   );
 // }
-function _install_package() {
+function _install_packages() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Intalling [${init_params.repo}]...`);
+        yield _install_package(defaults_1.defaults.lib_repo);
+        yield _install_dev_package(defaults_1.defaults.dev_repo);
         yield _install_repo_package(init_params.repo);
         output_instance.done_log(`Installed package [${init_params.repo}].`, 'repo');
+    });
+}
+function _install_package(package_url) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield util_instance.cmd.install_package(`${package_url}#${init_params.branch}`);
+        // return await util_instance.cmd.install_package(package_url);
+    });
+}
+function _install_dev_package(package_url) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield util_instance.cmd.install_package_dev(`${package_url}#${init_params.branch}`);
     });
 }
 function _install_repo_package(repo) {
     return __awaiter(this, void 0, void 0, function* () {
         const package_url = defaults_1.defaults[`${repo}_repo`];
-        return yield util_instance.cmd.install_package(`uranio@${package_url}`);
+        return yield util_instance.cmd.install_package(`uranio@${package_url}#${init_params.branch}`);
     });
 }
 // async function _install_repo(){
@@ -573,10 +622,16 @@ function _create_rc_file() {
     content += `{\n`;
     content += `\t"repo": "${init_params.repo}",\n`;
     content += `\t"pacman": "${init_params.pacman}",\n`;
-    content += `\t"deploy": "${init_params.deploy}",\n`;
-    content += `\t"docker": ${init_params.docker},\n`;
-    content += `\t"docker_db": ${init_params.docker_db},\n`;
-    content += `\t"db": "${init_params.db}",\n`;
+    if ((0, types_1.valid_deploy_repos)().includes(init_params.repo)) {
+        content += `\t"deploy": "${init_params.deploy}",\n`;
+    }
+    if (init_params.docker === true) {
+        content += `\t"docker": ${init_params.docker},\n`;
+    }
+    if (init_params.docker_db === true) {
+        content += `\t"docker_db": ${init_params.docker_db},\n`;
+        content += `\t"db": "${init_params.db}",\n`;
+    }
     content += `}`;
     util_instance.fs.write_file(`${init_params.root}/${defaults_1.defaults.json_filename}`, content);
     util_instance.pretty(`${init_params.root}/${defaults_1.defaults.json_filename}`, 'json');
@@ -706,6 +761,11 @@ function _update_resolutions() {
 //     util_instance.fs.copy_file(book_file, dest, 'book');
 //   }
 // }
+function _copy_generate() {
+    const gen_file = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets/main/generate.ts`;
+    const dest = `${init_params.root}/${defaults_1.defaults.folder}/generate.ts`;
+    util_instance.fs.copy_file(gen_file, dest, 'generate');
+}
 function _copy_sample() {
     const sample_file = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets/env/sample.env`;
     const dest = `${init_params.root}/sample.env`;
@@ -782,9 +842,6 @@ function _copy_trx_files() {
 function _copy_main_files(repo) {
     const core_assets_dir = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets/main/${repo}`;
     const src_folder = `${init_params.root}/src`;
-    if (!util_instance.fs.exists(src_folder)) {
-        util_instance.fs.create_directory(src_folder);
-    }
     const index_file = `${core_assets_dir}/index.txt`;
     const index_dest = `${src_folder}/index.ts`;
     const repo_dest = `${src_folder}/${repo}.ts`;

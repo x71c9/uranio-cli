@@ -101,9 +101,14 @@ class Output {
 		if(this.params.blank === true){
 			spinner.color = 'white';
 		}
-		spinner_current = text;
-		spinner_texts.push(text);
-		this.spinner_text(text);
+		
+		let noroot_text = text;
+		const regex = new RegExp(`${this.params.root}`, 'g');
+		noroot_text = text.replace(regex, '__root');
+		
+		spinner_current = noroot_text;
+		spinner_texts.push(noroot_text);
+		this.spinner_text(noroot_text);
 		if(this.params.spin === true && !spinner.isSpinning){
 			spinner.start();
 		}
@@ -116,10 +121,16 @@ class Output {
 	
 	public spinner_text(text:string)
 			:void{
+		
+		let noroot_text = text;
+		
+		const regex = new RegExp(`${this.params.root}`, 'g');
+		noroot_text = text.replace(regex, '__root');
+		
 		const chopped_current = (spinner_current.length > process.stdout.columns / 2) ?
 			spinner_current.substring(0, Math.floor(process.stdout.columns / 2)) + '...' :
 			spinner_current;
-		const text_with_current = (is_docker) ? text : `${chopped_current} ${text}`;
+		const text_with_current = (is_docker) ? noroot_text : `${chopped_current} ${noroot_text}`;
 		spinner.text = this._spinner_text_color(text_with_current);
 		if(spinner.text.length > process.stdout.columns){
 			spinner.text = spinner.text.substr(0, process.stdout.columns - 2);

@@ -60,6 +60,8 @@ export async function init(params:Partial<Params>)
 	// _create_client_server_folders();
 	
 	await _clone_assets_repo();
+	_create_schema_dir();
+	_create_src_dir();
 	_copy_assets();
 	_create_dot_env();
 	_ignore_files();
@@ -76,13 +78,14 @@ export async function init(params:Partial<Params>)
 	}else{
 		
 		await _init_pacman();
-		await _install_package();
+		await _install_packages();
 		// await _clone_repo();
 		// await _install_repo();
 		// await _remove_git_files();
 		
 		await _copy_specific_assets();
 		// await _replace_aliases();
+		await _generate_base_schema();
 		
 	}
 	
@@ -304,6 +307,46 @@ function _log_important_params(){
 	}
 }
 
+async function _generate_base_schema(){
+	
+	output_instance.verbose_log(`Started generating base types.`, `dts`);
+	await _promise_base_schema();
+	output_instance.done_log(`Generated base types.`, `dts`);
+	
+}
+
+function _promise_base_schema(){
+	
+	return new Promise((resolve, reject) => {
+		const schema_path = `${init_params.root}/node_modules/uranio-schema/`;
+		const relative_new = `../../${defaults.folder}/schema/index.d.ts`;
+		const npm_dts = `npx npm-dts generate -r ${schema_path} -o ${relative_new} -L debug`;
+		util_instance.spawn.spin(
+			npm_dts, 'dts', 'generating base types', undefined, resolve, reject
+		);
+	});
+	
+}
+
+function _create_src_dir(){
+	const src_folder = `${init_params.root}/src`;
+	const atoms_folder = `${src_folder}/atoms`;
+	if(!util_instance.fs.exists(src_folder)){
+		util_instance.fs.create_directory(src_folder);
+	}
+	if(!util_instance.fs.exists(atoms_folder)){
+		util_instance.fs.create_directory(atoms_folder);
+	}
+}
+
+function _create_schema_dir(){
+	const schema_dir = `${init_params.root}/${defaults.folder}/schema`;
+	if(util_instance.fs.exists(schema_dir)){
+		util_instance.fs.remove_directory(schema_dir);
+	}
+	util_instance.fs.create_directory(schema_dir);
+}
+
 async function _init_pacman(){
 	output_instance.start_loading(`Initializing pacman...`);
 	const yarn_lock = `${init_params.root}/yarn.lock`;
@@ -345,6 +388,7 @@ function _remove_tmp(){
 }
 
 function _copy_assets(){
+	_copy_generate();
 	// _copy_book();
 	_copy_sample();
 	_copy_tsconfigs();
@@ -550,10 +594,12 @@ async function _clone_assets_repo(){
 //   );
 // }
 
-async function _install_package(){
+async function _install_packages(){
 	output_instance.start_loading(
 		`Intalling [${init_params.repo}]...`
 	);
+	await _install_package(defaults.lib_repo);
+	await _install_dev_package(defaults.dev_repo);
 	await _install_repo_package(init_params.repo);
 	output_instance.done_log(
 		`Installed package [${init_params.repo}].`,
@@ -561,9 +607,18 @@ async function _install_package(){
 	);
 }
 
+async function _install_package(package_url:string){
+	return await util_instance.cmd.install_package(`${package_url}#${init_params.branch}`);
+	// return await util_instance.cmd.install_package(package_url);
+}
+
+async function _install_dev_package(package_url:string){
+	return await util_instance.cmd.install_package_dev(`${package_url}#${init_params.branch}`);
+}
+
 async function _install_repo_package(repo:Repo){
 	const package_url = defaults[`${repo}_repo`];
-	return await util_instance.cmd.install_package(`uranio@${package_url}`);
+	return await util_instance.cmd.install_package(`uranio@${package_url}#${init_params.branch}`);
 }
 
 // async function _install_repo(){
@@ -615,10 +670,16 @@ function _create_rc_file(){
 	content += `{\n`;
 	content += `\t"repo": "${init_params.repo}",\n`;
 	content += `\t"pacman": "${init_params.pacman}",\n`;
-	content += `\t"deploy": "${init_params.deploy}",\n`;
-	content += `\t"docker": ${init_params.docker},\n`;
-	content += `\t"docker_db": ${init_params.docker_db},\n`;
-	content += `\t"db": "${init_params.db}",\n`;
+	if(valid_deploy_repos().includes(init_params.repo)){
+		content += `\t"deploy": "${init_params.deploy}",\n`;
+	}
+	if(init_params.docker === true){
+		content += `\t"docker": ${init_params.docker},\n`;
+	}
+	if(init_params.docker_db === true){
+		content += `\t"docker_db": ${init_params.docker_db},\n`;
+		content += `\t"db": "${init_params.db}",\n`;
+	}
 	content += `}`;
 	util_instance.fs.write_file(`${init_params.root}/${defaults.json_filename}`, content);
 	util_instance.pretty(`${init_params.root}/${defaults.json_filename}`, 'json');
@@ -767,6 +828,13 @@ function _update_resolutions(){
 //   }
 // }
 
+function _copy_generate(){
+	const gen_file =
+		`${init_params.root}/${defaults.tmp_folder}/uranio-assets/main/generate.ts`;
+	const dest = `${init_params.root}/${defaults.folder}/generate.ts`;
+	util_instance.fs.copy_file(gen_file, dest, 'generate');
+}
+
 function _copy_sample(){
 	const sample_file =
 		`${init_params.root}/${defaults.tmp_folder}/uranio-assets/env/sample.env`;
@@ -870,9 +938,6 @@ function _copy_main_files(repo:Repo){
 	const core_assets_dir =
 		`${init_params.root}/${defaults.tmp_folder}/uranio-assets/main/${repo}`;
 	const src_folder = `${init_params.root}/src`;
-	if(!util_instance.fs.exists(src_folder)){
-		util_instance.fs.create_directory(src_folder);
-	}
 	const index_file = `${core_assets_dir}/index.txt`;
 	const index_dest = `${src_folder}/index.ts`;
 	const repo_dest = `${src_folder}/${repo}.ts`;
