@@ -29,7 +29,10 @@ export async function generate(params:Params, is_included=false)
 	
 	output_instance.start_loading(`Generating types...`);
 	
+	_create_generate_register();
+	_create_registers();
 	await _generate_types();
+	_copy_generated_types();
 	
 	if(!is_included){
 		output_instance.end_log('Generating types completed.');
@@ -37,10 +40,16 @@ export async function generate(params:Params, is_included=false)
 	
 }
 
+function _copy_generated_types(){
+	const dot_dir = `${generate_params.root}/${defaults.folder}`;
+	const generated_types = `${dot_dir}/generate/src/schema/index.d.ts`;
+	const dest_server = `${dot_dir}/server/src/schema/index.d.ts`;
+	const dest_client = `${dot_dir}/client/src/schema/index.d.ts`;
+	util_instance.fs.copy_file(generated_types, dest_server);
+	util_instance.fs.copy_file(generated_types, dest_client);
+}
+
 async function _generate_types(){
-	
-	_create_register();
-	
 	output_instance.verbose_log(`Started generating types.`, 'types');
 	await _promise_generate_types();
 	output_instance.done_log(`Generated types.`, 'types');
@@ -49,12 +58,12 @@ async function _generate_types(){
 function _esbuild_types(){
 	output_instance.verbose_log(`Started transpiling generate script.`, 'types');
 	esbuild.buildSync({
-		entryPoints: [`${generate_params.root}/${defaults.folder}/generate.ts`],
-		outfile: `${generate_params.root}/${defaults.folder}/generate.js`,
+		entryPoints: [`${generate_params.root}/${defaults.folder}/generate/src/generate.ts`],
+		outfile: `${generate_params.root}/${defaults.folder}/generate/dist/generate.js`,
 		bundle: true,
 		platform: 'node',
 		sourcemap: false,
-		minify: true
+		// minify: true
 	});
 	output_instance.done_log(`Transpiled generate script.`, 'types');
 }
@@ -64,7 +73,9 @@ function _promise_generate_types(){
 	_esbuild_types();
 	
 	return new Promise((resolve, reject) => {
-		const generate_path_js = `${generate_params.root}/${defaults.folder}/generate.js`;
+		const generate_arg1 = ` urn_generate_base_schema=${generate_params.root}/${defaults.folder}/generate/src/schema/index.d.ts`;
+		const generate_arg2 = ` urn_generate_output=${generate_params.root}/${defaults.folder}/generate/src/schema/index.d.ts`;
+		const generate_path_js = `${generate_params.root}/${defaults.folder}/generate/dist/generate.js${generate_arg1}${generate_arg2}`;
 		const flags = ``;
 		const tsn_cmd = `node ${generate_path_js} ${flags}`;
 		util_instance.spawn.spin_and_verbose_log(
@@ -92,7 +103,38 @@ function _promise_generate_types(){
 	
 }
 
-function _create_register(){
+function _create_generate_register(){
+	output_instance.verbose_log(`Started creating register for generate file.`, 'types');
+	
+	let text = '';
+	text += '/**\n';
+	text += ' * Auto-generated uranio generate register file.\n';
+	text += ' *\n';
+	text += ' */\n\n';
+	const atom_dir = `${generate_params.root}/src/atoms`;
+	const atom_folders = util_instance.fs.read_dir(atom_dir);
+	for(const folder of atom_folders){
+		if(!util_instance.fs.exists(`${atom_dir}/${folder}/index.ts`)){
+			continue;
+		}
+		text += `export * from './atoms/${folder}/';\n`;
+		output_instance.verbose_log(`Exported atom [${folder}].`, `atms`);
+	}
+	text += `export {};\n`;
+	
+	const dot_dir = `${generate_params.root}/${defaults.folder}`;
+	const register_path_root = `${dot_dir}/generate/src/register.ts`;
+	if(util_instance.fs.exists(register_path_root)){
+		util_instance.fs.remove_file(register_path_root);
+	}
+	util_instance.fs.write_file(register_path_root, text);
+	
+	output_instance.done_log(`Created register for generate files.`, 'types');
+}
+
+function _create_registers(){
+	output_instance.verbose_log(`Started creating register files.`, 'types');
+	
 	let text = '';
 	text += '/**\n';
 	text += ' * Auto-generated uranio register file.\n';
@@ -101,15 +143,27 @@ function _create_register(){
 	const atom_dir = `${generate_params.root}/src/atoms`;
 	const atom_folders = util_instance.fs.read_dir(atom_dir);
 	for(const folder of atom_folders){
-		text += `export * from '../src/atoms/${folder}/';\n`;
+		if(!util_instance.fs.exists(`${atom_dir}/${folder}/index.ts`)){
+			continue;
+		}
+		text += `export * from './atoms/${folder}/';\n`;
 		output_instance.verbose_log(`Exported atom [${folder}].`, `atms`);
 	}
 	text += `export {};\n`;
-	const register_path = `${generate_params.root}/${defaults.folder}/register.ts`;
-	if(util_instance.fs.exists(register_path)){
-		util_instance.fs.remove_file(register_path);
+	
+	const dot_dir = `${generate_params.root}/${defaults.folder}`;
+	const register_path_server = `${dot_dir}/server/src/__urn_register.ts`;
+	const register_path_client = `${dot_dir}/client/src/__urn_register.ts`;
+	if(util_instance.fs.exists(register_path_server)){
+		util_instance.fs.remove_file(register_path_server);
 	}
-	util_instance.fs.write_file(register_path, text);
+	if(util_instance.fs.exists(register_path_client)){
+		util_instance.fs.remove_file(register_path_client);
+	}
+	util_instance.fs.write_file(register_path_server, text);
+	util_instance.fs.write_file(register_path_client, text);
+	
+	output_instance.done_log(`Created register files.`, 'types');
 }
 
 

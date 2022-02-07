@@ -23,10 +23,10 @@ import {
 	valid_db
 } from '../types';
 
-export function read_rc_file(params:Params):Params;
-export function read_rc_file(params:Partial<Params>):Partial<Params>;
-export function read_rc_file(params:Partial<Params>):Partial<Params>{
-	const rcfile_path = `${params.root}/${defaults.json_filename}`;
+export function read_init_file(params:Params):Params;
+export function read_init_file(params:Partial<Params>):Partial<Params>;
+export function read_init_file(params:Partial<Params>):Partial<Params>{
+	const rcfile_path = `${params.root}/${defaults.init_filepath}`;
 	if(!fs.existsSync(rcfile_path)){
 		return params;
 	}
@@ -62,7 +62,7 @@ function _merge_params(params:Partial<Params>, is_init=false)
 		:Params{
 	let merged_params = {...default_params} as Partial<Params>;
 	if(!is_init){
-		merged_params = read_rc_file(params);
+		merged_params = read_init_file(params);
 	}
 	for(const k in default_params){
 		if(urn_util.object.has_key(params, k)){

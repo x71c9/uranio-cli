@@ -42,7 +42,7 @@ exports.defaults = {
     repo_folder: 'uranio',
     tmp_folder: '.tmp',
     log_filepath: '.urnlog',
-    json_filename: `uranio.init.json`,
+    init_filepath: `uranio.init.json`,
     time_format: "yy-mm-dd'T'HH:MM:ss:l",
     dot_repo: `${cloud_address}/uranio-dot.git`,
     dev_repo: `${cloud_address}/uranio-dev.git`,

@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 import { Params } from '../types';
-export declare function read_rc_file(params: Params): Params;
-export declare function read_rc_file(params: Partial<Params>): Partial<Params>;
+export declare function read_init_file(params: Params): Params;
+export declare function read_init_file(params: Partial<Params>): Partial<Params>;
 export declare function merge_params(params: Partial<Params>): Params;
 export declare function merge_init_params(params: Partial<Params>): Params;
 export declare function check_repo(repo: string): void;

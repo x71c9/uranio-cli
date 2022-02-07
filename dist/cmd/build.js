@@ -121,7 +121,7 @@ function _build_server() {
         //   }
         // };
         // util_instance.spawn.spin_and_verbose_log(cmd, 'tscb', 'building server', undefined, callback, reject);
-        yield (0, generate_1.generate)(build_params);
+        yield (0, generate_1.generate)(build_params, true);
     });
 }
 // async function _build_client(){

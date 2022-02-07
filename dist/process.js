@@ -44,7 +44,7 @@ function uranio_process(args) {
     if (!_cmd_that_do_not_need_root(args)) {
         _set_root(args);
     }
-    process_params = (0, common_1.read_rc_file)(process_params);
+    process_params = (0, common_1.read_init_file)(process_params);
     process_params = _set_args(process_params, args);
     process.chdir(process_params.root);
     // process_params = _autoset_is_dot(process_params, args);
@@ -460,6 +460,17 @@ function _switch_command(args) {
                 default: {
                     (0, cmd_1.build)(process_params);
                 }
+            }
+            break;
+        }
+        case 'transpose': {
+            if (args._.length > 1 && typeof args._[1] === 'string') {
+                const final_path = (args._[1][0] === '/') ?
+                    args._[1] : `${process.cwd()}/${args._[1]}`;
+                (0, cmd_1.transpose_one)(final_path, process_params);
+            }
+            else {
+                (0, cmd_1.transpose)(process_params);
             }
             break;
         }

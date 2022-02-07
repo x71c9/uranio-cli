@@ -14,7 +14,7 @@ export * from './build';
 
 export * from './dev';
 
-// export * from './transpose';
+export * from './transpose';
 
 // export * from './hooks';
 

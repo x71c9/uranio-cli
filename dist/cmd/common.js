@@ -8,13 +8,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.package_scripts = exports.check_if_is_dot = exports.check_db = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_init_params = exports.merge_params = exports.read_rc_file = void 0;
+exports.package_scripts = exports.check_if_is_dot = exports.check_db = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_init_params = exports.merge_params = exports.read_init_file = void 0;
 const fs_1 = __importDefault(require("fs"));
 const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
 const types_1 = require("../types");
-function read_rc_file(params) {
-    const rcfile_path = `${params.root}/${defaults_1.defaults.json_filename}`;
+function read_init_file(params) {
+    const rcfile_path = `${params.root}/${defaults_1.defaults.init_filepath}`;
     if (!fs_1.default.existsSync(rcfile_path)) {
         return params;
     }
@@ -36,7 +36,7 @@ function read_rc_file(params) {
         process.exit(1);
     }
 }
-exports.read_rc_file = read_rc_file;
+exports.read_init_file = read_init_file;
 function merge_params(params) {
     return _merge_params(params, false);
 }
@@ -48,7 +48,7 @@ exports.merge_init_params = merge_init_params;
 function _merge_params(params, is_init = false) {
     let merged_params = Object.assign({}, defaults_1.default_params);
     if (!is_init) {
-        merged_params = read_rc_file(params);
+        merged_params = read_init_file(params);
     }
     for (const k in defaults_1.default_params) {
         if (urn_lib_1.urn_util.object.has_key(params, k)) {
