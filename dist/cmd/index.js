@@ -21,7 +21,7 @@ __exportStar(require("./init"), exports);
 __exportStar(require("./generate"), exports);
 __exportStar(require("./build"), exports);
 __exportStar(require("./dev"), exports);
-// export * from './transpose';
+__exportStar(require("./transpose"), exports);
 // export * from './hooks';
 __exportStar(require("./info"), exports);
 __exportStar(require("./help"), exports);

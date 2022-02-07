@@ -91,7 +91,7 @@ function _delete_files() {
         util_instance.fs.remove_file(`${deinit_params.root}/netlify.toml`);
         util_instance.fs.remove_directory(`${deinit_params.root}/.netlify`);
         util_instance.fs.remove_directory(`${deinit_params.root}/${defaults_1.defaults.folder}`);
-        util_instance.fs.remove_file(`${deinit_params.root}/${defaults_1.defaults.json_filename}`);
+        util_instance.fs.remove_file(`${deinit_params.root}/${defaults_1.defaults.init_filepath}`);
     });
 }
 function _reset_package_json() {

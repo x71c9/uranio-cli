@@ -43,10 +43,10 @@ const esbuild = __importStar(require("esbuild"));
 const output = __importStar(require("../output/"));
 const util = __importStar(require("../util/"));
 const generate_1 = require("./generate");
-// import {default_params, defaults} from '../conf/defaults';
 const defaults_1 = require("../conf/defaults");
+// import {default_params} from '../conf/defaults';
 const types_1 = require("../types");
-// import {transpose, transpose_one} from './transpose';
+const transpose_1 = require("./transpose");
 // import {hooks} from './hooks';
 const common_1 = require("./common");
 const docker = __importStar(require("./docker"));
@@ -123,7 +123,7 @@ function _dev_server() {
         const dotenv_after = ` dotenv_config_path=${dev_params.root}/.env`;
         const urn_lib_pre = ` urn_log_prefix_type=true`;
         // const node_cmd = `cd ${dev_params.root}/dist/server/ && npx nodemon --watch index.js -e ts ${dotenv_part}${source_part} index.js${dotenv_after}${urn_lib_pre}`;
-        const node_cmd = `cd ${dev_params.root}/dist/src/ && npx nodemon --watch index.js -e ts ${dotenv_part}${source_part} index.js${dotenv_after}${urn_lib_pre}`;
+        const node_cmd = `cd ${dev_params.root}/dist/server/ && npx nodemon --watch index.js -e ts ${dotenv_part}${source_part} index.js${dotenv_after}${urn_lib_pre}`;
         // const cd_cmd = `cd ${dev_params.root}/${defaults.folder}/server`;
         const cd_cmd = `cd ${dev_params.root}`;
         const tsc_cmd = `${cd_cmd} && npx tsc -w`;
@@ -454,7 +454,7 @@ function _init_params(params) {
 }
 function _init_dev() {
     return __awaiter(this, void 0, void 0, function* () {
-        // await transpose(dev_params, true);
+        yield (0, transpose_1.transpose)(dev_params, true);
         // if(valid_hooks_repos().includes(dev_params.repo)){
         //   hooks(dev_params, true);
         // }
@@ -464,7 +464,7 @@ function _init_dev() {
 }
 function _watch() {
     const src_path = `${dev_params.root}/src/`;
-    // const base_path = `${dev_params.root}/${defaults.folder}`;
+    const base_path = `${dev_params.root}/${defaults_1.defaults.folder}`;
     output_instance.log(`Watching \`src\` folder [${src_path}] ...`, 'wtch');
     util_instance.watch(src_path, `watching \`src\` folder.`, () => {
         output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
@@ -486,50 +486,62 @@ function _watch() {
             return false;
         }
         output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
-        yield (0, generate_1.generate)(dev_params, true);
-        // const base_path_server = `${base_path}/server/src`;
-        // const base_path_client = `${base_path}/client/src`;
-        // const relative_path_to_src = _path.replace(`${dev_params.root}/src/`, '');
-        // const new_path_server = `${base_path_server}/${relative_path_to_src}`;
-        // const new_path_client = `${base_path_client}/${relative_path_to_src}`;
-        // if(_event === 'addDir'){
-        //   if(
-        //     valid_admin_repos().includes(dev_params.repo)
-        //     && _path.includes(`${dev_params.root}/src/frontend`)
-        //   ){
-        //     util_instance.fs.create_directory(
-        //       `${base_path_client}/${defaults.repo_folder}/nuxt/${path.basename(_path)}`
-        //     );
-        //   }else{
-        //     util_instance.fs.create_directory(new_path_server);
-        //     util_instance.fs.create_directory(new_path_client);
-        //   }
-        //   output_instance.done_log(
-        //     `[Src watch] Transposed dir [${_path}].`,
-        //     'wtch'
-        //   );
-        // }else if(_event === 'unlink' || _event === 'unlinkDir'){
-        //   if(util_instance.fs.exists(new_path_server)){
-        //     if(util_instance.fs.is_directory(new_path_server)){
-        //       util_instance.fs.remove_directory(new_path_server);
-        //     }else{
-        //       util_instance.fs.remove_file(new_path_server);
-        //     }
-        //   }
-        //   if(util_instance.fs.exists(new_path_client)){
-        //     if(util_instance.fs.is_directory(new_path_client)){
-        //       util_instance.fs.remove_directory(new_path_client);
-        //     }else{
-        //       util_instance.fs.remove_file(new_path_client);
-        //     }
-        //   }
-        // }else{
-        //   // await transpose_one(_path, dev_params, true);
-        //   // if(valid_hooks_repos().includes(dev_params.repo)){
-        //   //   hooks(dev_params, true);
-        //   // }
-        //   output_instance.done_log(`[src watch] Transposed [${_path}].`, 'wtch');
-        // }
+        const base_path_generate = `${base_path}/generate/src`;
+        const base_path_server = `${base_path}/server/src`;
+        const base_path_client = `${base_path}/client/src`;
+        const relative_path_to_src = _path.replace(`${dev_params.root}/src/`, '');
+        const new_path_generate = `${base_path_generate}/${relative_path_to_src}`;
+        const new_path_server = `${base_path_server}/${relative_path_to_src}`;
+        const new_path_client = `${base_path_client}/${relative_path_to_src}`;
+        if (_event === 'addDir') {
+            if ((0, types_1.valid_admin_repos)().includes(dev_params.repo)
+                && _path.includes(`${dev_params.root}/src/frontend`)) {
+                // util_instance.fs.create_directory(
+                //   `${base_path_client}/${defaults.repo_folder}/nuxt/${path.basename(_path)}`
+                // );
+            }
+            else {
+                if (_path.includes(`${dev_params.root}/src/atoms/`)) {
+                    util_instance.fs.create_directory(new_path_generate);
+                }
+                util_instance.fs.create_directory(new_path_server);
+                util_instance.fs.create_directory(new_path_client);
+            }
+            output_instance.done_log(`[Src watch] Transposed dir [${_path}].`, 'wtch');
+        }
+        else if (_event === 'unlink' || _event === 'unlinkDir') {
+            if (util_instance.fs.exists(new_path_server)) {
+                if (util_instance.fs.is_directory(new_path_server)) {
+                    util_instance.fs.remove_directory(new_path_server);
+                }
+                else {
+                    util_instance.fs.remove_file(new_path_server);
+                }
+            }
+            if (util_instance.fs.exists(new_path_client)) {
+                if (util_instance.fs.is_directory(new_path_client)) {
+                    util_instance.fs.remove_directory(new_path_client);
+                }
+                else {
+                    util_instance.fs.remove_file(new_path_client);
+                }
+            }
+            if (util_instance.fs.exists(new_path_generate)) {
+                if (util_instance.fs.is_directory(new_path_generate)) {
+                    util_instance.fs.remove_directory(new_path_generate);
+                }
+                else {
+                    util_instance.fs.remove_file(new_path_generate);
+                }
+            }
+        }
+        else {
+            yield (0, transpose_1.transpose_one)(_path, dev_params, true);
+            // if(valid_hooks_repos().includes(dev_params.repo)){
+            //   hooks(dev_params, true);
+            // }
+            output_instance.done_log(`[src watch] Transposed [${_path}].`, 'wtch');
+        }
         // if(
         //   valid_deploy_repos().includes(dev_params.repo)
         //   && dev_params.deploy === 'netlify'
@@ -537,17 +549,20 @@ function _watch() {
         // ){
         //   _replace_netlify_function_file();
         // }
-        try {
-            // if(dev_params.deploy === 'netlify'){
-            //   // _esbuild_netlify();
-            // }else{
-            //   _esbuild_server();
-            // }
-            _esbuild_server();
-        }
-        catch (err) {
-            const e = err;
-            output_instance.error_log(e.message);
+        if (_event !== 'addDir') {
+            yield (0, generate_1.generate)(dev_params, true);
+            try {
+                // if(dev_params.deploy === 'netlify'){
+                //   // _esbuild_netlify();
+                // }else{
+                //   _esbuild_server();
+                // }
+                _esbuild_server();
+            }
+            catch (err) {
+                const e = err;
+                output_instance.error_log(e.message);
+            }
         }
     }));
 }
@@ -584,8 +599,8 @@ function _esbuild_server() {
     //   minify: true
     // });
     esbuild.buildSync({
-        entryPoints: [`${dev_params.root}/src/index.ts`],
-        outfile: `${dev_params.root}/dist/src/index.js`,
+        entryPoints: [`${dev_params.root}/${defaults_1.defaults.folder}/server/src/index.ts`],
+        outfile: `${dev_params.root}/dist/server/index.js`,
         bundle: true,
         platform: 'node',
         sourcemap: true,

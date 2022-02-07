@@ -24,6 +24,8 @@ import {
 	build,
 	build_server,
 	build_client,
+	transpose,
+	transpose_one,
 	help,
 	info,
 	docker,
@@ -37,7 +39,7 @@ import {
 	check_deploy,
 	check_pacman,
 	check_db,
-	read_rc_file,
+	read_init_file,
 	// check_if_is_dot
 } from './cmd/common';
 
@@ -56,7 +58,7 @@ export function uranio_process(args:Arguments)
 		_set_root(args);
 	}
 	
-	process_params = read_rc_file(process_params);
+	process_params = read_init_file(process_params);
 	
 	process_params = _set_args(process_params, args);
 	
@@ -554,6 +556,16 @@ function _switch_command(args:Arguments){
 				default:{
 					build(process_params);
 				}
+			}
+			break;
+		}
+		case 'transpose':{
+			if(args._.length > 1 && typeof args._[1] === 'string'){
+				const final_path = (args._[1][0] === '/') ?
+					args._[1] : `${process.cwd()}/${args._[1]}`;
+				transpose_one(final_path, process_params);
+			}else{
+				transpose(process_params);
 			}
 			break;
 		}

@@ -63,7 +63,7 @@ class Util {
         });
     }
     is_initialized() {
-        const is = (this.fs.exists(`${this.params.root}/${defaults_1.defaults.json_filename}`));
+        const is = (this.fs.exists(`${this.params.root}/${defaults_1.defaults.init_filepath}`));
         if (is) {
             this.output.verbose_log(`Uranio is initialized.`);
         }
