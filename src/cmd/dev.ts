@@ -584,7 +584,7 @@ function _watch(){
 					//   `${base_path_client}/${defaults.repo_folder}/nuxt/${path.basename(_path)}`
 					// );
 				}else{
-					if(_path.includes(`${dev_params.root}/src/atoms/`)){
+					if(_path.includes(`${dev_params.root}/src/atoms`)){
 						util_instance.fs.create_directory(new_path_generate);
 					}
 					util_instance.fs.create_directory(new_path_server);
@@ -619,6 +619,8 @@ function _watch(){
 					}
 				}
 				
+				output_instance.done_log(`[src watch] Transposed [${_event}] [${_path}].`, 'wtch');
+				
 			}else{
 				
 				await transpose_one(_path, dev_params, true);
@@ -639,7 +641,7 @@ function _watch(){
 			// }
 			
 			
-			if(_event !== 'addDir'){
+			if(_event !== 'addDir' && _event !== 'unlinkDir'){
 				
 				await generate(dev_params, true);
 				

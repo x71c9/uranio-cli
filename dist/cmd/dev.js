@@ -501,7 +501,7 @@ function _watch() {
                 // );
             }
             else {
-                if (_path.includes(`${dev_params.root}/src/atoms/`)) {
+                if (_path.includes(`${dev_params.root}/src/atoms`)) {
                     util_instance.fs.create_directory(new_path_generate);
                 }
                 util_instance.fs.create_directory(new_path_server);
@@ -534,6 +534,7 @@ function _watch() {
                     util_instance.fs.remove_file(new_path_generate);
                 }
             }
+            output_instance.done_log(`[src watch] Transposed [${_event}] [${_path}].`, 'wtch');
         }
         else {
             yield (0, transpose_1.transpose_one)(_path, dev_params, true);
@@ -549,7 +550,7 @@ function _watch() {
         // ){
         //   _replace_netlify_function_file();
         // }
-        if (_event !== 'addDir') {
+        if (_event !== 'addDir' && _event !== 'unlinkDir') {
             yield (0, generate_1.generate)(dev_params, true);
             try {
                 // if(dev_params.deploy === 'netlify'){
