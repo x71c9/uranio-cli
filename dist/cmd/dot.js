@@ -38,8 +38,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.dot = void 0;
 const child_process_1 = __importDefault(require("child_process"));
-const output = __importStar(require("../output/"));
-const util = __importStar(require("../util/"));
+const output = __importStar(require("../output/index"));
+const util = __importStar(require("../util/index"));
 const init_1 = require("./init");
 const defaults_1 = require("../conf/defaults");
 const types_1 = require("../types");

@@ -8,9 +8,9 @@ import * as esbuild from 'esbuild';
 
 import {default_params, defaults} from '../conf/defaults';
 
-import * as output from '../output/';
+import * as output from '../output/index';
 
-import * as util from '../util/';
+import * as util from '../util/index';
 
 import {Params} from '../types';
 
@@ -117,7 +117,7 @@ function _create_generate_register(){
 		if(!util_instance.fs.exists(`${atom_dir}/${folder}/index.ts`)){
 			continue;
 		}
-		text += `export * from './atoms/${folder}/';\n`;
+		text += `export * from './atoms/${folder}/index';\n`;
 		output_instance.verbose_log(`Exported atom [${folder}].`, `atms`);
 	}
 	text += `export {};\n`;
@@ -146,7 +146,7 @@ function _create_registers(){
 		if(!util_instance.fs.exists(`${atom_dir}/${folder}/index.ts`)){
 			continue;
 		}
-		text += `export * from './atoms/${folder}/';\n`;
+		text += `export * from './atoms/${folder}/index';\n`;
 		output_instance.verbose_log(`Exported atom [${folder}].`, `atms`);
 	}
 	text += `export {};\n`;

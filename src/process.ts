@@ -12,9 +12,9 @@ import {urn_util} from 'urn-lib';
 
 import {Arguments, Repo, PacMan, Deploy, Params, DB} from './types';
 
-import * as output from './output/';
+import * as output from './output/index';
 
-import * as util from './util/';
+import * as util from './util/index';
 
 import {
 	prompt_init,
@@ -30,7 +30,7 @@ import {
 	info,
 	docker,
 	deinit
-} from './cmd/';
+} from './cmd/index';
 
 import {default_params, defaults} from './conf/defaults';
 

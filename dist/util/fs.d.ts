@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 /// <reference types="node" />
-import * as out from '../output/';
+import * as out from '../output/index';
 declare class FS {
     output: out.OutputInstance;
     constructor(output: out.OutputInstance);

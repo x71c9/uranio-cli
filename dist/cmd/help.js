@@ -16,7 +16,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.help = void 0;
 const title_1 = require("./title");
-// import * as output from '../output/';
+// import * as output from '../output/index';
 function help() {
     return __awaiter(this, void 0, void 0, function* () {
         (0, title_1.title)();

@@ -9,7 +9,7 @@ import fs from 'fs';
 
 import path from 'path';
 
-import * as out from '../output/';
+import * as out from '../output/index';
 
 class FS {
 	
