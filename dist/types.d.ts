@@ -75,3 +75,6 @@ export declare function valid_admin_repos(): string[];
 export declare function valid_pacman(): string[];
 export declare function valid_deploy(): string[];
 export declare function valid_db(): string[];
+export declare type Aliases = {
+    [key: string]: string[];
+};

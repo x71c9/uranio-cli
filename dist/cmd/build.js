@@ -43,7 +43,7 @@ const util = __importStar(require("../util/index"));
 // import {hooks} from './hooks';
 // import {transpose} from './transpose';
 const common_1 = require("./common");
-const generate_1 = require("./generate");
+const types_1 = require("./types");
 // import {BuildParams} from './types';
 // import * as common from './common';
 // // const cli_options = {
@@ -121,7 +121,7 @@ function _build_server() {
         //   }
         // };
         // util_instance.spawn.spin_and_verbose_log(cmd, 'tscb', 'building server', undefined, callback, reject);
-        yield (0, generate_1.generate)(build_params, true);
+        yield (0, types_1.types)(build_params, true);
     });
 }
 // async function _build_client(){

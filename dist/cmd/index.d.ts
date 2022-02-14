@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 export * from './init';
-export * from './generate';
+export * from './types';
 export * from './build';
 export * from './dev';
 export * from './transpose';

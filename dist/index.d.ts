@@ -1,7 +1,7 @@
-import { init, build, deinit } from './cmd/index';
+import { init, types, build, deinit } from './cmd/index';
 declare const _default: {
     init: typeof init;
-    types: any;
+    types: typeof types;
     build: typeof build;
     deinit: typeof deinit;
 };
