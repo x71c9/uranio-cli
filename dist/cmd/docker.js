@@ -35,8 +35,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.update_env = exports.prune = exports.network_remove = exports.network_create = exports.tmp_remove = exports.db_remove = exports.db_stop = exports.db_start = exports.db_create = exports.unbuild = exports.remove = exports.stop = exports.start = exports.create = exports.build = exports.docker = void 0;
 const urn_lib_1 = require("urn-lib");
-const output = __importStar(require("../output/"));
-const util = __importStar(require("../util/"));
+const output = __importStar(require("../output/index"));
+const util = __importStar(require("../util/index"));
 const defaults_1 = require("../conf/defaults");
 let output_instance;
 let util_instance;

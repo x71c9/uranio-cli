@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import {parser} from './args/';
+import {parser} from './args/index';
 
 import {uranio_process} from './process';
 

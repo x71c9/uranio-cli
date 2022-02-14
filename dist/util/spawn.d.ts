@@ -5,7 +5,7 @@
  */
 /// <reference types="node" />
 import * as cp from 'child_process';
-import * as out from '../output/';
+import * as out from '../output/index';
 declare type Resolve = (v?: unknown) => void;
 declare type Reject = (err?: Error) => void;
 declare class Spawn {

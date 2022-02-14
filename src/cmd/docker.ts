@@ -6,9 +6,9 @@
 
 import {urn_util} from 'urn-lib';
 
-import * as output from '../output/';
+import * as output from '../output/index';
 
-import * as util from '../util/';
+import * as util from '../util/index';
 
 import {default_params, defaults} from '../conf/defaults';
 

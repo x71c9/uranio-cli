@@ -6,7 +6,7 @@
 
 import * as cp from 'child_process';
 
-import * as out from '../output/';
+import * as out from '../output/index';
 
 type Resolve = (v?:unknown) => void;
 type Reject = (err?:Error) => void;

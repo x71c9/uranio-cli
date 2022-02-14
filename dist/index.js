@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const cmd_1 = require("./cmd/");
+const index_1 = require("./cmd/index");
 exports.default = {
-    init: cmd_1.init,
-    build: cmd_1.build,
-    deinit: cmd_1.deinit
+    init: index_1.init,
+    types: index_1.types,
+    build: index_1.build,
+    deinit: index_1.deinit
 };
 //# sourceMappingURL=index.js.map

@@ -38,8 +38,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.hooks = void 0;
 const tsm = __importStar(require("ts-morph"));
 const defaults_1 = require("../conf/defaults");
-const output = __importStar(require("../output/"));
-const util = __importStar(require("../util/"));
+const output = __importStar(require("../output/index"));
+const util = __importStar(require("../util/index"));
 const common_1 = require("./common");
 // import {HooksParams} from './types';
 const default_routes = {

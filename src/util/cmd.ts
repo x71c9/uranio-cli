@@ -10,7 +10,7 @@ import {Params} from '../types';
 
 import {defaults} from '../conf/defaults';
 
-import * as out from '../output/';
+import * as out from '../output/index';
 
 // DO NO CANCEL IT
 // import * as common from '../cmd/common';

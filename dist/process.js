@@ -31,9 +31,9 @@ exports.uranio_process = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const urn_lib_1 = require("urn-lib");
-const output = __importStar(require("./output/"));
-const util = __importStar(require("./util/"));
-const cmd_1 = require("./cmd/");
+const output = __importStar(require("./output/index"));
+const util = __importStar(require("./util/index"));
+const index_1 = require("./cmd/index");
 const defaults_1 = require("./conf/defaults");
 const common_1 = require("./cmd/common");
 let output_instance;
@@ -424,23 +424,23 @@ function _switch_command(args) {
             break;
         }
         case 'init': {
-            (0, cmd_1.prompt_init)(process_params, args);
+            (0, index_1.prompt_init)(process_params, args);
             break;
         }
         case 'dev': {
             switch (splitted_cmd[1]) {
                 case 'server': {
-                    (0, cmd_1.dev_server)(process_params);
+                    (0, index_1.dev_server)(process_params);
                     break;
                 }
                 case 'client': {
-                    (0, cmd_1.dev_client)(process_params);
+                    (0, index_1.dev_client)(process_params);
                     break;
                 }
                 case '':
                 case undefined:
                 default: {
-                    (0, cmd_1.dev)(process_params);
+                    (0, index_1.dev)(process_params);
                 }
             }
             break;
@@ -448,17 +448,17 @@ function _switch_command(args) {
         case 'build': {
             switch (splitted_cmd[1]) {
                 case 'server': {
-                    (0, cmd_1.build_server)(process_params);
+                    (0, index_1.build_server)(process_params);
                     break;
                 }
                 case 'client': {
-                    (0, cmd_1.build_client)(process_params);
+                    (0, index_1.build_client)(process_params);
                     break;
                 }
                 case '':
                 case undefined:
                 default: {
-                    (0, cmd_1.build)(process_params);
+                    (0, index_1.build)(process_params);
                 }
             }
             break;
@@ -467,27 +467,27 @@ function _switch_command(args) {
             if (args._.length > 1 && typeof args._[1] === 'string') {
                 const final_path = (args._[1][0] === '/') ?
                     args._[1] : `${process.cwd()}/${args._[1]}`;
-                (0, cmd_1.transpose_one)(final_path, process_params);
+                (0, index_1.transpose_one)(final_path, process_params);
             }
             else {
-                (0, cmd_1.transpose)(process_params);
+                (0, index_1.transpose)(process_params);
             }
             break;
         }
         case 'info': {
-            (0, cmd_1.info)(process_params);
+            (0, index_1.info)(process_params);
             break;
         }
         case 'help': {
-            (0, cmd_1.help)();
+            (0, index_1.help)();
             break;
         }
         case 'docker': {
-            (0, cmd_1.docker)(process_params, args);
+            (0, index_1.docker)(process_params, args);
             break;
         }
         case 'deinit': {
-            (0, cmd_1.deinit)(process_params);
+            (0, index_1.deinit)(process_params);
             break;
         }
         default: {

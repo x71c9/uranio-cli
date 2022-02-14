@@ -10,9 +10,9 @@ import inquirer from 'inquirer';
 
 import {defaults, default_params} from '../conf/defaults';
 
-import * as output from '../output/';
+import * as output from '../output/index';
 
-import * as util from '../util/';
+import * as util from '../util/index';
 
 import * as docker from './docker';
 

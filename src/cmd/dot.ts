@@ -6,9 +6,9 @@
 
 import cp from 'child_process';
 
-import * as output from '../output/';
+import * as output from '../output/index';
 
-import * as util from '../util/';
+import * as util from '../util/index';
 
 import {init} from './init';
 

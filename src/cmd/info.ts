@@ -10,9 +10,9 @@ import chalk from 'chalk';
 
 import {default_params} from '../conf/defaults';
 
-import * as output from '../output/';
+import * as output from '../output/index';
 
-import * as util from '../util/';
+import * as util from '../util/index';
 
 import { Params, valid_deploy_repos } from '../types';
 

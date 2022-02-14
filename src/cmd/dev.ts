@@ -10,9 +10,9 @@ import * as esbuild from 'esbuild';
 
 // import * as recast from 'recast';
 
-import * as output from '../output/';
+import * as output from '../output/index';
 
-import * as util from '../util/';
+import * as util from '../util/index';
 
 import {generate} from './generate';
 

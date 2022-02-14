@@ -6,7 +6,7 @@
 
 import {title} from './title';
 
-// import * as output from '../output/';
+// import * as output from '../output/index';
 
 export async function help():Promise<void> {
 	

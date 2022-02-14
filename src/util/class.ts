@@ -12,7 +12,7 @@ import {defaults} from '../conf/defaults';
 
 import {Params} from '../types';
 
-import * as out from '../output/';
+import * as out from '../output/index';
 
 // import {UtilParams} from './types';
 

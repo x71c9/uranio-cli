@@ -12,7 +12,7 @@
 
 // import * as spawn from './util/spawn';
 
-// import * as out from './output/';
+// import * as out from './output/index';
 
 // const output = out.create({
 //   verbose: true,

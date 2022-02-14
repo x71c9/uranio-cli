@@ -20,9 +20,9 @@ import {
 
 import {default_params, defaults} from '../conf/defaults';
 
-import * as output from '../output/';
+import * as output from '../output/index';
 
-import * as util from '../util/';
+import * as util from '../util/index';
 
 // import * as alias from './alias';
 
@@ -638,22 +638,22 @@ async function _transpose_folder(dir_path:string, included=false){
 //   switch(transpose_params.repo){
 //     case 'adm':{
 //       switch(submodule_name){
-//         case 'core': return 'trx/api/core/';
-//         case 'api': return 'trx/api/';
-//         case 'trx': return 'trx/';
+//         case 'core': return 'trx/api/core/index';
+//         case 'api': return 'trx/api/index';
+//         case 'trx': return 'trx/index';
 //       }
 //       break;
 //     }
 //     case 'trx':{
 //       switch(submodule_name){
-//         case 'core': return 'api/core/';
-//         case 'api': return 'api/';
+//         case 'core': return 'api/core/index';
+//         case 'api': return 'api/index';
 //       }
 //       break;
 //     }
 //     case 'api':{
 //       switch(submodule_name){
-//         case 'core': return 'core/';
+//         case 'core': return 'core/index';
 //       }
 //       break;
 //     }
@@ -1546,7 +1546,7 @@ async function _transpose_folder(dir_path:string, included=false){
 //     }
 		
 //     if(is_importing_uranio){
-//       const slash = (module_name[module_name.length - 2] === '/') ? '' : '/';
+//       const slash = (module_name[module_name.length - 2] === '/') ? '' : '/index';
 //       const replace_with = `"${module_name.substr(1, module_name.length -2)}${slash}client"`;
 //       str_lit.replaceWithText(replace_with);
 //       output_instance.verbose_log(`Replaced [${module_name}] to [${replace_with}]`, 'clnt');
