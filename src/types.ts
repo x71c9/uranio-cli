@@ -148,3 +148,16 @@ export function valid_db()
 	}
 	return vals;
 }
+
+// export type InitParams = Partial<Params> & {
+//   root: string
+//   repo?: Repo
+//   deploy?: Deploy
+//   pacman?: PacMan
+//   branch?: string
+// }
+
+export type Aliases = {
+	[key:string]: string[]
+}
+

@@ -16,9 +16,7 @@ import * as output from '../output/index';
 
 import * as util from '../util/index';
 
-import {Params} from '../types';
-
-import {Aliases} from './types';
+import {Params, Aliases} from '../types';
 
 import {merge_params} from './common';
 
