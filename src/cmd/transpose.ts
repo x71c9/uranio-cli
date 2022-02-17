@@ -347,7 +347,9 @@ async function _transpose_entrypoint(){
 	const entrypoint_path = `${transpose_params.root}/src/index.ts`;
 	const entrypoint_text = util_instance.fs.read_file(entrypoint_path);
 	let transposed_text = '';
-	transposed_text += `\n export * from './__urn_register';\n\n`;
+	transposed_text += `\n export * from './__urn_register';\n`;
+	transposed_text += `\n export * from './__urn_hooks';\n`;
+	transposed_text += `\n\n`;
 	transposed_text += entrypoint_text;
 	
 	const dot_dir = `${transpose_params.root}/${defaults.folder}`;
