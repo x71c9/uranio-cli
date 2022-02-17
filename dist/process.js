@@ -463,6 +463,20 @@ function _switch_command(args) {
             }
             break;
         }
+        case 'generate': {
+            switch (splitted_cmd[1]) {
+                case 'uranio': {
+                    (0, index_1.generate_uranio)(process_params);
+                    break;
+                }
+                case '':
+                case undefined:
+                default: {
+                    (0, index_1.generate)(process_params);
+                }
+            }
+            break;
+        }
         case 'transpose': {
             if (args._.length > 1 && typeof args._[1] === 'string') {
                 const final_path = (args._[1][0] === '/') ?

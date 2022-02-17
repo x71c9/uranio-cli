@@ -1,13 +1,13 @@
 import {
 	init,
-	types,
+	generate,
 	build,
 	deinit
 } from './cmd/index';
 
 export default {
 	init,
-	types,
+	generate,
 	build,
 	deinit
 };

@@ -23,7 +23,7 @@ import {Params} from '../types';
 
 import {merge_params} from './common';
 
-import {types} from './types';
+import {generate} from './generate';
 
 // import {BuildParams} from './types';
 
@@ -137,7 +137,7 @@ async function _build_server(){
 	
 	// util_instance.spawn.spin_and_verbose_log(cmd, 'tscb', 'building server', undefined, callback, reject);
 	
-	await types(build_params, true);
+	await generate(build_params, true);
 	
 }
 

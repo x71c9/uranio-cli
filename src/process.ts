@@ -29,7 +29,9 @@ import {
 	help,
 	info,
 	docker,
-	deinit
+	deinit,
+	generate,
+	generate_uranio
 } from './cmd/index';
 
 import {default_params, defaults} from './conf/defaults';
@@ -555,6 +557,20 @@ function _switch_command(args:Arguments){
 				case undefined:
 				default:{
 					build(process_params);
+				}
+			}
+			break;
+		}
+		case 'generate':{
+			switch(splitted_cmd[1]){
+				case 'uranio':{
+					generate_uranio(process_params);
+					break;
+				}
+				case '':
+				case undefined:
+				default:{
+					generate(process_params);
 				}
 			}
 			break;

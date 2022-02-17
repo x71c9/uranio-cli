@@ -42,10 +42,10 @@ const esbuild = __importStar(require("esbuild"));
 // import * as recast from 'recast';
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
-const types_1 = require("./types");
+const generate_1 = require("./generate");
 const defaults_1 = require("../conf/defaults");
 // import {default_params} from '../conf/defaults';
-const types_2 = require("../types");
+const types_1 = require("../types");
 const transpose_1 = require("./transpose");
 // import {hooks} from './hooks';
 const common_1 = require("./common");
@@ -94,7 +94,7 @@ function dev_client(params) {
         }
         else {
             _init_params(params);
-            if ((0, types_2.valid_client_repos)().includes(dev_params.repo)) {
+            if ((0, types_1.valid_client_repos)().includes(dev_params.repo)) {
                 if (params.inside_ntl != true) {
                     yield _init_dev();
                 }
@@ -458,7 +458,7 @@ function _init_dev() {
         // if(valid_hooks_repos().includes(dev_params.repo)){
         //   hooks(dev_params, true);
         // }
-        yield (0, types_1.types)(dev_params, true);
+        yield (0, generate_1.generate)(dev_params, true);
         _watch();
     });
 }
@@ -494,7 +494,7 @@ function _watch() {
         const new_path_server = `${base_path_server}/${relative_path_to_src}`;
         const new_path_client = `${base_path_client}/${relative_path_to_src}`;
         if (_event === 'addDir') {
-            if ((0, types_2.valid_admin_repos)().includes(dev_params.repo)
+            if ((0, types_1.valid_admin_repos)().includes(dev_params.repo)
                 && _path.includes(`${dev_params.root}/src/frontend`)) {
                 // util_instance.fs.create_directory(
                 //   `${base_path_client}/${defaults.repo_folder}/nuxt/${path.basename(_path)}`
@@ -551,7 +551,7 @@ function _watch() {
         //   _replace_netlify_function_file();
         // }
         if (_event !== 'addDir' && _event !== 'unlinkDir') {
-            yield (0, types_1.types)(dev_params, true);
+            yield (0, generate_1.generate)(dev_params, true);
             try {
                 // if(dev_params.deploy === 'netlify'){
                 //   // _esbuild_netlify();

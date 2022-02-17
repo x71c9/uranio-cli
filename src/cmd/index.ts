@@ -8,7 +8,7 @@ export * from './init';
 
 // export * from './alias';
 
-export * from './types';
+export * from './generate';
 
 export * from './build';
 

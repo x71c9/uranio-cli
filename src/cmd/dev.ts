@@ -14,7 +14,7 @@ import * as output from '../output/index';
 
 import * as util from '../util/index';
 
-import {types} from './types';
+import {generate} from './generate';
 
 import {default_params, defaults} from '../conf/defaults';
 // import {default_params} from '../conf/defaults';
@@ -524,7 +524,7 @@ async function _init_dev(){
 	//   hooks(dev_params, true);
 	// }
 	
-	await types(dev_params, true);
+	await generate(dev_params, true);
 	
 	_watch();
 }
@@ -643,7 +643,7 @@ function _watch(){
 			
 			if(_event !== 'addDir' && _event !== 'unlinkDir'){
 				
-				await types(dev_params, true);
+				await generate(dev_params, true);
 				
 				try{
 						
