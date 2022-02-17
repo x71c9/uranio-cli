@@ -27,7 +27,10 @@ const default_routes = {
 	find_one: {url: '/', method: 'GET'},
 	insert: {url: '/', method: 'POST'},
 	update: {url: '/:id', method: 'POST'},
-	delete: {url: '/:id', method: 'GET'}
+	delete: {url: '/:id', method: 'GET'},
+	insert_multiple: {url: '/multiple', method: 'POST'},
+	update_multiple: {url: '/multiple/:ids', method: 'POST'},
+	delete_multiple: {url: '/multiple/:ids', method: 'GET'}
 };
 
 const _project_option = {
