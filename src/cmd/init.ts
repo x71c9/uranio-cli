@@ -25,7 +25,8 @@ import {
 	abstract_deploy,
 	abstract_db,
 	valid_deploy_repos,
-	valid_admin_repos
+	valid_admin_repos,
+	valid_hooks_repos
 } from '../types';
 
 // import {alias} from './alias';
@@ -60,11 +61,12 @@ export async function init(params:Partial<Params>)
 	
 	_create_generate_dir();
 	_create_atoms_dir();
-	_create_schema_dir();
+	_create_types_dir();
+	_create_base_dir();
 	
 	_create_server_client_dir();
 	_create_atoms_dirs();
-	_create_schema_dirs();
+	_create_types_dirs();
 	
 	await _clone_assets_repo();
 	_create_src_dir();
@@ -92,7 +94,7 @@ export async function init(params:Partial<Params>)
 		
 		await _copy_specific_assets();
 		// await _replace_aliases();
-		await _generate_base_schema();
+		await _generate_base_types();
 		
 	}
 	
@@ -314,31 +316,57 @@ function _log_important_params(){
 	}
 }
 
-async function _generate_base_schema(){
-	
-	output_instance.verbose_log(`Started generating base types.`, `dts`);
-	await _promise_base_schema();
-	const dot_dir = `${init_params.root}/${defaults.folder}`;
-	const root_schema = `${dot_dir}/generate/src/schema/index.d.ts`;
-	const dest_schema_server = `${dot_dir}/server/src/schema/index.d.ts`;
-	const dest_schema_client = `${dot_dir}/client/src/schema/index.d.ts`;
-	util_instance.fs.copy_file(root_schema, dest_schema_server);
-	util_instance.fs.copy_file(root_schema, dest_schema_client);
-	output_instance.done_log(`Generated base types.`, `dts`);
-	
+async function _generate_base_types(){
+	await _generate_base_schema();
+	if(valid_hooks_repos().includes(init_params.repo)){
+		await _generate_base_uranio_types();;
+	}
 }
 
-function _promise_base_schema(){
-	
+async function _generate_base_uranio_types(){
+	output_instance.verbose_log(`Started generating base uranio types.`, `dts`);
+	await _promise_base_types();
+	// const dot_dir = `${init_params.root}/${defaults.folder}`;
+	// const root_schema = `${dot_dir}/generate/types/uranio.d.ts`;
+	// const dest_schema_server = `${dot_dir}/server/types/uranio.d.ts`;
+	// const dest_schema_client = `${dot_dir}/client/types/uranio.d.ts`;
+	// util_instance.fs.copy_file(root_schema, dest_schema_server);
+	// util_instance.fs.copy_file(root_schema, dest_schema_client);
+	output_instance.done_log(`Generated base uranio types.`, `dts`);
+}
+
+async function _generate_base_schema(){
+	output_instance.verbose_log(`Started generating base schema.`, `dts`);
+	await _promise_base_schema();
+	// const dot_dir = `${init_params.root}/${defaults.folder}`;
+	// const root_schema = `${dot_dir}/generate/types/schema.d.ts`;
+	// const dest_schema_server = `${dot_dir}/server/types/schema.d.ts`;
+	// const dest_schema_client = `${dot_dir}/client/types/schema.d.ts`;
+	// util_instance.fs.copy_file(root_schema, dest_schema_server);
+	// util_instance.fs.copy_file(root_schema, dest_schema_client);
+	output_instance.done_log(`Generated base schema types.`, `dts`);
+}
+
+function _promise_base_types(){
 	return new Promise((resolve, reject) => {
-		const schema_path = `${init_params.root}/node_modules/uranio-schema/`;
-		const relative_new = `../../${defaults.folder}/generate/src/schema/index.d.ts`;
+		const schema_path = `${init_params.root}/node_modules/uranio/`;
+		const relative_new = `../../${defaults.folder}/generate/base/uranio.d.ts`;
 		const npm_dts = `npx npm-dts generate -r ${schema_path} -o ${relative_new} -L debug`;
 		util_instance.spawn.spin(
 			npm_dts, 'dts', 'generating base types', undefined, resolve, reject
 		);
 	});
-	
+}
+
+function _promise_base_schema(){
+	return new Promise((resolve, reject) => {
+		const schema_path = `${init_params.root}/node_modules/uranio-schema/`;
+		const relative_new = `../../${defaults.folder}/generate/base/schema.d.ts`;
+		const npm_dts = `npx npm-dts generate -r ${schema_path} -o ${relative_new} -L debug`;
+		util_instance.spawn.spin(
+			npm_dts, 'dts', 'generating base types', undefined, resolve, reject
+		);
+	});
 }
 
 function _create_src_atom_dir(){
@@ -393,27 +421,36 @@ function _create_generate_dir(){
 	util_instance.fs.create_directory(generate_src_dir);
 }
 
-function _create_schema_dir(){
-	const generate_dir = `${init_params.root}/${defaults.folder}/generate/src`;
-	const generate_schema_dir = `${generate_dir}/schema`;
-	if(util_instance.fs.exists(generate_schema_dir)){
-		util_instance.fs.remove_directory(generate_schema_dir);
+function _create_base_dir(){
+	const generate_dir = `${init_params.root}/${defaults.folder}/generate`;
+	const generate_types_dir = `${generate_dir}/base`;
+	if(util_instance.fs.exists(generate_types_dir)){
+		util_instance.fs.remove_directory(generate_types_dir);
 	}
-	util_instance.fs.create_directory(generate_schema_dir);
+	util_instance.fs.create_directory(generate_types_dir);
 }
 
-function _create_schema_dirs(){
+function _create_types_dir(){
+	const generate_dir = `${init_params.root}/${defaults.folder}/generate`;
+	const generate_types_dir = `${generate_dir}/types`;
+	if(util_instance.fs.exists(generate_types_dir)){
+		util_instance.fs.remove_directory(generate_types_dir);
+	}
+	util_instance.fs.create_directory(generate_types_dir);
+}
+
+function _create_types_dirs(){
 	const dot_folder = `${init_params.root}/${defaults.folder}`;
-	const schema_dir_server = `${dot_folder}/server/src/schema`;
-	if(util_instance.fs.exists(schema_dir_server)){
-		util_instance.fs.remove_directory(schema_dir_server);
+	const types_dir_server = `${dot_folder}/server/types`;
+	if(util_instance.fs.exists(types_dir_server)){
+		util_instance.fs.remove_directory(types_dir_server);
 	}
-	util_instance.fs.create_directory(schema_dir_server);
-	const schema_dir_client = `${dot_folder}/client/src/schema`;
-	if(util_instance.fs.exists(schema_dir_client)){
-		util_instance.fs.remove_directory(schema_dir_client);
+	util_instance.fs.create_directory(types_dir_server);
+	const types_dir_client = `${dot_folder}/client/types`;
+	if(util_instance.fs.exists(types_dir_client)){
+		util_instance.fs.remove_directory(types_dir_client);
 	}
-	util_instance.fs.create_directory(schema_dir_client);
+	util_instance.fs.create_directory(types_dir_client);
 }
 
 async function _init_pacman(){
@@ -461,7 +498,7 @@ function _copy_assets(){
 	// _copy_book();
 	_copy_sample();
 	_copy_tsconfigs();
-	_update_tsconfig_paths();
+	// _update_tsconfig_paths();
 	_copy_eslint_files();
 	_copy_main_files(init_params.repo);
 }
@@ -494,106 +531,106 @@ function _create_dot_env(){
 	);
 }
 
-function _update_tsconfig_paths(){
-	// const prefix = init_params.is_dot === true ? '.' : `${defaults.folder}/server`;
-	const prefix = `${defaults.folder}/server`;
-	const main_paths = _generate_paths_server(init_params.repo, prefix);
-	const real_paths_server = _generate_paths_server(init_params.repo, `.`);
-	const real_paths_client = _generate_paths_client(init_params.repo, `.`);
-	const main_tsconfig = `tsconfig.json`;
-	_update_paths(main_tsconfig, main_paths);
-	const real_tsconfig_server = `${defaults.folder}/server/tsconfig.json`;
-	_update_paths(real_tsconfig_server, real_paths_server);
-	const real_tsconfig_client = `${defaults.folder}/client/tsconfig.json`;
-	_update_paths(real_tsconfig_client, real_paths_client);
-}
+// function _update_tsconfig_paths(){
+//   // const prefix = init_params.is_dot === true ? '.' : `${defaults.folder}/server`;
+//   const prefix = `${defaults.folder}/server`;
+//   const main_paths = _generate_paths_server(init_params.repo, prefix);
+//   const real_paths_server = _generate_paths_server(init_params.repo, `.`);
+//   const real_paths_client = _generate_paths_client(init_params.repo, `.`);
+//   const main_tsconfig = `tsconfig.json`;
+//   _update_paths(main_tsconfig, main_paths);
+//   const real_tsconfig_server = `${defaults.folder}/server/tsconfig.json`;
+//   _update_paths(real_tsconfig_server, real_paths_server);
+//   const real_tsconfig_client = `${defaults.folder}/client/tsconfig.json`;
+//   _update_paths(real_tsconfig_client, real_paths_client);
+// }
 
-function _update_paths(tsconfig_filepath:string, paths:string){
-	if(!util_instance.fs.exists(tsconfig_filepath)){
-		util_instance.fs.write_file(tsconfig_filepath, '');
-	}
-	const content = util_instance.fs.read_file(tsconfig_filepath, 'utf8');
-	const tsdata = JSON.parse(content);
-	if(!tsdata.compilerOptions){
-		tsdata.compilerOptions = {};
-	}
-	if(!tsdata.compilerOptions.paths){
-		tsdata.compilerOptions.paths = [];
-	}
-	tsdata.compilerOptions.paths = paths;
-	util_instance.fs.write_file(
-		tsconfig_filepath,
-		JSON.stringify(tsdata, null, '\t')
-	);
-}
+// function _update_paths(tsconfig_filepath:string, paths:string){
+//   if(!util_instance.fs.exists(tsconfig_filepath)){
+//     util_instance.fs.write_file(tsconfig_filepath, '');
+//   }
+//   const content = util_instance.fs.read_file(tsconfig_filepath, 'utf8');
+//   const tsdata = JSON.parse(content);
+//   if(!tsdata.compilerOptions){
+//     tsdata.compilerOptions = {};
+//   }
+//   if(!tsdata.compilerOptions.paths){
+//     tsdata.compilerOptions.paths = [];
+//   }
+//   tsdata.compilerOptions.paths = paths;
+//   util_instance.fs.write_file(
+//     tsconfig_filepath,
+//     JSON.stringify(tsdata, null, '\t')
+//   );
+// }
 
-function _generate_paths_server(repo:Repo, prefix:string){
-	const paths = {} as any;
-	// paths['uranio'] = [`${prefix}/src/uranio`];
-	// paths['uranio-books'] = [`${prefix}/src/books`];
-	// paths['uranio-books/*'] = [`${prefix}/src/books/*`];
-	switch(repo){
-		case 'core':{
-			break;
-		}
-		case 'api':{
-			paths['uranio-core'] = [`${prefix}/src/uranio/core`];
-			paths['uranio-core/*'] = [`${prefix}/src/uranio/core/*`];
-			break;
-		}
-		case 'trx':{
-			paths['uranio-core'] = [`${prefix}/src/uranio/api/core`];
-			paths['uranio-core/*'] = [`${prefix}/src/uranio/api/core/*`];
-			paths['uranio-api'] = [`${prefix}/src/uranio/api`];
-			paths['uranio-api/*'] = [`${prefix}/src/uranio/api/*`];
-			break;
-		}
-		case 'adm':{
-			paths['uranio-core'] = [`${prefix}/src/uranio/trx/api/core`];
-			paths['uranio-core/*'] = [`${prefix}/src/uranio/trx/api/core/*`];
-			paths['uranio-api'] = [`${prefix}/src/uranio/trx/api`];
-			paths['uranio-api/*'] = [`${prefix}/src/uranio/trx/api/*`];
-			paths['uranio-trx'] = [`${prefix}/src/uranio/trx`];
-			paths['uranio-trx/*'] = [`${prefix}/src/uranio/trx/*`];
-			break;
-		}
-	}
-	return paths;
-}
+// function _generate_paths_server(repo:Repo, prefix:string){
+//   const paths = {} as any;
+//   // paths['uranio'] = [`${prefix}/src/uranio`];
+//   // paths['uranio-books'] = [`${prefix}/src/books`];
+//   // paths['uranio-books/*'] = [`${prefix}/src/books/*`];
+//   switch(repo){
+//     case 'core':{
+//       break;
+//     }
+//     case 'api':{
+//       paths['uranio-core'] = [`${prefix}/src/uranio/core`];
+//       paths['uranio-core/*'] = [`${prefix}/src/uranio/core/*`];
+//       break;
+//     }
+//     case 'trx':{
+//       paths['uranio-core'] = [`${prefix}/src/uranio/api/core`];
+//       paths['uranio-core/*'] = [`${prefix}/src/uranio/api/core/*`];
+//       paths['uranio-api'] = [`${prefix}/src/uranio/api`];
+//       paths['uranio-api/*'] = [`${prefix}/src/uranio/api/*`];
+//       break;
+//     }
+//     case 'adm':{
+//       paths['uranio-core'] = [`${prefix}/src/uranio/trx/api/core`];
+//       paths['uranio-core/*'] = [`${prefix}/src/uranio/trx/api/core/*`];
+//       paths['uranio-api'] = [`${prefix}/src/uranio/trx/api`];
+//       paths['uranio-api/*'] = [`${prefix}/src/uranio/trx/api/*`];
+//       paths['uranio-trx'] = [`${prefix}/src/uranio/trx`];
+//       paths['uranio-trx/*'] = [`${prefix}/src/uranio/trx/*`];
+//       break;
+//     }
+//   }
+//   return paths;
+// }
 
-function _generate_paths_client(repo:Repo, prefix:string){
-	const paths = {} as any;
-	// paths['uranio'] = [`${prefix}/src/uranio/client`];
-	// paths['uranio-books'] = [`${prefix}/src/books`];
-	// paths['uranio-books/*'] = [`${prefix}/src/books/*`];
-	switch(repo){
-		case 'core':{
-			break;
-		}
-		case 'api':{
-			paths['uranio-core'] = [`${prefix}/src/uranio/core`];
-			paths['uranio-core/*'] = [`${prefix}/src/uranio/core/*`];
-			break;
-		}
-		case 'trx':{
-			paths['uranio-core'] = [`${prefix}/src/uranio/api/core`];
-			paths['uranio-core/*'] = [`${prefix}/src/uranio/api/core/*`];
-			paths['uranio-api'] = [`${prefix}/src/uranio/api`];
-			paths['uranio-api/*'] = [`${prefix}/src/uranio/api/*`];
-			break;
-		}
-		case 'adm':{
-			paths['uranio-core'] = [`${prefix}/src/uranio/trx/api/core`];
-			paths['uranio-core/*'] = [`${prefix}/src/uranio/trx/api/core/*`];
-			paths['uranio-api'] = [`${prefix}/src/uranio/trx/api`];
-			paths['uranio-api/*'] = [`${prefix}/src/uranio/trx/api/*`];
-			paths['uranio-trx'] = [`${prefix}/src/uranio/trx`];
-			paths['uranio-trx/*'] = [`${prefix}/src/uranio/trx/*`];
-			break;
-		}
-	}
-	return paths;
-}
+// function _generate_paths_client(repo:Repo, prefix:string){
+//   const paths = {} as any;
+//   // paths['uranio'] = [`${prefix}/src/uranio/client`];
+//   // paths['uranio-books'] = [`${prefix}/src/books`];
+//   // paths['uranio-books/*'] = [`${prefix}/src/books/*`];
+//   switch(repo){
+//     case 'core':{
+//       break;
+//     }
+//     case 'api':{
+//       paths['uranio-core'] = [`${prefix}/src/uranio/core`];
+//       paths['uranio-core/*'] = [`${prefix}/src/uranio/core/*`];
+//       break;
+//     }
+//     case 'trx':{
+//       paths['uranio-core'] = [`${prefix}/src/uranio/api/core`];
+//       paths['uranio-core/*'] = [`${prefix}/src/uranio/api/core/*`];
+//       paths['uranio-api'] = [`${prefix}/src/uranio/api`];
+//       paths['uranio-api/*'] = [`${prefix}/src/uranio/api/*`];
+//       break;
+//     }
+//     case 'adm':{
+//       paths['uranio-core'] = [`${prefix}/src/uranio/trx/api/core`];
+//       paths['uranio-core/*'] = [`${prefix}/src/uranio/trx/api/core/*`];
+//       paths['uranio-api'] = [`${prefix}/src/uranio/trx/api`];
+//       paths['uranio-api/*'] = [`${prefix}/src/uranio/trx/api/*`];
+//       paths['uranio-trx'] = [`${prefix}/src/uranio/trx`];
+//       paths['uranio-trx/*'] = [`${prefix}/src/uranio/trx/*`];
+//       break;
+//     }
+//   }
+//   return paths;
+// }
 
 async function _clone_assets_repo(){
 	output_instance.start_loading(`Cloning assets...`);
@@ -899,7 +936,7 @@ function _update_resolutions(){
 
 function _copy_generate(){
 	const gen_file =
-		`${init_params.root}/${defaults.tmp_folder}/uranio-assets/main/generate.ts`;
+		`${init_params.root}/${defaults.tmp_folder}/uranio-assets/main/${init_params.repo}/generate.ts`;
 	const dest = `${init_params.root}/${defaults.folder}/generate/src/generate.ts`;
 	util_instance.fs.copy_file(gen_file, dest, 'generate');
 }
@@ -994,7 +1031,7 @@ function _copy_admin_files(){
 }
 
 function _copy_trx_files(){
-	const assets_dir = `${init_params.root}/${defaults.tmp_folder}/uranio-assets/`;
+	const assets_dir = `${init_params.root}/${defaults.tmp_folder}/uranio-assets`;
 	const trx_main_dir = `${assets_dir}/main/trx`;
 	const dist_folder = `${init_params.root}/dist`;
 	if(!util_instance.fs.exists(dist_folder)){

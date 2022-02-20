@@ -22,6 +22,13 @@ let spinner_current = '';
 
 const is_docker = isDocker();
 
+const prefix_types = [
+	'[fn_debug]',
+	'[debug___]',
+	'[warn____]',
+	'[error___]'
+];
+
 class Output {
 	
 	constructor(public params:Params){
@@ -335,13 +342,6 @@ class Output {
 	
 }
 
-const prefix_types = [
-	'[--fn_debug--]',
-	'[--debug--]',
-	'[--warn--]',
-	'[--error--]'
-];
-
 function _is_uranio_native(text:string){
 	for(const pre of prefix_types){
 		if(text.indexOf(pre) !== -1){
@@ -373,20 +373,20 @@ function _uranio_color(text:string){
 		if(index !== -1){
 			processed_text = processed_text.substring(0, index) + processed_text.substring(index + pre.length, processed_text.length);
 			switch(pre){
-				case '[--fn_debug--]':{
+				case '[fn_debug]':{
 					processed_text = chalk.cyan(processed_text);
 					break;
 				}
-				case '[--debug--]':{
+				case '[debug___]':{
 					processed_text = chalk.blue(processed_text);
 					break;
 				}
-				case '[--warn--]':{
+				case '[warn____]':{
 					processed_text = chalk.yellow(processed_text);
 					break;
 				}
 				case '[ERROR]':
-				case '[--error--]':{
+				case '[error___]':{
 					processed_text = chalk.red(processed_text);
 					break;
 				}

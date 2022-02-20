@@ -27,29 +27,28 @@
  * Running the script will do:
  *
  * a) Generate the schema types with all the AtomName, AtomShape, Molecule, etc.
- * - /types/schema.d.ts
- * - /.uranio/generate/types/schema.d.ts
- * - /.uranio/server/types/schema.d.ts
- * - /.uranio/client/types/schema.d.ts
+ * - /.uranio/generate/schema.d.ts
  *
  * If the repository is using uranio-trx or an uranio repo that includes it:
  *
  * b) Generate the types for uranio with the custom Hooks
- * - /types/uranio.d.ts
- * - /.uranio/generate/types/uranio.d.ts
- * - /.uranio/server/types/uranio.d.ts
- * - /.uranio/client/types/uranio.d.ts
+ * - /.uranio/geneate/uranio.d.ts
  *
  * c) Generate the hooks file:
- * - /.uranio/server/src/__urn_hooks.ts
- * - /.uranio/client/src/__urn_hooks.ts
+ * - /.uranio/generate/__urn_hooks.ts
  *
  * NOTE:
- * In order for the script to run it needs the base schema file:
+ * In order for the script to run it needs the base schema files:
  * ```
- * /.uranio/generate/src/types/index.d.ts
+ * /.uranio/generate/types/schema.d.ts
+ * /.uranio/generate/types/uranio.d.ts (if uranio-trx or above)
  * ```
- * that is creted by the `init` command.
+ * that are creted by the `init` command.
+ *
+ * 5) Copy the genrated files in the correct folders:
+ * - /.uranio/generate/schema.d.ts -> /.uranio/server/types/, /.uranio/client/types/, /.uranio/generate/types/
+ * - /.uranio/generate/uranio.d.ts -> /.uranio/server/types/, /.uranio/client/types/
+ * - /.uranio/generate/hooks.ts -> /.uranio/server/src/__urn_hooks.ts, /.uranio/client/src/__urn_hooks.ts
  *
  * @packageDocumentation
  */

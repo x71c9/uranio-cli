@@ -17,6 +17,12 @@ const defaults_1 = require("../conf/defaults");
 const spinner_1 = require("./spinner");
 let spinner_current = '';
 const is_docker = (0, is_docker_1.default)();
+const prefix_types = [
+    '[fn_debug]',
+    '[debug___]',
+    '[warn____]',
+    '[error___]'
+];
 class Output {
     constructor(params) {
         this.params = params;
@@ -286,12 +292,6 @@ class Output {
         }
     }
 }
-const prefix_types = [
-    '[--fn_debug--]',
-    '[--debug--]',
-    '[--warn--]',
-    '[--error--]'
-];
 function _is_uranio_native(text) {
     for (const pre of prefix_types) {
         if (text.indexOf(pre) !== -1) {
@@ -322,20 +322,20 @@ function _uranio_color(text) {
         if (index !== -1) {
             processed_text = processed_text.substring(0, index) + processed_text.substring(index + pre.length, processed_text.length);
             switch (pre) {
-                case '[--fn_debug--]': {
+                case '[fn_debug]': {
                     processed_text = chalk_1.default.cyan(processed_text);
                     break;
                 }
-                case '[--debug--]': {
+                case '[debug___]': {
                     processed_text = chalk_1.default.blue(processed_text);
                     break;
                 }
-                case '[--warn--]': {
+                case '[warn____]': {
                     processed_text = chalk_1.default.yellow(processed_text);
                     break;
                 }
                 case '[ERROR]':
-                case '[--error--]': {
+                case '[error___]': {
                     processed_text = chalk_1.default.red(processed_text);
                     break;
                 }
