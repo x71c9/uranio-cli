@@ -15,7 +15,8 @@ import * as recast from 'recast';
 import {
 	Params,
 	valid_admin_repos,
-	valid_client_repos
+	valid_client_repos,
+	valid_hooks_repos
 } from '../types';
 
 import {default_params, defaults} from '../conf/defaults';
@@ -348,7 +349,9 @@ async function _transpose_entrypoint(){
 	const entrypoint_text = util_instance.fs.read_file(entrypoint_path);
 	let transposed_text = '';
 	transposed_text += `\n export * from './__urn_register';\n`;
-	transposed_text += `\n export * from './__urn_hooks';\n`;
+	if(valid_hooks_repos().includes(transpose_params.repo)){
+		transposed_text += `\n export * from './__urn_hooks';\n`;
+	}
 	transposed_text += `\n\n`;
 	transposed_text += entrypoint_text;
 	
