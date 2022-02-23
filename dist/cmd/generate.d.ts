@@ -32,7 +32,7 @@
  * If the repository is using uranio-trx or an uranio repo that includes it:
  *
  * b) Generate the types for uranio with the custom Hooks
- * - /.uranio/geneate/uranio.d.ts
+ * - /.uranio/geneate/uranio-trx.d.ts
  *
  * c) Generate the hooks file:
  * - /.uranio/generate/__urn_hooks.ts
@@ -41,13 +41,13 @@
  * In order for the script to run it needs the base schema files:
  * ```
  * /.uranio/generate/types/schema.d.ts
- * /.uranio/generate/types/uranio.d.ts (if uranio-trx or above)
+ * /.uranio/generate/types/uranio-trx.d.ts (if uranio-trx or above)
  * ```
  * that are creted by the `init` command.
  *
  * 5) Copy the genrated files in the correct folders:
  * - /.uranio/generate/schema.d.ts -> /.uranio/server/types/, /.uranio/client/types/, /.uranio/generate/types/
- * - /.uranio/generate/uranio.d.ts -> /.uranio/server/types/, /.uranio/client/types/
+ * - /.uranio/generate/uranio-trx.d.ts -> /.uranio/server/types/, /.uranio/client/types/
  * - /.uranio/generate/hooks.ts -> /.uranio/server/src/__urn_hooks.ts, /.uranio/client/src/__urn_hooks.ts
  *
  * @packageDocumentation

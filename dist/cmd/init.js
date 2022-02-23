@@ -316,9 +316,9 @@ function _generate_base_uranio_types() {
         output_instance.verbose_log(`Started generating base uranio types.`, `dts`);
         yield _promise_base_types();
         // const dot_dir = `${init_params.root}/${defaults.folder}`;
-        // const root_schema = `${dot_dir}/generate/types/uranio.d.ts`;
-        // const dest_schema_server = `${dot_dir}/server/types/uranio.d.ts`;
-        // const dest_schema_client = `${dot_dir}/client/types/uranio.d.ts`;
+        // const root_schema = `${dot_dir}/generate/types/uranio-trx.d.ts`;
+        // const dest_schema_server = `${dot_dir}/server/types/uranio-trx.d.ts`;
+        // const dest_schema_client = `${dot_dir}/client/types/uranio-trx.d.ts`;
         // util_instance.fs.copy_file(root_schema, dest_schema_server);
         // util_instance.fs.copy_file(root_schema, dest_schema_client);
         output_instance.done_log(`Generated base uranio types.`, `dts`);
@@ -340,7 +340,7 @@ function _generate_base_schema() {
 function _promise_base_types() {
     return new Promise((resolve, reject) => {
         const schema_path = `${init_params.root}/node_modules/uranio/`;
-        const relative_new = `../../${defaults_1.defaults.folder}/generate/base/uranio.d.ts`;
+        const relative_new = `../../${defaults_1.defaults.folder}/generate/base/uranio-trx.d.ts`;
         const npm_dts = `npx npm-dts generate -r ${schema_path} -o ${relative_new} -L debug`;
         util_instance.spawn.spin(npm_dts, 'dts', 'generating base types', undefined, resolve, reject);
     });

@@ -32,7 +32,7 @@
  * If the repository is using uranio-trx or an uranio repo that includes it:
  *
  * b) Generate the types for uranio with the custom Hooks
- * - /.uranio/geneate/uranio.d.ts
+ * - /.uranio/geneate/uranio-trx.d.ts
  *
  * c) Generate the hooks file:
  * - /.uranio/generate/__urn_hooks.ts
@@ -41,13 +41,13 @@
  * In order for the script to run it needs the base schema files:
  * ```
  * /.uranio/generate/types/schema.d.ts
- * /.uranio/generate/types/uranio.d.ts (if uranio-trx or above)
+ * /.uranio/generate/types/uranio-trx.d.ts (if uranio-trx or above)
  * ```
  * that are creted by the `init` command.
  * 
  * 5) Copy the genrated files in the correct folders:
  * - /.uranio/generate/schema.d.ts -> /.uranio/server/types/, /.uranio/client/types/, /.uranio/generate/types/
- * - /.uranio/generate/uranio.d.ts -> /.uranio/server/types/, /.uranio/client/types/
+ * - /.uranio/generate/uranio-trx.d.ts -> /.uranio/server/types/, /.uranio/client/types/
  * - /.uranio/generate/hooks.ts -> /.uranio/server/src/__urn_hooks.ts, /.uranio/client/src/__urn_hooks.ts
  *
  * @packageDocumentation
@@ -75,7 +75,7 @@ let generate_params = default_params as Params;
 
 let urn_optput_dir = `.uranio/generate`;
 let urn_schema_base_path = `.uranio/generate/base/schema.d.ts`;
-let urn_types_base_path = `.uranio/generate/base/uranio.d.ts`;
+let urn_types_base_path = `.uranio/generate/base/uranio-trx.d.ts`;
 
 let register_path_generate = `.uranio/generate/src/register.ts`;
 let register_path_server = `.uranio/server/src/__urn_register.ts`;
@@ -90,7 +90,7 @@ export async function generate(params:Params, is_included=false)
 	
 	const dot_dir = `${generate_params.root}/${defaults.folder}`;
 	urn_schema_base_path = `${dot_dir}/generate/base/schema.d.ts`;
-	urn_types_base_path = `${dot_dir}/generate/base/uranio.d.ts`;
+	urn_types_base_path = `${dot_dir}/generate/base/uranio-trx.d.ts`;
 	urn_optput_dir = `${dot_dir}/generate`;
 	
 	register_path_generate = `${dot_dir}/generate/src/register.ts`;
@@ -138,9 +138,9 @@ function _copy_generated_files(){
 	util_instance.fs.copy_file(`${urn_optput_dir}/schema.d.ts`, `${dot_dir}/client/types/schema.d.ts`);
 	
 	// util_instance.fs.copy_file(`${urn_optput_dir}/uranio.d.ts`, `${generate_params.root}/types/uranio.d.ts`);
-	util_instance.fs.copy_file(`${urn_optput_dir}/uranio.d.ts`, `${dot_dir}/generate/types/uranio.d.ts`);
-	util_instance.fs.copy_file(`${urn_optput_dir}/uranio.d.ts`, `${dot_dir}/server/types/uranio.d.ts`);
-	util_instance.fs.copy_file(`${urn_optput_dir}/uranio.d.ts`, `${dot_dir}/client/types/uranio.d.ts`);
+	util_instance.fs.copy_file(`${urn_optput_dir}/uranio-trx.d.ts`, `${dot_dir}/generate/types/uranio-trx.d.ts`);
+	util_instance.fs.copy_file(`${urn_optput_dir}/uranio-trx.d.ts`, `${dot_dir}/server/types/uranio-trx.d.ts`);
+	util_instance.fs.copy_file(`${urn_optput_dir}/uranio-trx.d.ts`, `${dot_dir}/client/types/uranio-trx.d.ts`);
 	
 	if(valid_hooks_repos().includes(generate_params.repo)){
 		util_instance.fs.copy_file(`${urn_optput_dir}/__urn_hooks.ts`, `${dot_dir}/server/src/__urn_hooks.ts`);
