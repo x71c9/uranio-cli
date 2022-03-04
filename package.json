@@ -34,7 +34,7 @@
 		"@types/is-docker": "^2.0.0",
 		"@types/minimist": "^1.2.1",
 		"@types/prettier": "^2.2.2",
-		"uranio-dev": "git+ssh://git@github.com/nbl7/uranio-dev.git"
+		"uranio-dev": "git+ssh://git@github.com/nbl7/uranio-dev.git#master"
 	},
 	"dependencies": {
 		"babylon": "^6.18.0",
@@ -50,7 +50,7 @@
 		"prettier": "^2.2.1",
 		"recast": "^0.20.5",
 		"ts-morph": "^10.0.1",
-		"urn-lib": "git+ssh://git@github.com/nbl7/uranio-lib.git"
+		"urn-lib": "git+ssh://git@github.com/nbl7/uranio-lib.git#master"
 	},
 	"bin": {
 		"urn": "dist/sh.js",
