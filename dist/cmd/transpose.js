@@ -38,53 +38,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.transpose_one = exports.transpose = void 0;
 const path_1 = __importDefault(require("path"));
+const esbuild = __importStar(require("esbuild"));
 const recast = __importStar(require("recast"));
-// import * as tsm from 'ts-morph';
-// import {urn_util} from 'urn-lib';
 const types_1 = require("../types");
+// import {default_params, defaults} from '../conf/defaults';
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
-// import * as alias from './alias';
 const common_1 = require("./common");
-// import {Aliases} from './types';
-// type BookName = 'atom' | 'dock' | 'bll' | 'routes';
-// const atom_book_required_properties = [
-//   'properties',
-//   'plural',
-//   'connection',
-//   'security',
-//   'read_only'
-// ];
-// const dock_book_required_properties = [
-//   'dock',
-//   'plural'
-// ];
-// const bll_book_required_properties = [
-//   'bll'
-// ];
-// const atom_book_required_client_first_props = [
-//   'properties',
-//   'plural',
-//   'connection',
-//   'authenticate',
-//   'read_only'
-// ];
-// const dock_book_required_client_second_props = [
-//   'url',
-//   'routes',
-//   'auth_url'
-// ];
-// const submodules = ['core', 'api', 'trx'];
 let output_instance;
 let util_instance;
 let transpose_params = defaults_1.default_params;
-// const _project_option = {
-//   manipulationSettings: {
-//     indentationText: tsm.IndentationText.Tab,
-//     quoteKind: tsm.QuoteKind.Single,
-//   }
-// };
 function transpose(params, included = false) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_tranpose(params);
@@ -136,198 +100,226 @@ function _transpose_file(file_path, included = false) {
         if (not_valid_extensions.includes(extension)) {
             return;
         }
-        // const dot_book_dir = `${transpose_params.root}/src/books`;
-        // if(transpose_params.is_dot && file_path.includes(dot_book_dir)){
-        //   return;
-        // }
-        // if(file_path === `${transpose_params.root}/src/book.ts`){
-        //   await _transpose_book();
-        //   if(!included){
-        //     output_instance.done_log(`Transpose book completed.`);
-        //   }
-        //   return;
-        // }
-        if (file_path === `${transpose_params.root}/src/index.ts`) {
-            yield _transpose_entrypoint();
-            if (!included) {
-                output_instance.done_log(`Transpose entrypoint completed.`);
-            }
+        const src_path = `${transpose_params.root}/src`;
+        if (!file_path || !util_instance.fs.exists(file_path)) {
+            let err_msg = '';
+            err_msg += `Invalid file path [${file_path}].`;
+            output_instance.error_log(err_msg, 'trsp');
             return;
         }
-        const src_path = `${transpose_params.root}/src/`;
-        if (file_path &&
-            util_instance.fs.exists(file_path) &&
-            file_path.includes(src_path)) {
-            const base_folder = `${transpose_params.root}/${defaults_1.defaults.folder}`;
-            const atom_dir = `${transpose_params.root}/src/atoms`;
-            const frontend_src_path = `${transpose_params.root}/src/frontend`;
-            const uranio_src_path = `${transpose_params.root}/src/uranio`;
-            if (file_path.includes(atom_dir)) {
-                _transpose_atom(file_path);
-            }
-            else if (file_path.includes(uranio_src_path)) {
-                // const uranio_server_target = file_path.replace(
-                //   uranio_src_path,
-                //   path.join(base_folder, 'server/src', defaults.repo_folder)
-                // );
-                // util_instance.fs.copy_file(file_path, uranio_server_target, 'trsp');
-                // if(path.extname(file_path) === '.ts'){
-                //   await alias.replace_file_aliases(
-                //     uranio_server_target,
-                //     alias.get_aliases(
-                //       `${base_folder}/server/tsconfig.json`,
-                //       transpose_params
-                //     )
-                //   );
-                //   await _avoid_import_loop(uranio_server_target);
-                //   output_instance.done_verbose_log(
-                //     `Transposed uranio server file [${file_path}] [${uranio_server_target}].`,
-                //     'trsp'
-                //   );
-                // }
-                // const uranio_client_target = file_path.replace(
-                //   uranio_src_path,
-                //   path.join(base_folder, 'client/src', defaults.repo_folder)
-                // );
-                // util_instance.fs.copy_file(file_path, uranio_client_target, 'trsp');
-                // if(path.extname(file_path) === '.ts'){
-                //   await alias.replace_file_aliases(
-                //     uranio_client_target,
-                //     alias.get_aliases(
-                //       `${base_folder}/client/tsconfig.json`,
-                //       transpose_params
-                //     )
-                //   );
-                //   await _avoid_import_loop(uranio_client_target);
-                //   output_instance.done_verbose_log(
-                //     `Transposed uranio client file [${file_path}] [${uranio_client_target}].`,
-                //     'trsp'
-                //   );
-                // }
-            }
-            else if ((0, types_1.valid_admin_repos)().includes(transpose_params.repo)
-                && file_path.includes(frontend_src_path)) {
-                // const frontend_target = file_path.replace(
-                //   frontend_src_path,
-                //   path.join(base_folder, 'client/src', defaults.repo_folder, 'nuxt')
-                // );
-                // util_instance.fs.copy_file(file_path, frontend_target, 'trsp');
-                // if(path.extname(file_path) === '.ts'){
-                //   await alias.replace_file_aliases(
-                //     frontend_target,
-                //     alias.get_aliases(
-                //       `${base_folder}/client/tsconfig.json`,
-                //       transpose_params
-                //     )
-                //   );
-                //   await _avoid_import_loop(frontend_target);
-                //   output_instance.done_verbose_log(
-                //     `Transposed frontend file [${file_path}] [${frontend_target}].`,
-                //     'trsp'
-                //   );
-                // }
-            }
-            else if ((0, types_1.valid_client_repos)().includes(transpose_params.repo)
-                && file_path.includes(frontend_src_path)) {
-                // const frontend_target = file_path.replace(
-                //   frontend_src_path,
-                //   path.join(base_folder, 'client/src', defaults.repo_folder)
-                // );
-                // util_instance.fs.copy_file(file_path, frontend_target, 'trsp');
-                // if(path.extname(file_path) === '.ts'){
-                //   await alias.replace_file_aliases(
-                //     frontend_target,
-                //     alias.get_aliases(
-                //       `${base_folder}/client/tsconfig.json`,
-                //       transpose_params
-                //     )
-                //   );
-                //   await _avoid_import_loop(frontend_target);
-                //   output_instance.done_verbose_log(
-                //     `Transposed frontend file [${file_path}] [${frontend_target}].`,
-                //     'trsp'
-                //   );
-                // }
-            }
-            else {
-                const new_path_server = file_path.replace(src_path, `${base_folder}/server/src/`);
-                const new_path_client = file_path.replace(src_path, `${base_folder}/client/src/`);
-                util_instance.fs.copy_file(file_path, new_path_server, 'trsp');
-                util_instance.fs.copy_file(file_path, new_path_client, 'trsp');
-                // if(path.extname(file_path) === '.ts'){
-                //   const alias_srv_promise = alias.replace_file_aliases(
-                //     new_path_server,
-                //     alias.get_aliases(
-                //       `${base_folder}/server/tsconfig.json`,
-                //       transpose_params
-                //     )
-                //   );
-                //   const alias_cln_promise = alias.replace_file_aliases(
-                //     new_path_client,
-                //     alias.get_aliases(
-                //       `${base_folder}/client/tsconfig.json`,
-                //       transpose_params
-                //     )
-                //   );
-                //   await Promise.all([alias_srv_promise, alias_cln_promise]);
-                //   const srv_promise = _avoid_import_loop(new_path_server);
-                //   const cln_promise = _avoid_import_loop(new_path_client);
-                //   await Promise.all([srv_promise, cln_promise]);
-                //   output_instance.done_verbose_log(
-                //     `Transposed file [${file_path}].`,
-                //     'trsp'
-                //   );
-                // }
-            }
-        }
-        else {
+        if (!file_path.includes(src_path)) {
             let err_msg = '';
             err_msg += `Invalid file path [${file_path}].`;
             err_msg += ` File must be in [${transpose_params.root}/src/].`;
             output_instance.error_log(err_msg, 'trsp');
+            return;
+        }
+        const atoms_src_dir = `${src_path}/atoms`;
+        const server_src_dir = `${src_path}/server`;
+        const admin_src_dir = `${src_path}/admin`;
+        if (file_path.includes(atoms_src_dir)) {
+            _transpose_atom_dir_file(file_path);
+        }
+        else if ((0, types_1.valid_deploy_repos)().includes(transpose_params.repo)
+            && file_path.includes(server_src_dir)) {
+            _transpose_server_dir_file(file_path);
+        }
+        else if ((0, types_1.valid_admin_repos)().includes(transpose_params.repo)
+            && file_path.includes(admin_src_dir)) {
+            _transpose_admin_dir_file(file_path);
         }
         if (!included) {
             output_instance.done_log(`Transpose file completed. [${file_path}]`);
         }
     });
 }
-function _transpose_entrypoint() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const entrypoint_path = `${transpose_params.root}/src/index.ts`;
-        const entrypoint_text = util_instance.fs.read_file(entrypoint_path);
-        let transposed_text = '';
-        transposed_text += `\n export * from './__urn_register';\n`;
-        if ((0, types_1.valid_hooks_repos)().includes(transpose_params.repo)) {
-            transposed_text += `\n export * from './__urn_hooks';\n`;
-        }
-        transposed_text += `\n\n`;
-        transposed_text += entrypoint_text;
-        const dot_dir = `${transpose_params.root}/${defaults_1.defaults.folder}`;
-        const entrypoint_dest_server = `${dot_dir}/server/src/index.ts`;
-        const entrypoint_dest_client = `${dot_dir}/client/src/index.ts`;
-        util_instance.fs.write_file(entrypoint_dest_server, transposed_text);
-        util_instance.fs.write_file(entrypoint_dest_client, transposed_text);
+function _transpose_atom_dir_file(file_path) {
+    const atoms_dir = `${transpose_params.root}/src/atoms/`;
+    const relative_path = file_path.replace(atoms_dir, '');
+    const text = util_instance.fs.read_file(file_path);
+    let text_server = _replace_import_server(text, file_path);
+    let text_client = _replace_import_client(text, file_path);
+    if (_is_atom_register_definition(file_path)) {
+        const atom_name = _get_atom_name_from_path(file_path);
+        text_server = _process_atom_register_definition_server(text_server, atom_name);
+        text_client = _process_atom_register_definition_client(text_client, atom_name);
+    }
+    else if ((0, types_1.valid_deploy_repos)().includes(transpose_params.repo)
+        && _is_route_register_definition(file_path)) {
+        const atom_name = _get_atom_name_from_path(file_path);
+        const route_name = _get_route_name_from_path(file_path);
+        text_server = _process_route_register_definition_server(text_server, atom_name, route_name);
+        text_client = _process_route_register_definition_client(text_client, atom_name, route_name);
+    }
+    const node_atoms = `${transpose_params.root}/node_modules/uranio/src/atoms`;
+    const node_dest_server = `${node_atoms}/server/${relative_path}`;
+    const node_dest_client = `${node_atoms}/client/${relative_path}`;
+    util_instance.fs.write_file(node_dest_server, text_server);
+    util_instance.fs.write_file(node_dest_client, text_client);
+    const node_dist_path_server = _dest_dist_path(node_dest_server);
+    const node_dist_path_client = _dest_dist_path(node_dest_client);
+    _compile(node_dest_server, node_dist_path_server);
+    _compile(node_dest_client, node_dist_path_client);
+}
+function _dest_dist_path(filepath) {
+    const file_name = path_1.default.parse(filepath).name;
+    let dir_name = path_1.default.dirname(filepath);
+    dir_name = dir_name.replace(`${transpose_params.root}/node_modules/uranio/src/`, `${transpose_params.root}/node_modules/uranio/dist/`);
+    return `${dir_name}/${file_name}.js`;
+}
+function _compile(src_path, dest_path) {
+    esbuild.buildSync({
+        entryPoints: [src_path],
+        outfile: dest_path,
+        platform: 'node',
+        format: 'cjs',
+        // sourcemap: true,
+        // minify: true
     });
 }
-function _transpose_atom(file_path) {
-    const atom_dir = `${transpose_params.root}/src/atoms/`;
-    const atom_path = file_path.replace(atom_dir, '');
-    const splitted_atom_path = atom_path.split('/');
-    if (splitted_atom_path.length !== 2) {
-        return;
-    }
-    const atom_name = splitted_atom_path[0];
-    const text = _atom_with_name_argument(file_path, atom_name);
-    const dot_dir = `${transpose_params.root}/${defaults_1.defaults.folder}`;
-    const dest_generate = `${dot_dir}/generate/src/atoms/${atom_path}`;
-    const dest_server = `${dot_dir}/server/src/atoms/${atom_path}`;
-    const dest_client = `${dot_dir}/client/src/atoms/${atom_path}`;
-    util_instance.fs.write_file(dest_generate, text);
-    util_instance.fs.copy_file(dest_generate, dest_server);
-    util_instance.fs.copy_file(dest_generate, dest_client);
+function _process_route_register_definition_client(text, atom_name, route_name) {
+    let updated_text = text;
+    updated_text = _route_definition_without_call_paramter(updated_text);
+    updated_text = _route_with_atom_and_name_argument(updated_text, atom_name, route_name);
+    return updated_text;
 }
-function _atom_with_name_argument(file_path, atom_name) {
-    const source = util_instance.fs.read_file(file_path);
+function _process_route_register_definition_server(text, atom_name, route_name) {
+    let updated_text = text;
+    updated_text = _route_with_atom_and_name_argument(updated_text, atom_name, route_name);
+    return updated_text;
+}
+function _route_definition_without_call_paramter(source) {
+    const parsed_ast = recast.parse(source, {
+        parser: require("recast/parsers/typescript")
+    });
+    const all = parsed_ast.program.body;
+    for (const node of all) {
+        if (node.type === 'ExportDefaultDeclaration') {
+            const obj_declaration = node.declaration;
+            if (obj_declaration.type === 'CallExpression') {
+                if (obj_declaration.arguments.length === 0) {
+                    break;
+                }
+                const definition = obj_declaration.arguments[0];
+                if (definition.properties.length === 0) {
+                    break;
+                }
+                for (let i = 0; i < definition.properties.length; i++) {
+                    const obj_prop = definition.properties[i];
+                    const key = obj_prop.key;
+                    if (key && key.name === 'call') {
+                        delete definition.properties[i];
+                        break;
+                    }
+                }
+            }
+            break;
+        }
+    }
+    const printed = recast.print(parsed_ast, { useTabs: true }).code;
+    return printed;
+}
+function _route_with_atom_and_name_argument(source, atom_name, route_name) {
+    const parsed_ast = recast.parse(source, {
+        parser: require("recast/parsers/typescript")
+    });
+    const all = parsed_ast.program.body;
+    for (const node of all) {
+        if (node.type === 'ExportDefaultDeclaration') {
+            const obj_declaration = node.declaration;
+            if (obj_declaration.type === 'CallExpression') {
+                const atom_arg = _create_atom_name_argument(atom_name);
+                const route_arg = _create_route_name_argument(route_name);
+                if (obj_declaration.arguments.length === 1) {
+                    obj_declaration.arguments.push(atom_arg);
+                    obj_declaration.arguments.push(route_arg);
+                }
+                else if (obj_declaration.arguments.length === 2) {
+                    obj_declaration.arguments[1] = atom_arg;
+                    obj_declaration.arguments.push(route_arg);
+                }
+                else if (obj_declaration.arguments.length === 3) {
+                    obj_declaration.arguments[1] = atom_arg;
+                    obj_declaration.arguments[2] = route_arg;
+                }
+            }
+            break;
+        }
+    }
+    const printed = recast.print(parsed_ast, { useTabs: true }).code;
+    return printed;
+}
+function _get_route_name_from_path(file_path) {
+    return path_1.default.parse(file_path).name;
+}
+function _get_atom_name_from_path(file_path) {
+    const atoms_dir_path = `${transpose_params.root}/src/atoms/`;
+    const relative_to_atom_dir_path = file_path.replace(atoms_dir_path, '');
+    const relative_splitted = relative_to_atom_dir_path.split('/');
+    const atom_name = relative_splitted[0];
+    return atom_name;
+}
+function _process_atom_register_definition_server(text, atom_name) {
+    let updated_text = text;
+    updated_text = _atom_with_name_argument(updated_text, atom_name);
+    return updated_text;
+}
+function _process_atom_register_definition_client(text, atom_name) {
+    let updated_text = text;
+    updated_text = _atom_with_name_argument(updated_text, atom_name);
+    return updated_text;
+}
+function _is_route_register_definition(file_path) {
+    const atoms_dir_path = `${transpose_params.root}/src/atoms/`;
+    const relative_to_atom_dir_path = file_path.replace(atoms_dir_path, '');
+    const relative_splitted = relative_to_atom_dir_path.split('/');
+    return (relative_splitted.length === 3 && relative_splitted[1] === 'routes');
+}
+function _is_atom_register_definition(file_path) {
+    const atoms_dir_path = `${transpose_params.root}/src/atoms/`;
+    const relative_to_atom_dir_path = file_path.replace(atoms_dir_path, '');
+    const relative_splitted = relative_to_atom_dir_path.split('/');
+    return (relative_splitted.length === 2 && path_1.default.basename(file_path) === 'index.ts');
+}
+function _replace_import_server(text, file_path) {
+    return _replace_import(text, file_path, 'server');
+}
+function _replace_import_client(text, file_path) {
+    return _replace_import(text, file_path, 'client');
+}
+function _replace_import(text, file_path, parent_folder) {
+    const atoms_dir_path = `${transpose_params.root}/src/atoms/`;
+    const relative_to_atom_dir_path = file_path.replace(atoms_dir_path, '');
+    const relative_splitted = relative_to_atom_dir_path.split('/');
+    const depth = relative_splitted.length;
+    const up = Array(depth + 1).fill('..').join('/');
+    const source = `${up}/${parent_folder}/main`;
+    const parsed_ast = recast.parse(text, {
+        parser: require("recast/parsers/typescript")
+    });
+    const all = parsed_ast.program.body;
+    for (const node of all) {
+        if (node.type === 'ImportDeclaration') {
+            if (node.source.value === 'uranio') {
+                const b = recast.types.builders;
+                const all_uranio_id = b.identifier('uranio');
+                const import_namespace = b.importNamespaceSpecifier(all_uranio_id); // * as uranio
+                node.specifiers[0] = import_namespace; // replace default "uranio" to "* as uranio"
+                node.source.value = source; // replace "uranio" with "../../../server/main"
+                break;
+            }
+        }
+    }
+    const printed = recast.print(parsed_ast, { useTabs: true }).code;
+    return printed;
+}
+function _transpose_server_dir_file(_file_path) {
+    //TODO
+}
+function _transpose_admin_dir_file(_file_path) {
+    //TODO
+}
+function _atom_with_name_argument(source, atom_name) {
     const parsed_ast = recast.parse(source, {
         parser: require("recast/parsers/typescript")
     });
@@ -353,6 +345,11 @@ function _atom_with_name_argument(file_path, atom_name) {
 function _create_atom_name_argument(atom_name) {
     const b = recast.types.builders;
     const arg_node = b.stringLiteral(atom_name);
+    return arg_node;
+}
+function _create_route_name_argument(route_name) {
+    const b = recast.types.builders;
+    const arg_node = b.stringLiteral(route_name);
     return arg_node;
 }
 // async function _transpose_book(){

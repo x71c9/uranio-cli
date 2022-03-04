@@ -465,8 +465,8 @@ function _switch_command(args) {
         }
         case 'generate': {
             switch (splitted_cmd[1]) {
-                case 'uranio': {
-                    (0, index_1.generate_uranio)(process_params);
+                case 'register': {
+                    (0, index_1.generate_register)(process_params);
                     break;
                 }
                 case '':

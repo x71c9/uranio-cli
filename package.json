@@ -5,12 +5,14 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
-		"init": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js init -fvw -r api -x [CL] --branch new\"",
-		"build": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js build -fvw -r api -x [CL] --branch new\"",
-		"dev": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js dev --branch new\"",
-		"help": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -h -x --branch new\"",
-		"version": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v --branch new\"",
-		"watch": "npx tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -vu --branch new\""
+		"init": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js init -fvw -r api -x [CL] --branch master\"",
+		"build": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js build -fvw -r api -x [CL] --branch master\"",
+		"dev": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js dev --branch master\"",
+		"help": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -h -x --branch master\"",
+		"version": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v --branch master\"",
+		"watch": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -vu --branch master\"",
+		"transpose": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js transpose -vu \"",
+		"generate:register": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js generate:register -vu \""
 	},
 	"engines": {
 		"node": ">=14"

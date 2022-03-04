@@ -31,7 +31,7 @@ import {
 	docker,
 	deinit,
 	generate,
-	generate_uranio
+	generate_register
 } from './cmd/index';
 
 import {default_params, defaults} from './conf/defaults';
@@ -563,8 +563,8 @@ function _switch_command(args:Arguments){
 		}
 		case 'generate':{
 			switch(splitted_cmd[1]){
-				case 'uranio':{
-					generate_uranio(process_params);
+				case 'register':{
+					generate_register(process_params);
 					break;
 				}
 				case '':
