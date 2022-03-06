@@ -38,7 +38,24 @@ export async function transpose(params:Partial<Params>, included=false)
 	
 	_init_tranpose(params);
 	
-	await _transpose_all(included);
+	try{
+		
+		await _transpose_all(included);
+		
+	}catch(ex){
+		
+		const err = ex as Error;
+		if(included){
+			output_instance.error_log(err.toString());
+			// if(err.stack){
+			//   output_instance.error_log(err.stack.toString());
+			// }
+			output_instance.error_log(err.message);
+		}else{
+			throw ex;
+		}
+		
+	}
 	
 }
 
@@ -47,11 +64,6 @@ export async function transpose_one(full_path:string, params:Partial<Params>, in
 	
 	_init_tranpose(params);
 	
-	if(typeof full_path !== 'string' || full_path === ''){
-		output_instance.error_log('Invalid path.', 'trsp');
-		process.exit(1);
-	}
-		
 	if(util_instance.fs.is_directory(full_path)){
 		
 		await _transpose_folder(full_path, included);
@@ -63,6 +75,38 @@ export async function transpose_one(full_path:string, params:Partial<Params>, in
 	}
 }
 
+export async function transpose_unlink_dir(full_path:string, params:Partial<Params>, included=false)
+		:Promise<void>{
+	
+	_init_tranpose(params);
+	
+	_validate_path(full_path);
+	
+	await _unlink_dir(full_path);
+	
+	if(included){
+		output_instance.done_log(`Transpose unlink dir completed.`);
+	}else{
+		output_instance.end_log(`Transpose unlink dir completed.`);
+	}
+}
+
+export async function transpose_unlink_file(full_path:string, params:Partial<Params>, included=false)
+		:Promise<void>{
+	
+	_init_tranpose(params);
+	
+	_validate_path(full_path);
+	
+	await _unlink_file(full_path);
+	
+	if(included){
+		output_instance.done_log(`Transpose unlink file completed.`);
+	}else{
+		output_instance.end_log(`Transpose unlink file completed.`);
+	}
+}
+
 function _init_tranpose(params:Partial<Params>){
 	
 	transpose_params = merge_params(params);
@@ -71,7 +115,7 @@ function _init_tranpose(params:Partial<Params>){
 	
 	util_instance = util.create(transpose_params, output_instance);
 	
-	util_instance.must_be_initialized();
+	// util_instance.must_be_initialized();
 	
 }
 
@@ -89,35 +133,12 @@ async function _transpose_all(included=false){
 
 async function _transpose_file(file_path:string, included=false):Promise<void>{
 	
-	const basename = path.basename(file_path);
-	const extension = path.extname(basename);
+	output_instance.debug_log(`Transposing [${file_path}]...`);
 	
-	if(basename.match(/^\.git/) !== null){
-		return;
-	}
-	
-	const not_valid_extensions = ['.swp', '.swo'];
-	if(not_valid_extensions.includes(extension)){
-		return;
-	}
+	_validate_exists_path(file_path);
 	
 	const src_path = `${transpose_params.root}/src`;
 	
-	if(!file_path || !util_instance.fs.exists(file_path)){
-		let err_msg = '';
-		err_msg += `Invalid file path [${file_path}].`;
-		output_instance.error_log(err_msg, 'trsp');
-		return;
-	}
-	
-	if(!file_path.includes(src_path)){
-		let err_msg = '';
-		err_msg += `Invalid file path [${file_path}].`;
-		err_msg += ` File must be in [${transpose_params.root}/src/].`;
-		output_instance.error_log(err_msg, 'trsp');
-		return;
-	}
-		
 	const atoms_src_dir = `${src_path}/atoms`;
 	const server_src_dir = `${src_path}/server`;
 	const admin_src_dir = `${src_path}/admin`;
@@ -146,6 +167,139 @@ async function _transpose_file(file_path:string, included=false):Promise<void>{
 		output_instance.done_log(`Transpose file completed. [${file_path}]`);
 	}
 	
+}
+
+function _validate_exists_path(full_path:string){
+	
+	_validate_path(full_path);
+	
+	if(!full_path || !util_instance.fs.exists(full_path)){
+		let err_msg = '';
+		err_msg += `Invalid file path [${full_path}].`;
+		output_instance.error_log(err_msg, 'trsp');
+		return;
+	}
+	
+}
+
+function _validate_path(full_path:string){
+	
+	if(typeof full_path !== 'string' || full_path === ''){
+		output_instance.error_log('Invalid path.', 'trsp');
+		process.exit(1);
+	}
+		
+	const basename = path.basename(full_path);
+	const extension = path.extname(basename);
+	
+	if(basename.match(/^\.git/) !== null){
+		return;
+	}
+	
+	const not_valid_extensions = ['.swp', '.swo'];
+	if(not_valid_extensions.includes(extension)){
+		return;
+	}
+	
+	const src_path = `${transpose_params.root}/src`;
+	
+	if(!full_path.includes(src_path)){
+		let err_msg = '';
+		err_msg += `Invalid file path [${full_path}].`;
+		err_msg += ` File must be in [${transpose_params.root}/src/].`;
+		output_instance.error_log(err_msg, 'trsp');
+		return;
+	}
+	
+}
+
+async function _unlink_dir(full_path:string){
+	
+	const src_path = `${transpose_params.root}/src`;
+	
+	const atoms_src_dir = `${src_path}/atoms`;
+	const server_src_dir = `${src_path}/server`;
+	const admin_src_dir = `${src_path}/admin`;
+	
+	if(full_path.includes(atoms_src_dir)){
+		
+		const relative_to_atom_dir_path = full_path.replace(atoms_src_dir, '');
+		const node_uranio_dir = `${transpose_params.root}/node_modules/uranio`;
+		const node_atoms_src = `${node_uranio_dir}/src/atoms`;
+		const node_atoms_dist = `${node_uranio_dir}/dist/atoms`;
+		util_instance.fs.remove_directory(
+			`${node_atoms_src}/server${relative_to_atom_dir_path}`
+		);
+		util_instance.fs.remove_directory(
+			`${node_atoms_src}/client${relative_to_atom_dir_path}`
+		);
+		util_instance.fs.remove_directory(
+			`${node_atoms_dist}/server${relative_to_atom_dir_path}`
+		);
+		util_instance.fs.remove_directory(
+			`${node_atoms_dist}/client${relative_to_atom_dir_path}`
+		);
+		
+	}else if(
+		valid_deploy_repos().includes(transpose_params.repo)
+		&& full_path.includes(server_src_dir)
+	){
+		
+		// TODO
+		
+	}else if(
+		valid_admin_repos().includes(transpose_params.repo)
+		&& full_path.includes(admin_src_dir)
+	){
+		
+		// TODO
+		
+	}
+	
+}
+
+async function _unlink_file(file_path:string){
+	
+	const src_path = `${transpose_params.root}/src`;
+	
+	const atoms_src_dir = `${src_path}/atoms`;
+	const server_src_dir = `${src_path}/server`;
+	const admin_src_dir = `${src_path}/admin`;
+	
+	if(file_path.includes(atoms_src_dir)){
+		
+		const relative_to_atom_dir_path = file_path.replace(atoms_src_dir, '');
+		const node_uranio_dir = `${transpose_params.root}/node_modules/uranio`;
+		const node_atoms_src = `${node_uranio_dir}/src/atoms`;
+		const node_atoms_dist = `${node_uranio_dir}/dist/atoms`;
+		util_instance.fs.remove_file(
+			`${node_atoms_src}/server${relative_to_atom_dir_path}`
+		);
+		util_instance.fs.remove_file(
+			`${node_atoms_src}/client${relative_to_atom_dir_path}`
+		);
+		util_instance.fs.remove_file(
+			`${node_atoms_dist}/server${relative_to_atom_dir_path}`
+		);
+		util_instance.fs.remove_file(
+			`${node_atoms_dist}/client${relative_to_atom_dir_path}`
+		);
+		
+	}else if(
+		valid_deploy_repos().includes(transpose_params.repo)
+		&& file_path.includes(server_src_dir)
+	){
+		
+		// TODO
+		
+	}else if(
+		valid_admin_repos().includes(transpose_params.repo)
+		&& file_path.includes(admin_src_dir)
+	){
+		
+		// TODO
+		
+	}
 }
 
 function _transpose_atom_dir_file(file_path:string){

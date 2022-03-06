@@ -34,7 +34,10 @@ let compiled_register_path_client = `node_modules/uranio/dist/client/register.js
 export async function generate(params:Params, is_included=false)
 		:Promise<void>{
 	
-	_init_types(params);
+	_init_generate(params);
+	
+	const generate_cmd = `yarn uranio-generate-${generate_params.repo}`;
+	util_instance.spawn.verbose_log(generate_cmd, 'generate', 'generating');
 	
 	if(!is_included){
 		output_instance.end_log('Generate completed.');
@@ -45,13 +48,21 @@ export async function generate(params:Params, is_included=false)
 export async function generate_register(params:Params, is_included=false)
 		:Promise<void>{
 	
-	_init_types(params);
+	_init_generate(params);
 	
-	register_path_server = `${generate_params.root}/${register_path_server}`;
-	register_path_client = `${generate_params.root}/${register_path_client}`;
+	const node_register_uranio_src = `node_modules/uranio/src`;
+	const node_register_src_server = `${node_register_uranio_src}/server/register.ts`;
+	const node_register_src_client = `${node_register_uranio_src}/client/register.ts`;
 	
-	compiled_register_path_server = `${generate_params.root}/${compiled_register_path_server}`;
-	compiled_register_path_client = `${generate_params.root}/${compiled_register_path_client}`;
+	const node_register_uranio_dist = `node_modules/uranio/dist`;
+	const node_register_dist_server = `${node_register_uranio_dist}/server/register.js`
+	const node_register_dist_client = `${node_register_uranio_dist}/client/register.js`
+	
+	register_path_server = `${generate_params.root}/${node_register_src_server}`;
+	register_path_client = `${generate_params.root}/${node_register_src_client}`;
+	
+	compiled_register_path_server = `${generate_params.root}/${node_register_dist_server}`;
+	compiled_register_path_client = `${generate_params.root}/${node_register_dist_client}`;
 	
 	_generate_server_register();
 	_generate_client_register();
@@ -65,10 +76,10 @@ export async function generate_register(params:Params, is_included=false)
 	
 }
 
-function _compile_register_server(){
+function _compile(src:string, dest:string){
 	esbuild.buildSync({
-		entryPoints: [register_path_server],
-		outfile: compiled_register_path_server,
+		entryPoints: [src],
+		outfile: dest,
 		platform: 'node',
 		format: 'cjs',
 		// sourcemap: true,
@@ -76,15 +87,12 @@ function _compile_register_server(){
 	});
 }
 
+function _compile_register_server(){
+	_compile(register_path_server, compiled_register_path_server);
+}
+
 function _compile_register_client(){
-	esbuild.buildSync({
-		entryPoints: [register_path_client],
-		outfile: compiled_register_path_client,
-		platform: 'node',
-		format: 'cjs',
-		// sourcemap: true,
-		// minify: true
-	});
+	_compile(register_path_client, compiled_register_path_client);
 }
 
 function _generate_server_register(){
@@ -123,7 +131,7 @@ function _register_text(parent_folder:string){
 	return text;
 }
 
-function _init_types(params:Partial<Params>, must_init=true)
+function _init_generate(params:Partial<Params>, must_init=true)
 		:void{
 	
 	generate_params = merge_params(params);
@@ -133,7 +141,7 @@ function _init_types(params:Partial<Params>, must_init=true)
 	util_instance = util.create(generate_params, output_instance);
 	
 	if(must_init){
-		util_instance.must_be_initialized();
+		// util_instance.must_be_initialized();
 	}
 	
 }

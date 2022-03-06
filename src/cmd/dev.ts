@@ -6,7 +6,7 @@
 
 import path from 'path';
 
-import * as esbuild from 'esbuild';
+// import * as esbuild from 'esbuild';
 
 // import * as recast from 'recast';
 
@@ -14,20 +14,25 @@ import * as output from '../output/index';
 
 import * as util from '../util/index';
 
-import {generate} from './generate';
+import {generate, generate_register} from './generate';
 
-import {default_params, defaults} from '../conf/defaults';
-// import {default_params} from '../conf/defaults';
+// import {default_params, defaults} from '../conf/defaults';
+import {default_params} from '../conf/defaults';
 
 import {
 	Params,
 	// valid_hooks_repos,
-	valid_admin_repos,
+	// valid_admin_repos,
 	valid_client_repos,
 	// valid_deploy_repos
 } from '../types';
 
-import {transpose, transpose_one} from './transpose';
+import {
+	transpose,
+	transpose_one,
+	transpose_unlink_dir,
+	transpose_unlink_file
+} from './transpose';
 
 // import {hooks} from './hooks';
 
@@ -72,7 +77,7 @@ export async function dev_server(params:Partial<Params>):Promise<void>{
 	}else{
 		_init_params(params);
 		await _init_dev();
-		await _dev_server();
+		// await _dev_server();
 	}
 }
 
@@ -111,7 +116,7 @@ async function _dev_server(){
 		
 	// }else{ // this is valid also if the repo is core.
 	
-	_esbuild_server();
+	// _esbuild_server();
 	
 	const dotenv_part = ` -r dotenv/config`;
 	const source_part = ` -r source-map-support/register`;
@@ -512,7 +517,7 @@ function _init_params(params:Partial<Params>)
 	
 	util_instance = util.create(dev_params, output_instance);
 	
-	util_instance.must_be_initialized();
+	// util_instance.must_be_initialized();
 	
 }
 
@@ -520,11 +525,13 @@ async function _init_dev(){
 	
 	await transpose(dev_params, true);
 	
+	await generate_register(dev_params, true);
+	
+	await generate(dev_params, true);
+	
 	// if(valid_hooks_repos().includes(dev_params.repo)){
 	//   hooks(dev_params, true);
 	// }
-	
-	await generate(dev_params, true);
 	
 	_watch();
 }
@@ -532,7 +539,7 @@ async function _init_dev(){
 function _watch(){
 	
 	const src_path = `${dev_params.root}/src/`;
-	const base_path = `${dev_params.root}/${defaults.folder}`;
+	// const base_path = `${dev_params.root}/${defaults.folder}`;
 	
 	output_instance.log(`Watching \`src\` folder [${src_path}] ...`, 'wtch');
 	
@@ -544,10 +551,6 @@ function _watch(){
 			watch_src_scanned = true;
 		},
 		async (_event, _path) => {
-			
-			// if(!_check_dot_file(dev_params, _path)){
-			//   return false;
-			// }
 			
 			const basename = path.basename(_path);
 			const extension = path.extname(basename);
@@ -566,71 +569,35 @@ function _watch(){
 			
 			output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
 			
-			const base_path_generate = `${base_path}/generate/src`;
-			const base_path_server = `${base_path}/server/src`;
-			const base_path_client = `${base_path}/client/src`;
-			const relative_path_to_src = _path.replace(`${dev_params.root}/src/`, '');
-			const new_path_generate = `${base_path_generate}/${relative_path_to_src}`;
-			const new_path_server = `${base_path_server}/${relative_path_to_src}`;
-			const new_path_client = `${base_path_client}/${relative_path_to_src}`;
+			// const base_path_generate = `${base_path}/generate/src`;
+			// const base_path_server = `${base_path}/server/src`;
+			// const base_path_client = `${base_path}/client/src`;
+			// const relative_path_to_src = _path.replace(`${dev_params.root}/src/`, '');
+			// const new_path_generate = `${base_path_generate}/${relative_path_to_src}`;
+			// const new_path_server = `${base_path_server}/${relative_path_to_src}`;
+			// const new_path_client = `${base_path_client}/${relative_path_to_src}`;
 			
 			if(_event === 'addDir'){
 				
-				if(
-					valid_admin_repos().includes(dev_params.repo)
-					&& _path.includes(`${dev_params.root}/src/frontend`)
-				){
-					// util_instance.fs.create_directory(
-					//   `${base_path_client}/${defaults.repo_folder}/nuxt/${path.basename(_path)}`
-					// );
-				}else{
-					if(_path.includes(`${dev_params.root}/src/atoms`)){
-						util_instance.fs.create_directory(new_path_generate);
-					}
-					util_instance.fs.create_directory(new_path_server);
-					util_instance.fs.create_directory(new_path_client);
-				}
-				output_instance.done_log(
-					`[Src watch] Transposed dir [${_path}].`,
-					'wtch'
-				);
+			}else if(_event === 'unlink'){
 				
-			}else if(_event === 'unlink' || _event === 'unlinkDir'){
+				await transpose_unlink_file(_path, dev_params, true);
 				
-				if(util_instance.fs.exists(new_path_server)){
-					if(util_instance.fs.is_directory(new_path_server)){
-						util_instance.fs.remove_directory(new_path_server);
-					}else{
-						util_instance.fs.remove_file(new_path_server);
-					}
-				}
-				if(util_instance.fs.exists(new_path_client)){
-					if(util_instance.fs.is_directory(new_path_client)){
-						util_instance.fs.remove_directory(new_path_client);
-					}else{
-						util_instance.fs.remove_file(new_path_client);
-					}
-				}
-				if(util_instance.fs.exists(new_path_generate)){
-					if(util_instance.fs.is_directory(new_path_generate)){
-						util_instance.fs.remove_directory(new_path_generate);
-					}else{
-						util_instance.fs.remove_file(new_path_generate);
-					}
-				}
+			}else if(_event === 'unlinkDir'){
 				
-				output_instance.done_log(`[src watch] Transposed [${_event}] [${_path}].`, 'wtch');
+				await transpose_unlink_dir(_path, dev_params, true);
 				
 			}else{
 				
 				await transpose_one(_path, dev_params, true);
 				
-				// if(valid_hooks_repos().includes(dev_params.repo)){
-				//   hooks(dev_params, true);
-				// }
-				output_instance.done_log(`[src watch] Transposed [${_path}].`, 'wtch');
-				
 			}
+			
+			await generate_register(dev_params, true);
+			
+			await generate(dev_params, true);
+			
+			output_instance.done_log(`[src watch] Transposed [${_event}] [${_path}].`, 'wtch');
 			
 			// if(
 			//   valid_deploy_repos().includes(dev_params.repo)
@@ -639,26 +606,6 @@ function _watch(){
 			// ){
 			//   _replace_netlify_function_file();
 			// }
-			
-			
-			if(_event !== 'addDir' && _event !== 'unlinkDir'){
-				
-				await generate(dev_params, true);
-				
-				try{
-						
-					// if(dev_params.deploy === 'netlify'){
-					//   // _esbuild_netlify();
-					// }else{
-					//   _esbuild_server();
-					// }
-					_esbuild_server();
-					
-				}catch(err){
-					const e = err as Error;
-					output_instance.error_log(e.message);
-				}
-			}
 			
 		}
 	);
@@ -695,24 +642,24 @@ function _fix_mongodb_saslprep_requirement(){
 //   });
 // }
 
-function _esbuild_server(){
-	// esbuild.buildSync({
-	//   entryPoints: [`${dev_params.root}/${defaults.folder}/server/src/index.ts`],
-	//   outfile: `${dev_params.root}/dist/server/index.js`,
-	//   bundle: true,
-	//   platform: 'node',
-	//   sourcemap: true,
-	//   minify: true
-	// });
-	esbuild.buildSync({
-		entryPoints: [`${dev_params.root}/${defaults.folder}/server/src/index.ts`],
-		outfile: `${dev_params.root}/dist/server/index.js`,
-		bundle: true,
-		platform: 'node',
-		sourcemap: true,
-		minify: true
-	});
-}
+// function _esbuild_server(){
+//   // esbuild.buildSync({
+//   //   entryPoints: [`${dev_params.root}/${defaults.folder}/server/src/index.ts`],
+//   //   outfile: `${dev_params.root}/dist/server/index.js`,
+//   //   bundle: true,
+//   //   platform: 'node',
+//   //   sourcemap: true,
+//   //   minify: true
+//   // });
+//   esbuild.buildSync({
+//     entryPoints: [`${dev_params.root}/${defaults.folder}/server/src/index.ts`],
+//     outfile: `${dev_params.root}/dist/server/index.js`,
+//     bundle: true,
+//     platform: 'node',
+//     sourcemap: true,
+//     minify: true
+//   });
+// }
 
 // function _is_file_related_to_lambda_function(_path:string){
 //   if(
@@ -750,18 +697,3 @@ function _esbuild_server(){
 //   output_instance.done_verbose_log(`Replaced Netlify serverless function file.`, 'less');
 // }
 
-// function _check_dot_file(params:Partial<Params>, _path:string):boolean{
-//   if(params.is_dot === true){
-//     const do_not_dot_watch_paths = [
-//       `${params.root}/src/books`,
-//       `${params.root}/src/uranio/trx/hooks`,
-//       `${params.root}/src/uranio/hooks`,
-//     ];
-//     for(const invalid_path of do_not_dot_watch_paths){
-//       if(_path.indexOf(invalid_path) === 0){
-//         return false;
-//       }
-//     }
-//   }
-//   return true;
-// }

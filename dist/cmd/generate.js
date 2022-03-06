@@ -53,7 +53,9 @@ let compiled_register_path_server = `node_modules/uranio/dist/server/register.js
 let compiled_register_path_client = `node_modules/uranio/dist/client/register.js`;
 function generate(params, is_included = false) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_types(params);
+        _init_generate(params);
+        const generate_cmd = `yarn uranio-generate-${generate_params.repo}`;
+        util_instance.spawn.verbose_log(generate_cmd, 'generate', 'generating');
         if (!is_included) {
             output_instance.end_log('Generate completed.');
         }
@@ -62,11 +64,17 @@ function generate(params, is_included = false) {
 exports.generate = generate;
 function generate_register(params, is_included = false) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_types(params);
-        register_path_server = `${generate_params.root}/${register_path_server}`;
-        register_path_client = `${generate_params.root}/${register_path_client}`;
-        compiled_register_path_server = `${generate_params.root}/${compiled_register_path_server}`;
-        compiled_register_path_client = `${generate_params.root}/${compiled_register_path_client}`;
+        _init_generate(params);
+        const node_register_uranio_src = `node_modules/uranio/src`;
+        const node_register_src_server = `${node_register_uranio_src}/server/register.ts`;
+        const node_register_src_client = `${node_register_uranio_src}/client/register.ts`;
+        const node_register_uranio_dist = `node_modules/uranio/dist`;
+        const node_register_dist_server = `${node_register_uranio_dist}/server/register.js`;
+        const node_register_dist_client = `${node_register_uranio_dist}/client/register.js`;
+        register_path_server = `${generate_params.root}/${node_register_src_server}`;
+        register_path_client = `${generate_params.root}/${node_register_src_client}`;
+        compiled_register_path_server = `${generate_params.root}/${node_register_dist_server}`;
+        compiled_register_path_client = `${generate_params.root}/${node_register_dist_client}`;
         _generate_server_register();
         _generate_client_register();
         _compile_register_server();
@@ -77,25 +85,21 @@ function generate_register(params, is_included = false) {
     });
 }
 exports.generate_register = generate_register;
-function _compile_register_server() {
+function _compile(src, dest) {
     esbuild.buildSync({
-        entryPoints: [register_path_server],
-        outfile: compiled_register_path_server,
+        entryPoints: [src],
+        outfile: dest,
         platform: 'node',
         format: 'cjs',
         // sourcemap: true,
         // minify: true
     });
 }
+function _compile_register_server() {
+    _compile(register_path_server, compiled_register_path_server);
+}
 function _compile_register_client() {
-    esbuild.buildSync({
-        entryPoints: [register_path_client],
-        outfile: compiled_register_path_client,
-        platform: 'node',
-        format: 'cjs',
-        // sourcemap: true,
-        // minify: true
-    });
+    _compile(register_path_client, compiled_register_path_client);
 }
 function _generate_server_register() {
     const text = _register_text('server');
@@ -130,12 +134,12 @@ function _register_text(parent_folder) {
     text += `export {};\n`;
     return text;
 }
-function _init_types(params, must_init = true) {
+function _init_generate(params, must_init = true) {
     generate_params = (0, common_1.merge_params)(params);
     output_instance = output.create(generate_params);
     util_instance = util.create(generate_params, output_instance);
     if (must_init) {
-        util_instance.must_be_initialized();
+        // util_instance.must_be_initialized();
     }
 }
 //# sourceMappingURL=generate.js.map
