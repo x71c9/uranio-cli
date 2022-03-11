@@ -6,7 +6,6 @@
 import minimist from 'minimist';
 export declare type Repo = keyof typeof abstract_repos;
 export declare type PacMan = keyof typeof abstract_pacman;
-export declare type Deploy = keyof typeof abstract_deploy;
 export declare type DB = keyof typeof abstract_db;
 export declare type Params = {
     force: boolean;
@@ -29,7 +28,6 @@ export declare type Params = {
     branch: string;
     repo: Repo;
     pacman: PacMan;
-    deploy: Deploy;
     db: DB;
     color_log: string;
     color_verbose: string;
@@ -60,10 +58,6 @@ export declare const abstract_pacman: {
     readonly yarn: "";
     readonly npm: "";
 };
-export declare const abstract_deploy: {
-    readonly netlify: "";
-    readonly express: "";
-};
 export declare const abstract_db: {
     readonly mongo: "";
 };
@@ -73,7 +67,6 @@ export declare function valid_client_repos(): string[];
 export declare function valid_hooks_repos(): string[];
 export declare function valid_admin_repos(): string[];
 export declare function valid_pacman(): string[];
-export declare function valid_deploy(): string[];
 export declare function valid_db(): string[];
 export declare type Aliases = {
     [key: string]: string[];

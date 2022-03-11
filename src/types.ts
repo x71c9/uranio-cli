@@ -8,7 +8,7 @@ import minimist from 'minimist';
 
 export type Repo = keyof typeof abstract_repos;
 export type PacMan = keyof typeof abstract_pacman;
-export type Deploy = keyof typeof abstract_deploy;
+// export type Deploy = keyof typeof abstract_deploy;
 export type DB = keyof typeof abstract_db;
 
 export type Params = {
@@ -33,7 +33,7 @@ export type Params = {
 	branch: string
 	repo: Repo
 	pacman: PacMan
-	deploy: Deploy
+	// deploy: Deploy
 	db: DB
 	color_log: string
 	color_verbose: string
@@ -72,10 +72,10 @@ export const abstract_pacman = {
 	npm: '',
 } as const;
 
-export const abstract_deploy = {
-	netlify: '',
-	express: '',
-} as const;
+// export const abstract_deploy = {
+//   netlify: '',
+//   express: '',
+// } as const;
 
 export const abstract_db = {
 	mongo: ''
@@ -131,14 +131,14 @@ export function valid_pacman()
 	return vals;
 }
 
-export function valid_deploy()
-		:string[]{
-	const vals:string[] = [];
-	for(const k in abstract_deploy){
-		vals.push(k);
-	}
-	return vals;
-}
+// export function valid_deploy()
+//     :string[]{
+//   const vals:string[] = [];
+//   for(const k in abstract_deploy){
+//     vals.push(k);
+//   }
+//   return vals;
+// }
 
 export function valid_db()
 		:string[]{

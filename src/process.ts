@@ -19,19 +19,21 @@ import * as util from './util/index';
 import {
 	prompt_init,
 	dev,
-	dev_server,
-	dev_client,
+	// dev_server,
+	// dev_client,
 	build,
-	build_server,
-	build_client,
+	// build_server,
+	// build_client,
 	transpose,
 	transpose_one,
 	help,
-	info,
+	// info,
 	docker,
-	deinit,
+	// deinit,
 	generate,
-	generate_register
+	start,
+	start_server,
+	start_panel,
 } from './cmd/index';
 
 import {default_params, defaults} from './conf/defaults';
@@ -526,53 +528,33 @@ function _switch_command(args:Arguments){
 			break;
 		}
 		case 'dev':{
-			switch(splitted_cmd[1]){
-				case 'server':{
-					dev_server(process_params);
-					break;
-				}
-				case 'client':{
-					dev_client(process_params);
-					break;
-				}
-				case '':
-				case undefined:
-				default:{
-					dev(process_params);
-				}
-			}
+			dev(process_params);
 			break;
 		}
 		case 'build':{
+			build(process_params);
+			break;
+		}
+		case 'start':{
 			switch(splitted_cmd[1]){
 				case 'server':{
-					build_server(process_params);
+					start_server(process_params);
 					break;
 				}
-				case 'client':{
-					build_client(process_params);
+				case 'panel':{
+					start_panel(process_params);
 					break;
 				}
 				case '':
 				case undefined:
 				default:{
-					build(process_params);
+					start(process_params);
 				}
 			}
 			break;
 		}
 		case 'generate':{
-			switch(splitted_cmd[1]){
-				case 'register':{
-					generate_register(process_params);
-					break;
-				}
-				case '':
-				case undefined:
-				default:{
-					generate(process_params);
-				}
-			}
+			generate(process_params);
 			break;
 		}
 		case 'transpose':{
@@ -585,10 +567,10 @@ function _switch_command(args:Arguments){
 			}
 			break;
 		}
-		case 'info':{
-			info(process_params);
-			break;
-		}
+		// case 'info':{
+		//   info(process_params);
+		//   break;
+		// }
 		case 'help':{
 			help();
 			break;
@@ -597,10 +579,10 @@ function _switch_command(args:Arguments){
 			docker(process_params, args);
 			break;
 		}
-		case 'deinit':{
-			deinit(process_params);
-			break;
-		}
+		// case 'deinit':{
+		//   deinit(process_params);
+		//   break;
+		// }
 		default:{
 			output_instance.error_log(`Invalid argument [${cmd}]`);
 			process.exit(1);

@@ -428,53 +428,33 @@ function _switch_command(args) {
             break;
         }
         case 'dev': {
-            switch (splitted_cmd[1]) {
-                case 'server': {
-                    (0, index_1.dev_server)(process_params);
-                    break;
-                }
-                case 'client': {
-                    (0, index_1.dev_client)(process_params);
-                    break;
-                }
-                case '':
-                case undefined:
-                default: {
-                    (0, index_1.dev)(process_params);
-                }
-            }
+            (0, index_1.dev)(process_params);
             break;
         }
         case 'build': {
+            (0, index_1.build)(process_params);
+            break;
+        }
+        case 'start': {
             switch (splitted_cmd[1]) {
                 case 'server': {
-                    (0, index_1.build_server)(process_params);
+                    (0, index_1.start_server)(process_params);
                     break;
                 }
-                case 'client': {
-                    (0, index_1.build_client)(process_params);
+                case 'panel': {
+                    (0, index_1.start_panel)(process_params);
                     break;
                 }
                 case '':
                 case undefined:
                 default: {
-                    (0, index_1.build)(process_params);
+                    (0, index_1.start)(process_params);
                 }
             }
             break;
         }
         case 'generate': {
-            switch (splitted_cmd[1]) {
-                case 'register': {
-                    (0, index_1.generate_register)(process_params);
-                    break;
-                }
-                case '':
-                case undefined:
-                default: {
-                    (0, index_1.generate)(process_params);
-                }
-            }
+            (0, index_1.generate)(process_params);
             break;
         }
         case 'transpose': {
@@ -488,10 +468,10 @@ function _switch_command(args) {
             }
             break;
         }
-        case 'info': {
-            (0, index_1.info)(process_params);
-            break;
-        }
+        // case 'info':{
+        //   info(process_params);
+        //   break;
+        // }
         case 'help': {
             (0, index_1.help)();
             break;
@@ -500,10 +480,10 @@ function _switch_command(args) {
             (0, index_1.docker)(process_params, args);
             break;
         }
-        case 'deinit': {
-            (0, index_1.deinit)(process_params);
-            break;
-        }
+        // case 'deinit':{
+        //   deinit(process_params);
+        //   break;
+        // }
         default: {
             output_instance.error_log(`Invalid argument [${cmd}]`);
             process.exit(1);

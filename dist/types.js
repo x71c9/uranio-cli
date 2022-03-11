@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.valid_db = exports.valid_deploy = exports.valid_pacman = exports.valid_admin_repos = exports.valid_hooks_repos = exports.valid_client_repos = exports.valid_deploy_repos = exports.valid_repos = exports.abstract_db = exports.abstract_deploy = exports.abstract_pacman = exports.abstract_admin_repos = exports.abstract_hooks_repos = exports.abstract_deploy_repos = exports.abstract_repos = void 0;
+exports.valid_db = exports.valid_pacman = exports.valid_admin_repos = exports.valid_hooks_repos = exports.valid_client_repos = exports.valid_deploy_repos = exports.valid_repos = exports.abstract_db = exports.abstract_pacman = exports.abstract_admin_repos = exports.abstract_hooks_repos = exports.abstract_deploy_repos = exports.abstract_repos = void 0;
 exports.abstract_repos = {
     core: '',
     api: '',
@@ -28,10 +28,10 @@ exports.abstract_pacman = {
     yarn: '',
     npm: '',
 };
-exports.abstract_deploy = {
-    netlify: '',
-    express: '',
-};
+// export const abstract_deploy = {
+//   netlify: '',
+//   express: '',
+// } as const;
 exports.abstract_db = {
     mongo: ''
 };
@@ -79,14 +79,14 @@ function valid_pacman() {
     return vals;
 }
 exports.valid_pacman = valid_pacman;
-function valid_deploy() {
-    const vals = [];
-    for (const k in exports.abstract_deploy) {
-        vals.push(k);
-    }
-    return vals;
-}
-exports.valid_deploy = valid_deploy;
+// export function valid_deploy()
+//     :string[]{
+//   const vals:string[] = [];
+//   for(const k in abstract_deploy){
+//     vals.push(k);
+//   }
+//   return vals;
+// }
 function valid_db() {
     const vals = [];
     for (const k in exports.abstract_db) {

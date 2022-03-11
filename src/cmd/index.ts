@@ -18,12 +18,14 @@ export * from './transpose';
 
 // export * from './hooks';
 
-export * from './info';
+// export * from './info';
 
 export * from './help';
 
 export {docker} from './docker';
 
-export * from './deinit';
+// export * from './deinit';
 
 // export * from './dot';
+
+export * from './start';

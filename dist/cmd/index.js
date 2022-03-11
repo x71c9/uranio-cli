@@ -23,10 +23,11 @@ __exportStar(require("./build"), exports);
 __exportStar(require("./dev"), exports);
 __exportStar(require("./transpose"), exports);
 // export * from './hooks';
-__exportStar(require("./info"), exports);
+// export * from './info';
 __exportStar(require("./help"), exports);
 var docker_1 = require("./docker");
 Object.defineProperty(exports, "docker", { enumerable: true, get: function () { return docker_1.docker; } });
-__exportStar(require("./deinit"), exports);
+// export * from './deinit';
 // export * from './dot';
+__exportStar(require("./start"), exports);
 //# sourceMappingURL=index.js.map

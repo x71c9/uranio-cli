@@ -18,8 +18,6 @@ import {Params} from '../types';
 
 import {merge_params} from './common';
 
-// import {valid_hooks_repos} from '../types';
-
 let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
@@ -36,19 +34,21 @@ export async function generate(params:Params, is_included=false)
 	
 	_init_generate(params);
 	
+	_generate_register();
+	
 	const generate_cmd = `yarn uranio-generate-${generate_params.repo}`;
 	util_instance.spawn.verbose_log(generate_cmd, 'generate', 'generating');
 	
-	if(!is_included){
+	if(is_included){
+		output_instance.done_log('Generate completed.');
+	}else{
 		output_instance.end_log('Generate completed.');
 	}
 	
 }
 
-export async function generate_register(params:Params, is_included=false)
+async function _generate_register()
 		:Promise<void>{
-	
-	_init_generate(params);
 	
 	const node_register_uranio_src = `node_modules/uranio/src`;
 	const node_register_src_server = `${node_register_uranio_src}/server/register.ts`;
@@ -70,9 +70,7 @@ export async function generate_register(params:Params, is_included=false)
 	_compile_register_server();
 	_compile_register_client();
 	
-	if(!is_included){
-		output_instance.end_log('Generate register completed.');
-	}
+	output_instance.done_log('Generate register completed.');
 	
 }
 
@@ -131,7 +129,7 @@ function _register_text(parent_folder:string){
 	return text;
 }
 
-function _init_generate(params:Partial<Params>, must_init=true)
+function _init_generate(params:Partial<Params>)
 		:void{
 	
 	generate_params = merge_params(params);
@@ -139,10 +137,6 @@ function _init_generate(params:Partial<Params>, must_init=true)
 	output_instance = output.create(generate_params);
 	
 	util_instance = util.create(generate_params, output_instance);
-	
-	if(must_init){
-		// util_instance.must_be_initialized();
-	}
 	
 }
 

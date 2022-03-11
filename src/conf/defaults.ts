@@ -28,7 +28,7 @@ export const default_params:Params = {
 	branch: 'master',
 	repo: 'adm',
 	pacman: 'yarn',
-	deploy: 'netlify',
+	// deploy: 'netlify',
 	db: 'mongo',
 	color_log: '#859900',
 	color_verbose: '#668899',

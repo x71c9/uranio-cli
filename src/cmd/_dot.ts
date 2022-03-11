@@ -19,7 +19,7 @@ import {
 	Arguments,
 	Repo,
 	PacMan,
-	Deploy,
+	// Deploy,
 	valid_deploy_repos
 } from '../types';
 
@@ -76,10 +76,10 @@ async function _switch(args:Arguments):Promise<void>{
 	if(typeof repo === 'undefined' && typeof args.repo === 'string'){
 		repo = args.repo as Repo;
 	}
-	let deploy = (args._[3] || 'express') as Deploy;
-	if(typeof deploy === 'undefined' && typeof args.deploy === 'string'){
-		deploy = args.deploy as Deploy;
-	}
+	// let deploy = (args._[3] || 'express') as Deploy;
+	// if(typeof deploy === 'undefined' && typeof args.deploy === 'string'){
+	//   deploy = args.deploy as Deploy;
+	// }
 	let pacman = (args._[4] || 'yarn') as PacMan;
 	if(typeof pacman === 'undefined' && typeof args.pacman === 'string'){
 		pacman = args.pacman as PacMan;
@@ -101,13 +101,13 @@ async function _switch(args:Arguments):Promise<void>{
 	);
 	output_instance.log(`Selected repo: ${repo}`, `args`);
 	output_instance.log(`Selected pacman: ${pacman}`, `args`);
-	if(valid_deploy_repos().includes(repo)){
-		output_instance.log(`Selected deploy: ${deploy}`, `args`);
-	}
+	// if(valid_deploy_repos().includes(repo)){
+	//   output_instance.log(`Selected deploy: ${deploy}`, `args`);
+	// }
 	
 	check_repo(repo);
 	check_pacman(pacman);
-	check_deploy(deploy);
+	// check_deploy(deploy);
 	
 	await _check_if_clean_repo();
 	

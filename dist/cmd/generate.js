@@ -36,14 +36,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generate_register = exports.generate = void 0;
+exports.generate = void 0;
 const path_1 = __importDefault(require("path"));
 const esbuild = __importStar(require("esbuild"));
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
 const common_1 = require("./common");
-// import {valid_hooks_repos} from '../types';
 let output_instance;
 let util_instance;
 let generate_params = defaults_1.default_params;
@@ -54,17 +53,20 @@ let compiled_register_path_client = `node_modules/uranio/dist/client/register.js
 function generate(params, is_included = false) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_generate(params);
+        _generate_register();
         const generate_cmd = `yarn uranio-generate-${generate_params.repo}`;
         util_instance.spawn.verbose_log(generate_cmd, 'generate', 'generating');
-        if (!is_included) {
+        if (is_included) {
+            output_instance.done_log('Generate completed.');
+        }
+        else {
             output_instance.end_log('Generate completed.');
         }
     });
 }
 exports.generate = generate;
-function generate_register(params, is_included = false) {
+function _generate_register() {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_generate(params);
         const node_register_uranio_src = `node_modules/uranio/src`;
         const node_register_src_server = `${node_register_uranio_src}/server/register.ts`;
         const node_register_src_client = `${node_register_uranio_src}/client/register.ts`;
@@ -79,12 +81,9 @@ function generate_register(params, is_included = false) {
         _generate_client_register();
         _compile_register_server();
         _compile_register_client();
-        if (!is_included) {
-            output_instance.end_log('Generate register completed.');
-        }
+        output_instance.done_log('Generate register completed.');
     });
 }
-exports.generate_register = generate_register;
 function _compile(src, dest) {
     esbuild.buildSync({
         entryPoints: [src],
@@ -134,12 +133,9 @@ function _register_text(parent_folder) {
     text += `export {};\n`;
     return text;
 }
-function _init_generate(params, must_init = true) {
+function _init_generate(params) {
     generate_params = (0, common_1.merge_params)(params);
     output_instance = output.create(generate_params);
     util_instance = util.create(generate_params, output_instance);
-    if (must_init) {
-        // util_instance.must_be_initialized();
-    }
 }
 //# sourceMappingURL=generate.js.map

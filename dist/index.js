@@ -5,6 +5,7 @@ exports.default = {
     init: index_1.init,
     generate: index_1.generate,
     build: index_1.build,
-    deinit: index_1.deinit
+    start: index_1.start,
+    // deinit
 };
 //# sourceMappingURL=index.js.map
