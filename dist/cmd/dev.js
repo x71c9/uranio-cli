@@ -36,12 +36,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dev = void 0;
+exports.dev_panel = exports.dev_server = exports.dev = void 0;
 const path_1 = __importDefault(require("path"));
+const forever_monitor_1 = __importDefault(require("forever-monitor"));
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
-const generate_1 = require("./generate");
 const defaults_1 = require("../conf/defaults");
+const generate_1 = require("./generate");
 const transpose_1 = require("./transpose");
 const build_1 = require("./build");
 const common_1 = require("./common");
@@ -51,9 +52,11 @@ let util_instance;
 let dev_params = defaults_1.default_params;
 // let watch_lib_scanned = false;
 let watch_src_scanned = false;
+let watch_toml_scanned = false;
 // const nuxt_color = '#677cc7';
 // const tscw_color = '#734de3';
 const watc_color = '#687a6a';
+let service_child;
 function dev(params) {
     return __awaiter(this, void 0, void 0, function* () {
         if (params.docker === true) {
@@ -66,6 +69,31 @@ function dev(params) {
     });
 }
 exports.dev = dev;
+function dev_server(params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (params.docker === true) {
+            yield docker.start(params);
+        }
+        else {
+            _init_params(params);
+            yield _init_dev();
+            _dev_server();
+        }
+    });
+}
+exports.dev_server = dev_server;
+function dev_panel(params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (params.docker === true) {
+            yield docker.start(params);
+        }
+        else {
+            _init_params(params);
+            _dev_panel();
+        }
+    });
+}
+exports.dev_panel = dev_panel;
 function _init_params(params) {
     params.spin = false;
     dev_params = (0, common_1.merge_params)(params);
@@ -74,8 +102,46 @@ function _init_params(params) {
 }
 function _init_dev() {
     return __awaiter(this, void 0, void 0, function* () {
-        yield (0, build_1.build)(dev_params, true);
+        yield (0, build_1.build)(dev_params);
         _watch();
+    });
+}
+function _dev_panel() {
+    return __awaiter(this, void 0, void 0, function* () {
+        service_child = new forever_monitor_1.default.Monitor(`${dev_params.root}/node_modules/uranio/dist/panel/index.js dev`, {
+            args: ['urn_log_prefix=true'],
+            // watch: true,
+            // watchDirectory: `${dev_params.root}/src`
+        });
+        service_child.start();
+        service_child.on('watch:restart', function (info) {
+            output_instance.log('Restarting [dev panel] because ' + info.file + ' changed');
+        });
+        service_child.on('restart', function (_info) {
+            output_instance.log('Forever restarting [dev panel].');
+        });
+        service_child.on('exit:code', function (code) {
+            output_instance.done_log('Forever detected [dev panel] exited with code ' + code);
+        });
+    });
+}
+function _dev_server() {
+    return __awaiter(this, void 0, void 0, function* () {
+        service_child = new forever_monitor_1.default.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`, {
+            args: ['urn_log_prefix=true'],
+            // watch: true,
+            // watchDirectory: `${dev_params.root}/src`
+        });
+        service_child.start();
+        service_child.on('watch:restart', function (info) {
+            output_instance.log('Restarting [dev server] because ' + info.file + ' changed');
+        });
+        service_child.on('restart', function (_info) {
+            output_instance.log('Forever restarting [dev server].');
+        });
+        service_child.on('exit:code', function (code) {
+            output_instance.done_log('Forever detected [dev server] exited with code ' + code);
+        });
     });
 }
 function _watch() {
@@ -98,19 +164,29 @@ function _watch() {
             return false;
         }
         output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
-        if (_event === 'addDir') {
+        yield (0, transpose_1.transpose)(dev_params, _path, _event);
+        yield (0, generate_1.generate)(dev_params, _path, _event);
+        service_child.restart();
+        output_instance.done_log(`[src watch] Built [${_event}] [${_path}].`, 'wtch');
+    }));
+    if (!util_instance.fs.exists(dev_params.config)) {
+        return;
+    }
+    output_instance.log(`Watching \`uranio.toml\` file [${dev_params.config}] ...`, 'wtch');
+    util_instance.watch(dev_params.config, `watching \`toml\` file.`, () => {
+        output_instance.done_log(`Initial scanner completed for [${dev_params.config}].`, 'wtch');
+        watch_toml_scanned = true;
+    }, (_event, _path) => __awaiter(this, void 0, void 0, function* () {
+        if (!watch_toml_scanned) {
+            if (_event === 'add' || _event === 'addDir') {
+                output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
+            }
+            return false;
         }
-        else if (_event === 'unlink') {
-            yield (0, transpose_1.transpose_unlink_file)(_path, dev_params, true);
-        }
-        else if (_event === 'unlinkDir') {
-            yield (0, transpose_1.transpose_unlink_dir)(_path, dev_params, true);
-        }
-        else {
-            yield (0, transpose_1.transpose_one)(_path, dev_params, true);
-        }
-        yield (0, generate_1.generate)(dev_params, true);
-        output_instance.done_log(`[src watch] Transposed [${_event}] [${_path}].`, 'wtch');
+        output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
+        yield (0, generate_1.generate)(dev_params, _path, _event);
+        service_child.restart();
+        output_instance.done_log(`[toml watch] Generated [${_event}] [${_path}].`, 'wtch');
     }));
 }
 //# sourceMappingURL=dev.js.map

@@ -28,6 +28,7 @@ export async function start(params:Partial<Params>)
 		:Promise<void>{
 	
 	start_server(params);
+	start_panel(params);
 	
 	if(valid_admin_repos().includes(start_params.repo)){
 		start_panel(params);
@@ -41,8 +42,8 @@ export async function start_server(params:Partial<Params>)
 	_init_params(params);
 	
 	const urn_lib_pre = ` urn_log_prefix_type=true`;
-	const urn_config_path = ` -c ${start_params.root}/uranio.config.js`;
-	const cmd_server = `yarn uranio-webservice-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
+	const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
+	const cmd_server = `NODE_ENV=production yarn uranio-webservice-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
 	util_instance.spawn.log(cmd_server, 'start', 'starting server');
 	
 }
@@ -53,8 +54,8 @@ export async function start_panel(params:Partial<Params>)
 	_init_params(params);
 	
 	const urn_lib_pre = ` urn_log_prefix_type=true`;
-	const urn_config_path = ` -c ${start_params.root}/uranio.config.js`;
-	const cmd_server = `yarn uranio-panel-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
+	const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
+	const cmd_server = `NODE_ENV=production yarn uranio-panel-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
 	util_instance.spawn.log(cmd_server, 'start', 'starting panel');
 	
 }

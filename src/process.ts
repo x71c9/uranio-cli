@@ -10,7 +10,8 @@ import path from 'path';
 
 import {urn_util} from 'urn-lib';
 
-import {Arguments, Repo, PacMan, Deploy, Params, DB} from './types';
+// import {Arguments, Repo, PacMan, Deploy, Params, DB} from './types';
+import {Arguments, Repo, PacMan, Params, DB} from './types';
 
 import * as output from './output/index';
 
@@ -18,29 +19,28 @@ import * as util from './util/index';
 
 import {
 	prompt_init,
-	dev,
-	// dev_server,
-	// dev_client,
-	build,
-	// build_server,
-	// build_client,
 	transpose,
-	transpose_one,
-	help,
-	// info,
-	docker,
-	// deinit,
 	generate,
+	dev,
+	dev_server,
+	dev_panel,
+	build,
+	build_server,
+	build_panel,
 	start,
 	start_server,
 	start_panel,
+	help,
+	info,
+	docker,
+	deinit,
 } from './cmd/index';
 
 import {default_params, defaults} from './conf/defaults';
 
 import {
 	check_repo,
-	check_deploy,
+	// check_deploy,
 	check_pacman,
 	check_db,
 	read_init_file,
@@ -332,12 +332,18 @@ function _set_args(params:Params, args:Arguments)
 		params.repo = repo as Repo;
 	}
 	
-	const deploy = args.d || args.deploy;
+	const config = args.c || args.config;
 	
-	if(typeof deploy === 'string' && deploy != ''){
-		check_deploy(deploy);
-		params.deploy = deploy as Deploy;
+	if(typeof config === 'string' && config != ''){
+		params.config = config;
 	}
+	
+	// const deploy = args.d || args.deploy;
+	
+	// if(typeof deploy === 'string' && deploy != ''){
+	//   check_deploy(deploy);
+	//   params.deploy = deploy as Deploy;
+	// }
 	
 	const db = args.db;
 	
@@ -346,7 +352,7 @@ function _set_args(params:Params, args:Arguments)
 		params.db = db as DB;
 	}
 	
-	const color_log = args.c || args.color_log;
+	const color_log = args.d || args.color_log;
 	
 	if(typeof color_log === 'string' && color_log != ''){
 		params.color_log = color_log;
@@ -528,11 +534,39 @@ function _switch_command(args:Arguments){
 			break;
 		}
 		case 'dev':{
-			dev(process_params);
+			switch(splitted_cmd[1]){
+				case 'server':{
+					dev_server(process_params);
+					break;
+				}
+				case 'panel':{
+					dev_panel(process_params);
+					break;
+				}
+				case '':
+				case undefined:
+				default:{
+					dev(process_params);
+				}
+			}
 			break;
 		}
 		case 'build':{
-			build(process_params);
+			switch(splitted_cmd[1]){
+				case 'server':{
+					build_server(process_params);
+					break;
+				}
+				case 'panel':{
+					build_panel(process_params);
+					break;
+				}
+				case '':
+				case undefined:
+				default:{
+					build(process_params);
+				}
+			}
 			break;
 		}
 		case 'start':{
@@ -558,19 +592,19 @@ function _switch_command(args:Arguments){
 			break;
 		}
 		case 'transpose':{
-			if(args._.length > 1 && typeof args._[1] === 'string'){
-				const final_path = (args._[1][0] === '/') ?
-					args._[1] : `${process.cwd()}/${args._[1]}`;
-				transpose_one(final_path, process_params);
-			}else{
-				transpose(process_params);
-			}
+			// if(args._.length > 1 && typeof args._[1] === 'string'){
+			//   const final_path = (args._[1][0] === '/') ?
+			//     args._[1] : `${process.cwd()}/${args._[1]}`;
+			//   transpose_one(final_path, process_params);
+			// }else{
+			transpose(process_params);
+			// }
 			break;
 		}
-		// case 'info':{
-		//   info(process_params);
-		//   break;
-		// }
+		case 'info':{
+			info(process_params);
+			break;
+		}
 		case 'help':{
 			help();
 			break;
@@ -579,10 +613,10 @@ function _switch_command(args:Arguments){
 			docker(process_params, args);
 			break;
 		}
-		// case 'deinit':{
-		//   deinit(process_params);
-		//   break;
-		// }
+		case 'deinit':{
+			deinit(process_params);
+			break;
+		}
 		default:{
 			output_instance.error_log(`Invalid argument [${cmd}]`);
 			process.exit(1);

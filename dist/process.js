@@ -248,17 +248,21 @@ function _set_args(params, args) {
         (0, common_1.check_repo)(repo);
         params.repo = repo;
     }
-    const deploy = args.d || args.deploy;
-    if (typeof deploy === 'string' && deploy != '') {
-        (0, common_1.check_deploy)(deploy);
-        params.deploy = deploy;
+    const config = args.c || args.config;
+    if (typeof config === 'string' && config != '') {
+        params.config = config;
     }
+    // const deploy = args.d || args.deploy;
+    // if(typeof deploy === 'string' && deploy != ''){
+    //   check_deploy(deploy);
+    //   params.deploy = deploy as Deploy;
+    // }
     const db = args.db;
     if (typeof db === 'string' && db !== '') {
         (0, common_1.check_db)(db);
         params.db = db;
     }
-    const color_log = args.c || args.color_log;
+    const color_log = args.d || args.color_log;
     if (typeof color_log === 'string' && color_log != '') {
         params.color_log = color_log;
     }
@@ -428,11 +432,39 @@ function _switch_command(args) {
             break;
         }
         case 'dev': {
-            (0, index_1.dev)(process_params);
+            switch (splitted_cmd[1]) {
+                case 'server': {
+                    (0, index_1.dev_server)(process_params);
+                    break;
+                }
+                case 'panel': {
+                    (0, index_1.dev_panel)(process_params);
+                    break;
+                }
+                case '':
+                case undefined:
+                default: {
+                    (0, index_1.dev)(process_params);
+                }
+            }
             break;
         }
         case 'build': {
-            (0, index_1.build)(process_params);
+            switch (splitted_cmd[1]) {
+                case 'server': {
+                    (0, index_1.build_server)(process_params);
+                    break;
+                }
+                case 'panel': {
+                    (0, index_1.build_panel)(process_params);
+                    break;
+                }
+                case '':
+                case undefined:
+                default: {
+                    (0, index_1.build)(process_params);
+                }
+            }
             break;
         }
         case 'start': {
@@ -458,20 +490,19 @@ function _switch_command(args) {
             break;
         }
         case 'transpose': {
-            if (args._.length > 1 && typeof args._[1] === 'string') {
-                const final_path = (args._[1][0] === '/') ?
-                    args._[1] : `${process.cwd()}/${args._[1]}`;
-                (0, index_1.transpose_one)(final_path, process_params);
-            }
-            else {
-                (0, index_1.transpose)(process_params);
-            }
+            // if(args._.length > 1 && typeof args._[1] === 'string'){
+            //   const final_path = (args._[1][0] === '/') ?
+            //     args._[1] : `${process.cwd()}/${args._[1]}`;
+            //   transpose_one(final_path, process_params);
+            // }else{
+            (0, index_1.transpose)(process_params);
+            // }
             break;
         }
-        // case 'info':{
-        //   info(process_params);
-        //   break;
-        // }
+        case 'info': {
+            (0, index_1.info)(process_params);
+            break;
+        }
         case 'help': {
             (0, index_1.help)();
             break;
@@ -480,10 +511,10 @@ function _switch_command(args) {
             (0, index_1.docker)(process_params, args);
             break;
         }
-        // case 'deinit':{
-        //   deinit(process_params);
-        //   break;
-        // }
+        case 'deinit': {
+            (0, index_1.deinit)(process_params);
+            break;
+        }
         default: {
             output_instance.error_log(`Invalid argument [${cmd}]`);
             process.exit(1);

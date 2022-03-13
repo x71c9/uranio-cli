@@ -6,21 +6,19 @@
 
 import path from 'path';
 
+import forever from 'forever-monitor';
+
 import * as output from '../output/index';
 
 import * as util from '../util/index';
-
-import {generate} from './generate';
 
 import {default_params} from '../conf/defaults';
 
 import {Params} from '../types';
 
-import {
-	transpose_one,
-	transpose_unlink_dir,
-	transpose_unlink_file
-} from './transpose';
+import {generate} from './generate';
+
+import {transpose} from './transpose';
 
 import {build} from './build';
 
@@ -36,10 +34,13 @@ let dev_params = default_params as Params;
 
 // let watch_lib_scanned = false;
 let watch_src_scanned = false;
+let watch_toml_scanned = false;
 
 // const nuxt_color = '#677cc7';
 // const tscw_color = '#734de3';
 const watc_color = '#687a6a';
+
+let service_child:forever.Monitor;
 
 export async function dev(params:Partial<Params>)
 		:Promise<void>{
@@ -53,6 +54,41 @@ export async function dev(params:Partial<Params>)
 		await _init_dev();
 		
 	}
+}
+
+export async function dev_server(params:Partial<Params>)
+		:Promise<void>{
+	
+	if(params.docker === true){
+		
+		await docker.start(params);
+		
+	}else{
+		
+		_init_params(params);
+		await _init_dev();
+		
+		_dev_server();
+		
+	}
+	
+}
+
+export async function dev_panel(params:Partial<Params>)
+		:Promise<void>{
+	
+	if(params.docker === true){
+		
+		await docker.start(params);
+		
+	}else{
+		
+		_init_params(params);
+		
+		_dev_panel();
+		
+	}
+	
 }
 
 function _init_params(params:Partial<Params>)
@@ -70,9 +106,56 @@ function _init_params(params:Partial<Params>)
 
 async function _init_dev(){
 	
-	await build(dev_params, true);
+	await build(dev_params);
 	
 	_watch();
+}
+
+async function _dev_panel(){
+	
+	service_child = new forever.Monitor(`${dev_params.root}/node_modules/uranio/dist/panel/index.js dev`,{
+		args: ['urn_log_prefix=true'],
+		// watch: true,
+		// watchDirectory: `${dev_params.root}/src`
+	});
+	
+	service_child.start();
+	
+	service_child.on('watch:restart', function(info) {
+		output_instance.log('Restarting [dev panel] because ' + info.file + ' changed');
+	});
+	
+	service_child.on('restart', function(_info) {
+		output_instance.log('Forever restarting [dev panel].');
+	});
+	
+	service_child.on('exit:code', function(code) {
+		output_instance.done_log('Forever detected [dev panel] exited with code ' + code);
+	});
+	
+}
+async function _dev_server(){
+	
+	service_child = new forever.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`,{
+		args: ['urn_log_prefix=true'],
+		// watch: true,
+		// watchDirectory: `${dev_params.root}/src`
+	});
+	
+	service_child.start();
+	
+	service_child.on('watch:restart', function(info) {
+		output_instance.log('Restarting [dev server] because ' + info.file + ' changed');
+	});
+	
+	service_child.on('restart', function(_info) {
+		output_instance.log('Forever restarting [dev server].');
+	});
+	
+	service_child.on('exit:code', function(code) {
+		output_instance.done_log('Forever detected [dev server] exited with code ' + code);
+	});
+	
 }
 
 function _watch(){
@@ -107,25 +190,46 @@ function _watch(){
 			
 			output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
 			
-			if(_event === 'addDir'){
-				
-			}else if(_event === 'unlink'){
-				
-				await transpose_unlink_file(_path, dev_params, true);
-				
-			}else if(_event === 'unlinkDir'){
-				
-				await transpose_unlink_dir(_path, dev_params, true);
-				
-			}else{
-				
-				await transpose_one(_path, dev_params, true);
-				
+			await transpose(dev_params, _path, _event);
+			
+			await generate(dev_params, _path, _event);
+			
+			service_child.restart();
+			
+			output_instance.done_log(`[src watch] Built [${_event}] [${_path}].`, 'wtch');
+			
+		}
+	);
+	
+	if(!util_instance.fs.exists(dev_params.config)){
+		return;
+	}
+	
+	output_instance.log(`Watching \`uranio.toml\` file [${dev_params.config}] ...`, 'wtch');
+	
+	util_instance.watch(
+		dev_params.config,
+		`watching \`toml\` file.`,
+		() => {
+			output_instance.done_log(`Initial scanner completed for [${dev_params.config}].`, 'wtch');
+			watch_toml_scanned = true;
+		},
+		async (_event, _path) => {
+			
+			if(!watch_toml_scanned){
+				if(_event === 'add' || _event === 'addDir'){
+					output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
+				}
+				return false;
 			}
 			
-			await generate(dev_params, true);
+			output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
 			
-			output_instance.done_log(`[src watch] Transposed [${_event}] [${_path}].`, 'wtch');
+			await generate(dev_params, _path, _event);
+			
+			service_child.restart();
+			
+			output_instance.done_log(`[toml watch] Generated [${_event}] [${_path}].`, 'wtch');
 			
 		}
 	);

@@ -272,35 +272,38 @@ function _ask_for_repo(args) {
 }
 function _ask_for_deploy(args) {
     return __awaiter(this, void 0, void 0, function* () {
-        const deploy = args.d || args.deploy;
-        if (!deploy && init_params.force === false) {
-            // output.stop_loading();
-            inquirer_1.default.
-                prompt([
-                {
-                    type: 'list',
-                    name: 'deploy',
-                    message: 'How you want to deploy?',
-                    choices: Object.keys(types_1.abstract_deploy)
-                }
-            ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
-                (0, common_1.check_deploy)(answers.deploy);
-                init_params.deploy = answers.deploy;
-                yield init(init_params);
-            }));
-        }
-        else {
-            yield init(init_params);
-        }
+        console.log(args);
+        // const deploy = args.d || args.deploy;
+        // if(!deploy && init_params.force === false){
+        //   // output.stop_loading();
+        //   inquirer.
+        //     prompt([
+        //       {
+        //         type: 'list',
+        //         name: 'deploy',
+        //         message: 'How you want to deploy?',
+        //         choices: Object.keys(abstract_deploy)
+        //       }
+        //     ]).then(async (answers) => {
+        //       check_deploy(answers.deploy);
+        //       init_params.deploy = answers.deploy;
+        //       await init(init_params);
+        //     });
+        // }else{
+        yield init(init_params);
+        // }
     });
 }
 function _log_important_params() {
     output_instance.verbose_log(`$URNROOT$Project root: [${init_params.root}]`, 'root');
     output_instance.verbose_log(`Selected repository: [${init_params.repo}]`, 'repo');
     output_instance.verbose_log(`Selected pacman: [${init_params.pacman}]`, 'repo');
-    if ((0, types_1.valid_deploy_repos)().includes(init_params.repo)) {
-        output_instance.verbose_log(`Selected deploy: [${init_params.deploy}]`, 'dply');
-    }
+    // if(valid_deploy_repos().includes(init_params.repo)){
+    //   output_instance.verbose_log(
+    //     `Selected deploy: [${init_params.deploy}]`,
+    //     'dply'
+    //   );
+    // }
 }
 // async function _generate_base_types(){
 //   await _generate_base_schema();

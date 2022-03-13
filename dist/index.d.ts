@@ -1,8 +1,9 @@
-import { init, generate, build, start } from './cmd/index';
+import { init, build, start, generate, transpose } from './cmd/index';
 declare const _default: {
     init: typeof init;
-    generate: typeof generate;
     build: typeof build;
     start: typeof start;
+    generate: typeof generate;
+    transpose: typeof transpose;
 };
 export default _default;

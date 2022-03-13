@@ -14,7 +14,7 @@ import * as output from '../output/index';
 
 import * as util from '../util/index';
 
-import {generate} from './generate';
+// import {generate} from './generate';
 
 // import {default_params, defaults} from '../conf/defaults';
 import {default_params} from '../conf/defaults';
@@ -29,12 +29,12 @@ import {
 
 import {
 	// transpose,
-	transpose_one,
-	transpose_unlink_dir,
-	transpose_unlink_file
+	// transpose_one,
+	// transpose_unlink_dir,
+	// transpose_unlink_file
 } from './transpose';
 
-import {build} from './build';
+// import {build} from './build';
 
 // import {hooks} from './hooks';
 
@@ -531,7 +531,7 @@ async function _init_dev(){
 	
 	// await generate(dev_params, true);
 	
-	await build(dev_params, true);
+	// await build(dev_params, true);
 	
 	// if(valid_hooks_repos().includes(dev_params.repo)){
 	//   hooks(dev_params, true);
@@ -585,19 +585,19 @@ function _watch(){
 				
 			}else if(_event === 'unlink'){
 				
-				await transpose_unlink_file(_path, dev_params, true);
+				// await transpose_unlink_file(_path, dev_params, true);
 				
 			}else if(_event === 'unlinkDir'){
 				
-				await transpose_unlink_dir(_path, dev_params, true);
+				// await transpose_unlink_dir(_path, dev_params, true);
 				
 			}else{
 				
-				await transpose_one(_path, dev_params, true);
+				// await transpose_one(_path, dev_params, true);
 				
 			}
 			
-			await generate(dev_params, true);
+			// await generate(dev_params, true);
 			
 			output_instance.done_log(`[src watch] Transposed [${_event}] [${_path}].`, 'wtch');
 			

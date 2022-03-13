@@ -22,9 +22,9 @@ import {
 	Repo,
 	abstract_repos,
 	abstract_pacman,
-	abstract_deploy,
+	// abstract_deploy,
 	abstract_db,
-	valid_deploy_repos,
+	// valid_deploy_repos,
 	// valid_admin_repos,
 	// valid_hooks_repos
 } from '../types';
@@ -36,7 +36,7 @@ import {title} from './title';
 import {
 	merge_init_params,
 	check_repo,
-	check_deploy,
+	// check_deploy,
 	check_pacman,
 	// package_scripts
 } from './common';
@@ -274,25 +274,26 @@ async function _ask_for_repo(args:Arguments){
 }
 
 async function _ask_for_deploy(args:Arguments){
-	const deploy = args.d || args.deploy;
-	if(!deploy && init_params.force === false){
-		// output.stop_loading();
-		inquirer.
-			prompt([
-				{
-					type: 'list',
-					name: 'deploy',
-					message: 'How you want to deploy?',
-					choices: Object.keys(abstract_deploy)
-				}
-			]).then(async (answers) => {
-				check_deploy(answers.deploy);
-				init_params.deploy = answers.deploy;
-				await init(init_params);
-			});
-	}else{
+	console.log(args);
+	// const deploy = args.d || args.deploy;
+	// if(!deploy && init_params.force === false){
+	//   // output.stop_loading();
+	//   inquirer.
+	//     prompt([
+	//       {
+	//         type: 'list',
+	//         name: 'deploy',
+	//         message: 'How you want to deploy?',
+	//         choices: Object.keys(abstract_deploy)
+	//       }
+	//     ]).then(async (answers) => {
+	//       check_deploy(answers.deploy);
+	//       init_params.deploy = answers.deploy;
+	//       await init(init_params);
+	//     });
+	// }else{
 		await init(init_params);
-	}
+	// }
 }
 
 function _log_important_params(){
@@ -308,12 +309,12 @@ function _log_important_params(){
 		`Selected pacman: [${init_params.pacman}]`,
 		'repo'
 	);
-	if(valid_deploy_repos().includes(init_params.repo)){
-		output_instance.verbose_log(
-			`Selected deploy: [${init_params.deploy}]`,
-			'dply'
-		);
-	}
+	// if(valid_deploy_repos().includes(init_params.repo)){
+	//   output_instance.verbose_log(
+	//     `Selected deploy: [${init_params.deploy}]`,
+	//     'dply'
+	//   );
+	// }
 }
 
 // async function _generate_base_types(){

@@ -19,11 +19,11 @@ import {Params} from '../types';
 
 // import {hooks} from './hooks';
 
-import {transpose} from './transpose';
+// import {transpose} from './transpose';
 
 import {merge_params} from './common';
 
-import {generate} from './generate';
+// import {generate} from './generate';
 
 // import {BuildParams} from './types';
 
@@ -60,9 +60,9 @@ export async function build(params:Params, included=false)
 	
 	output_instance.start_loading(`Building...`);
 	
-	await transpose(build_params, true);
+	// await transpose(build_params, true);
 	
-	await generate(build_params, true);
+	// await generate(build_params, true);
 	
 	// await hooks(build_params, true);
 	

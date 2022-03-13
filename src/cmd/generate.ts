@@ -1,6 +1,24 @@
 /**
  * Generate command module
  *
+ * Method `generate` first create the register files with the user defined Atoms
+ * by reading the src/atoms folder of the project.
+ *
+ * Then it runs the binary script exported from uranio repo:
+ * - uranio-generate-adm
+ * - uranio-generate-trx
+ * - uranio-generate-api
+ * - uranio-generate-core
+ *
+ * This scripts are defined inside uranio repos: src/server/generate.ts
+ *
+ * In general what they do is:
+ *
+ * - Generating the schema in node_modules/uranio-schema
+ * - Generating the hooks in node_modules/uranio-trx
+ * - Generating the hook types in node_modules/uranio-trx
+ * - Generating the client_toml module in node_modules/uranio
+ *
  * @packageDocumentation
  */
 
@@ -14,7 +32,7 @@ import * as output from '../output/index';
 
 import * as util from '../util/index';
 
-import {Params} from '../types';
+import {Params, valid_admin_repos, valid_deploy_repos} from '../types';
 
 import {merge_params} from './common';
 
@@ -29,23 +47,93 @@ let register_path_client = `node_modules/uranio/src/client/register.ts`;
 let compiled_register_path_server = `node_modules/uranio/dist/server/register.js`;
 let compiled_register_path_client = `node_modules/uranio/dist/client/register.js`;
 
-export async function generate(params:Params, is_included=false)
+export async function generate(params:Params, path?:string, _event?:string)
 		:Promise<void>{
 	
 	_init_generate(params);
 	
-	_generate_register();
+	const src_path = `${generate_params.root}/src`;
 	
-	const generate_cmd = `yarn uranio-generate-${generate_params.repo}`;
-	util_instance.spawn.verbose_log(generate_cmd, 'generate', 'generating');
+	const atoms_src_dir = `${src_path}/atoms`;
+	const server_src_dir = `${src_path}/server`;
+	const admin_src_dir = `${src_path}/admin`;
 	
-	if(is_included){
-		output_instance.done_log('Generate completed.');
-	}else{
-		output_instance.end_log('Generate completed.');
+	if(typeof path === 'undefined'){
+		await _generate_all();
+		return;
 	}
 	
+	if(path.includes(atoms_src_dir)){
+		
+		await _generate_atoms();
+		
+	}else if(
+		valid_deploy_repos().includes(generate_params.repo)
+		&& path.includes(server_src_dir)
+	){
+		
+		// TODO
+		
+	}else if(
+		valid_admin_repos().includes(generate_params.repo)
+		&& path.includes(admin_src_dir)
+	){
+		
+		// TODO
+		
+	}else if(
+		path.includes(generate_params.config)
+	){
+		
+		await _generate_client_config();
+		
+	}else{
+		
+		await _generate_all();
+		
+	}
+	
+	output_instance.done_log('Generate completed.');
+	
 }
+
+async function _generate_all():Promise<void>{
+	await _generate('');
+	output_instance.done_verbose_log('Generate all completed.');
+}
+
+async function _generate_atoms():Promise<void>{
+	await _generate(`urn_command=atoms`);
+}
+
+// async function _generate_schema(params:Params):Promise<void>{
+//   await _generate(`urn_command=schema`, params);
+// }
+
+// async function _generate_hooks(params:Params):Promise<void>{
+//   await _generate(`urn_command=hooks`, params);
+//   await _generate(`urn_command=hook-types`, params);
+// }
+
+async function _generate_client_config():Promise<void>{
+	await _generate(`urn_command=client-config`);
+}
+
+async function _generate(args:string){
+	
+	// _init_generate(params);
+	
+	await _generate_register();
+	
+	await new Promise((resolve, reject) => {
+		const generate_cmd = `yarn uranio-generate-${generate_params.repo} ${args}`;
+		util_instance.spawn.verbose_log(generate_cmd, 'generate', 'generating', undefined, resolve, reject);
+	});
+	
+	// output_instance.done_log('Generate completed.');
+	
+}
+
 
 async function _generate_register()
 		:Promise<void>{
@@ -55,8 +143,8 @@ async function _generate_register()
 	const node_register_src_client = `${node_register_uranio_src}/client/register.ts`;
 	
 	const node_register_uranio_dist = `node_modules/uranio/dist`;
-	const node_register_dist_server = `${node_register_uranio_dist}/server/register.js`
-	const node_register_dist_client = `${node_register_uranio_dist}/client/register.js`
+	const node_register_dist_server = `${node_register_uranio_dist}/server/register.js`;
+	const node_register_dist_client = `${node_register_uranio_dist}/client/register.js`;
 	
 	register_path_server = `${generate_params.root}/${node_register_src_server}`;
 	register_path_client = `${generate_params.root}/${node_register_src_client}`;
@@ -120,7 +208,7 @@ function _register_text(parent_folder:string){
 			const routes_folder = util_instance.fs.read_dir(`${atom_dir}/${atom_folder}/routes`);
 			for(const route_file of routes_folder){
 				const base_route_filename = path.parse(route_file).name;
-				text += `export * from '../atoms/${parent_folder}/${atom_folder}/routes/${base_route_filename}';\n`
+				text += `export * from '../atoms/${parent_folder}/${atom_folder}/routes/${base_route_filename}';\n`;
 			}
 		}
 		output_instance.verbose_log(`Exported atom [${atom_folder}].`, `atms`);

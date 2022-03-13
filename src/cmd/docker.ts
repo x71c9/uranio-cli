@@ -151,7 +151,7 @@ export async function build(params:Partial<Params>)
 	cmd += ` -t ${image_name}`;
 	cmd += ` -f ${docker_params.root}/${defaults.folder}/${defaults.docker_folder}/Dockerfile`;
 	cmd += ` --build-arg repo=${docker_params.repo}`;
-	cmd += ` --build-arg deploy=${docker_params.deploy}`;
+	// cmd += ` --build-arg deploy=${docker_params.deploy}`;
 	cmd += ` --build-arg project=${project_name}`;
 	cmd += ` .`;
 	await _execute_spin_verbose(cmd, 'docker', 'building');

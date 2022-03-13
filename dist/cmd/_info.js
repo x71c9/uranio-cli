@@ -42,7 +42,6 @@ const chalk_1 = __importDefault(require("chalk"));
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
-const types_1 = require("../types");
 const common_1 = require("./common");
 let output_instance;
 let util_instance;
@@ -53,9 +52,9 @@ function info(params) {
         _check_if_is_initialized();
         console.log(`root:   ${_bold(info_params.root)}`);
         console.log(`repo:   ${_bold(info_params.repo)}`);
-        if ((0, types_1.valid_deploy_repos)().includes(info_params.repo)) {
-            console.log(`deploy: ${_bold(info_params.deploy)}`);
-        }
+        // if(valid_deploy_repos().includes(info_params.repo)){
+        //   console.log(`deploy: ${_bold(info_params.deploy)}`);
+        // }
         console.log(`pacman: ${_bold(info_params.pacman)}`);
         console.log(`docker: ${_bold(String(info_params.docker))}`);
         if (info_params.docker_db) {

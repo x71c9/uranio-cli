@@ -17,17 +17,14 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.docker = void 0;
 __exportStar(require("./init"), exports);
-// export * from './alias';
-__exportStar(require("./generate"), exports);
-__exportStar(require("./build"), exports);
 __exportStar(require("./dev"), exports);
+__exportStar(require("./build"), exports);
+__exportStar(require("./start"), exports);
 __exportStar(require("./transpose"), exports);
-// export * from './hooks';
-// export * from './info';
+__exportStar(require("./generate"), exports);
 __exportStar(require("./help"), exports);
+__exportStar(require("./info"), exports);
+__exportStar(require("./deinit"), exports);
 var docker_1 = require("./docker");
 Object.defineProperty(exports, "docker", { enumerable: true, get: function () { return docker_1.docker; } });
-// export * from './deinit';
-// export * from './dot';
-__exportStar(require("./start"), exports);
 //# sourceMappingURL=index.js.map

@@ -42,11 +42,10 @@ const path_1 = __importDefault(require("path"));
 // import * as recast from 'recast';
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
-const generate_1 = require("./generate");
+// import {generate} from './generate';
 // import {default_params, defaults} from '../conf/defaults';
 const defaults_1 = require("../conf/defaults");
-const transpose_1 = require("./transpose");
-const build_1 = require("./build");
+// import {build} from './build';
 // import {hooks} from './hooks';
 const common_1 = require("./common");
 const docker = __importStar(require("./docker"));
@@ -446,7 +445,7 @@ function _init_dev() {
         // await transpose(dev_params, true);
         // await generate_register(dev_params, true);
         // await generate(dev_params, true);
-        yield (0, build_1.build)(dev_params, true);
+        // await build(dev_params, true);
         // if(valid_hooks_repos().includes(dev_params.repo)){
         //   hooks(dev_params, true);
         // }
@@ -484,15 +483,15 @@ function _watch() {
         if (_event === 'addDir') {
         }
         else if (_event === 'unlink') {
-            yield (0, transpose_1.transpose_unlink_file)(_path, dev_params, true);
+            // await transpose_unlink_file(_path, dev_params, true);
         }
         else if (_event === 'unlinkDir') {
-            yield (0, transpose_1.transpose_unlink_dir)(_path, dev_params, true);
+            // await transpose_unlink_dir(_path, dev_params, true);
         }
         else {
-            yield (0, transpose_1.transpose_one)(_path, dev_params, true);
+            // await transpose_one(_path, dev_params, true);
         }
-        yield (0, generate_1.generate)(dev_params, true);
+        // await generate(dev_params, true);
         output_instance.done_log(`[src watch] Transposed [${_event}] [${_path}].`, 'wtch');
         // if(
         //   valid_deploy_repos().includes(dev_params.repo)

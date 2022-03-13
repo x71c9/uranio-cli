@@ -17,6 +17,8 @@ type CachedOutput = {
 
 const child_list:cp.ChildProcessWithoutNullStreams[] = [];
 
+// const child_list_detached:cp.ChildProcessWithoutNullStreams[] = [];
+
 const child_outputs:CachedOutput = {};
 
 process.on('SIGINT', function() {
@@ -27,6 +29,13 @@ process.on('SIGINT', function() {
 			process.kill(child.pid);
 		}
 	}
+	// for(let i = 0; i < child_list_detached.length; i++){
+	//   const child = child_list_detached[i];
+	//   if(child.pid){
+	//     // Minus symbol "-" is needed for detached process child.
+	//     process.kill(-child.pid);
+	//   }
+	// }
 });
 
 class Spawn {
@@ -38,29 +47,29 @@ class Spawn {
 		cp.execSync(command);
 	}
 	
-	public spin(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+	public spin(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject, detached=false){
 		this.output.debug_log(command, 'spin');
-		return this._spawn(command, context, action, true, false, false, color, resolve, reject);
+		return this._spawn(command, context, action, true, false, false, color, resolve, reject, detached);
 	}
 	
-	public log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+	public log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject, detached=false){
 		this.output.debug_log(command, 'log');
-		return this._spawn(command, context, action, false, true, false, color, resolve, reject);
+		return this._spawn(command, context, action, false, true, false, color, resolve, reject, detached);
 	}
 	
-	public verbose_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+	public verbose_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject, detached=false){
 		this.output.debug_log(command, 'verbose log');
-		return this._spawn(command, context, action, false, false, true, color, resolve, reject);
+		return this._spawn(command, context, action, false, false, true, color, resolve, reject, detached);
 	}
 	
-	public spin_and_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+	public spin_and_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject, detached=false){
 		this.output.debug_log(command, 'spin and log');
-		return this._spawn(command, context, action, true, true, false, color, resolve, reject);
+		return this._spawn(command, context, action, true, true, false, color, resolve, reject, detached);
 	}
 	
-	public spin_and_verbose_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject){
+	public spin_and_verbose_log(command:string, context:string, action:string, color?:string, resolve?:Resolve, reject?:Reject, detached=false){
 		this.output.debug_log(command, 'spin and verbose');
-		return this._spawn(command, context, action, true, false, true, color, resolve, reject);
+		return this._spawn(command, context, action, true, false, true, color, resolve, reject, detached);
 	}
 	
 	private _spawn(
@@ -72,7 +81,8 @@ class Spawn {
 		verbose:boolean,
 		color?:string,
 		resolve?:Resolve,
-		reject?:Reject
+		reject?:Reject,
+		detached=false
 	){
 		if(spin && verbose){
 			this.output.start_loading(command);
@@ -83,7 +93,7 @@ class Spawn {
 			this.output.verbose_log(command, context, color);
 		}
 		
-		const child = cp.spawn(command, {shell: true});
+		const child = cp.spawn(command, {shell: true, detached: detached});
 		
 		if(child.stdout){
 			child.stdout.setEncoding('utf8');
@@ -161,7 +171,11 @@ class Spawn {
 			}
 		});
 		
+		// if(detached){
+		//   child_list_detached.push(child);
+		// }else{
 		child_list.push(child);
+		// }
 		
 		child_outputs[child.pid || 'pid0'] = [];
 		

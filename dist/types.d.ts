@@ -26,6 +26,7 @@ export declare type Params = {
     color_uranio: boolean;
     prefix: string;
     branch: string;
+    config: string;
     repo: Repo;
     pacman: PacMan;
     db: DB;

@@ -11,7 +11,7 @@ export declare const defaults: {
     readonly repo_folder: "uranio";
     readonly tmp_folder: ".tmp";
     readonly log_filepath: ".urnlog";
-    readonly init_filepath: "uranio.init.json";
+    readonly init_filepath: ".uranio.json";
     readonly time_format: "yy-mm-dd'T'HH:MM:ss:l";
     readonly dot_repo: "git+ssh://git@github.com/nbl7/uranio-dot.git";
     readonly dev_repo: "git+ssh://git@github.com/nbl7/uranio-dev.git";

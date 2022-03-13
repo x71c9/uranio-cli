@@ -27,7 +27,8 @@ export async function help():Promise<void> {
 	console.log(`list of options`);
 	console.log(`  -s --root .......... set the project root folder.`);
 	console.log(`  -r --repo .......... set uranio repo to use [core, api, trx, adm].`);
-	console.log(`  -d --deploy ........ set deploy [netlify, express].`);
+	console.log(`  -c --config ........ set config toml file path.`);
+	// console.log(`  -d --deploy ........ set deploy [netlify, express].`);
 	console.log(`  -p --pacman ........ set package manager [npm, yarn].`);
 	console.log(`  -f --force ......... run without prompts.`);
 	console.log(`  -g --branch ........ set branch to clone.`);
@@ -47,7 +48,7 @@ export async function help():Promise<void> {
 	console.log(`  -l --filelog ....... save log on file.`);
 	console.log(`  -i --spin .......... log with spinner.`);
 	console.log(`  -e --native ........ log in native mode.`);
-	console.log(`  -c --color_log ..... log color.`);
+	console.log(`  -d --color_log ..... log color.`);
 	console.log(`  -o --color_verbose . verbose log color.`);
 	console.log(`  -q --color_debug ... debug log color.`);
 	

@@ -40,9 +40,9 @@ exports.build = void 0;
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/index"));
 // import {hooks} from './hooks';
-const transpose_1 = require("./transpose");
+// import {transpose} from './transpose';
 const common_1 = require("./common");
-const generate_1 = require("./generate");
+// import {generate} from './generate';
 // import {BuildParams} from './types';
 // import * as common from './common';
 // // const cli_options = {
@@ -64,8 +64,8 @@ function build(params, included = false) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_build(params);
         output_instance.start_loading(`Building...`);
-        yield (0, transpose_1.transpose)(build_params, true);
-        yield (0, generate_1.generate)(build_params, true);
+        // await transpose(build_params, true);
+        // await generate(build_params, true);
         // await hooks(build_params, true);
         // await _build_server();
         // await _build_client();

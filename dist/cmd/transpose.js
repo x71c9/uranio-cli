@@ -2,6 +2,24 @@
 /**
  * Transpose command module
  *
+ * Method `transpose` copies files from the project `src` folder into
+ * uranio node_modules folders:
+ * - node_modules/uranio
+ * - node_modules/uranio-trx
+ *
+ * Depending from which folder is copying it will do different things.
+ *
+ * 1) SRC Atom Folder
+ * It copies and process all file from src/atoms to:
+ * -- node_modules/uranio/src/atoms/server
+ * -- node_modules/uranio/src/atoms/client
+ *
+ * 2) SRC Server Folder
+ * TODO
+ *
+ * 2) SRC Admin Folder
+ * TODO
+ *
  * @packageDocumentation
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -36,7 +54,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.transpose_unlink_file = exports.transpose_unlink_dir = exports.transpose_one = exports.transpose = void 0;
+exports.transpose = void 0;
 const path_1 = __importDefault(require("path"));
 const esbuild = __importStar(require("esbuild"));
 const recast = __importStar(require("recast"));
@@ -48,116 +66,121 @@ const common_1 = require("./common");
 let output_instance;
 let util_instance;
 let transpose_params = defaults_1.default_params;
-function transpose(params, included = false) {
+function transpose(params, path, event) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_tranpose(params);
+        _init_transpose(params);
         try {
-            yield _transpose_all(included);
+            if (typeof path === 'undefined') {
+                yield _transpose_all();
+                return;
+            }
+            switch (event) {
+                case 'addDir': {
+                    break;
+                }
+                case 'unlink': {
+                    yield _transpose_unlink_file(path);
+                    break;
+                }
+                case 'unlinkDir': {
+                    yield _transpose_unlink_dir(path);
+                    break;
+                }
+                default: {
+                    yield _transpose_one(path);
+                    break;
+                }
+            }
         }
         catch (ex) {
             const err = ex;
-            if (included) {
-                output_instance.error_log(err.toString());
-                // if(err.stack){
-                //   output_instance.error_log(err.stack.toString());
-                // }
-                output_instance.error_log(err.message);
+            if (path) {
+                output_instance.error_log(path);
             }
-            else {
-                throw ex;
-            }
+            output_instance.error_log(err.toString());
+            output_instance.error_log(err.message);
         }
+        output_instance.done_log(`Transpose completed.`);
     });
 }
 exports.transpose = transpose;
-function transpose_one(full_path, params, included = false) {
+function _transpose_one(full_path) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_tranpose(params);
+        // _init_transpose(params);
         if (util_instance.fs.is_directory(full_path)) {
-            yield _transpose_folder(full_path, included);
+            yield _transpose_folder(full_path);
         }
         else {
-            yield _transpose_file(full_path, included);
+            yield _transpose_file(full_path);
         }
     });
 }
-exports.transpose_one = transpose_one;
-function transpose_unlink_dir(full_path, params, included = false) {
+function _transpose_unlink_dir(full_path) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_tranpose(params);
-        _validate_path(full_path);
+        // _init_transpose(params);
+        if (!_validate_path(full_path)) {
+            return;
+        }
         yield _unlink_dir(full_path);
-        if (included) {
-            output_instance.done_log(`Transpose unlink dir completed.`);
-        }
-        else {
-            output_instance.end_log(`Transpose unlink dir completed.`);
-        }
+        output_instance.done_verbose_log(`Transpose unlink dir completed.`);
     });
 }
-exports.transpose_unlink_dir = transpose_unlink_dir;
-function transpose_unlink_file(full_path, params, included = false) {
+function _transpose_unlink_file(full_path) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_tranpose(params);
-        _validate_path(full_path);
+        // _init_transpose(params);
+        if (!_validate_path(full_path)) {
+            return;
+        }
         yield _unlink_file(full_path);
-        if (included) {
-            output_instance.done_log(`Transpose unlink file completed.`);
-        }
-        else {
-            output_instance.end_log(`Transpose unlink file completed.`);
-        }
+        output_instance.done_verbose_log(`Transpose unlink file completed.`);
     });
 }
-exports.transpose_unlink_file = transpose_unlink_file;
-function _init_tranpose(params) {
+function _init_transpose(params) {
     transpose_params = (0, common_1.merge_params)(params);
     output_instance = output.create(transpose_params);
     util_instance = util.create(transpose_params, output_instance);
 }
-function _transpose_all(included = false) {
+function _transpose_all() {
     return __awaiter(this, void 0, void 0, function* () {
         yield _transpose_folder(path_1.default.join(transpose_params.root, 'src'), true);
-        if (included) {
-            output_instance.done_log(`Transpose completed.`);
-        }
-        else {
-            output_instance.end_log(`Transpose completed.`);
-        }
+        output_instance.done_verbose_log(`Transpose all completed.`);
     });
 }
-function _transpose_file(file_path, included = false) {
+function _transpose_file(file_path) {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.debug_log(`Transposing [${file_path}]...`);
-        _validate_exists_path(file_path);
+        if (!_validate_exists_path(file_path)) {
+            return;
+        }
         const src_path = `${transpose_params.root}/src`;
         const atoms_src_dir = `${src_path}/atoms`;
         const server_src_dir = `${src_path}/server`;
         const admin_src_dir = `${src_path}/admin`;
         if (file_path.includes(atoms_src_dir)) {
-            _transpose_atom_dir_file(file_path);
+            yield _transpose_atom_dir_file(file_path);
         }
         else if ((0, types_1.valid_deploy_repos)().includes(transpose_params.repo)
             && file_path.includes(server_src_dir)) {
-            _transpose_server_dir_file(file_path);
+            yield _transpose_server_dir_file(file_path);
         }
         else if ((0, types_1.valid_admin_repos)().includes(transpose_params.repo)
             && file_path.includes(admin_src_dir)) {
-            _transpose_admin_dir_file(file_path);
+            yield _transpose_admin_dir_file(file_path);
         }
-        if (!included) {
-            output_instance.done_log(`Transpose file completed. [${file_path}]`);
-        }
+        output_instance.done_verbose_log(`Transpose file completed. [${file_path}]`);
     });
 }
 function _validate_exists_path(full_path) {
-    _validate_path(full_path);
+    if (!_validate_path(full_path)) {
+        return false;
+    }
     if (!full_path || !util_instance.fs.exists(full_path)) {
         let err_msg = '';
         err_msg += `Invalid file path [${full_path}].`;
         output_instance.error_log(err_msg, 'trsp');
-        return;
+        return false;
     }
+    return true;
 }
 function _validate_path(full_path) {
     if (typeof full_path !== 'string' || full_path === '') {
@@ -167,11 +190,11 @@ function _validate_path(full_path) {
     const basename = path_1.default.basename(full_path);
     const extension = path_1.default.extname(basename);
     if (basename.match(/^\.git/) !== null) {
-        return;
+        return false;
     }
     const not_valid_extensions = ['.swp', '.swo'];
     if (not_valid_extensions.includes(extension)) {
-        return;
+        return false;
     }
     const src_path = `${transpose_params.root}/src`;
     if (!full_path.includes(src_path)) {
@@ -179,8 +202,9 @@ function _validate_path(full_path) {
         err_msg += `Invalid file path [${full_path}].`;
         err_msg += ` File must be in [${transpose_params.root}/src/].`;
         output_instance.error_log(err_msg, 'trsp');
-        return;
+        return false;
     }
+    return true;
 }
 function _unlink_dir(full_path) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -235,6 +259,7 @@ function _unlink_file(file_path) {
     });
 }
 function _transpose_atom_dir_file(file_path) {
+    output_instance.verbose_log(`Transpose atom dir file [${file_path}].`);
     const atoms_dir = `${transpose_params.root}/src/atoms/`;
     const relative_path = file_path.replace(atoms_dir, '');
     const text = util_instance.fs.read_file(file_path);
@@ -415,9 +440,11 @@ function _replace_import(text, file_path, parent_folder) {
     return printed;
 }
 function _transpose_server_dir_file(_file_path) {
+    output_instance.verbose_log(`Transpose server dir file [${_file_path}].`);
     //TODO
 }
 function _transpose_admin_dir_file(_file_path) {
+    output_instance.verbose_log(`Transpose admin dir file [${_file_path}].`);
     //TODO
 }
 function _atom_with_name_argument(source, atom_name) {
@@ -464,7 +491,7 @@ function _transpose_folder(dir_path, included = false) {
                 promises.push(folder_promise);
             }
             else {
-                const file_promise = _transpose_file(full_path, true);
+                const file_promise = _transpose_file(full_path);
                 promises.push(file_promise);
             }
         }

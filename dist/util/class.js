@@ -55,7 +55,7 @@ class Util {
         this.cmd = cmd.create(params, output);
     }
     watch(watch_path, watch_text, on_ready, on_all) {
-        const watch_child = chokidar_1.default.watch(watch_path).on('ready', on_ready).on('all', on_all);
+        const watch_child = chokidar_1.default.watch(watch_path, { ignoreInitial: true }).on('ready', on_ready).on('all', on_all);
         watch_child_list.push({
             child: watch_child,
             context: `wtch`,

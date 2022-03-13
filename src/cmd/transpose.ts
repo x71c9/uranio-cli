@@ -1,6 +1,24 @@
 /**
  * Transpose command module
  *
+ * Method `transpose` copies files from the project `src` folder into
+ * uranio node_modules folders:
+ * - node_modules/uranio
+ * - node_modules/uranio-trx
+ *
+ * Depending from which folder is copying it will do different things.
+ *
+ * 1) SRC Atom Folder
+ * It copies and process all file from src/atoms to:
+ * -- node_modules/uranio/src/atoms/server
+ * -- node_modules/uranio/src/atoms/client
+ *
+ * 2) SRC Server Folder
+ * TODO
+ *
+ * 2) SRC Admin Folder
+ * TODO
+ *
  * @packageDocumentation
  */
 
@@ -30,81 +48,97 @@ let util_instance:util.UtilInstance;
 
 let transpose_params = default_params as Params;
 
-export async function transpose(params:Partial<Params>, included=false)
+export async function transpose(params:Partial<Params>, path?:string, event?:string)
 		:Promise<void>{
 	
-	_init_tranpose(params);
+	_init_transpose(params);
 	
 	try{
 		
-		await _transpose_all(included);
+		if(typeof path === 'undefined'){
+			await _transpose_all();
+			return;
+		}
+		switch(event){
+			case 'addDir':{
+				break;
+			}
+			case 'unlink':{
+				await _transpose_unlink_file(path);
+				break;
+			}
+			case 'unlinkDir':{
+				await _transpose_unlink_dir(path);
+				break;
+			}
+			default:{
+				await _transpose_one(path);
+				break;
+			}
+		}
 		
 	}catch(ex){
 		
 		const err = ex as Error;
-		if(included){
-			output_instance.error_log(err.toString());
-			// if(err.stack){
-			//   output_instance.error_log(err.stack.toString());
-			// }
-			output_instance.error_log(err.message);
-		}else{
-			throw ex;
+		if(path){
+			output_instance.error_log(path);
 		}
+		output_instance.error_log(err.toString());
+		output_instance.error_log(err.message);
 		
 	}
 	
+	output_instance.done_log(`Transpose completed.`);
+	
 }
 
-export async function transpose_one(full_path:string, params:Partial<Params>, included=false)
+async function _transpose_one(full_path:string)
 		:Promise<void>{
 	
-	_init_tranpose(params);
+	// _init_transpose(params);
 	
 	if(util_instance.fs.is_directory(full_path)){
 		
-		await _transpose_folder(full_path, included);
+		await _transpose_folder(full_path);
 		
 	}else{
 		
-		await _transpose_file(full_path, included);
+		await _transpose_file(full_path);
 		
 	}
 }
 
-export async function transpose_unlink_dir(full_path:string, params:Partial<Params>, included=false)
+async function _transpose_unlink_dir(full_path:string)
 		:Promise<void>{
 	
-	_init_tranpose(params);
+	// _init_transpose(params);
 	
-	_validate_path(full_path);
+	if(!_validate_path(full_path)){
+		return;
+	}
 	
 	await _unlink_dir(full_path);
 	
-	if(included){
-		output_instance.done_log(`Transpose unlink dir completed.`);
-	}else{
-		output_instance.end_log(`Transpose unlink dir completed.`);
-	}
+	output_instance.done_verbose_log(`Transpose unlink dir completed.`);
+	
 }
 
-export async function transpose_unlink_file(full_path:string, params:Partial<Params>, included=false)
+async function _transpose_unlink_file(full_path:string)
 		:Promise<void>{
 	
-	_init_tranpose(params);
+	// _init_transpose(params);
 	
-	_validate_path(full_path);
+	if(!_validate_path(full_path)){
+		return;
+	}
 	
 	await _unlink_file(full_path);
 	
-	if(included){
-		output_instance.done_log(`Transpose unlink file completed.`);
-	}else{
-		output_instance.end_log(`Transpose unlink file completed.`);
-	}
+	output_instance.done_verbose_log(`Transpose unlink file completed.`);
+	
 }
 
-function _init_tranpose(params:Partial<Params>){
+function _init_transpose(params:Partial<Params>){
 	
 	transpose_params = merge_params(params);
 	
@@ -114,23 +148,21 @@ function _init_tranpose(params:Partial<Params>){
 	
 }
 
-async function _transpose_all(included=false){
+async function _transpose_all(){
 	
 	await _transpose_folder(path.join(transpose_params.root, 'src'), true);
 	
-	if(included){
-		output_instance.done_log(`Transpose completed.`);
-	}else{
-		output_instance.end_log(`Transpose completed.`);
-	}
+	output_instance.done_verbose_log(`Transpose all completed.`);
 	
 }
 
-async function _transpose_file(file_path:string, included=false):Promise<void>{
+async function _transpose_file(file_path:string):Promise<void>{
 	
 	output_instance.debug_log(`Transposing [${file_path}]...`);
 	
-	_validate_exists_path(file_path);
+	if(!_validate_exists_path(file_path)){
+		return;
+	}
 	
 	const src_path = `${transpose_params.root}/src`;
 	
@@ -140,40 +172,42 @@ async function _transpose_file(file_path:string, included=false):Promise<void>{
 	
 	if(file_path.includes(atoms_src_dir)){
 		
-		_transpose_atom_dir_file(file_path);
+		await _transpose_atom_dir_file(file_path);
 		
 	}else if(
 		valid_deploy_repos().includes(transpose_params.repo)
 		&& file_path.includes(server_src_dir)
 	){
 		
-		_transpose_server_dir_file(file_path);
+		await _transpose_server_dir_file(file_path);
 		
 	}else if(
 		valid_admin_repos().includes(transpose_params.repo)
 		&& file_path.includes(admin_src_dir)
 	){
 		
-		_transpose_admin_dir_file(file_path);
+		await _transpose_admin_dir_file(file_path);
 		
 	}
 	
-	if(!included){
-		output_instance.done_log(`Transpose file completed. [${file_path}]`);
-	}
+	output_instance.done_verbose_log(`Transpose file completed. [${file_path}]`);
 	
 }
 
 function _validate_exists_path(full_path:string){
 	
-	_validate_path(full_path);
+	if(!_validate_path(full_path)){
+		return false;
+	}
 	
 	if(!full_path || !util_instance.fs.exists(full_path)){
 		let err_msg = '';
 		err_msg += `Invalid file path [${full_path}].`;
 		output_instance.error_log(err_msg, 'trsp');
-		return;
+		return false;
 	}
+	
+	return true;
 	
 }
 
@@ -188,12 +222,12 @@ function _validate_path(full_path:string){
 	const extension = path.extname(basename);
 	
 	if(basename.match(/^\.git/) !== null){
-		return;
+		return false;
 	}
 	
 	const not_valid_extensions = ['.swp', '.swo'];
 	if(not_valid_extensions.includes(extension)){
-		return;
+		return false;
 	}
 	
 	const src_path = `${transpose_params.root}/src`;
@@ -203,8 +237,10 @@ function _validate_path(full_path:string){
 		err_msg += `Invalid file path [${full_path}].`;
 		err_msg += ` File must be in [${transpose_params.root}/src/].`;
 		output_instance.error_log(err_msg, 'trsp');
-		return;
+		return false;
 	}
+	
+	return true;
 	
 }
 
@@ -298,6 +334,8 @@ async function _unlink_file(file_path:string){
 }
 
 function _transpose_atom_dir_file(file_path:string){
+	
+	output_instance.verbose_log(`Transpose atom dir file [${file_path}].`);
 	
 	const atoms_dir = `${transpose_params.root}/src/atoms/`;
 	const relative_path = file_path.replace(atoms_dir, '');
@@ -511,10 +549,12 @@ function _replace_import(text:string, file_path:string, parent_folder:string){
 
 
 function _transpose_server_dir_file(_file_path:string){
+		output_instance.verbose_log(`Transpose server dir file [${_file_path}].`);
 	//TODO
 }
 
 function _transpose_admin_dir_file(_file_path:string){
+		output_instance.verbose_log(`Transpose admin dir file [${_file_path}].`);
 	//TODO
 }
 
@@ -562,7 +602,7 @@ async function _transpose_folder(dir_path:string, included=false){
 			const folder_promise = _transpose_folder(full_path, true);
 			promises.push(folder_promise);
 		}else{
-			const file_promise = _transpose_file(full_path, true);
+			const file_promise = _transpose_file(full_path);
 			promises.push(file_promise);
 		}
 	}

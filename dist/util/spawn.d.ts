@@ -12,11 +12,11 @@ declare class Spawn {
     output: out.OutputInstance;
     constructor(output: out.OutputInstance);
     exec_sync(command: string): void;
-    spin(command: string, context: string, action: string, color?: string, resolve?: Resolve, reject?: Reject): cp.ChildProcessWithoutNullStreams;
-    log(command: string, context: string, action: string, color?: string, resolve?: Resolve, reject?: Reject): cp.ChildProcessWithoutNullStreams;
-    verbose_log(command: string, context: string, action: string, color?: string, resolve?: Resolve, reject?: Reject): cp.ChildProcessWithoutNullStreams;
-    spin_and_log(command: string, context: string, action: string, color?: string, resolve?: Resolve, reject?: Reject): cp.ChildProcessWithoutNullStreams;
-    spin_and_verbose_log(command: string, context: string, action: string, color?: string, resolve?: Resolve, reject?: Reject): cp.ChildProcessWithoutNullStreams;
+    spin(command: string, context: string, action: string, color?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
+    log(command: string, context: string, action: string, color?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
+    verbose_log(command: string, context: string, action: string, color?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
+    spin_and_log(command: string, context: string, action: string, color?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
+    spin_and_verbose_log(command: string, context: string, action: string, color?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
     private _spawn;
 }
 export declare type SpawnInstance = InstanceType<typeof Spawn>;

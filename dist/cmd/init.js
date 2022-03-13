@@ -53,8 +53,11 @@ function init(params) {
         init_params = (0, common_1.merge_init_params)(params);
         output_instance = output.create(init_params);
         util_instance = util.create(init_params, output_instance);
+        yield _clone_assets_repo();
         _log_important_params();
+        _create_init_file();
         _create_src_dirs();
+        _copy_assets();
         _create_dot_env();
         _ignore_files();
         _update_resolutions();
@@ -235,43 +238,40 @@ function _ask_for_repo(args) {
             ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
                 (0, common_1.check_repo)(answers.repo);
                 init_params.repo = answers.repo;
-                if (answers.repo !== 'core') {
-                    yield _ask_for_deploy(args);
-                }
-                else {
-                    yield init(init_params);
-                }
-            }));
-        }
-        else {
-            yield _ask_for_deploy(args);
-        }
-    });
-}
-function _ask_for_deploy(args) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const deploy = args.d || args.deploy;
-        if (!deploy && init_params.force === false) {
-            // output.stop_loading();
-            inquirer_1.default.
-                prompt([
-                {
-                    type: 'list',
-                    name: 'deploy',
-                    message: 'How you want to deploy?',
-                    choices: Object.keys(types_1.abstract_deploy)
-                }
-            ]).then((answers) => __awaiter(this, void 0, void 0, function* () {
-                (0, common_1.check_deploy)(answers.deploy);
-                init_params.deploy = answers.deploy;
+                // if(answers.repo !== 'core'){
+                //   await _ask_for_deploy(args);
+                // }else{
                 yield init(init_params);
+                // }
             }));
         }
         else {
+            // await _ask_for_deploy(args);
             yield init(init_params);
         }
     });
 }
+// async function _ask_for_deploy(args:Arguments){
+//   const deploy = args.d || args.deploy;
+//   if(!deploy && init_params.force === false){
+//     // output.stop_loading();
+//     inquirer.
+//       prompt([
+//         {
+//           type: 'list',
+//           name: 'deploy',
+//           message: 'How you want to deploy?',
+//           choices: Object.keys(abstract_deploy)
+//         }
+//       ]).then(async (answers) => {
+//         check_deploy(answers.deploy);
+//         init_params.deploy = answers.deploy;
+//         await init(init_params);
+//       });
+//   }else{
+//     await init(init_params);
+//   }
+// }
 function _log_important_params() {
     output_instance.verbose_log(`$URNROOT$Project root: [${init_params.root}]`, 'root');
     output_instance.verbose_log(`Selected repository: [${init_params.repo}]`, 'repo');
@@ -283,6 +283,60 @@ function _log_important_params() {
     //   );
     // }
 }
+function _clone_assets_repo() {
+    return __awaiter(this, void 0, void 0, function* () {
+        output_instance.start_loading(`Cloning assets...`);
+        util_instance.fs.remove_directory(defaults_1.defaults.tmp_folder, 'assets');
+        util_instance.fs.create_directory(defaults_1.defaults.tmp_folder, 'assets');
+        yield util_instance.cmd.clone_repo(defaults_1.defaults.assets_repo, `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets`, 'assets', init_params.branch);
+        output_instance.done_log(`Cloned assets repo.`, 'assets');
+    });
+}
+function _copy_assets() {
+    _copy_sample();
+    // _copy_tsconfigs();
+    // _copy_eslint_files();
+}
+function _copy_sample() {
+    const sample_file = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets/env/sample.env`;
+    const dest = `${init_params.root}/sample.env`;
+    util_instance.fs.copy_file(sample_file, dest, 'book');
+}
+// function _copy_tsconfigs(){
+//   const ass_dir = `${init_params.root}/${defaults.tmp_folder}/uranio-assets`;
+//   const ts_dir = `${ass_dir}/typescript`;
+//   const dot_tsc_file = `${ts_dir}/root/tsconfig.json`;
+//   const dest = `${init_params.root}/tsconfig.json`;
+//   util_instance.fs.copy_file(dot_tsc_file, dest, 'tsco');
+// }
+// function _copy_eslint_files(){
+//   const eslint_dir = `${init_params.root}/${defaults.tmp_folder}/uranio-assets/eslint`;
+//   const dest_dir = `${init_params.root}`;
+//   const dest_ignore = `${dest_dir}/.eslintignore`;
+//   const dest_esrc = `${dest_dir}/.eslintrc.js`;
+//   const dest_style = `${dest_dir}/.stylelintrc.json`;
+//   if(!util_instance.fs.exists(dest_ignore)){
+//     util_instance.fs.copy_file(
+//       `${eslint_dir}/.eslintignore`,
+//       dest_ignore,
+//       'esln'
+//     );
+//   }
+//   if(!util_instance.fs.exists(dest_esrc)){
+//     util_instance.fs.copy_file(
+//       `${eslint_dir}/.eslintrc.js`,
+//       dest_esrc,
+//       'esln'
+//     );
+//   }
+//   if(!util_instance.fs.exists(dest_style)){
+//     util_instance.fs.copy_file(
+//       `${eslint_dir}/.stylelintrc.json`,
+//       dest_style,
+//       'esln'
+//     );
+//   }
+// }
 function _create_src_admin_dir() {
     const src_folder = `${init_params.root}/src`;
     const atoms_folder = `${src_folder}/admin`;
@@ -329,6 +383,27 @@ function _remove_tmp() {
     output_instance.start_loading(`Removing tmp folder [${defaults_1.defaults.tmp_folder}]...`);
     util_instance.fs.remove_directory(`${init_params.root}/${defaults_1.defaults.tmp_folder}`, 'tmp');
     output_instance.done_verbose_log(`Removed tmp folder [${defaults_1.defaults.tmp_folder}].`, 'tmp');
+}
+function _create_init_file() {
+    output_instance.start_loading('Creating rc file...');
+    let content = ``;
+    content += `{\n`;
+    content += `\t"repo": "${init_params.repo}",\n`;
+    content += `\t"pacman": "${init_params.pacman}",\n`;
+    // if(valid_deploy_repos().includes(init_params.repo)){
+    //   content += `\t"deploy": "${init_params.deploy}",\n`;
+    // }
+    if (init_params.docker === true) {
+        content += `\t"docker": ${init_params.docker},\n`;
+    }
+    if (init_params.docker_db === true) {
+        content += `\t"docker_db": ${init_params.docker_db},\n`;
+        content += `\t"db": "${init_params.db}",\n`;
+    }
+    content += `}`;
+    util_instance.fs.write_file(`${init_params.root}/${defaults_1.defaults.init_filepath}`, content);
+    util_instance.pretty(`${init_params.root}/${defaults_1.defaults.init_filepath}`, 'json');
+    output_instance.done_log(`Created file ${defaults_1.defaults.init_filepath}.`, 'rcfl');
 }
 function _create_dot_env() {
     const dot_env_path = `${init_params.root}/.env`;

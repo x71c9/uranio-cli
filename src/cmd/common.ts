@@ -17,8 +17,8 @@ import {
 	valid_repos,
 	abstract_pacman,
 	valid_pacman,
-	abstract_deploy,
-	valid_deploy,
+	// abstract_deploy,
+	// valid_deploy,
 	abstract_db,
 	valid_db
 } from '../types';
@@ -36,7 +36,7 @@ export function read_init_file(params:Partial<Params>):Partial<Params>{
 		const rc_obj = urn_util.json.clean_parse(rc_content);
 		cloned_params.repo = rc_obj.repo;
 		cloned_params.pacman = rc_obj.pacman;
-		cloned_params.deploy = rc_obj.deploy;
+		// cloned_params.deploy = rc_obj.deploy;
 		cloned_params.docker = Boolean(rc_obj.docker);
 		cloned_params.docker_db = Boolean(rc_obj.docker_db);
 		cloned_params.db = rc_obj.db;
@@ -103,14 +103,15 @@ export function check_pacman(pacman:string)
 
 export function check_deploy(deploy:string)
 		:void{
-	if(!urn_util.object.has_key(abstract_deploy, deploy)){
-		const valid_deploy_str = valid_deploy().join(', ');
-		let end_log = '';
-		end_log += `Wrong deploy value. `;
-		end_log += `Deploy value must be one of the following [${valid_deploy_str}]\n`;
-		process.stderr.write(end_log);
-		process.exit(1);
-	}
+	console.log(deploy);
+	// if(!urn_util.object.has_key(abstract_deploy, deploy)){
+	//   const valid_deploy_str = valid_deploy().join(', ');
+	//   let end_log = '';
+	//   end_log += `Wrong deploy value. `;
+	//   end_log += `Deploy value must be one of the following [${valid_deploy_str}]\n`;
+	//   process.stderr.write(end_log);
+	//   process.exit(1);
+	// }
 }
 
 export function check_db(db:string)
