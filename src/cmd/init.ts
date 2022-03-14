@@ -452,7 +452,9 @@ async function _install_packages(){
 		`Intalling [${init_params.repo}]...`
 	);
 	// await _install_package(defaults.lib_repo);
-	// await _install_dev_package(defaults.dev_repo);
+	if(valid_admin_repos().includes(init_params.repo)){
+		await _install_dev_package(defaults.adm_dep_dev_repo);
+	}
 	await _install_repo_package(init_params.repo);
 	output_instance.done_log(
 		`Installed package [${init_params.repo}].`,
@@ -465,9 +467,9 @@ async function _install_packages(){
 //   // return await util_instance.cmd.install_package(package_url);
 // }
 
-// async function _install_dev_package(package_url:string){
-//   return await util_instance.cmd.install_package_dev(`${package_url}#${init_params.branch}`);
-// }
+async function _install_dev_package(package_url:string){
+	return await util_instance.cmd.install_package_dev(`${package_url}#${init_params.branch}`);
+}
 
 async function _install_repo_package(repo:Repo){
 	const package_url = defaults[`${repo}_repo`];

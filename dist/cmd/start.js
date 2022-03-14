@@ -67,8 +67,8 @@ function start_panel(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
         const urn_lib_pre = ` urn_log_prefix_type=true`;
-        const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
-        const cmd_server = `NODE_ENV=production yarn uranio-panel-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
+        // const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
+        const cmd_server = `NODE_ENV=production yarn uranio-panel-${start_params.repo}${urn_lib_pre}`;
         util_instance.spawn.log(cmd_server, 'start', 'starting panel');
     });
 }

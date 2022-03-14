@@ -416,7 +416,9 @@ function _install_packages() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Intalling [${init_params.repo}]...`);
         // await _install_package(defaults.lib_repo);
-        // await _install_dev_package(defaults.dev_repo);
+        if ((0, types_1.valid_admin_repos)().includes(init_params.repo)) {
+            yield _install_dev_package(defaults_1.defaults.adm_dep_dev_repo);
+        }
         yield _install_repo_package(init_params.repo);
         output_instance.done_log(`Installed package [${init_params.repo}].`, 'repo');
     });
@@ -425,9 +427,11 @@ function _install_packages() {
 //   return await util_instance.cmd.install_package(`${package_url}#${init_params.branch}`);
 //   // return await util_instance.cmd.install_package(package_url);
 // }
-// async function _install_dev_package(package_url:string){
-//   return await util_instance.cmd.install_package_dev(`${package_url}#${init_params.branch}`);
-// }
+function _install_dev_package(package_url) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield util_instance.cmd.install_package_dev(`${package_url}#${init_params.branch}`);
+    });
+}
 function _install_repo_package(repo) {
     return __awaiter(this, void 0, void 0, function* () {
         const package_url = defaults_1.defaults[`${repo}_repo`];
