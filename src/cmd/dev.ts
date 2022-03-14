@@ -39,7 +39,8 @@ let watch_toml_scanned = false;
 // const nuxt_color = '#677cc7';
 // const tscw_color = '#734de3';
 const watc_color = '#687a6a';
-const pane_color = '#4f9ee3';
+// const pane_color = '#4f9ee3';
+const pane_color = '#b44fe3';
 
 let service_child:forever.Monitor;
 
@@ -53,7 +54,8 @@ export async function dev(params:Partial<Params>)
 		
 		_init_params(params);
 		await _init_dev();
-		
+		_dev_server();
+		_dev_panel();
 	}
 }
 
