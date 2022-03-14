@@ -6,6 +6,8 @@
 
 import inquirer from 'inquirer';
 
+import {urn_util} from 'urn-lib';
+
 import {defaults, default_params} from '../conf/defaults';
 
 import * as output from '../output/index';
@@ -33,6 +35,8 @@ import {
 	check_repo,
 	// check_deploy,
 	check_pacman,
+	package_scripts,
+	adm_package_scripts,
 } from './common';
 
 let output_instance:output.OutputInstance;
@@ -57,6 +61,7 @@ export async function init(params:Partial<Params>)
 	_create_dot_env();
 	_ignore_files();
 	_update_resolutions();
+	_update_package_scripts();
 	
 	if(init_params.docker === true){
 		
@@ -520,3 +525,35 @@ function _update_resolutions(){
 		output_instance.error_log(`Cannot update ${package_json_path}.`, 'packdata');
 	}
 }
+
+function _update_package_scripts(){
+	output_instance.start_loading('Updating scripts...');
+	const package_json_path = `${init_params.root}/package.json`;
+	const data = util_instance.fs.read_file(package_json_path, 'utf8');
+	try{
+		const package_data = urn_util.json.clean_parse(data);
+		const old_scripts = package_data['scripts'] || {};
+		package_data['scripts'] = {
+			...old_scripts,
+			...package_scripts
+		};
+		if(valid_admin_repos().includes(init_params.repo)){
+			package_data['scripts'] = {
+				...package_data['scripts'],
+				...adm_package_scripts
+			};
+		}
+		try{
+			util_instance.fs.write_file(
+				package_json_path,
+				JSON.stringify(package_data, null, '\t')
+			);
+			output_instance.done_log(`Updated package.json scripts.`, 'scripts');
+		}catch(ex){
+			output_instance.error_log(`Cannot update ${package_json_path}.`, 'scripts');
+		}
+	}catch(ex){
+		output_instance.error_log(`Cannot parse ${package_json_path}.`, 'scripts');
+	}
+}
+

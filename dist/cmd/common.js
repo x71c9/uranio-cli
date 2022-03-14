@@ -8,7 +8,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.package_scripts = exports.check_if_is_dot = exports.check_db = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_init_params = exports.merge_params = exports.read_init_file = void 0;
+exports.adm_package_scripts = exports.package_scripts = exports.check_if_is_dot = exports.check_db = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_init_params = exports.merge_params = exports.read_init_file = void 0;
 const fs_1 = __importDefault(require("fs"));
 const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
@@ -136,9 +136,12 @@ exports.check_if_is_dot = check_if_is_dot;
 exports.package_scripts = {
     'build': `uranio build`,
     'build:server': `uranio build:client`,
-    'build:client': `uranio build:client`,
+    'build:panel': `uranio build:panel`,
     'dev': `uranio dev`,
     'dev:server': `uranio dev:server`,
-    'dev:client': `uranio dev:client`
+    'dev:panel': `uranio dev:panel`
+};
+exports.adm_package_scripts = {
+    'postinstall': `yarn patch-package --patch-dir node_modules/uranio/patches`
 };
 //# sourceMappingURL=common.js.map

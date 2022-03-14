@@ -211,6 +211,14 @@ class CMD {
             return true;
         });
     }
+    uninstall_uranio(pack_data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.dependency_exists('uranio', pack_data)) {
+                yield this.uninstall_dep('uranio', 'urn');
+            }
+            return true;
+        });
+    }
     uninstall_core_dep(pack_data) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this._uninstall_uranio_dep(defaults_1.defaults.core_dep_repo, 'core', pack_data);

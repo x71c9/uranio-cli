@@ -33,6 +33,7 @@ declare class CMD {
     install_api_dep(): Promise<boolean>;
     install_trx_dep(): Promise<boolean>;
     install_adm_dep(): Promise<boolean>;
+    uninstall_uranio(pack_data: any): Promise<boolean>;
     uninstall_core_dep(pack_data?: any): Promise<boolean>;
     uninstall_api_dep(pack_data?: any): Promise<boolean>;
     uninstall_trx_dep(pack_data?: any): Promise<boolean>;

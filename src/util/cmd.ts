@@ -252,6 +252,13 @@ class CMD {
 		return true;
 	}
 	
+	public async uninstall_uranio(pack_data:any){
+		if(this.dependency_exists('uranio', pack_data)){
+			await this.uninstall_dep('uranio', 'urn');
+		}
+		return true;
+	}
+	
 	public async uninstall_core_dep(pack_data?:any){
 		await this._uninstall_uranio_dep(defaults.core_dep_repo, 'core', pack_data);
 		await this._uninstall_uranio_dep(defaults.core_dep_dev_repo, 'core', pack_data);

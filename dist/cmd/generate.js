@@ -129,7 +129,11 @@ function _generate(args) {
         // _init_generate(params);
         yield _generate_register();
         yield new Promise((resolve, reject) => {
-            const generate_cmd = `yarn uranio-generate-${generate_params.repo} ${args}`;
+            let root_uranio = generate_params.config;
+            if (generate_params.config[0] !== '/') {
+                root_uranio = `${generate_params.root}/${generate_params.config}`;
+            }
+            const generate_cmd = `yarn uranio-generate-${generate_params.repo} -c ${root_uranio} ${args}`;
             util_instance.spawn.verbose_log(generate_cmd, 'generate', 'generating', undefined, resolve, reject);
         });
         // output_instance.done_log('Generate completed.');

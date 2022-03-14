@@ -55,7 +55,7 @@ export async function start_panel(params:Partial<Params>)
 	
 	const urn_lib_pre = ` urn_log_prefix_type=true`;
 	// const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
-	const cmd_server = `NODE_ENV=production yarn uranio-panel-${start_params.repo}${urn_lib_pre}`;
+	const cmd_server = `NODE_ENV=production yarn uranio-panel-${start_params.repo} start${urn_lib_pre}`;
 	util_instance.spawn.log(cmd_server, 'start', 'starting panel');
 	
 }

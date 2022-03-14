@@ -38,6 +38,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.prompt_init = exports.init = void 0;
 const inquirer_1 = __importDefault(require("inquirer"));
+const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
@@ -61,6 +62,7 @@ function init(params) {
         _create_dot_env();
         _ignore_files();
         _update_resolutions();
+        _update_package_scripts();
         if (init_params.docker === true) {
             yield docker.build(init_params);
             yield docker.network_create(init_params);
@@ -473,6 +475,29 @@ function _update_resolutions() {
     }
     catch (ex) {
         output_instance.error_log(`Cannot update ${package_json_path}.`, 'packdata');
+    }
+}
+function _update_package_scripts() {
+    output_instance.start_loading('Updating scripts...');
+    const package_json_path = `${init_params.root}/package.json`;
+    const data = util_instance.fs.read_file(package_json_path, 'utf8');
+    try {
+        const package_data = urn_lib_1.urn_util.json.clean_parse(data);
+        const old_scripts = package_data['scripts'] || {};
+        package_data['scripts'] = Object.assign(Object.assign({}, old_scripts), common_1.package_scripts);
+        if ((0, types_1.valid_admin_repos)().includes(init_params.repo)) {
+            package_data['scripts'] = Object.assign(Object.assign({}, package_data['scripts']), common_1.adm_package_scripts);
+        }
+        try {
+            util_instance.fs.write_file(package_json_path, JSON.stringify(package_data, null, '\t'));
+            output_instance.done_log(`Updated package.json scripts.`, 'scripts');
+        }
+        catch (ex) {
+            output_instance.error_log(`Cannot update ${package_json_path}.`, 'scripts');
+        }
+    }
+    catch (ex) {
+        output_instance.error_log(`Cannot parse ${package_json_path}.`, 'scripts');
     }
 }
 //# sourceMappingURL=init.js.map

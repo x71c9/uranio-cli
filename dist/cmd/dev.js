@@ -56,6 +56,7 @@ let watch_toml_scanned = false;
 // const nuxt_color = '#677cc7';
 // const tscw_color = '#734de3';
 const watc_color = '#687a6a';
+const pane_color = '#4f9ee3';
 let service_child;
 function dev(params) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -89,6 +90,7 @@ function dev_panel(params) {
         }
         else {
             _init_params(params);
+            yield _init_dev();
             _dev_panel();
         }
     });
@@ -108,21 +110,26 @@ function _init_dev() {
 }
 function _dev_panel() {
     return __awaiter(this, void 0, void 0, function* () {
-        service_child = new forever_monitor_1.default.Monitor(`${dev_params.root}/node_modules/uranio/dist/panel/index.js dev`, {
-            args: ['urn_log_prefix=true'],
-            // watch: true,
-            // watchDirectory: `${dev_params.root}/src`
-        });
-        service_child.start();
-        service_child.on('watch:restart', function (info) {
-            output_instance.log('Restarting [dev panel] because ' + info.file + ' changed');
-        });
-        service_child.on('restart', function (_info) {
-            output_instance.log('Forever restarting [dev panel].');
-        });
-        service_child.on('exit:code', function (code) {
-            output_instance.done_log('Forever detected [dev panel] exited with code ' + code);
-        });
+        // const urn_lib_pre = ` urn_log_prefix_type=true`;
+        // const urn_config_path = ` -c ${build_params.root}/uranio.toml`;
+        // const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev ${urn_lib_pre}`;
+        const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev`;
+        util_instance.spawn.log(cmd_dev_panel, 'dev', 'developing panel', pane_color);
+        // service_child = new forever.Monitor(`${dev_params.root}/node_modules/uranio/dist/panel/index.js dev`,{
+        //   args: ['urn_log_prefix=true'],
+        //   // watch: true,
+        //   // watchDirectory: `${dev_params.root}/src`
+        // });
+        // service_child.start();
+        // service_child.on('watch:restart', function(info) {
+        //   output_instance.log('Restarting [dev panel] because ' + info.file + ' changed');
+        // });
+        // service_child.on('restart', function(_info) {
+        //   output_instance.log('Forever restarting [dev panel].');
+        // });
+        // service_child.on('exit:code', function(code) {
+        //   output_instance.done_log('Forever detected [dev panel] exited with code ' + code);
+        // });
     });
 }
 function _dev_server() {
