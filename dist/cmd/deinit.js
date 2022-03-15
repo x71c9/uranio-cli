@@ -101,6 +101,8 @@ function _reset_package_json() {
         _remove_package_scripts();
         _remove_package_resolutions();
         const pack_data = util_instance.cmd.get_package_data(`${deinit_params.root}/package.json`);
+        // await util_instance.cmd.uninstall_dep('patch-package', 'patch');
+        // await util_instance.cmd.uninstall_dep('postinstall-postinstall', 'post');
         yield util_instance.cmd.uninstall_uranio(pack_data);
         yield util_instance.cmd.uninstall_core_dep(pack_data);
         yield util_instance.cmd.uninstall_api_dep(pack_data);

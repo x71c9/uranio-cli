@@ -94,6 +94,9 @@ async function _reset_package_json(){
 		`${deinit_params.root}/package.json`
 	);
 	
+	// await util_instance.cmd.uninstall_dep('patch-package', 'patch');
+	// await util_instance.cmd.uninstall_dep('postinstall-postinstall', 'post');
+	
 	await util_instance.cmd.uninstall_uranio(pack_data);
 	
 	await util_instance.cmd.uninstall_core_dep(pack_data);

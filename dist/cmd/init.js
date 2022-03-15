@@ -67,7 +67,7 @@ function init(params) {
         _create_dot_env();
         _ignore_files();
         _update_resolutions();
-        yield _install_patches();
+        yield _install_dev_dep();
         _update_package_scripts();
         if (init_params.docker === true) {
             yield docker.build(init_params);
@@ -428,21 +428,24 @@ function _create_dot_env() {
     }
     util_instance.fs.copy_file(`${init_params.root}/sample.env`, dot_env_path);
 }
-function _install_patches() {
+function _install_dev_dep() {
     return __awaiter(this, void 0, void 0, function* () {
         if ((0, types_1.valid_admin_repos)().includes(init_params.repo)) {
-            yield _install_real_dev_package(`patch-package`);
-            yield _install_real_dev_package(`postinstall-postinstall`);
+            yield _install_dev_package(defaults_1.defaults.adm_dep_dev_repo);
         }
+        // if(valid_admin_repos().includes(init_params.repo)){
+        //   await _install_real_dev_package(`patch-package`);
+        //   await _install_real_dev_package(`postinstall-postinstall`);
+        // }
     });
 }
 function _install_packages() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Intalling [${init_params.repo}]...`);
         // await _install_package(defaults.lib_repo);
-        if ((0, types_1.valid_admin_repos)().includes(init_params.repo)) {
-            yield _install_dev_package(defaults_1.defaults.adm_dep_dev_repo);
-        }
+        // if(valid_admin_repos().includes(init_params.repo)){
+        //   await _install_dev_package(defaults.adm_dep_dev_repo);
+        // }
         yield _install_repo_package(init_params.repo);
         output_instance.done_log(`Installed package [${init_params.repo}].`, 'repo');
     });

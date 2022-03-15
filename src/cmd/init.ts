@@ -69,7 +69,7 @@ export async function init(params:Partial<Params>)
 	_ignore_files();
 	_update_resolutions();
 	
-	await _install_patches();
+	await _install_dev_dep();
 	_update_package_scripts();
 	
 	if(init_params.docker === true){
@@ -472,11 +472,14 @@ function _create_dot_env(){
 	);
 }
 
-async function _install_patches(){
+async function _install_dev_dep(){
 	if(valid_admin_repos().includes(init_params.repo)){
-		await _install_real_dev_package(`patch-package`);
-		await _install_real_dev_package(`postinstall-postinstall`);
+		await _install_dev_package(defaults.adm_dep_dev_repo);
 	}
+	// if(valid_admin_repos().includes(init_params.repo)){
+	//   await _install_real_dev_package(`patch-package`);
+	//   await _install_real_dev_package(`postinstall-postinstall`);
+	// }
 }
 
 async function _install_packages(){
@@ -484,9 +487,9 @@ async function _install_packages(){
 		`Intalling [${init_params.repo}]...`
 	);
 	// await _install_package(defaults.lib_repo);
-	if(valid_admin_repos().includes(init_params.repo)){
-		await _install_dev_package(defaults.adm_dep_dev_repo);
-	}
+	// if(valid_admin_repos().includes(init_params.repo)){
+	//   await _install_dev_package(defaults.adm_dep_dev_repo);
+	// }
 	await _install_repo_package(init_params.repo);
 	output_instance.done_log(
 		`Installed package [${init_params.repo}].`,

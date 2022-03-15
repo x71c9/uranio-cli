@@ -195,10 +195,10 @@ function create(params, entrypoint) {
         cmd += ` -v $(pwd)/node_modules/:/app/node_modules/`;
         // cmd += ` -v $(pwd)/.uranio/:/app/.uranio/`;
         cmd += ` --name ${container_name}`;
-        cmd += ` ${image_name}`;
         if (typeof entrypoint === 'string') {
             cmd += ` --entrypoint="${entrypoint}"`;
         }
+        cmd += ` ${image_name}`;
         yield _execute_spin_verbose(cmd, 'docker', 'creating');
         output_instance.done_log(`Docker container created ${container_name}`);
     });
