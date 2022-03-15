@@ -40,7 +40,7 @@
 		"uranio-dev": "git+ssh://git@github.com/nbl7/uranio-dev.git#master"
 	},
 	"dependencies": {
-		"@nbl7/ora": "^6.1.2",
+		"@nbl7/ora": "^1.0.3",
 		"babylon": "^6.18.0",
 		"chalk": "^4.1.0",
 		"chokidar": "^3.5.2",
