@@ -123,10 +123,10 @@ async function _init_dev(){
 
 async function _dev_panel(){
 	
-	// const urn_lib_pre = ` urn_log_prefix_type=true`;
+	const urn_lib_pre = ` urn_log_prefix_type=true`;
 	// const urn_config_path = ` -c ${build_params.root}/uranio.toml`;
-	// const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev ${urn_lib_pre}`;
-	const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev`;
+	const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev ${urn_lib_pre}`;
+	// const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev`;
 	util_instance.spawn.log(cmd_dev_panel, 'dev', 'developing panel', pane_color);
 	
 	// service_child = new forever.Monitor(`${dev_params.root}/node_modules/uranio/dist/panel/index.js dev`,{
@@ -152,8 +152,10 @@ async function _dev_panel(){
 }
 async function _dev_server(){
 	
+	// _fix_mongodb_saslprep_requirement();
+	
 	service_child = new forever.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`,{
-		args: ['urn_log_prefix=true'],
+		args: ['urn_log_prefix_type=true'],
 		// watch: true,
 		// watchDirectory: `${dev_params.root}/src`
 	});
@@ -251,3 +253,22 @@ function _watch(){
 	);
 	
 }
+
+// function _fix_mongodb_saslprep_requirement(){
+	
+//   const dist_dir = `${dev_params.root}/dist`;
+//   if(!util_instance.fs.exists(dist_dir)){
+//     util_instance.fs.create_directory(dist_dir);
+//   }
+//   const saslprep_filename = `code-points.mem`;
+//   const saslprep_module_dir = `${dev_params.root}/node_modules/saslprep/`;
+	
+//   util_instance.fs.copy_file(
+//     `${saslprep_module_dir}/${saslprep_filename}`,
+//     `${dist_dir}/${saslprep_filename}`
+//   );
+//   // util_instance.fs.copy_file(
+//   //   `${saslprep_module_dir}/${saslprep_filename}`,
+//   //   `${dist_dir}/server/${saslprep_filename}`
+//   // );
+// }

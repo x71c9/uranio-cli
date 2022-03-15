@@ -217,7 +217,7 @@ function start(params) {
 exports.start = start;
 function start_server(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(`Start servre`, params);
+        console.log(`Start server`, params);
         // _init_params(params);
         // const container_name = _get_container_name();
         // let cmd = '';

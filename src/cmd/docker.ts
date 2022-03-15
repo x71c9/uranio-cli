@@ -228,7 +228,7 @@ export async function start(params:Partial<Params>):Promise<void>{
 }
 
 export async function start_server(params:Partial<Params>):Promise<void>{
-	console.log(`Start servre`, params);
+	console.log(`Start server`, params);
 	// _init_params(params);
 	
 	// const container_name = _get_container_name();
