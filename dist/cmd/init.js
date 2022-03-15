@@ -301,6 +301,7 @@ function _clone_assets_repo() {
 }
 function _copy_assets() {
     _copy_sample();
+    _copy_toml();
     // _copy_tsconfigs();
     // _copy_eslint_files();
 }
@@ -308,6 +309,13 @@ function _copy_sample() {
     const sample_file = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets/env/sample.env`;
     const dest = `${init_params.root}/sample.env`;
     util_instance.fs.copy_file(sample_file, dest, 'book');
+}
+function _copy_toml() {
+    const ass_toml_filepath = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets/toml/uranio.toml`;
+    const dest = `${init_params.root}/uranio.toml`;
+    if (!util_instance.fs.exists(dest)) {
+        util_instance.fs.copy_file(ass_toml_filepath, dest, 'book');
+    }
 }
 // function _copy_tsconfigs(){
 //   const ass_dir = `${init_params.root}/${defaults.tmp_folder}/uranio-assets`;
