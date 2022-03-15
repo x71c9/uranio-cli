@@ -1,6 +1,6 @@
 {
 	"name": "uranio-cli",
-	"version": "0.0.49",
+	"version": "0.0.50",
 	"description": "Uranio command line interface",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -9,7 +9,7 @@
 		"build": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js build -fvw -r api -x [CL] --branch master\"",
 		"dev": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js dev --branch master\"",
 		"help": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -h -x --branch master\"",
-		"version": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v --branch master\"",
+		"ver": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v --branch master\"",
 		"watch": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -vu --branch master\"",
 		"transpose": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js transpose -vu \"",
 		"generate:register": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js generate:register -vu \""
