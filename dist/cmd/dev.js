@@ -39,6 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.dev_panel = exports.dev_server = exports.dev = void 0;
 const path_1 = __importDefault(require("path"));
 const forever_monitor_1 = __importDefault(require("forever-monitor"));
+const is_docker_1 = __importDefault(require("is-docker"));
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
 const defaults_1 = require("../conf/defaults");
@@ -48,6 +49,7 @@ const transpose_1 = require("./transpose");
 const build_1 = require("./build");
 const common_1 = require("./common");
 const docker = __importStar(require("./docker"));
+const is_docker = (0, is_docker_1.default)();
 let output_instance;
 let util_instance;
 let dev_params = defaults_1.default_params;
@@ -141,8 +143,9 @@ function _dev_panel() {
 function _dev_server() {
     return __awaiter(this, void 0, void 0, function* () {
         // _fix_mongodb_saslprep_requirement();
+        const args = (is_docker === true) ? ['urn_log_prefix_type=true'] : [];
         service_child = new forever_monitor_1.default.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`, {
-            args: ['urn_log_prefix_type=true'],
+            args: args,
             // watch: true,
             // watchDirectory: `${dev_params.root}/src`
         });

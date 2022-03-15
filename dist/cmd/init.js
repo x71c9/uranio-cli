@@ -67,6 +67,7 @@ function init(params) {
         _create_dot_env();
         _ignore_files();
         _update_resolutions();
+        yield _install_patches();
         _update_package_scripts();
         if (init_params.docker === true) {
             yield docker.build(init_params);
@@ -427,6 +428,14 @@ function _create_dot_env() {
     }
     util_instance.fs.copy_file(`${init_params.root}/sample.env`, dot_env_path);
 }
+function _install_patches() {
+    return __awaiter(this, void 0, void 0, function* () {
+        if ((0, types_1.valid_admin_repos)().includes(init_params.repo)) {
+            yield _install_real_dev_package(`patch-package`);
+            yield _install_real_dev_package(`postinstall-postinstall`);
+        }
+    });
+}
 function _install_packages() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Intalling [${init_params.repo}]...`);
@@ -442,6 +451,11 @@ function _install_packages() {
 //   return await util_instance.cmd.install_package(`${package_url}#${init_params.branch}`);
 //   // return await util_instance.cmd.install_package(package_url);
 // }
+function _install_real_dev_package(package_url) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield util_instance.cmd.install_package_dev(`${package_url}`);
+    });
+}
 function _install_dev_package(package_url) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield util_instance.cmd.install_package_dev(`${package_url}#${init_params.branch}`);

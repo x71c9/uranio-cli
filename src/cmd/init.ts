@@ -68,6 +68,8 @@ export async function init(params:Partial<Params>)
 	_create_dot_env();
 	_ignore_files();
 	_update_resolutions();
+	
+	await _install_patches();
 	_update_package_scripts();
 	
 	if(init_params.docker === true){
@@ -470,6 +472,13 @@ function _create_dot_env(){
 	);
 }
 
+async function _install_patches(){
+	if(valid_admin_repos().includes(init_params.repo)){
+		await _install_real_dev_package(`patch-package`);
+		await _install_real_dev_package(`postinstall-postinstall`);
+	}
+}
+
 async function _install_packages(){
 	output_instance.start_loading(
 		`Intalling [${init_params.repo}]...`
@@ -489,6 +498,10 @@ async function _install_packages(){
 //   return await util_instance.cmd.install_package(`${package_url}#${init_params.branch}`);
 //   // return await util_instance.cmd.install_package(package_url);
 // }
+
+async function _install_real_dev_package(package_url:string){
+	return await util_instance.cmd.install_package_dev(`${package_url}`);
+}
 
 async function _install_dev_package(package_url:string){
 	return await util_instance.cmd.install_package_dev(`${package_url}#${init_params.branch}`);

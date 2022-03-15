@@ -8,6 +8,8 @@ import path from 'path';
 
 import forever from 'forever-monitor';
 
+import isDocker from 'is-docker';
+
 import * as output from '../output/index';
 
 import * as util from '../util/index';
@@ -25,6 +27,8 @@ import {build_server} from './build';
 import {merge_params} from './common';
 
 import * as docker from './docker';
+
+const is_docker = isDocker();
 
 let output_instance:output.OutputInstance;
 
@@ -154,8 +158,9 @@ async function _dev_server(){
 	
 	// _fix_mongodb_saslprep_requirement();
 	
+	const args = (is_docker === true) ? ['urn_log_prefix_type=true'] : [];
 	service_child = new forever.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`,{
-		args: ['urn_log_prefix_type=true'],
+		args: args,
 		// watch: true,
 		// watchDirectory: `${dev_params.root}/src`
 	});
