@@ -330,7 +330,8 @@ class Output {
 		if(!text){
 			return '';
 		}
-		return (this.params.blank === false) ? chalk.magenta(text) : text;
+		// return (this.params.blank === false) ? chalk.magenta(text) : text;
+		return (this.params.blank === false) ? chalk.hex('#A633FF')(text) : text;
 	}
 	
 	private _go_previous(){

@@ -283,7 +283,8 @@ class Output {
         if (!text) {
             return '';
         }
-        return (this.params.blank === false) ? chalk_1.default.magenta(text) : text;
+        // return (this.params.blank === false) ? chalk.magenta(text) : text;
+        return (this.params.blank === false) ? chalk_1.default.hex('#A633FF')(text) : text;
     }
     _go_previous() {
         spinner_1.spinner_texts.pop();
