@@ -12,25 +12,28 @@ import * as util from '../util/index';
 
 import {default_params, defaults} from '../conf/defaults';
 
-import {
-	Params,
-	Arguments,
-} from '../types';
+import {Params, Arguments} from '../types';
 
 let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
 
-import {
-	merge_params,
-} from './common';
+import {merge_params} from './common';
 
 let docker_params = default_params as Params;
+
+let dot_folder = `./${defaults.folder}`;
+// let init_filepath = `${dot_folder}/${defaults.init_filepath}`;
+let docker_folder = `${dot_folder}/${defaults.docker_folder}`;
 
 export async function docker(params:Partial<Params>, args:Arguments)
 		:Promise<void>{
 	
 	_init_params(params);
+	
+	dot_folder = `${docker_params.root}/${defaults.folder}`;
+	// init_filepath = `${dot_folder}/${defaults.init_filepath}`;
+	docker_folder = `${dot_folder}/${defaults.docker_folder}`;
 	
 	switch(args._[1]){
 		case 'build':{
@@ -149,10 +152,10 @@ export async function build(params:Partial<Params>)
 	let cmd = '';
 	cmd += `docker build --ssh default`;
 	cmd += ` -t ${image_name}`;
-	cmd += ` -f ${docker_params.root}/${defaults.folder}/${defaults.docker_folder}/Dockerfile`;
+	cmd += ` -f ${docker_folder}/Dockerfile`;
 	cmd += ` --build-arg repo=${docker_params.repo}`;
-	// cmd += ` --build-arg deploy=${docker_params.deploy}`;
 	cmd += ` --build-arg project=${project_name}`;
+	// cmd += ` --build-arg deploy=${docker_params.deploy}`;
 	cmd += ` .`;
 	await _execute_spin_verbose(cmd, 'docker', 'building');
 	output_instance.done_log(
@@ -171,17 +174,20 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 	const container_name = _get_container_name();
 	const image_name = _get_image_name();
 	
-	const dotenv = util_instance.cmd.read_dotenv();
+	// const dotenv = util_instance.cmd.read_dotenv();
+	// const port_server = dotenv.URN_SERVICE_PORT;
+	// const port_client = dotenv.URN_CLIENT_PORT;
 	
-	const port_server = dotenv.URN_SERVICE_PORT;
-	const port_client = dotenv.URN_CLIENT_PORT;
+	const toml = util_instance.cmd.read_toml();
+	const port_server = toml.service_port;
+	const port_panel = toml.client_panel_port;
 	
 	const network_name = _get_network_name();
 	
 	let cmd = '';
 	cmd += `docker create`;
 	cmd += ` --network ${network_name}`;
-	cmd += ` -p ${port_server}:${port_server} -p ${port_client}:${port_client}`;
+	cmd += ` -p ${port_server}:${port_server} -p ${port_panel}:${port_panel}`;
 	cmd += ` -v $(pwd)/src/:/app/src/`;
 	cmd += ` -v $(pwd)/.env:/app/.env`;
 	cmd += ` -v $(pwd)/package.json:/app/package.json`;
@@ -449,25 +455,26 @@ async function _download_dockerfiles(){
 	
 	await _clone_assets();
 	
-	const def_folder = `${docker_params.root}/${defaults.folder}`;
-	const dest_folder = `${def_folder}/${defaults.docker_folder}`;
-	if(!util_instance.fs.exists(dest_folder)){
-		util_instance.fs.create_directory(dest_folder, 'docker');
+	// const def_folder = `${docker_params.root}/${defaults.folder}`;
+	// const dest_folder = `${def_folder}/${defaults.docker_folder}`;
+	
+	if(!util_instance.fs.exists(docker_folder)){
+		util_instance.fs.create_directory(docker_folder, 'docker');
 	}
 	
 	const docker_file =
 		`${docker_params.root}/${defaults.tmp_folder}/uranio-assets/docker/Dockerfile`;
-	const dest = `${dest_folder}/Dockerfile`;
+	const dest = `${docker_folder}/Dockerfile`;
 	util_instance.fs.copy_file(docker_file, dest, 'docker');
 	
 	const dockerignore_file =
 		`${docker_params.root}/${defaults.tmp_folder}/uranio-assets/docker/.dockerignore`;
-	const ignore_dest = `${dest_folder}/.dockerignore`;
+	const ignore_dest = `${docker_folder}/.dockerignore`;
 	util_instance.fs.copy_file(dockerignore_file, ignore_dest, 'docker');
 	
 	const docker_bash =
 		`${docker_params.root}/${defaults.tmp_folder}/uranio-assets/docker/.bash_docker`;
-	const bash_dest = `${dest_folder}/.bash_docker`;
+	const bash_dest = `${docker_folder}/.bash_docker`;
 	util_instance.fs.copy_file(docker_bash, bash_dest, 'docker');
 	
 	_remove_tmp();

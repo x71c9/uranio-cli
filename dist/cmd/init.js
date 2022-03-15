@@ -49,13 +49,18 @@ const common_1 = require("./common");
 let output_instance;
 let util_instance;
 let init_params = defaults_1.default_params;
+let dot_folder = `./${defaults_1.defaults.folder}`;
+let init_filepath = `${dot_folder}/${defaults_1.defaults.init_filepath}`;
 function init(params) {
     return __awaiter(this, void 0, void 0, function* () {
         init_params = (0, common_1.merge_init_params)(params);
         output_instance = output.create(init_params);
         util_instance = util.create(init_params, output_instance);
+        dot_folder = `${init_params.root}/${defaults_1.defaults.folder}`;
+        init_filepath = `${dot_folder}/${defaults_1.defaults.init_filepath}`;
         yield _clone_assets_repo();
         _log_important_params();
+        _create_dot_dir();
         _create_init_file();
         _create_src_dirs();
         _copy_assets();
@@ -403,9 +408,9 @@ function _create_init_file() {
         content += `\t"db": "${init_params.db}",\n`;
     }
     content += `}`;
-    util_instance.fs.write_file(`${init_params.root}/${defaults_1.defaults.init_filepath}`, content);
-    util_instance.pretty(`${init_params.root}/${defaults_1.defaults.init_filepath}`, 'json');
-    output_instance.done_log(`Created file ${defaults_1.defaults.init_filepath}.`, 'rcfl');
+    util_instance.fs.write_file(init_filepath, content);
+    util_instance.pretty(init_filepath, 'json');
+    output_instance.done_log(`Created file [${init_filepath}].`, 'rcfl');
 }
 function _create_dot_env() {
     const dot_env_path = `${init_params.root}/.env`;
@@ -447,9 +452,9 @@ function _ignore_files() {
         util_instance.fs.create_file(gitignore, 'giti');
     }
     let content = util_instance.fs.read_file(gitignore, 'utf8');
-    // if(content.indexOf(defaults.folder+'/') === -1){
-    //   content += `\n${defaults.folder}/`;
-    // }
+    if (content.indexOf(defaults_1.defaults.folder + '/') === -1) {
+        content += `\n${defaults_1.defaults.folder}/`;
+    }
     if (content.indexOf(defaults_1.defaults.log_filepath) === -1) {
         content += `\n${defaults_1.defaults.log_filepath}`;
     }
@@ -499,5 +504,11 @@ function _update_package_scripts() {
     catch (ex) {
         output_instance.error_log(`Cannot parse ${package_json_path}.`, 'scripts');
     }
+}
+function _create_dot_dir() {
+    output_instance.start_loading(`Creating ${defaults_1.defaults.folder} folder...`);
+    util_instance.fs.remove_directory(`${init_params.root}/${defaults_1.defaults.folder}`, 'init');
+    util_instance.fs.create_directory(`${init_params.root}/${defaults_1.defaults.folder}`, 'init');
+    output_instance.done_log(`Created folder ${defaults_1.defaults.folder}.`, 'init');
 }
 //# sourceMappingURL=init.js.map

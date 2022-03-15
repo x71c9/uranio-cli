@@ -10,6 +10,9 @@ import * as spawn from './spawn';
 declare type DotEnv = {
     [k: string]: string;
 };
+declare type Toml = {
+    [k: string]: string;
+};
 declare class CMD {
     params: Params;
     output: out.OutputInstance;
@@ -26,6 +29,7 @@ declare class CMD {
     clone_repo_recursive(address: string, dest_folder: string, context?: string, branch?: string): Promise<any>;
     get_package_data(package_json_path: string): any;
     dependency_exists(repo: string, package_data?: any): boolean;
+    read_toml(): Toml;
     read_dotenv(): DotEnv;
     client_env_variables_to_command_string(): string;
     write_dotenv(dotenv: DotEnv): void;

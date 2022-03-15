@@ -4,6 +4,8 @@
  * @packageDocumentation
  */
 
+import toml from 'toml';
+
 import {urn_util} from 'urn-lib';
 
 import {Params} from '../types';
@@ -20,6 +22,10 @@ import * as fs from './fs';
 import * as spawn from './spawn';
 
 type DotEnv = {
+	[k:string]: string
+}
+
+type Toml = {
 	[k:string]: string
 }
 
@@ -176,6 +182,19 @@ class CMD {
 			(packdata_dep && typeof packdata_dep[repo] === 'string') ||
 			(packdata_dep_dev && typeof packdata_dep_dev[repo] === 'string')
 		);
+	}
+	
+	public read_toml()
+			:Toml{
+		const toml_path = `${this.params.config}`;
+		if(!this.fs.exists(toml_path)){
+			this.output.warn_log(`Missing .toml file.`);
+			// process.exit(1);
+		}
+		const content = this.fs.read_file(toml_path);
+		const parsed_toml = toml.parse(content);
+		const converted_toml = _convert_toml(parsed_toml);
+		return converted_toml;
 	}
 	
 	public read_dotenv()
@@ -351,6 +370,36 @@ export function create(params:Params, output:out.OutputInstance)
 		:CMDInstance{
 	// const full_params = merge_params(params);
 	return new CMD(params, output);
+}
+
+function _convert_toml(parsed_toml:any):Toml{
+	const converted_config:Toml = {};
+	for(const [key, value] of Object.entries(parsed_toml)){
+		if(value === null || value === undefined){
+			continue;
+		}
+		if(typeof value === 'object'){
+			_convert_subobject(converted_config, key, value);
+		}else{
+			(converted_config as any)[key] = value;
+		}
+	}
+	return converted_config;
+}
+
+function _convert_subobject(config:Toml, key:string, obj:any){
+	for(const [subkey, subvalue] of Object.entries(obj)){
+		if(subvalue === null || subvalue === undefined){
+			continue;
+		}
+		const full_key = `${key}_${subkey}`;
+		if(typeof subvalue === 'object'){
+			_convert_subobject(config, full_key, subvalue);
+		}else{
+			(config as any)[full_key] = subvalue;
+		}
+	}
+	return config;
 }
 
 const _pacman_commands = {

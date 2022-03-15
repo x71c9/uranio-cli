@@ -32,8 +32,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = void 0;
+const toml_1 = __importDefault(require("toml"));
 const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
 // DO NO CANCEL IT
@@ -137,6 +141,17 @@ class CMD {
         const packdata_dep_dev = pack_data['devDependencies'];
         return ((packdata_dep && typeof packdata_dep[repo] === 'string') ||
             (packdata_dep_dev && typeof packdata_dep_dev[repo] === 'string'));
+    }
+    read_toml() {
+        const toml_path = `${this.params.config}`;
+        if (!this.fs.exists(toml_path)) {
+            this.output.warn_log(`Missing .toml file.`);
+            // process.exit(1);
+        }
+        const content = this.fs.read_file(toml_path);
+        const parsed_toml = toml_1.default.parse(content);
+        const converted_toml = _convert_toml(parsed_toml);
+        return converted_toml;
     }
     read_dotenv() {
         const dotenv_path = `${this.params.root}/.env`;
@@ -280,6 +295,36 @@ function create(params, output) {
     return new CMD(params, output);
 }
 exports.create = create;
+function _convert_toml(parsed_toml) {
+    const converted_config = {};
+    for (const [key, value] of Object.entries(parsed_toml)) {
+        if (value === null || value === undefined) {
+            continue;
+        }
+        if (typeof value === 'object') {
+            _convert_subobject(converted_config, key, value);
+        }
+        else {
+            converted_config[key] = value;
+        }
+    }
+    return converted_config;
+}
+function _convert_subobject(config, key, obj) {
+    for (const [subkey, subvalue] of Object.entries(obj)) {
+        if (subvalue === null || subvalue === undefined) {
+            continue;
+        }
+        const full_key = `${key}_${subkey}`;
+        if (typeof subvalue === 'object') {
+            _convert_subobject(config, full_key, subvalue);
+        }
+        else {
+            config[full_key] = subvalue;
+        }
+    }
+    return config;
+}
 const _pacman_commands = {
     install: {
         npm(repo) {
