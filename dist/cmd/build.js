@@ -37,6 +37,7 @@ exports.build_panel = exports.build_server = exports.build = void 0;
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
+const types_1 = require("../types");
 const common_1 = require("./common");
 const transpose_1 = require("./transpose");
 const generate_1 = require("./generate");
@@ -49,36 +50,52 @@ function build(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_build(params);
         output_instance.start_loading(`Building...`);
-        yield (0, transpose_1.transpose)(build_params);
-        yield (0, generate_1.generate)(build_params);
+        yield _build();
+        build_server(build_params, false);
+        if ((0, types_1.valid_admin_repos)().includes(build_params.repo)) {
+            build_panel(build_params, false);
+        }
         output_instance.done_log('Build completed.');
     });
 }
 exports.build = build;
-function build_server(params) {
+function build_server(params, init = true) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_build(params);
+        if (init) {
+            _init_build(params);
+        }
         output_instance.start_loading(`Building server...`);
-        yield (0, transpose_1.transpose)(build_params);
-        yield (0, generate_1.generate)(build_params);
+        if (init) {
+            yield _build();
+        }
         output_instance.done_log('Build server completed.');
     });
 }
 exports.build_server = build_server;
-function build_panel(params) {
+function build_panel(params, init = true) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_build(params);
+        if (init) {
+            _init_build(params);
+        }
         output_instance.start_loading(`Building panel...`);
-        yield (0, transpose_1.transpose)(build_params);
-        yield (0, generate_1.generate)(build_params);
+        if (init) {
+            yield _build();
+        }
         const urn_lib_pre = ` urn_log_prefix_type=true`;
         // const urn_config_path = ` -c ${build_params.root}/uranio.toml`;
-        const cmd_server = `NODE_ENV=production yarn uranio-panel-${build_params.repo} generate ${urn_lib_pre}`;
-        util_instance.spawn.log(cmd_server, 'panel', 'generating panel');
+        // const cmd_server = `NODE_ENV=production yarn uranio-panel-${build_params.repo} generate ${urn_lib_pre}`;
+        const cmd_server = `NODE_ENV=production yarn uranio-panel-${build_params.repo} build ${urn_lib_pre}`;
+        util_instance.spawn.log(cmd_server, 'panel', 'building panel');
         output_instance.done_log('Build panel completed.');
     });
 }
 exports.build_panel = build_panel;
+function _build() {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield (0, transpose_1.transpose)(build_params);
+        yield (0, generate_1.generate)(build_params);
+    });
+}
 function _init_build(params) {
     build_params = (0, common_1.merge_params)(params);
     output_instance = output.create(build_params);

@@ -11,7 +11,7 @@ import path from 'path';
 import {urn_util} from 'urn-lib';
 
 // import {Arguments, Repo, PacMan, Deploy, Params, DB} from './types';
-import {Arguments, Repo, PacMan, Params, DB} from './types';
+import {Arguments, Repo, PacMan, Params, DB, valid_admin_repos} from './types';
 
 import * as output from './output/index';
 
@@ -540,7 +540,9 @@ function _switch_command(args:Arguments){
 					break;
 				}
 				case 'panel':{
-					dev_panel(process_params);
+					if(valid_admin_repos().includes(process_params.repo)){
+						dev_panel(process_params);
+					}
 					break;
 				}
 				case '':
@@ -558,7 +560,9 @@ function _switch_command(args:Arguments){
 					break;
 				}
 				case 'panel':{
-					build_panel(process_params);
+					if(valid_admin_repos().includes(process_params.repo)){
+						build_panel(process_params);
+					}
 					break;
 				}
 				case '':
@@ -576,7 +580,9 @@ function _switch_command(args:Arguments){
 					break;
 				}
 				case 'panel':{
-					start_panel(process_params);
+					if(valid_admin_repos().includes(process_params.repo)){
+						start_panel(process_params);
+					}
 					break;
 				}
 				case '':

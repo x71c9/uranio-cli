@@ -42,6 +42,7 @@ const forever_monitor_1 = __importDefault(require("forever-monitor"));
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
 const defaults_1 = require("../conf/defaults");
+const types_1 = require("../types");
 const generate_1 = require("./generate");
 const transpose_1 = require("./transpose");
 const build_1 = require("./build");
@@ -68,7 +69,9 @@ function dev(params) {
             _init_params(params);
             yield _init_dev();
             _dev_server();
-            _dev_panel();
+            if ((0, types_1.valid_admin_repos)().includes(dev_params.repo)) {
+                _dev_panel();
+            }
         }
     });
 }

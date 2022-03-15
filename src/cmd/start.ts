@@ -27,19 +27,26 @@ let start_params = default_params as Params;
 export async function start(params:Partial<Params>)
 		:Promise<void>{
 	
-	start_server(params);
-	start_panel(params);
+	_init_params(params);
+	
+	output_instance.start_loading(`Starting...`);
+	
+	start_server(start_params, false);
 	
 	if(valid_admin_repos().includes(start_params.repo)){
-		start_panel(params);
+		start_panel(start_params, false);
 	}
 	
 }
 
-export async function start_server(params:Partial<Params>)
+export async function start_server(params:Partial<Params>, init=true)
 		:Promise<void>{
 	
-	_init_params(params);
+	if(init){
+		_init_params(params);
+	}
+	
+	output_instance.start_loading(`Starting server...`);
 	
 	const urn_lib_pre = ` urn_log_prefix_type=true`;
 	const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
@@ -48,10 +55,14 @@ export async function start_server(params:Partial<Params>)
 	
 }
 
-export async function start_panel(params:Partial<Params>)
+export async function start_panel(params:Partial<Params>, init=true)
 		:Promise<void>{
 	
-	_init_params(params);
+	if(init){
+		_init_params(params);
+	}
+	
+	output_instance.start_loading(`Starting panel...`);
 	
 	const urn_lib_pre = ` urn_log_prefix_type=true`;
 	// const urn_config_path = ` -c ${start_params.root}/uranio.toml`;

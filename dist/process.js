@@ -31,6 +31,8 @@ exports.uranio_process = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const urn_lib_1 = require("urn-lib");
+// import {Arguments, Repo, PacMan, Deploy, Params, DB} from './types';
+const types_1 = require("./types");
 const output = __importStar(require("./output/index"));
 const util = __importStar(require("./util/index"));
 const index_1 = require("./cmd/index");
@@ -438,7 +440,9 @@ function _switch_command(args) {
                     break;
                 }
                 case 'panel': {
-                    (0, index_1.dev_panel)(process_params);
+                    if ((0, types_1.valid_admin_repos)().includes(process_params.repo)) {
+                        (0, index_1.dev_panel)(process_params);
+                    }
                     break;
                 }
                 case '':
@@ -456,7 +460,9 @@ function _switch_command(args) {
                     break;
                 }
                 case 'panel': {
-                    (0, index_1.build_panel)(process_params);
+                    if ((0, types_1.valid_admin_repos)().includes(process_params.repo)) {
+                        (0, index_1.build_panel)(process_params);
+                    }
                     break;
                 }
                 case '':
@@ -474,7 +480,9 @@ function _switch_command(args) {
                     break;
                 }
                 case 'panel': {
-                    (0, index_1.start_panel)(process_params);
+                    if ((0, types_1.valid_admin_repos)().includes(process_params.repo)) {
+                        (0, index_1.start_panel)(process_params);
+                    }
                     break;
                 }
                 case '':

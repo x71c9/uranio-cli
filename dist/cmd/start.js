@@ -45,17 +45,21 @@ let util_instance;
 let start_params = defaults_1.default_params;
 function start(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        start_server(params);
-        start_panel(params);
+        _init_params(params);
+        output_instance.start_loading(`Starting...`);
+        start_server(start_params, false);
         if ((0, types_1.valid_admin_repos)().includes(start_params.repo)) {
-            start_panel(params);
+            start_panel(start_params, false);
         }
     });
 }
 exports.start = start;
-function start_server(params) {
+function start_server(params, init = true) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_params(params);
+        if (init) {
+            _init_params(params);
+        }
+        output_instance.start_loading(`Starting server...`);
         const urn_lib_pre = ` urn_log_prefix_type=true`;
         const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
         const cmd_server = `NODE_ENV=production yarn uranio-webservice-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
@@ -63,9 +67,12 @@ function start_server(params) {
     });
 }
 exports.start_server = start_server;
-function start_panel(params) {
+function start_panel(params, init = true) {
     return __awaiter(this, void 0, void 0, function* () {
-        _init_params(params);
+        if (init) {
+            _init_params(params);
+        }
+        output_instance.start_loading(`Starting panel...`);
         const urn_lib_pre = ` urn_log_prefix_type=true`;
         // const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
         const cmd_server = `NODE_ENV=production yarn uranio-panel-${start_params.repo} start${urn_lib_pre}`;

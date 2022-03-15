@@ -10,7 +10,7 @@ import * as output from '../output/index';
 
 import * as util from '../util/index';
 
-import {Params} from '../types';
+import {Params, valid_admin_repos} from '../types';
 
 import {merge_params} from './common';
 
@@ -34,46 +34,63 @@ export async function build(params:Params)
 	
 	output_instance.start_loading(`Building...`);
 	
-	await transpose(build_params);
+	await _build();
 	
-	await generate(build_params);
+	build_server(build_params, false);
+	
+	if(valid_admin_repos().includes(build_params.repo)){
+		build_panel(build_params, false);
+	}
 	
 	output_instance.done_log('Build completed.');
 	
 }
 
-export async function build_server(params:Params)
+export async function build_server(params:Params, init=true)
 		:Promise<void>{
 	
-	_init_build(params);
+	if(init){
+		_init_build(params);
+	}
 	
 	output_instance.start_loading(`Building server...`);
 	
-	await transpose(build_params);
-	
-	await generate(build_params);
+	if(init){
+		await _build();
+	}
 	
 	output_instance.done_log('Build server completed.');
 	
 }
 
-export async function build_panel(params:Params)
+export async function build_panel(params:Params, init=true)
 		:Promise<void>{
 	
-	_init_build(params);
+	if(init){
+		_init_build(params);
+	}
 	
 	output_instance.start_loading(`Building panel...`);
+	
+	if(init){
+		await _build();
+	}
+	
+	const urn_lib_pre = ` urn_log_prefix_type=true`;
+	// const urn_config_path = ` -c ${build_params.root}/uranio.toml`;
+	// const cmd_server = `NODE_ENV=production yarn uranio-panel-${build_params.repo} generate ${urn_lib_pre}`;
+	const cmd_server = `NODE_ENV=production yarn uranio-panel-${build_params.repo} build ${urn_lib_pre}`;
+	util_instance.spawn.log(cmd_server, 'panel', 'building panel');
+	
+	output_instance.done_log('Build panel completed.');
+	
+}
+
+async function _build(){
 	
 	await transpose(build_params);
 	
 	await generate(build_params);
-	
-	const urn_lib_pre = ` urn_log_prefix_type=true`;
-	// const urn_config_path = ` -c ${build_params.root}/uranio.toml`;
-	const cmd_server = `NODE_ENV=production yarn uranio-panel-${build_params.repo} generate ${urn_lib_pre}`;
-	util_instance.spawn.log(cmd_server, 'panel', 'generating panel');
-	
-	output_instance.done_log('Build panel completed.');
 	
 }
 

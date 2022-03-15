@@ -14,7 +14,7 @@ import * as util from '../util/index';
 
 import {default_params} from '../conf/defaults';
 
-import {Params} from '../types';
+import {Params, valid_admin_repos} from '../types';
 
 import {generate} from './generate';
 
@@ -55,7 +55,11 @@ export async function dev(params:Partial<Params>)
 		_init_params(params);
 		await _init_dev();
 		_dev_server();
-		_dev_panel();
+		
+		if(valid_admin_repos().includes(dev_params.repo)){
+			_dev_panel();
+		}
+		
 	}
 }
 
