@@ -171,7 +171,7 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 	
 	_init_params(params);
 	
-	const container_name = _get_container_name();
+	const container_name = `${_get_container_name()}`;
 	const image_name = _get_image_name();
 	
 	// const dotenv = util_instance.cmd.read_dotenv();
@@ -179,18 +179,26 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 	// const port_client = dotenv.URN_CLIENT_PORT;
 	
 	const toml = util_instance.cmd.read_toml();
-	const port_server = toml.service_port;
-	const port_panel = toml.client_panel_port;
+	const port_server = toml.service_port || 777;
+	const port_panel = toml.client_panel_port || 5454;
+	const dev_port_server = toml.dev_service_port || port_server;
+	const dev_port_panel = toml.client_dev_panel_port || port_panel;
 	
 	const network_name = _get_network_name();
+	
+	const toml_path = (docker_params.config[0] === '/') ?
+		docker_params.config : `$(pwd)/${docker_params.config}`;
 	
 	let cmd = '';
 	cmd += `docker create`;
 	cmd += ` --network ${network_name}`;
-	cmd += ` -p ${port_server}:${port_server} -p ${port_panel}:${port_panel}`;
+	// cmd += ` -p ${port_server}:${port_server}`;
+	// cmd += ` -p ${port_panel}:${port_panel}`;
+	cmd += ` -p ${dev_port_server}:${dev_port_server}`;
+	cmd += ` -p ${dev_port_panel}:${dev_port_panel}`;
 	cmd += ` -v $(pwd)/src/:/app/src/`;
 	cmd += ` -v $(pwd)/.env:/app/.env`;
-	cmd += ` -v ${docker_params.config}:/app/uranio.toml`;
+	cmd += ` -v ${toml_path}:/app/uranio.toml`;
 	cmd += ` -v $(pwd)/package.json:/app/package.json`;
 	cmd += ` -v $(pwd)/node_modules/:/app/node_modules/`;
 	// cmd += ` -v $(pwd)/.uranio/:/app/.uranio/`;

@@ -110,7 +110,7 @@ function _init_params(params) {
 }
 function _init_dev() {
     return __awaiter(this, void 0, void 0, function* () {
-        yield (0, build_1.build)(dev_params);
+        yield (0, build_1.build_server)(dev_params);
         _watch();
     });
 }

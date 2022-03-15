@@ -20,7 +20,7 @@ import {generate} from './generate';
 
 import {transpose} from './transpose';
 
-import {build} from './build';
+import {build_server} from './build';
 
 import {merge_params} from './common';
 
@@ -116,7 +116,7 @@ function _init_params(params:Partial<Params>)
 
 async function _init_dev(){
 	
-	await build(dev_params);
+	await build_server(dev_params);
 	
 	_watch();
 }
