@@ -60,7 +60,7 @@ let watch_toml_scanned = false;
 // const tscw_color = '#734de3';
 const watc_color = '#687a6a';
 // const pane_color = '#4f9ee3';
-const pane_color = '#b44fe3';
+const pane_color = '#7464C3';
 let service_child;
 function dev(params) {
     return __awaiter(this, void 0, void 0, function* () {

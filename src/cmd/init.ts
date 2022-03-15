@@ -72,8 +72,8 @@ export async function init(params:Partial<Params>)
 	if(init_params.docker === true){
 		
 		await docker.build(init_params);
-		await docker.network_create(init_params);
 		await docker.create(init_params);
+		await docker.network_create(init_params);
 		
 	}else{
 		

@@ -69,8 +69,8 @@ function init(params) {
         _update_resolutions();
         if (init_params.docker === true) {
             yield docker.build(init_params);
-            yield docker.network_create(init_params);
             yield docker.create(init_params);
+            yield docker.network_create(init_params);
         }
         else {
             yield _init_pacman();
