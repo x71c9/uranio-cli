@@ -26,7 +26,7 @@ import {
 export function read_init_file(params:Params):Params;
 export function read_init_file(params:Partial<Params>):Partial<Params>;
 export function read_init_file(params:Partial<Params>):Partial<Params>{
-	const rcfile_path = `${params.root}/${defaults.init_filepath}`;
+	const rcfile_path = `${params.root}/${defaults.folder}/${defaults.init_filepath}`;
 	if(!fs.existsSync(rcfile_path)){
 		return params;
 	}

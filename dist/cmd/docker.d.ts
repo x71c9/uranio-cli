@@ -8,6 +8,8 @@ export declare function docker(params: Partial<Params>, args: Arguments): Promis
 export declare function build(params: Partial<Params>): Promise<void>;
 export declare function create(params: Partial<Params>, entrypoint?: string): Promise<void>;
 export declare function start(params: Partial<Params>): Promise<void>;
+export declare function start_server(params: Partial<Params>): Promise<void>;
+export declare function start_panel(params: Partial<Params>): Promise<void>;
 export declare function stop(params: Partial<Params>, continue_on_fail?: boolean): Promise<void>;
 export declare function remove(params: Partial<Params>, continue_on_fail?: boolean): Promise<void>;
 export declare function unbuild(params: Partial<Params>, continue_on_fail?: boolean): Promise<void>;

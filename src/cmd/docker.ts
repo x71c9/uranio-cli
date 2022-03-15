@@ -190,6 +190,7 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 	cmd += ` -p ${port_server}:${port_server} -p ${port_panel}:${port_panel}`;
 	cmd += ` -v $(pwd)/src/:/app/src/`;
 	cmd += ` -v $(pwd)/.env:/app/.env`;
+	cmd += ` -v ${docker_params.config}:/app/uranio.toml`;
 	cmd += ` -v $(pwd)/package.json:/app/package.json`;
 	cmd += ` -v $(pwd)/node_modules/:/app/node_modules/`;
 	// cmd += ` -v $(pwd)/.uranio/:/app/.uranio/`;
@@ -206,7 +207,9 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 }
 
 export async function start(params:Partial<Params>):Promise<void>{
+	
 	_init_params(params);
+	
 	const container_name = _get_container_name();
 	let cmd = '';
 	cmd += `docker start -i ${container_name}`;
@@ -214,6 +217,32 @@ export async function start(params:Partial<Params>):Promise<void>{
 	output_instance.done_log(
 		`Docker image started ${container_name}`
 	);
+}
+
+export async function start_server(params:Partial<Params>):Promise<void>{
+	console.log(`Start servre`, params);
+	// _init_params(params);
+	
+	// const container_name = _get_container_name();
+	// let cmd = '';
+	// cmd += `docker start -i ${container_name}`;
+	// await _execute_log(cmd, 'docker', 'starting');
+	// output_instance.done_log(
+	//   `Docker image started ${container_name}`
+	// );
+}
+
+export async function start_panel(params:Partial<Params>):Promise<void>{
+	console.log(`Start panel`, params);
+	// _init_params(params);
+	
+	// const container_name = _get_container_name();
+	// let cmd = '';
+	// cmd += `docker start -i ${container_name}`;
+	// await _execute_log(cmd, 'docker', 'starting');
+	// output_instance.done_log(
+	//   `Docker image started ${container_name}`
+	// );
 }
 
 export async function stop(params:Partial<Params>, continue_on_fail=false)

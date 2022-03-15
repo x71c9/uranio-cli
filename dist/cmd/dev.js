@@ -62,11 +62,11 @@ const pane_color = '#b44fe3';
 let service_child;
 function dev(params) {
     return __awaiter(this, void 0, void 0, function* () {
+        _init_params(params);
         if (params.docker === true) {
-            yield docker.start(params);
+            yield docker.start(dev_params);
         }
         else {
-            _init_params(params);
             yield _init_dev();
             _dev_server();
             if ((0, types_1.valid_admin_repos)().includes(dev_params.repo)) {
@@ -78,11 +78,11 @@ function dev(params) {
 exports.dev = dev;
 function dev_server(params) {
     return __awaiter(this, void 0, void 0, function* () {
+        _init_params(params);
         if (params.docker === true) {
-            yield docker.start(params);
+            yield docker.start_server(dev_params);
         }
         else {
-            _init_params(params);
             yield _init_dev();
             _dev_server();
         }
@@ -91,11 +91,11 @@ function dev_server(params) {
 exports.dev_server = dev_server;
 function dev_panel(params) {
     return __awaiter(this, void 0, void 0, function* () {
+        _init_params(params);
         if (params.docker === true) {
-            yield docker.start(params);
+            yield docker.start_panel(dev_params);
         }
         else {
-            _init_params(params);
             yield _init_dev();
             _dev_panel();
         }

@@ -46,13 +46,15 @@ let service_child:forever.Monitor;
 
 export async function dev(params:Partial<Params>)
 		:Promise<void>{
+	
+	_init_params(params);
+	
 	if(params.docker === true){
 		
-		await docker.start(params);
+		await docker.start(dev_params);
 		
 	}else{
 		
-		_init_params(params);
 		await _init_dev();
 		_dev_server();
 		
@@ -66,13 +68,13 @@ export async function dev(params:Partial<Params>)
 export async function dev_server(params:Partial<Params>)
 		:Promise<void>{
 	
+	_init_params(params);
+	
 	if(params.docker === true){
 		
-		await docker.start(params);
+		await docker.start_server(dev_params);
 		
 	}else{
-		
-		_init_params(params);
 		
 		await _init_dev();
 		_dev_server();
@@ -84,13 +86,13 @@ export async function dev_server(params:Partial<Params>)
 export async function dev_panel(params:Partial<Params>)
 		:Promise<void>{
 	
+	_init_params(params);
+	
 	if(params.docker === true){
 		
-		await docker.start(params);
+		await docker.start_panel(dev_params);
 		
 	}else{
-		
-		_init_params(params);
 		
 		await _init_dev();
 		_dev_panel();

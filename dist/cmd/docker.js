@@ -33,7 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.update_env = exports.prune = exports.network_remove = exports.network_create = exports.tmp_remove = exports.db_remove = exports.db_stop = exports.db_start = exports.db_create = exports.unbuild = exports.remove = exports.stop = exports.start = exports.create = exports.build = exports.docker = void 0;
+exports.update_env = exports.prune = exports.network_remove = exports.network_create = exports.tmp_remove = exports.db_remove = exports.db_stop = exports.db_start = exports.db_create = exports.unbuild = exports.remove = exports.stop = exports.start_panel = exports.start_server = exports.start = exports.create = exports.build = exports.docker = void 0;
 const urn_lib_1 = require("urn-lib");
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
@@ -183,6 +183,7 @@ function create(params, entrypoint) {
         cmd += ` -p ${port_server}:${port_server} -p ${port_panel}:${port_panel}`;
         cmd += ` -v $(pwd)/src/:/app/src/`;
         cmd += ` -v $(pwd)/.env:/app/.env`;
+        cmd += ` -v ${docker_params.config}:/app/uranio.toml`;
         cmd += ` -v $(pwd)/package.json:/app/package.json`;
         cmd += ` -v $(pwd)/node_modules/:/app/node_modules/`;
         // cmd += ` -v $(pwd)/.uranio/:/app/.uranio/`;
@@ -207,6 +208,34 @@ function start(params) {
     });
 }
 exports.start = start;
+function start_server(params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log(`Start servre`, params);
+        // _init_params(params);
+        // const container_name = _get_container_name();
+        // let cmd = '';
+        // cmd += `docker start -i ${container_name}`;
+        // await _execute_log(cmd, 'docker', 'starting');
+        // output_instance.done_log(
+        //   `Docker image started ${container_name}`
+        // );
+    });
+}
+exports.start_server = start_server;
+function start_panel(params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log(`Start panel`, params);
+        // _init_params(params);
+        // const container_name = _get_container_name();
+        // let cmd = '';
+        // cmd += `docker start -i ${container_name}`;
+        // await _execute_log(cmd, 'docker', 'starting');
+        // output_instance.done_log(
+        //   `Docker image started ${container_name}`
+        // );
+    });
+}
+exports.start_panel = start_panel;
 function stop(params, continue_on_fail = false) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);

@@ -14,7 +14,7 @@ const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
 const types_1 = require("../types");
 function read_init_file(params) {
-    const rcfile_path = `${params.root}/${defaults_1.defaults.init_filepath}`;
+    const rcfile_path = `${params.root}/${defaults_1.defaults.folder}/${defaults_1.defaults.init_filepath}`;
     if (!fs_1.default.existsSync(rcfile_path)) {
         return params;
     }
