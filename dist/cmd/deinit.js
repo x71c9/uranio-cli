@@ -38,6 +38,7 @@ const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
+const docker = __importStar(require("./docker"));
 const common_1 = require("./common");
 let output_instance;
 let util_instance;
@@ -51,28 +52,29 @@ function deinit(params) {
             return;
         }
         yield _reset_package_json();
-        // await _remove_dockers();
+        yield _remove_dockers();
         _delete_files();
         output_instance.end_log(`Deinitialization completed.`);
     });
 }
 exports.deinit = deinit;
-// async function _remove_dockers()
-//     :Promise<void>{
-//   if(!util_instance.is_initialized()){
-//     output_instance.warn_log(`Uranio was not initliazed or is missing ${defaults.init_filepath} file.`);
-//     output_instance.warn_log(`Some build artifacts might be still present.`);
-//     return;
-//   }
-//   await docker.tmp_remove(deinit_params, true);
-//   await docker.db_stop(deinit_params, true);
-//   await docker.db_remove(deinit_params, true);
-//   await docker.network_remove(deinit_params, true);
-//   await docker.stop(deinit_params, true);
-//   await docker.remove(deinit_params, true);
-//   await docker.unbuild(deinit_params, true);
-//   await docker.prune(deinit_params, true);
-// }
+function _remove_dockers() {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!util_instance.is_initialized()) {
+            output_instance.warn_log(`Uranio was not initliazed or is missing ${defaults_1.defaults.init_filepath} file.`);
+            output_instance.warn_log(`Some build artifacts might be still present.`);
+            return;
+        }
+        yield docker.tmp_remove(deinit_params, true);
+        yield docker.db_stop(deinit_params, true);
+        yield docker.db_remove(deinit_params, true);
+        yield docker.network_remove(deinit_params, true);
+        yield docker.stop(deinit_params, true);
+        yield docker.remove(deinit_params, true);
+        yield docker.unbuild(deinit_params, true);
+        yield docker.prune(deinit_params, true);
+    });
+}
 function _delete_files() {
     return __awaiter(this, void 0, void 0, function* () {
         util_instance.fs.remove_directory(`${deinit_params.root}/.tmp`);
@@ -88,8 +90,8 @@ function _delete_files() {
         util_instance.fs.remove_file(`${deinit_params.root}/package-lock.json`);
         util_instance.fs.remove_file(`${deinit_params.root}/netlify.toml`);
         util_instance.fs.remove_directory(`${deinit_params.root}/.netlify`);
-        // util_instance.fs.remove_directory(`${deinit_params.root}/${defaults.folder}`);
-        util_instance.fs.remove_file(`${deinit_params.root}/${defaults_1.defaults.init_filepath}`);
+        util_instance.fs.remove_directory(`${deinit_params.root}/${defaults_1.defaults.folder}`);
+        // util_instance.fs.remove_file(`${deinit_params.root}/${defaults.init_filepath}`);
     });
 }
 function _reset_package_json() {

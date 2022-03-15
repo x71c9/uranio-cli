@@ -192,7 +192,7 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 	cmd += ` -v $(pwd)/.env:/app/.env`;
 	cmd += ` -v $(pwd)/package.json:/app/package.json`;
 	cmd += ` -v $(pwd)/node_modules/:/app/node_modules/`;
-	cmd += ` -v $(pwd)/.uranio/:/app/.uranio/`;
+	// cmd += ` -v $(pwd)/.uranio/:/app/.uranio/`;
 	cmd += ` --name ${container_name}`;
 	cmd += ` ${image_name}`;
 	if(typeof entrypoint === 'string'){
@@ -392,9 +392,9 @@ async function _copy_compiled(){
 	let cmd_cp_node = '';
 	cmd_cp_node += `docker cp tmp_${container_name}:/app/node_modules node_modules`;
 	await _execute_spin_verbose(cmd_cp_node, 'docker', `copying node_modules from tmp container tmp_${container_name}`);
-	let cmd_cp_uranio = '';
-	cmd_cp_uranio += `docker cp tmp_${container_name}:/app/.uranio/. .uranio/`;
-	await _execute_spin_verbose(cmd_cp_uranio, 'docker', `copying .uranio from tmp container tmp_${container_name}`);
+	// let cmd_cp_uranio = '';
+	// cmd_cp_uranio += `docker cp tmp_${container_name}:/app/.uranio/. .uranio/`;
+	// await _execute_spin_verbose(cmd_cp_uranio, 'docker', `copying .uranio from tmp container tmp_${container_name}`);
 	let cmd_remove = '';
 	cmd_remove += `docker rm tmp_${container_name}`;
 	await _execute_spin_verbose(cmd_remove, 'docker', `removing tmp container tmp_${container_name}`);

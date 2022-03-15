@@ -12,7 +12,7 @@ import * as output from '../output/index';
 
 import * as util from '../util/index';
 
-// import * as docker from './docker';
+import * as docker from './docker';
 
 import {
 	Params,
@@ -44,28 +44,28 @@ export async function deinit(params:Partial<Params>)
 	}
 	
 	await _reset_package_json();
-	// await _remove_dockers();
+	await _remove_dockers();
 	_delete_files();
 	
 	output_instance.end_log(`Deinitialization completed.`);
 }
 
-// async function _remove_dockers()
-//     :Promise<void>{
-//   if(!util_instance.is_initialized()){
-//     output_instance.warn_log(`Uranio was not initliazed or is missing ${defaults.init_filepath} file.`);
-//     output_instance.warn_log(`Some build artifacts might be still present.`);
-//     return;
-//   }
-//   await docker.tmp_remove(deinit_params, true);
-//   await docker.db_stop(deinit_params, true);
-//   await docker.db_remove(deinit_params, true);
-//   await docker.network_remove(deinit_params, true);
-//   await docker.stop(deinit_params, true);
-//   await docker.remove(deinit_params, true);
-//   await docker.unbuild(deinit_params, true);
-//   await docker.prune(deinit_params, true);
-// }
+async function _remove_dockers()
+		:Promise<void>{
+	if(!util_instance.is_initialized()){
+		output_instance.warn_log(`Uranio was not initliazed or is missing ${defaults.init_filepath} file.`);
+		output_instance.warn_log(`Some build artifacts might be still present.`);
+		return;
+	}
+	await docker.tmp_remove(deinit_params, true);
+	await docker.db_stop(deinit_params, true);
+	await docker.db_remove(deinit_params, true);
+	await docker.network_remove(deinit_params, true);
+	await docker.stop(deinit_params, true);
+	await docker.remove(deinit_params, true);
+	await docker.unbuild(deinit_params, true);
+	await docker.prune(deinit_params, true);
+}
 
 async function _delete_files(){
 	util_instance.fs.remove_directory(`${deinit_params.root}/.tmp`);
@@ -81,8 +81,8 @@ async function _delete_files(){
 	util_instance.fs.remove_file(`${deinit_params.root}/package-lock.json`);
 	util_instance.fs.remove_file(`${deinit_params.root}/netlify.toml`);
 	util_instance.fs.remove_directory(`${deinit_params.root}/.netlify`);
-	// util_instance.fs.remove_directory(`${deinit_params.root}/${defaults.folder}`);
-	util_instance.fs.remove_file(`${deinit_params.root}/${defaults.init_filepath}`);
+	util_instance.fs.remove_directory(`${deinit_params.root}/${defaults.folder}`);
+	// util_instance.fs.remove_file(`${deinit_params.root}/${defaults.init_filepath}`);
 }
 
 async function _reset_package_json(){
