@@ -67,8 +67,6 @@ function init(params) {
         _create_dot_env();
         _ignore_files();
         _update_resolutions();
-        yield _install_dev_dep();
-        _update_package_scripts();
         if (init_params.docker === true) {
             yield docker.build(init_params);
             yield docker.network_create(init_params);
@@ -76,6 +74,8 @@ function init(params) {
         }
         else {
             yield _init_pacman();
+            yield _install_dev_dep();
+            _update_package_scripts();
             yield _install_packages();
         }
         if (init_params.docker_db === true) {
@@ -454,11 +454,9 @@ function _install_packages() {
 //   return await util_instance.cmd.install_package(`${package_url}#${init_params.branch}`);
 //   // return await util_instance.cmd.install_package(package_url);
 // }
-function _install_real_dev_package(package_url) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield util_instance.cmd.install_package_dev(`${package_url}`);
-    });
-}
+// async function _install_real_dev_package(package_url:string){
+//   return await util_instance.cmd.install_package_dev(`${package_url}`);
+// }
 function _install_dev_package(package_url) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield util_instance.cmd.install_package_dev(`${package_url}#${init_params.branch}`);

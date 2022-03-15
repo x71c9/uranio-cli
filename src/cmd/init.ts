@@ -69,9 +69,6 @@ export async function init(params:Partial<Params>)
 	_ignore_files();
 	_update_resolutions();
 	
-	await _install_dev_dep();
-	_update_package_scripts();
-	
 	if(init_params.docker === true){
 		
 		await docker.build(init_params);
@@ -81,6 +78,10 @@ export async function init(params:Partial<Params>)
 	}else{
 		
 		await _init_pacman();
+		
+		await _install_dev_dep();
+		_update_package_scripts();
+		
 		await _install_packages();
 		
 	}
@@ -502,9 +503,9 @@ async function _install_packages(){
 //   // return await util_instance.cmd.install_package(package_url);
 // }
 
-async function _install_real_dev_package(package_url:string){
-	return await util_instance.cmd.install_package_dev(`${package_url}`);
-}
+// async function _install_real_dev_package(package_url:string){
+//   return await util_instance.cmd.install_package_dev(`${package_url}`);
+// }
 
 async function _install_dev_package(package_url:string){
 	return await util_instance.cmd.install_package_dev(`${package_url}#${init_params.branch}`);
