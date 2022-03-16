@@ -13,9 +13,9 @@ Uranio command line interface.
 
 ### About
 
-*Uranio CLI* is the only package you need in order to work with Uranio.
+**`uranio-cli`** is the only package you need in order to work with Uranio.
 
-**Uranio** is a framework that helps you build CRUD API.
+Uranio is a framework that builds CRUD APIs.
 
 Uranio can be installed as one of the following repo:
 `core`, `api`, `trx`, `adm`.
@@ -26,7 +26,7 @@ Each repo includes the previous one.
 
 ##### Core
 
-*Uranio Core* generates classes needed to interact with the database.
+`uranio-core` generates classes needed to interact with the database.
 
 Uranio can interact with the following databases:
 [MongoDB](https://www.mongodb.com/)
@@ -35,7 +35,7 @@ Uranio can interact with the following databases:
 
 ##### Api
 
-*Uranio API* run a web service that expose a CRUD API.
+`uranio-api` runs a web service that expose a CRUD API.
 
 The web service use [Express.js](https://expressjs.com/) internally.
 
@@ -50,13 +50,13 @@ on [Netlify](https://www.netlify.com/). -->
 
 ##### TRX
 
-*Uranio TRX* creates Hooks that can be used to query the API from a client.
+`uranio-trx` creates Hooks that can be used to query the API from a client.
 
 > See [Hooks](#hooks)
 
 ##### ADM
 
-*Uranio Admin* creates a full Administration Panel that interact with the API.
+`uranio-adm` creates a full Administration Panel that interact with the API.
 
 
 ### Installation
