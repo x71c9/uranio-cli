@@ -28,15 +28,23 @@ Each repo includes the previous one.
 
 *Uranio Core* generates classes needed to interact with the database.
 
-Uranio can run the following databases:
+Uranio can interact with the following databases:
 [MongoDB](https://www.mongodb.com/)
 
 > More Database will be implemented in the future.
 
 ##### Api
 
-*Uranio API* run a web service with CRUD API.
+*Uranio API* run a web service that expose a CRUD API.
 
+The web service use [Express.js](https://expressjs.com/) internally.
+
+Uranio API can also be used inside a Lambda Function. It has a method that
+creates a service to use inside [Netlify](https://www.netlify.com/) Functions.
+
+```
+uranio.api.lambda.create();
+```
 <!-- Uranio can run the API on [Express.js](https://expressjs.com/) or
 on [Netlify](https://www.netlify.com/). -->
 
@@ -49,7 +57,6 @@ on [Netlify](https://www.netlify.com/). -->
 ##### ADM
 
 *Uranio Admin* creates a full Administration Panel that interact with the API.
-
 
 
 ### Installation
@@ -65,7 +72,6 @@ or if you are using npm
 ```bash
 npm install uranio-cli -g
 ```
-
 
 When using the CLI in a CI environment we recommend installing it locally
 as a development dependency, instead of globally.
