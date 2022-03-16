@@ -127,32 +127,11 @@ async function _init_dev(){
 
 async function _dev_panel(){
 	
-	const urn_colors = (is_docker === true) ? '--color_uranio=fale' : '';
-	const urn_lib_pre = ` urn_log_prefix_type=true`;
-	// const urn_config_path = ` -c ${build_params.root}/uranio.toml`;
-	const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev ${urn_lib_pre}${urn_colors}`;
-	// const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev`;
+	// uranio-panel-adm dev doesn't need Forever to reaload (like the server)
+	// because it reloads itself by launching Nuxt dev service.
+	
+	const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev`;
 	util_instance.spawn.log(cmd_dev_panel, 'dev', 'developing panel', pane_color);
-	
-	// service_child = new forever.Monitor(`${dev_params.root}/node_modules/uranio/dist/panel/index.js dev`,{
-	//   args: ['urn_log_prefix=true'],
-	//   // watch: true,
-	//   // watchDirectory: `${dev_params.root}/src`
-	// });
-	
-	// service_child.start();
-	
-	// service_child.on('watch:restart', function(info) {
-	//   output_instance.log('Restarting [dev panel] because ' + info.file + ' changed');
-	// });
-	
-	// service_child.on('restart', function(_info) {
-	//   output_instance.log('Forever restarting [dev panel].');
-	// });
-	
-	// service_child.on('exit:code', function(code) {
-	//   output_instance.done_log('Forever detected [dev panel] exited with code ' + code);
-	// });
 	
 }
 async function _dev_server(){

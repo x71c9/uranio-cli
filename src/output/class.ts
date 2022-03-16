@@ -255,6 +255,7 @@ class Output {
 
 	private _color_text(text:string, type:string, color?:string){
 		let colored_text = text;
+		
 		if(_is_uranio_native(text) && this.params.color_uranio === true){
 			
 			colored_text = _uranio_color(colored_text);
@@ -283,12 +284,12 @@ class Output {
 	}
 	
 	private _has_prefix_color(text:string):boolean{
-		const regex = new RegExp(/.?\[c#[0-9a-z]{0,6}\]/);
+		const regex = new RegExp(/.?\[c#[0-9a-zA-Z]{0,6}\]/);
 		return (regex.test(text));
 	}
 	
 	private _read_color(text:string):string{
-		const regex = new RegExp(/.?\[c#[0-9a-z]{0,6}\]/);
+		const regex = new RegExp(/.?\[c#[0-9a-zA-Z]{0,6}\]/);
 		const match = regex.exec(text);
 		if(!match){
 			return text;
@@ -353,7 +354,7 @@ function _is_uranio_native(text:string){
 }
 
 function _remove_color_prefix(text:string):string{
-	const regex = new RegExp(/.?\[c#[0-9a-z]{0,6}\]/);
+	const regex = new RegExp(/.?\[c#[0-9a-zA-Z]{0,6}\]/);
 	const match = regex.exec(text);
 	if(!match){
 		return text;

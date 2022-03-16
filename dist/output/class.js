@@ -243,11 +243,11 @@ class Output {
         return colored_text;
     }
     _has_prefix_color(text) {
-        const regex = new RegExp(/.?\[c#[0-9a-z]{0,6}\]/);
+        const regex = new RegExp(/.?\[c#[0-9a-zA-Z]{0,6}\]/);
         return (regex.test(text));
     }
     _read_color(text) {
-        const regex = new RegExp(/.?\[c#[0-9a-z]{0,6}\]/);
+        const regex = new RegExp(/.?\[c#[0-9a-zA-Z]{0,6}\]/);
         const match = regex.exec(text);
         if (!match) {
             return text;
@@ -302,7 +302,7 @@ function _is_uranio_native(text) {
     return false;
 }
 function _remove_color_prefix(text) {
-    const regex = new RegExp(/.?\[c#[0-9a-z]{0,6}\]/);
+    const regex = new RegExp(/.?\[c#[0-9a-zA-Z]{0,6}\]/);
     const match = regex.exec(text);
     if (!match) {
         return text;
