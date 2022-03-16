@@ -4,14 +4,14 @@ Uranio command line interface.
 
 ### Table of Contents
 
-- [What is it](#what-is-it)
+- [About](#about)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Commands](#commands)
 - [Getting started](#getting-started)
 - [How to develop](#how-to-develop)
 
-### What is it
+### About
 
 *Uranio CLI* is the only package you need in order to work with Uranio.
 
@@ -22,25 +22,29 @@ Uranio can be installed as one of the following repo:
 
 Each repo includes the previous one.
 
-![uranio repos](./uranio_repos.jpg)
+![uranio repos](./img/uranio_repos.jpg)
 
 ##### Core
 
 *Uranio Core* generates classes needed to interact with the database.
 
 Uranio can run the following databases:
-[MongoDB](https://www.mongodb.com/) // More in the future.
+[MongoDB](https://www.mongodb.com/)
+
+> More Database will be implemented in the future.
 
 ##### Api
 
-*Uranio API* run a service with CRUD API.
+*Uranio API* run a web service with CRUD API.
 
-Uranio can run the API on [Express.js](https://expressjs.com/) or
-on [Netlify](https://www.netlify.com/).
+<!-- Uranio can run the API on [Express.js](https://expressjs.com/) or
+on [Netlify](https://www.netlify.com/). -->
 
 ##### TRX
 
-*Uranio TRX* creates Hooks that can be used to query the API.
+*Uranio TRX* creates Hooks that can be used to query the API from a client.
+
+> See [Hooks](#hooks)
 
 ##### ADM
 
@@ -54,13 +58,17 @@ Uranio CLI requires [Node.js](https://nodejs.org), version 14 or above.
 To install `uranio-cli`, run the following command from any directory
 in your terminal:
 
-```bash
-npm install uranio-cli -g
-```
-or if you are using yarn
+## title {.tabset .tabset-fade}
+### yarn
 ```bash
 yarn global add uranio-cli
 ```
+### npm
+```bash
+npm install uranio-cli -g
+```
+##
+
 
 When using the CLI in a CI environment we recommend installing it locally
 as a development dependency, instead of globally.
