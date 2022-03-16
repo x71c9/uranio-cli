@@ -58,16 +58,13 @@ Uranio CLI requires [Node.js](https://nodejs.org), version 14 or above.
 To install `uranio-cli`, run the following command from any directory
 in your terminal:
 
-## title {.tabset .tabset-fade}
-### yarn
 ```bash
 yarn global add uranio-cli
 ```
-### npm
+or if you are using npm
 ```bash
 npm install uranio-cli -g
 ```
-##
 
 
 When using the CLI in a CI environment we recommend installing it locally
@@ -76,11 +73,11 @@ To install locally, run the following command from the root
 directory of your project:
 
 ```bash
-npm install --save-dev uranio-cli
-```
-or if you are using yarn
-```bash
 yarn add --dev uranio-cli
+```
+or if you are using npm
+```bash
+npm install --save-dev uranio-cli
 ```
 
 ### Usage
@@ -108,13 +105,16 @@ urn [command]
 ```
 uranio init
 ```
+
+This command initialize the repository. It will download and install all
+dependencies and copy all the files needed in order to start developing.
+
 ##### Flags
 
 - `-s --root` (*string*) - Set project root.
 If empty Uranio will auto detect the closest repo.
 - `-r --repo` (*string*) - Set Uranio repo [core, api, trx, adm]
 - `-f --force` (*boolean*) - Run without prompts.
-- `-d --deploy` (*string*) - Set deploy [express, netlify]
 - `-p --pacman` (*string*) - Set package manager [npm, yarn]
 - `-k --docker` (*boolean*) - Compile and run inside a Docker container -
 Docker must be installed on the machine.
@@ -122,9 +122,6 @@ Docker must be installed on the machine.
 Docker must be installed on the machine.
 - `--db` (*string*) - Set docker DB [mongo] -
 Docker must be installed on the machine.
-
-This command initialize the repository. It will download and install all
-dependencies and copy all the files needed in order to start developing.
 
 
 #### dev
@@ -137,7 +134,33 @@ This command starts a local development server.
 | Subcommand | description  |
 |:------------ |:-----|
 | `dev:server` | Run development only for server  |
-| `dev:client` | Run development only for client  |
+| `dev:panel` | Run development only for the admin panel  |
+
+
+#### build
+
+```
+uranio build
+```
+This command build and compiled the code that will be needed in production.
+
+| Subcommand | description  |
+|:------------ |:-----|
+| `build:server` | Build the server |
+| `build:panel` | Build the admin panel  |
+
+
+#### start
+
+```
+uranio start
+```
+This command starts the server and the admin panel for production.
+
+| Subcommand | description  |
+|:------------ |:-----|
+| `start:server` | Start the server in production mode |
+| `start:panel` | Start the admin panel in production mode  |
 
 
 #### deinit
@@ -205,15 +228,15 @@ cd /path/to/my/repo
 
 If not already, run:
 ```bash
-npm init
-#or
 yarn init
+#or
+npm init
 ```
 
 Then initialize Uranio with:
 
 ```bash
-uranio init -vu
+uranio init
 ```
 
 The command will prompt with questions regarding the repository you
@@ -224,8 +247,6 @@ want to initialize.
 - Choose if you want Uranio to create a Docker container with a database.
 - If the previous answer was affirmative, choose the database type.
 - Choose the uranio module you want to use: [core, api, trx, adm]
-- If the previous answer was `api` or above, choose how you want to deploy
-the service [express, netlify]
 
 This might take a while, depending on your internet connection.
 
@@ -236,35 +257,46 @@ In order to start developing you will need to create and run a development serve
 ```bash
 uranio dev
 ```
-Here you will see all the logs, also it will print the IP of the client
-in the case of the `adm` module.
+Here you will see all the logs, also it will print the IP of the Admin panel
+in the case of the `adm` repo.
 
 Now you can start developing.
 
 
 ### How to develop
 
-Uranio can work by developing only one file. The file is `/src/book.ts`.
+The first things that need to be defined in Uranio are `Atoms`.
 
-The file `/src/book.ts` must export an object called `atom_book` of type
-`uranio.types.Book`;
+`Atoms` are the objects stored in the database.
 
-Each key of the object will be a relation in the database.
+For example if we want to define an `Atom` with the name `product`, we need to
+create the directory `src/atoms/product` and the file `src/atoms/prodcut/index.ts`.
 
-For example:
-```js
+The name `product` will be picked from the name of the directory just created.
+
+The `src/atoms/product/index.ts` must export a default object with the `Atom`
+definition, like so:
+
+```ts
 import uranio from 'uranio';
 
-export const atom_book:uranio.types.Book = {
-	product: {
-		...
-	}
-}
+export default uranio.register.atom({
+	properties: {
+		title: {
+			type: uranio.types.PropertyType.TEXT,
+			label: 'Title'
+		},
+		price: {
+			type: uranio.tyoes.PropertyType.FLOAT,
+			label: 'Price'
+		},
+		// ...
+	},
+	// ...
+});
 ```
 
-creates a `product` relation and all the API CRUD call for the relation.
-
-Uranio already creates the following relations:
+Uranio already creates the following required `Atoms`:
 
 ##### Core
 - superuser
@@ -279,42 +311,267 @@ Uranio already creates the following relations:
 ##### Admin
 - setting
 
+#### Atom register
+The parameter of the function `uranio.register.atom` used in `src/atoms/product/index.ts`
+is of type:
 
-
-The value of each key is of type: `uranio.types.Book.Definition`.
+`uranio.types.Book.Definition`.
 
 ```ts
-//type Book.Definition
-
 properties: Book.Definition.Properties
+plural?: string
 authenticate?: boolean
 connection?: ConnectionName
-plural?: string
 security?: Book.Definition.Security
-
+dock?: Book.Definition.Dock
 ```
 
-For example:
-```js
-...
-product:{
-	plural: 'products',
+A full `Atom` definition would be like this:
+```ts
+import uranio from 'uranio';
+
+export default uranio.register.atom({
+	plural: 'customers',
+	authenticate: true,
 	security: {
 		type: uranio.types.BookSecurityType.UNIFORM,
 		_r: uranio.types.BookPermissionType.NOBODY
 	},
+	connection: 'main',
 	properties: {
-		title: {
-			type: uranio.types.BookPropertyType.TEXT,
-			label: 'Title'
+		full_name: {
+			type: uranio.types.PropertyType.TEXT,
+			label: 'Full name'
 		},
-		price: {
-			type: uranio.types.BookPropertyType.FLOAT,
-			label: 'Price'
-		}
+		email: {
+			type: uranio.tyoes.PropertyType.EMAIL,
+			label: 'Email'
+		},
+		password: {
+			type: uranio.tyoes.PropertyType.ENCRYPTED,
+			label: 'Password',
+			hidden: true
+		},
+		groups: {
+			type: uranio.tyoes.PropertyType.ATOM,
+			label: 'Group',
+			atom: 'group',
+			optional: true
+		},
+	},
+	dock: {
+		url: '/products'
 	}
+});
+```
+
+#### Plural
+
+**`plural`** define the plural word to define the `Atom`.
+
+e.g.: For the `Atom` `product` will be `products`.
+
+#### Authenticate
+
+**`authenticate`** define if the `Atom` is an `AuthAtom`.
+
+> See [AuthAtom]()
+
+`AuthAtom` are `Atom`s that can be authenticated, meaning they have
+methods that authenticate with `email` and `password`.
+
+> For example they can be used to define customers.
+
+Uranio already provide 2 `AuthAtom`s: `superuser` and `user`.
+
+#### Connection
+
+**`connection`** define with which connection the `Atom` is stored.
+
+`connection` can be one of the follwing: `main` (default), `log`, `trash`.
+
+Uranio creates 3 database with 3 different connections.
+
+- The `main` connection is where are stored all the main `Atom`s.
+- The `log` connection is where are stored the `Atom`s that define logs.
+- The `trash` connection is where Uranio put the deleted `Atom`s.
+
+> Uranio API already provide 2 `Atom`s that are used in the `log` connection.
+> They are `request` and `error`.
+> For each API request an `Atom` `request` is stored.
+> For each Uranio error and `Atom` `error` is stored.
+
+
+#### Security
+
+**`security`** define the security of the `Atom`, meaning how the database can
+be queried.
+
+Uranio creates an Access Control Layer (ACL) before querying the database.
+This will check if the request can read or write in the database.
+
+Each `Atom` relation can have its own rules.
+
+`security` can be of type:
+
+- `uranio.types.SecurityType.UNIFORM`.
+- `uranio.types.SecurityType.GRANULAR`.
+
+Default is `UNIFORM`.
+
+`UNIFORM` permission will check on a relation level, meaning that the rule is
+defined for the entire `Atom` relation.
+
+`GRANULAR` permission will check on a Record level, meaning that the rules can
+differ between the records. Each record has its own write and read rules.
+
+Each relation / record has two attributes `_r` and `_w`, respectively for reading
+and writing permission. The value of these attributes is an `Atom` `group` ID Array.
+
+`_r` will narrow from Everybody
+
+`_w` will widen from Nobody
+
+`_r` == nullish -> Everybody can read
+
+`_w` == nullish -> Nobody can write
+
+For example:
+```ts
+// src/atoms/product/index.ts
+
+import uranio from 'uranio';
+
+export default uranio.register.atom({
+	// ...
+	security: {
+		type: uranio.types.BookSecurityType.UNIFORM,
+		_r: uranio.types.BookPermissionType.NOBODY
+	},
+	// ...
+});
+```
+The above definition means that Nobody can read or write on the entire `Atom` relation.
+
+
+```ts
+// src/atoms/product/index.ts
+
+import uranio from 'uranio';
+
+export default uranio.register.atom({
+	// ...
+	security: {
+		type: uranio.types.BookSecurityType.UNIFORM,
+		_w: uranio.types.BookPermissionType.PUBLIC
+	},
+	// ...
+});
+```
+The above definition means that Everybody can read and write on the entire `Atom` relation without
+authenitcation.
+
+```ts
+// src/atoms/product/index.ts
+
+import uranio from 'uranio';
+
+export default uranio.register.atom({
+	// ...
+	security: {
+		type: uranio.types.BookSecurityType.UNIFORM,
+		_w: ['61d81a12f3e4ea6edbdcdd1e', '61d81a12f3e4ea6edbwcddff']
+	},
+	// ...
+});
+```
+The above definition means that Everybody can read but only authenitcated `AuthAtom` that have
+groups with the following ids: `['61d81a12f3e4ea6edbdcdd1e', '61d81a12f3e4ea6edbwcddff']`
+can write.
+
+
+```ts
+// src/atoms/product/index.ts
+
+import uranio from 'uranio';
+
+export default uranio.register.atom({
+	// ...
+	security: {
+		type: uranio.types.BookSecurityType.GRANULAR,
+	},
+	// ...
+});
+```
+When the `security` type is `GRANULAR`, the ACL will check if the singles `Atom`s
+have the right permission to be read or written.
+
+#### Dock
+
+If **`dock`** property is defined, Uranio will create the CRUD API and expose it
+in the web serivce.
+
+`dock` must have a `url` property starting with `/`.
+
+For example:
+
+```ts
+// src/atoms/product/index.ts
+
+import uranio from 'uranio';
+
+export default uranio.register.atom({
+	// ...
+	dock: {
+		url: '/products'
+	},
+	// ...
+});
+```
+will create a route in the webserice `https://[WEBSERVICEURL]/uranio/api/products` where
+the `Atom` relation `product` can be queried.
+
+`[WEBSERVICEURL]` can be defined in `uranio.toml`.
+
+`/uranio/api` prefix can be defined in `uranio.toml`.
+
+> See [uranio.toml]() definition
+
+**`dock`** has also the properties `auth_url` that need to be defined when
+`authenticate` is equal to `true`.
+
+`auth_url` define the route url where the `AuthAtom` can authenticate.
+
+For example:
+```ts
+// src/atoms/customer/index.ts
+
+import uranio from 'uranio';
+
+export default uranio.register.atom({
+	// ...
+	dock: {
+		url: '/customers',
+		auth_url: '/auth-customer'
+	},
+	// ...
+});
+```
+will create a route in the webservice `https://[WEBSERVICEURL]/uranio/api/auth-customer`
+
+tha will accept as body in JSON format:
+```json
+{
+	email: 'uranio@email.com',
+	password: 'MyPassword1234'
 }
 ```
+and will return an `AuthResponse` object with a token and a http-only cookie
+if authenitcated.
+
+
+
+#### Properties
 
 Type `Book.Definition.Properties` is a list of all the relation key.
 
@@ -375,3 +632,4 @@ SET_NUMBER = 'SET_NUMBER',
 ATOM = 'ATOM',
 ATOM_ARRAY = 'ATOM_ARRAY'
 ```
+
