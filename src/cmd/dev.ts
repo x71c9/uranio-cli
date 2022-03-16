@@ -127,9 +127,10 @@ async function _init_dev(){
 
 async function _dev_panel(){
 	
+	const urn_colors = (is_docker === true) ? '--color_uranio=fale' : '';
 	const urn_lib_pre = ` urn_log_prefix_type=true`;
 	// const urn_config_path = ` -c ${build_params.root}/uranio.toml`;
-	const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev ${urn_lib_pre}`;
+	const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev ${urn_lib_pre}${urn_colors}`;
 	// const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev`;
 	util_instance.spawn.log(cmd_dev_panel, 'dev', 'developing panel', pane_color);
 	
