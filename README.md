@@ -271,9 +271,9 @@ Now you can start developing.
 
 ### How to develop
 
-The first things that need to be defined in Uranio are `Atoms`.
+The first things that need to be defined in Uranio are `Atom`s.
 
-`Atoms` are the objects stored in the database.
+`Atom`s are the objects stored in the database.
 
 For example if we want to define an `Atom` with the name `product`, we need to
 create the directory `src/atoms/product` and the file `src/atoms/prodcut/index.ts`.
@@ -283,7 +283,7 @@ The name `product` will be picked from the name of the directory just created.
 The `src/atoms/product/index.ts` must export a default object with the `Atom`
 definition, like so:
 
-```ts
+```typescript
 import uranio from 'uranio';
 
 export default uranio.register.atom({
