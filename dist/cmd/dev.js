@@ -62,6 +62,7 @@ const watc_color = '#687a6a';
 // const pane_color = '#4f9ee3';
 const pane_color = '#7464C3';
 let service_child;
+let _is_dev_server = false;
 function dev(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
@@ -126,6 +127,7 @@ function _dev_panel() {
 }
 function _dev_server() {
     return __awaiter(this, void 0, void 0, function* () {
+        _is_dev_server = true;
         // _fix_mongodb_saslprep_requirement();
         const args = (is_docker === true) ? ['urn_log_prefix_type=true'] : [];
         service_child = new forever_monitor_1.default.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`, {
@@ -167,7 +169,9 @@ function _watch() {
         output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
         yield (0, transpose_1.transpose)(dev_params, _path, _event);
         yield (0, generate_1.generate)(dev_params, _path, _event);
-        service_child.restart();
+        if (_is_dev_server) {
+            service_child.restart();
+        }
         output_instance.done_log(`[src watch] Built [${_event}] [${_path}].`, 'wtch');
     }));
     if (!util_instance.fs.exists(dev_params.config)) {
@@ -186,7 +190,9 @@ function _watch() {
         }
         output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
         yield (0, generate_1.generate)(dev_params, _path, _event);
-        service_child.restart();
+        if (_is_dev_server) {
+            service_child.restart();
+        }
         output_instance.done_log(`[toml watch] Generated [${_event}] [${_path}].`, 'wtch');
     }));
 }

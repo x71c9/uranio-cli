@@ -199,6 +199,9 @@ function _register_text(parent_folder) {
             const routes_folder = util_instance.fs.read_dir(`${atom_dir}/${atom_folder}/routes`);
             for (const route_file of routes_folder) {
                 const base_route_filename = path_1.default.parse(route_file).name;
+                if (!_is_valid_route_name(route_file)) {
+                    continue;
+                }
                 text += `export * from '../atoms/${parent_folder}/${atom_folder}/routes/${base_route_filename}';\n`;
             }
         }
@@ -206,6 +209,12 @@ function _register_text(parent_folder) {
     }
     text += `export {};\n`;
     return text;
+}
+function _is_valid_route_name(name) {
+    if (name[0] === '.') {
+        return false;
+    }
+    return true;
 }
 function _init_generate(params) {
     generate_params = (0, common_1.merge_params)(params);

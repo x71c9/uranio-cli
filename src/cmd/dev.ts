@@ -48,6 +48,8 @@ const pane_color = '#7464C3';
 
 let service_child:forever.Monitor;
 
+let _is_dev_server = false;
+
 export async function dev(params:Partial<Params>)
 		:Promise<void>{
 	
@@ -136,6 +138,8 @@ async function _dev_panel(){
 }
 async function _dev_server(){
 	
+	_is_dev_server = true;
+	
 	// _fix_mongodb_saslprep_requirement();
 	
 	const args = (is_docker === true) ? ['urn_log_prefix_type=true'] : [];
@@ -197,7 +201,9 @@ function _watch(){
 			
 			await generate(dev_params, _path, _event);
 			
-			service_child.restart();
+			if(_is_dev_server){
+				service_child.restart();
+			}
 			
 			output_instance.done_log(`[src watch] Built [${_event}] [${_path}].`, 'wtch');
 			
@@ -230,7 +236,9 @@ function _watch(){
 			
 			await generate(dev_params, _path, _event);
 			
-			service_child.restart();
+			if(_is_dev_server){
+				service_child.restart();
+			}
 			
 			output_instance.done_log(`[toml watch] Generated [${_event}] [${_path}].`, 'wtch');
 			
