@@ -46,8 +46,8 @@ const watc_color = '#687a6a';
 // const pane_color = '#4f9ee3';
 const pane_color = '#7464C3';
 
-let service_child:forever.Monitor;
-
+let _service_child:forever.Monitor;
+// let _service_time:ReturnType<typeof setTimeout>;
 let _is_dev_server = false;
 
 export async function dev(params:Partial<Params>)
@@ -143,23 +143,23 @@ async function _dev_server(){
 	// _fix_mongodb_saslprep_requirement();
 	
 	const args = (is_docker === true) ? ['urn_log_prefix_type=true'] : [];
-	service_child = new forever.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`,{
+	_service_child = new forever.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`,{
 		args: args,
 		// watch: true,
 		// watchDirectory: `${dev_params.root}/src`
 	});
 	
-	service_child.start();
+	_service_child.start();
 	
-	service_child.on('watch:restart', function(info) {
+	_service_child.on('watch:restart', function(info) {
 		output_instance.log('Restarting [dev server] because ' + info.file + ' changed');
 	});
 	
-	service_child.on('restart', function(_info) {
+	_service_child.on('restart', function(_info) {
 		output_instance.log('Forever restarting [dev server].');
 	});
 	
-	service_child.on('exit:code', function(code) {
+	_service_child.on('exit:code', function(code) {
 		output_instance.done_log('Forever detected [dev server] exited with code ' + code);
 	});
 	
@@ -202,7 +202,10 @@ function _watch(){
 			await generate(dev_params, _path, _event);
 			
 			if(_is_dev_server){
-				service_child.restart();
+				// clearTimeout(_service_time);
+				// _service_time = setTimeout(() => {
+				_service_child.restart();
+				// }, 500);
 			}
 			
 			output_instance.done_log(`[src watch] Built [${_event}] [${_path}].`, 'wtch');
@@ -237,7 +240,10 @@ function _watch(){
 			await generate(dev_params, _path, _event);
 			
 			if(_is_dev_server){
-				service_child.restart();
+				// clearTimeout(_service_time);
+				// _service_time = setTimeout(() => {
+				_service_child.restart();
+				// }, 500);
 			}
 			
 			output_instance.done_log(`[toml watch] Generated [${_event}] [${_path}].`, 'wtch');
