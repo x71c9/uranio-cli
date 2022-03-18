@@ -17,6 +17,7 @@ export declare const defaults: {
     readonly dev_repo: "git+ssh://git@github.com/nbl7/uranio-dev.git";
     readonly lib_repo: "git+ssh://git@github.com/nbl7/uranio-lib.git";
     readonly assets_repo: "git+ssh://git@github.com/nbl7/uranio-assets.git";
+    readonly schema_repo: "git+ssh://git@github.com/nbl7/uranio-schema.git";
     readonly adm_repo: "git+ssh://git@github.com/nbl7/uranio-adm.git";
     readonly trx_repo: "git+ssh://git@github.com/nbl7/uranio-trx.git";
     readonly api_repo: "git+ssh://git@github.com/nbl7/uranio-api.git";

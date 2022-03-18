@@ -26,7 +26,7 @@ import path from 'path';
 
 import * as esbuild from 'esbuild';
 
-import {default_params} from '../conf/defaults';
+import {defaults, default_params} from '../conf/defaults';
 
 import * as output from '../output/index';
 
@@ -134,8 +134,19 @@ async function _generate(args:string){
 		util_instance.spawn.verbose_log(generate_cmd, 'generate', 'generating', undefined, resolve, reject);
 	});
 	
+	_copy_uranio_schema_repo();
+	
 	// output_instance.done_log('Generate completed.');
 	
+}
+
+function _copy_uranio_schema_repo(){
+	
+	const uranio_schema_path =
+		`${generate_params.root}/node_modules/uranio-schema/dist/typ/atom.d.ts`;
+	const schema_copy_path =
+		`${generate_params.root}/${defaults.folder}/uranio-schema/dist/typ/atom.d.ts`;
+	util_instance.fs.copy_file(uranio_schema_path, schema_copy_path);
 }
 
 

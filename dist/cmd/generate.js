@@ -136,8 +136,14 @@ function _generate(args) {
             const generate_cmd = `yarn uranio-generate-${generate_params.repo} -c ${root_uranio} ${args}`;
             util_instance.spawn.verbose_log(generate_cmd, 'generate', 'generating', undefined, resolve, reject);
         });
+        _copy_uranio_schema_repo();
         // output_instance.done_log('Generate completed.');
     });
+}
+function _copy_uranio_schema_repo() {
+    const uranio_schema_path = `${generate_params.root}/node_modules/uranio-schema/dist/typ/atom.d.ts`;
+    const schema_copy_path = `${generate_params.root}/${defaults_1.defaults.folder}/uranio-schema/dist/typ/atom.d.ts`;
+    util_instance.fs.copy_file(uranio_schema_path, schema_copy_path);
 }
 function _generate_register() {
     return __awaiter(this, void 0, void 0, function* () {

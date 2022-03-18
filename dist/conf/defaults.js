@@ -49,6 +49,7 @@ exports.defaults = {
     dev_repo: `${cloud_address}/uranio-dev.git`,
     lib_repo: `${cloud_address}/uranio-lib.git`,
     assets_repo: `${cloud_address}/uranio-assets.git`,
+    schema_repo: `${cloud_address}/uranio-schema.git`,
     adm_repo: `${cloud_address}/uranio-adm.git`,
     trx_repo: `${cloud_address}/uranio-trx.git`,
     api_repo: `${cloud_address}/uranio-api.git`,

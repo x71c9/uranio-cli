@@ -57,10 +57,11 @@ let dev_params = defaults_1.default_params;
 let watch_src_scanned = false;
 let watch_toml_scanned = false;
 // const nuxt_color = '#677cc7';
-// const tscw_color = '#734de3';
+const tscw_color = '#734de3';
 const watc_color = '#687a6a';
 // const pane_color = '#4f9ee3';
-const pane_color = '#7464C3';
+// const pane_color = '#7464C3';
+const pane_color = '#00AA7E';
 let _service_child;
 // let _service_time:ReturnType<typeof setTimeout>;
 let _is_dev_server = false;
@@ -115,6 +116,7 @@ function _init_params(params) {
 function _init_dev() {
     return __awaiter(this, void 0, void 0, function* () {
         yield (0, build_1.build_server)(dev_params);
+        _tsc_watch();
         _watch();
     });
 }
@@ -147,6 +149,10 @@ function _dev_server() {
             output_instance.done_log('Forever detected [dev server] exited with code ' + code);
         });
     });
+}
+function _tsc_watch() {
+    const tsc_watch = `yarn tsc -w`;
+    util_instance.spawn.log(tsc_watch, 'tsc', 'watching types', tscw_color);
 }
 function _watch() {
     const src_path = `${dev_params.root}/src/`;

@@ -59,10 +59,11 @@ export async function init(params:Partial<Params>)
 	dot_folder = `${init_params.root}/${defaults.folder}`;
 	init_filepath = `${dot_folder}/${defaults.init_filepath}`;
 	
-	await _clone_assets_repo();
 	_log_important_params();
 	_create_dot_dir();
 	_create_init_file();
+	await _clone_assets_repo();
+	await _clone_uranio_schema();
 	_create_src_dirs();
 	_copy_assets();
 	_create_dot_env();
@@ -318,10 +319,21 @@ async function _clone_assets_repo(){
 	output_instance.done_log(`Cloned assets repo.`, 'assets');
 }
 
+async function _clone_uranio_schema(){
+	output_instance.start_loading(`Cloning uranio schema...`);
+	await util_instance.cmd.clone_repo(
+		defaults.schema_repo,
+		`${init_params.root}/${defaults.folder}/uranio-schema`,
+		'assets',
+		init_params.branch
+	);
+	output_instance.done_log(`Cloned schema repo.`, 'assets');
+}
+
 function _copy_assets(){
 	_copy_sample();
 	_copy_toml();
-	// _copy_tsconfigs();
+	_copy_tsconfigs();
 	// _copy_eslint_files();
 }
 
@@ -341,15 +353,18 @@ function _copy_toml(){
 	}
 }
 
-// function _copy_tsconfigs(){
-//   const ass_dir = `${init_params.root}/${defaults.tmp_folder}/uranio-assets`;
+function _copy_tsconfigs(){
+	const ass_dir = `${init_params.root}/${defaults.tmp_folder}/uranio-assets`;
+	const ts_dir = `${ass_dir}/typescript`;
 	
-//   const ts_dir = `${ass_dir}/typescript`;
-//   const dot_tsc_file = `${ts_dir}/root/tsconfig.json`;
-//   const dest = `${init_params.root}/tsconfig.json`;
-//   util_instance.fs.copy_file(dot_tsc_file, dest, 'tsco');
+	const dot_tsc_file = `${ts_dir}/root/tsconfig.json`;
+	const dot_dest = `${dot_folder}/tsconfig.json`;
+	util_instance.fs.copy_file(dot_tsc_file, dot_dest, 'tsco');
 	
-// }
+	const bld_tsc_file = `${ts_dir}/builder/tsconfig.json`;
+	const bld_dest = `${init_params.root}/tsconfig.json`;
+	util_instance.fs.copy_file(bld_tsc_file, bld_dest, 'tsco');
+}
 
 // function _copy_eslint_files(){
 //   const eslint_dir = `${init_params.root}/${defaults.tmp_folder}/uranio-assets/eslint`;

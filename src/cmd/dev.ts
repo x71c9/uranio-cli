@@ -41,10 +41,11 @@ let watch_src_scanned = false;
 let watch_toml_scanned = false;
 
 // const nuxt_color = '#677cc7';
-// const tscw_color = '#734de3';
+const tscw_color = '#734de3';
 const watc_color = '#687a6a';
 // const pane_color = '#4f9ee3';
-const pane_color = '#7464C3';
+// const pane_color = '#7464C3';
+const pane_color = '#00AA7E';
 
 let _service_child:forever.Monitor;
 // let _service_time:ReturnType<typeof setTimeout>;
@@ -124,6 +125,8 @@ async function _init_dev(){
 	
 	await build_server(dev_params);
 	
+	_tsc_watch();
+	
 	_watch();
 }
 
@@ -162,6 +165,13 @@ async function _dev_server(){
 	_service_child.on('exit:code', function(code) {
 		output_instance.done_log('Forever detected [dev server] exited with code ' + code);
 	});
+	
+}
+
+function _tsc_watch(){
+	
+	const tsc_watch = `yarn tsc -w`;
+	util_instance.spawn.log(tsc_watch, 'tsc', 'watching types', tscw_color);
 	
 }
 
