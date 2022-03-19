@@ -59,13 +59,15 @@ export async function init(params:Partial<Params>)
 	dot_folder = `${init_params.root}/${defaults.folder}`;
 	init_filepath = `${dot_folder}/${defaults.init_filepath}`;
 	
+	_create_tmp_dir();
+	await _clone_assets_repo();
+	await _clone_uranio_schema();
 	_log_important_params();
 	_create_dot_dir();
 	_create_init_file();
-	await _clone_assets_repo();
-	await _clone_uranio_schema();
 	_create_src_dirs();
 	_copy_assets();
+	_copy_schema();
 	_create_dot_env();
 	_ignore_files();
 	_update_resolutions();
@@ -306,10 +308,13 @@ function _log_important_params(){
 	// }
 }
 
+function _create_tmp_dir(){
+	util_instance.fs.remove_directory(defaults.tmp_folder, 'tmp');
+	util_instance.fs.create_directory(defaults.tmp_folder, 'tmp');
+}
+
 async function _clone_assets_repo(){
 	output_instance.start_loading(`Cloning assets...`);
-	util_instance.fs.remove_directory(defaults.tmp_folder, 'assets');
-	util_instance.fs.create_directory(defaults.tmp_folder, 'assets');
 	await util_instance.cmd.clone_repo(
 		defaults.assets_repo,
 		`${init_params.root}/${defaults.tmp_folder}/uranio-assets`,
@@ -323,11 +328,20 @@ async function _clone_uranio_schema(){
 	output_instance.start_loading(`Cloning uranio schema...`);
 	await util_instance.cmd.clone_repo(
 		defaults.schema_repo,
-		`${init_params.root}/${defaults.folder}/uranio-schema`,
+		`${init_params.root}/${defaults.tmp_folder}/uranio-schema`,
 		'assets',
 		init_params.branch
 	);
 	output_instance.done_log(`Cloned schema repo.`, 'assets');
+}
+
+function _copy_schema(){
+	const dot_schema = `${init_params.root}/${defaults.folder}/uranio-schema`;
+	util_instance.fs.remove_directory(dot_schema, 'tmp');
+	util_instance.fs.create_directory(dot_schema, 'tmp');
+	const schema_dist =
+		`${init_params.root}/${defaults.tmp_folder}/uranio-schema/dist`;
+	util_instance.fs.copy_directory(schema_dist, `${dot_schema}/dist`, 'book');
 }
 
 function _copy_assets(){

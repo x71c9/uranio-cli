@@ -58,13 +58,15 @@ function init(params) {
         util_instance = util.create(init_params, output_instance);
         dot_folder = `${init_params.root}/${defaults_1.defaults.folder}`;
         init_filepath = `${dot_folder}/${defaults_1.defaults.init_filepath}`;
+        _create_tmp_dir();
+        yield _clone_assets_repo();
+        yield _clone_uranio_schema();
         _log_important_params();
         _create_dot_dir();
         _create_init_file();
-        yield _clone_assets_repo();
-        yield _clone_uranio_schema();
         _create_src_dirs();
         _copy_assets();
+        _copy_schema();
         _create_dot_env();
         _ignore_files();
         _update_resolutions();
@@ -292,11 +294,13 @@ function _log_important_params() {
     //   );
     // }
 }
+function _create_tmp_dir() {
+    util_instance.fs.remove_directory(defaults_1.defaults.tmp_folder, 'tmp');
+    util_instance.fs.create_directory(defaults_1.defaults.tmp_folder, 'tmp');
+}
 function _clone_assets_repo() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Cloning assets...`);
-        util_instance.fs.remove_directory(defaults_1.defaults.tmp_folder, 'assets');
-        util_instance.fs.create_directory(defaults_1.defaults.tmp_folder, 'assets');
         yield util_instance.cmd.clone_repo(defaults_1.defaults.assets_repo, `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets`, 'assets', init_params.branch);
         output_instance.done_log(`Cloned assets repo.`, 'assets');
     });
@@ -304,9 +308,16 @@ function _clone_assets_repo() {
 function _clone_uranio_schema() {
     return __awaiter(this, void 0, void 0, function* () {
         output_instance.start_loading(`Cloning uranio schema...`);
-        yield util_instance.cmd.clone_repo(defaults_1.defaults.schema_repo, `${init_params.root}/${defaults_1.defaults.folder}/uranio-schema`, 'assets', init_params.branch);
+        yield util_instance.cmd.clone_repo(defaults_1.defaults.schema_repo, `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-schema`, 'assets', init_params.branch);
         output_instance.done_log(`Cloned schema repo.`, 'assets');
     });
+}
+function _copy_schema() {
+    const dot_schema = `${init_params.root}/${defaults_1.defaults.folder}/uranio-schema`;
+    util_instance.fs.remove_directory(dot_schema, 'tmp');
+    util_instance.fs.create_directory(dot_schema, 'tmp');
+    const schema_dist = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-schema/dist`;
+    util_instance.fs.copy_directory(schema_dist, `${dot_schema}/dist`, 'book');
 }
 function _copy_assets() {
     _copy_sample();
