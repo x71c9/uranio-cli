@@ -51,6 +51,8 @@ let _service_child:forever.Monitor;
 // let _service_time:ReturnType<typeof setTimeout>;
 let _is_dev_server = false;
 
+const _valid_reload_extensions = ['.ts', '.js'];
+
 export async function dev(params:Partial<Params>)
 		:Promise<void>{
 	
@@ -211,7 +213,7 @@ function _watch(){
 			
 			await generate(dev_params, _path, _event);
 			
-			if(_is_dev_server){
+			if(_is_dev_server && _valid_reload_extensions.includes(extension)){
 				// clearTimeout(_service_time);
 				// _service_time = setTimeout(() => {
 				_service_child.restart();

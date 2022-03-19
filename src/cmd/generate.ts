@@ -42,12 +42,14 @@ let util_instance:util.UtilInstance;
 
 let generate_params = default_params as Params;
 
+const _valid_generate_extensions = ['.ts', '.js'];
+
 let register_path_server = `node_modules/uranio/src/server/register.ts`;
 let register_path_client = `node_modules/uranio/src/client/register.ts`;
 let compiled_register_path_server = `node_modules/uranio/dist/server/register.js`;
 let compiled_register_path_client = `node_modules/uranio/dist/client/register.js`;
 
-export async function generate(params:Params, path?:string, _event?:string)
+export async function generate(params:Params, _path?:string, _event?:string)
 		:Promise<void>{
 	
 	_init_generate(params);
@@ -58,31 +60,36 @@ export async function generate(params:Params, path?:string, _event?:string)
 	const server_src_dir = `${src_path}/server`;
 	const admin_src_dir = `${src_path}/admin`;
 	
-	if(typeof path === 'undefined'){
+	if(typeof _path === 'undefined'){
 		await _generate_all();
 		return;
 	}
 	
-	if(path.includes(atoms_src_dir)){
+	const ext = path.parse(_path).ext;
+	if(!_is_valid_extension(ext)){
+		return;
+	}
+	
+	if(_path.includes(atoms_src_dir)){
 		
 		await _generate_atoms();
 		
 	}else if(
 		valid_deploy_repos().includes(generate_params.repo)
-		&& path.includes(server_src_dir)
+		&& _path.includes(server_src_dir)
 	){
 		
 		// TODO
 		
 	}else if(
 		valid_admin_repos().includes(generate_params.repo)
-		&& path.includes(admin_src_dir)
+		&& _path.includes(admin_src_dir)
 	){
 		
 		// TODO
 		
 	}else if(
-		path.includes(generate_params.config)
+		_path.includes(generate_params.config)
 	){
 		
 		await _generate_client_config();
@@ -95,6 +102,10 @@ export async function generate(params:Params, path?:string, _event?:string)
 	
 	output_instance.done_log('Generate completed.');
 	
+}
+
+function _is_valid_extension(ext:string){
+	return _valid_generate_extensions.includes(ext);
 }
 
 async function _generate_all():Promise<void>{

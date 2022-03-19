@@ -65,33 +65,38 @@ const common_1 = require("./common");
 let output_instance;
 let util_instance;
 let generate_params = defaults_1.default_params;
+const _valid_generate_extensions = ['.ts', '.js'];
 let register_path_server = `node_modules/uranio/src/server/register.ts`;
 let register_path_client = `node_modules/uranio/src/client/register.ts`;
 let compiled_register_path_server = `node_modules/uranio/dist/server/register.js`;
 let compiled_register_path_client = `node_modules/uranio/dist/client/register.js`;
-function generate(params, path, _event) {
+function generate(params, _path, _event) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_generate(params);
         const src_path = `${generate_params.root}/src`;
         const atoms_src_dir = `${src_path}/atoms`;
         const server_src_dir = `${src_path}/server`;
         const admin_src_dir = `${src_path}/admin`;
-        if (typeof path === 'undefined') {
+        if (typeof _path === 'undefined') {
             yield _generate_all();
             return;
         }
-        if (path.includes(atoms_src_dir)) {
+        const ext = path_1.default.parse(_path).ext;
+        if (!_is_valid_extension(ext)) {
+            return;
+        }
+        if (_path.includes(atoms_src_dir)) {
             yield _generate_atoms();
         }
         else if ((0, types_1.valid_deploy_repos)().includes(generate_params.repo)
-            && path.includes(server_src_dir)) {
+            && _path.includes(server_src_dir)) {
             // TODO
         }
         else if ((0, types_1.valid_admin_repos)().includes(generate_params.repo)
-            && path.includes(admin_src_dir)) {
+            && _path.includes(admin_src_dir)) {
             // TODO
         }
-        else if (path.includes(generate_params.config)) {
+        else if (_path.includes(generate_params.config)) {
             yield _generate_client_config();
         }
         else {
@@ -101,6 +106,9 @@ function generate(params, path, _event) {
     });
 }
 exports.generate = generate;
+function _is_valid_extension(ext) {
+    return _valid_generate_extensions.includes(ext);
+}
 function _generate_all() {
     return __awaiter(this, void 0, void 0, function* () {
         yield _generate('');

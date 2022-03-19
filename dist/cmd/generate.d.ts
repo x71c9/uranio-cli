@@ -22,4 +22,4 @@
  * @packageDocumentation
  */
 import { Params } from '../types';
-export declare function generate(params: Params, path?: string, _event?: string): Promise<void>;
+export declare function generate(params: Params, _path?: string, _event?: string): Promise<void>;

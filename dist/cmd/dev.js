@@ -65,6 +65,7 @@ const pane_color = '#00AA7E';
 let _service_child;
 // let _service_time:ReturnType<typeof setTimeout>;
 let _is_dev_server = false;
+const _valid_reload_extensions = ['.ts', '.js'];
 function dev(params) {
     return __awaiter(this, void 0, void 0, function* () {
         _init_params(params);
@@ -176,7 +177,7 @@ function _watch() {
         output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
         yield (0, transpose_1.transpose)(dev_params, _path, _event);
         yield (0, generate_1.generate)(dev_params, _path, _event);
-        if (_is_dev_server) {
+        if (_is_dev_server && _valid_reload_extensions.includes(extension)) {
             // clearTimeout(_service_time);
             // _service_time = setTimeout(() => {
             _service_child.restart();
