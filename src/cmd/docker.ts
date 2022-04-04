@@ -119,7 +119,7 @@ export async function docker(params:Partial<Params>, args:Arguments)
 		case 'env':{
 			switch(args._[2]){
 				case 'update':{
-					// await update_env(docker_params);
+					await update_env(docker_params);
 					break;
 				}
 				default:{

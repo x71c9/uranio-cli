@@ -91,7 +91,7 @@ function init(params) {
             }
             yield docker.db_create(init_params);
             yield docker.db_start(init_params);
-            docker.update_env();
+            // docker.update_env();
         }
         _remove_tmp();
         output_instance.end_log(`Initialization completed.`);
@@ -327,6 +327,7 @@ function _copy_assets() {
     _copy_sample();
     _copy_toml();
     _copy_tsconfigs();
+    _copy_index();
     // _copy_eslint_files();
 }
 function _copy_sample() {
@@ -339,6 +340,13 @@ function _copy_toml() {
     const dest = `${init_params.root}/uranio.toml`;
     if (!util_instance.fs.exists(dest)) {
         util_instance.fs.copy_file(ass_toml_filepath, dest, 'book');
+    }
+}
+function _copy_index() {
+    const index_filepath = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets/main/index.ts`;
+    const dest = `${init_params.root}/src/atoms/index.ts`;
+    if (!util_instance.fs.exists(dest)) {
+        util_instance.fs.copy_file(index_filepath, dest, 'index');
     }
 }
 function _copy_tsconfigs() {
