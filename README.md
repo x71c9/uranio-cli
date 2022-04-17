@@ -24,7 +24,7 @@ Uranio can be installed as one of the following repo:
 
 Each repo includes the previous one.
 
-![uranio repos](./img/uranio_repos.jpg)
+![uranio repos](./img/uranio_repos_00.png)
 
 ##### Core
 
