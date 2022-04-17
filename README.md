@@ -1,5 +1,7 @@
 ## Uranio CLI
 
+![uranio logo](./img/URN_TEXT_1440_BANNER_00.png)
+
 Uranio command line interface.
 
 ### Table of Contents
@@ -15,7 +17,7 @@ Uranio command line interface.
 
 **`uranio-cli`** is the only package you need in order to work with Uranio.
 
-Uranio is a framework that builds CRUD APIs.
+Uranio is a Typescript framework that builds CRUD APIs.
 
 Uranio can be installed as one of the following repo:
 `core`, `api`, `trx`, `adm`.
@@ -70,7 +72,7 @@ yarn global add uranio-cli
 ```
 or if you are using npm
 ```bash
-npm install uranio-cli -g
+npm install -g uranio-cli
 ```
 
 When using the CLI in a CI environment we recommend installing it locally
@@ -293,7 +295,7 @@ export default uranio.register.atom({
 			label: 'Title'
 		},
 		price: {
-			type: uranio.tyoes.PropertyType.FLOAT,
+			type: uranio.types.PropertyType.FLOAT,
 			label: 'Price'
 		},
 		// ...
@@ -373,13 +375,13 @@ export default uranio.register.atom({
 
 #### Plural
 
-**`plural`** define the plural word to define the `Atom`.
+**`plural`** defines the plural word to define the `Atom`.
 
 e.g.: For the `Atom` `product` will be `products`.
 
 #### Authenticate
 
-**`authenticate`** define if the `Atom` is an `AuthAtom`.
+**`authenticate`** defines if the `Atom` is an `AuthAtom`.
 
 > See [AuthAtom]()
 
@@ -428,7 +430,7 @@ Default is `UNIFORM`.
 `UNIFORM` permission will check on a relation level, meaning that the rule is
 defined for the entire `Atom` relation.
 
-`GRANULAR` permission will check on a Record level, meaning that the rules can
+`GRANULAR` permission will check on a record level, meaning that the rules can
 differ between the records. Each record has its own write and read rules.
 
 Each relation / record has two attributes `_r` and `_w`, respectively for reading
@@ -514,10 +516,7 @@ have the right permission to be read or written.
 
 #### Dock
 
-If **`dock`** property is defined, Uranio will create the CRUD API and expose it
-in the web serivce.
-
-`dock` must have a `url` property starting with `/`.
+`dock` have a `url` property that must start with `/`.
 
 For example:
 
