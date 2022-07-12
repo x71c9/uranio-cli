@@ -1,6 +1,6 @@
 {
 	"name": "uranio",
-	"version": "0.0.63",
+	"version": "0.0.64",
 	"description": "Uranio command line interface",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
