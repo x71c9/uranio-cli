@@ -1,4 +1,4 @@
-## Uranio CLI
+## Uranio
 
 ![uranio logo](./img/URN_TEXT_1440_BANNER_00.png)
 
@@ -15,7 +15,7 @@ Uranio command line interface.
 
 ### About
 
-**`uranio-cli`** is the only package you need in order to work with Uranio.
+**`uranio`** is the only package you need in order to work with Uranio.
 
 Uranio is a Typescript framework that builds CRUD APIs.
 
@@ -63,16 +63,16 @@ on [Netlify](https://www.netlify.com/). -->
 
 ### Installation
 
-Uranio CLI requires [Node.js](https://nodejs.org), version 14 or above.
-To install `uranio-cli`, run the following command from any directory
+Uranio requires [Node.js](https://nodejs.org), version 14 or above.
+To install `uranio`, run the following command from any directory
 in your terminal:
 
 ```bash
-yarn global add uranio-cli
+yarn global add uranio
 ```
 or if you are using npm
 ```bash
-npm install -g uranio-cli
+npm install -g uranio
 ```
 
 When using the CLI in a CI environment we recommend installing it locally
@@ -81,11 +81,11 @@ To install locally, run the following command from the root
 directory of your project:
 
 ```bash
-yarn add --dev uranio-cli
+yarn add --dev uranio
 ```
 or if you are using npm
 ```bash
-npm install --save-dev uranio-cli
+npm install --save-dev uranio
 ```
 
 ### Usage
@@ -205,7 +205,7 @@ uranio version
 
 uranio
 ```
-This command prints `uranio-cli` version.
+This command prints `uranio` version.
 
 
 ### Output options
