@@ -45,7 +45,7 @@
 		"chalk": "^4.1.0",
 		"chokidar": "^3.5.2",
 		"dateformat": "^4.5.1",
-		"esbuild": "^0.14.10",
+		"esbuild": "^0.14.49",
 		"forever": "^4.0.3",
 		"forever-monitor": "^3.0.3",
 		"inquirer": "^8.0.0",

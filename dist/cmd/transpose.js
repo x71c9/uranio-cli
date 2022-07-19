@@ -24,7 +24,11 @@
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -40,15 +44,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -66,109 +61,97 @@ const common_1 = require("./common");
 let output_instance;
 let util_instance;
 let transpose_params = defaults_1.default_params;
-function transpose(params, path, event) {
-    return __awaiter(this, void 0, void 0, function* () {
-        _init_transpose(params);
-        try {
-            if (typeof path === 'undefined') {
-                yield _transpose_all();
-                return;
+async function transpose(params, path, event) {
+    _init_transpose(params);
+    try {
+        if (typeof path === 'undefined') {
+            await _transpose_all();
+            return;
+        }
+        switch (event) {
+            case 'addDir': {
+                break;
             }
-            switch (event) {
-                case 'addDir': {
-                    break;
-                }
-                case 'unlink': {
-                    yield _transpose_unlink_file(path);
-                    break;
-                }
-                case 'unlinkDir': {
-                    yield _transpose_unlink_dir(path);
-                    break;
-                }
-                default: {
-                    yield _transpose_one(path);
-                    break;
-                }
+            case 'unlink': {
+                await _transpose_unlink_file(path);
+                break;
+            }
+            case 'unlinkDir': {
+                await _transpose_unlink_dir(path);
+                break;
+            }
+            default: {
+                await _transpose_one(path);
+                break;
             }
         }
-        catch (ex) {
-            const err = ex;
-            if (path) {
-                output_instance.error_log(path);
-            }
-            output_instance.error_log(err.toString());
-            output_instance.error_log(err.message);
+    }
+    catch (ex) {
+        const err = ex;
+        if (path) {
+            output_instance.error_log(path);
         }
-        output_instance.done_log(`Transpose completed.`);
-    });
+        output_instance.error_log(err.toString());
+        output_instance.error_log(err.message);
+    }
+    output_instance.done_log(`Transpose completed.`);
 }
 exports.transpose = transpose;
-function _transpose_one(full_path) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // _init_transpose(params);
-        if (util_instance.fs.is_directory(full_path)) {
-            yield _transpose_folder(full_path);
-        }
-        else {
-            yield _transpose_file(full_path);
-        }
-    });
+async function _transpose_one(full_path) {
+    // _init_transpose(params);
+    if (util_instance.fs.is_directory(full_path)) {
+        await _transpose_folder(full_path);
+    }
+    else {
+        await _transpose_file(full_path);
+    }
 }
-function _transpose_unlink_dir(full_path) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // _init_transpose(params);
-        if (!_validate_path(full_path)) {
-            return;
-        }
-        yield _unlink_dir(full_path);
-        output_instance.done_verbose_log(`Transpose unlink dir completed.`);
-    });
+async function _transpose_unlink_dir(full_path) {
+    // _init_transpose(params);
+    if (!_validate_path(full_path)) {
+        return;
+    }
+    await _unlink_dir(full_path);
+    output_instance.done_verbose_log(`Transpose unlink dir completed.`);
 }
-function _transpose_unlink_file(full_path) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // _init_transpose(params);
-        if (!_validate_path(full_path)) {
-            return;
-        }
-        yield _unlink_file(full_path);
-        output_instance.done_verbose_log(`Transpose unlink file completed.`);
-    });
+async function _transpose_unlink_file(full_path) {
+    // _init_transpose(params);
+    if (!_validate_path(full_path)) {
+        return;
+    }
+    await _unlink_file(full_path);
+    output_instance.done_verbose_log(`Transpose unlink file completed.`);
 }
 function _init_transpose(params) {
     transpose_params = (0, common_1.merge_params)(params);
     output_instance = output.create(transpose_params);
     util_instance = util.create(transpose_params, output_instance);
 }
-function _transpose_all() {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield _transpose_folder(path_1.default.join(transpose_params.root, 'src'), true);
-        output_instance.done_verbose_log(`Transpose all completed.`);
-    });
+async function _transpose_all() {
+    await _transpose_folder(path_1.default.join(transpose_params.root, 'src'), true);
+    output_instance.done_verbose_log(`Transpose all completed.`);
 }
-function _transpose_file(file_path) {
-    return __awaiter(this, void 0, void 0, function* () {
-        output_instance.debug_log(`Transposing [${file_path}]...`);
-        if (!_validate_exists_path(file_path)) {
-            return;
-        }
-        const src_path = `${transpose_params.root}/src`;
-        const atoms_src_dir = `${src_path}/atoms`;
-        const server_src_dir = `${src_path}/server`;
-        const admin_src_dir = `${src_path}/admin`;
-        if (file_path.includes(atoms_src_dir)) {
-            yield _transpose_atom_dir_file(file_path);
-        }
-        else if ((0, types_1.valid_deploy_repos)().includes(transpose_params.repo)
-            && file_path.includes(server_src_dir)) {
-            yield _transpose_server_dir_file(file_path);
-        }
-        else if ((0, types_1.valid_admin_repos)().includes(transpose_params.repo)
-            && file_path.includes(admin_src_dir)) {
-            yield _transpose_admin_dir_file(file_path);
-        }
-        output_instance.done_verbose_log(`Transpose file completed. [${file_path}]`);
-    });
+async function _transpose_file(file_path) {
+    output_instance.debug_log(`Transposing [${file_path}]...`);
+    if (!_validate_exists_path(file_path)) {
+        return;
+    }
+    const src_path = `${transpose_params.root}/src`;
+    const atoms_src_dir = `${src_path}/atoms`;
+    const server_src_dir = `${src_path}/server`;
+    const admin_src_dir = `${src_path}/admin`;
+    if (file_path.includes(atoms_src_dir)) {
+        await _transpose_atom_dir_file(file_path);
+    }
+    else if ((0, types_1.valid_deploy_repos)().includes(transpose_params.repo)
+        && file_path.includes(server_src_dir)) {
+        await _transpose_server_dir_file(file_path);
+    }
+    else if ((0, types_1.valid_admin_repos)().includes(transpose_params.repo)
+        && file_path.includes(admin_src_dir)) {
+        await _transpose_admin_dir_file(file_path);
+    }
+    output_instance.done_verbose_log(`Transpose file completed. [${file_path}]`);
 }
 function _validate_exists_path(full_path) {
     if (!_validate_path(full_path)) {
@@ -206,57 +189,53 @@ function _validate_path(full_path) {
     }
     return true;
 }
-function _unlink_dir(full_path) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const src_path = `${transpose_params.root}/src`;
-        const atoms_src_dir = `${src_path}/atoms`;
-        const server_src_dir = `${src_path}/server`;
-        const admin_src_dir = `${src_path}/admin`;
-        if (full_path.includes(atoms_src_dir)) {
-            const relative_to_atom_dir_path = full_path.replace(atoms_src_dir, '');
-            const node_uranio_dir = `${transpose_params.root}/node_modules/uranio`;
-            const node_atoms_src = `${node_uranio_dir}/src/atoms`;
-            const node_atoms_dist = `${node_uranio_dir}/dist/atoms`;
-            util_instance.fs.remove_directory(`${node_atoms_src}/server${relative_to_atom_dir_path}`);
-            util_instance.fs.remove_directory(`${node_atoms_src}/client${relative_to_atom_dir_path}`);
-            util_instance.fs.remove_directory(`${node_atoms_dist}/server${relative_to_atom_dir_path}`);
-            util_instance.fs.remove_directory(`${node_atoms_dist}/client${relative_to_atom_dir_path}`);
-        }
-        else if ((0, types_1.valid_deploy_repos)().includes(transpose_params.repo)
-            && full_path.includes(server_src_dir)) {
-            // TODO
-        }
-        else if ((0, types_1.valid_admin_repos)().includes(transpose_params.repo)
-            && full_path.includes(admin_src_dir)) {
-            // TODO
-        }
-    });
+async function _unlink_dir(full_path) {
+    const src_path = `${transpose_params.root}/src`;
+    const atoms_src_dir = `${src_path}/atoms`;
+    const server_src_dir = `${src_path}/server`;
+    const admin_src_dir = `${src_path}/admin`;
+    if (full_path.includes(atoms_src_dir)) {
+        const relative_to_atom_dir_path = full_path.replace(atoms_src_dir, '');
+        const node_uranio_dir = `${transpose_params.root}/node_modules/uranio`;
+        const node_atoms_src = `${node_uranio_dir}/src/atoms`;
+        const node_atoms_dist = `${node_uranio_dir}/dist/atoms`;
+        util_instance.fs.remove_directory(`${node_atoms_src}/server${relative_to_atom_dir_path}`);
+        util_instance.fs.remove_directory(`${node_atoms_src}/client${relative_to_atom_dir_path}`);
+        util_instance.fs.remove_directory(`${node_atoms_dist}/server${relative_to_atom_dir_path}`);
+        util_instance.fs.remove_directory(`${node_atoms_dist}/client${relative_to_atom_dir_path}`);
+    }
+    else if ((0, types_1.valid_deploy_repos)().includes(transpose_params.repo)
+        && full_path.includes(server_src_dir)) {
+        // TODO
+    }
+    else if ((0, types_1.valid_admin_repos)().includes(transpose_params.repo)
+        && full_path.includes(admin_src_dir)) {
+        // TODO
+    }
 }
-function _unlink_file(file_path) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const src_path = `${transpose_params.root}/src`;
-        const atoms_src_dir = `${src_path}/atoms`;
-        const server_src_dir = `${src_path}/server`;
-        const admin_src_dir = `${src_path}/admin`;
-        if (file_path.includes(atoms_src_dir)) {
-            const relative_to_atom_dir_path = file_path.replace(atoms_src_dir, '');
-            const node_uranio_dir = `${transpose_params.root}/node_modules/uranio`;
-            const node_atoms_src = `${node_uranio_dir}/src/atoms`;
-            const node_atoms_dist = `${node_uranio_dir}/dist/atoms`;
-            util_instance.fs.remove_file(`${node_atoms_src}/server${relative_to_atom_dir_path}`);
-            util_instance.fs.remove_file(`${node_atoms_src}/client${relative_to_atom_dir_path}`);
-            util_instance.fs.remove_file(`${node_atoms_dist}/server${relative_to_atom_dir_path}`);
-            util_instance.fs.remove_file(`${node_atoms_dist}/client${relative_to_atom_dir_path}`);
-        }
-        else if ((0, types_1.valid_deploy_repos)().includes(transpose_params.repo)
-            && file_path.includes(server_src_dir)) {
-            // TODO
-        }
-        else if ((0, types_1.valid_admin_repos)().includes(transpose_params.repo)
-            && file_path.includes(admin_src_dir)) {
-            // TODO
-        }
-    });
+async function _unlink_file(file_path) {
+    const src_path = `${transpose_params.root}/src`;
+    const atoms_src_dir = `${src_path}/atoms`;
+    const server_src_dir = `${src_path}/server`;
+    const admin_src_dir = `${src_path}/admin`;
+    if (file_path.includes(atoms_src_dir)) {
+        const relative_to_atom_dir_path = file_path.replace(atoms_src_dir, '');
+        const node_uranio_dir = `${transpose_params.root}/node_modules/uranio`;
+        const node_atoms_src = `${node_uranio_dir}/src/atoms`;
+        const node_atoms_dist = `${node_uranio_dir}/dist/atoms`;
+        util_instance.fs.remove_file(`${node_atoms_src}/server${relative_to_atom_dir_path}`);
+        util_instance.fs.remove_file(`${node_atoms_src}/client${relative_to_atom_dir_path}`);
+        util_instance.fs.remove_file(`${node_atoms_dist}/server${relative_to_atom_dir_path}`);
+        util_instance.fs.remove_file(`${node_atoms_dist}/client${relative_to_atom_dir_path}`);
+    }
+    else if ((0, types_1.valid_deploy_repos)().includes(transpose_params.repo)
+        && file_path.includes(server_src_dir)) {
+        // TODO
+    }
+    else if ((0, types_1.valid_admin_repos)().includes(transpose_params.repo)
+        && file_path.includes(admin_src_dir)) {
+        // TODO
+    }
 }
 function _transpose_atom_dir_file(file_path) {
     output_instance.verbose_log(`Transpose atom dir file [${file_path}].`);
@@ -480,25 +459,23 @@ function _create_route_name_argument(route_name) {
     const arg_node = b.stringLiteral(route_name);
     return arg_node;
 }
-function _transpose_folder(dir_path, included = false) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const entries = util_instance.fs.read_dir(dir_path);
-        const promises = [];
-        for (const filename of entries) {
-            const full_path = path_1.default.resolve(dir_path, filename);
-            if (util_instance.fs.is_directory(full_path) && filename !== '.git') {
-                const folder_promise = _transpose_folder(full_path, true);
-                promises.push(folder_promise);
-            }
-            else {
-                const file_promise = _transpose_file(full_path);
-                promises.push(file_promise);
-            }
+async function _transpose_folder(dir_path, included = false) {
+    const entries = util_instance.fs.read_dir(dir_path);
+    const promises = [];
+    for (const filename of entries) {
+        const full_path = path_1.default.resolve(dir_path, filename);
+        if (util_instance.fs.is_directory(full_path) && filename !== '.git') {
+            const folder_promise = _transpose_folder(full_path, true);
+            promises.push(folder_promise);
         }
-        yield Promise.all(promises);
-        if (!included) {
-            output_instance.done_log(`Transpose folder completed.`);
+        else {
+            const file_promise = _transpose_file(full_path);
+            promises.push(file_promise);
         }
-    });
+    }
+    await Promise.all(promises);
+    if (!included) {
+        output_instance.done_log(`Transpose folder completed.`);
+    }
 }
 //# sourceMappingURL=transpose.js.map

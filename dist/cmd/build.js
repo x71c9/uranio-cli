@@ -6,7 +6,11 @@
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -23,15 +27,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.build_panel = exports.build_server = exports.build = void 0;
 const defaults_1 = require("../conf/defaults");
@@ -46,55 +41,47 @@ const generate_1 = require("./generate");
 let output_instance;
 let util_instance;
 let build_params = defaults_1.default_params;
-function build(params) {
-    return __awaiter(this, void 0, void 0, function* () {
-        _init_build(params);
-        output_instance.start_loading(`Building...`);
-        yield _build();
-        build_server(build_params, false);
-        if ((0, types_1.valid_admin_repos)().includes(build_params.repo)) {
-            build_panel(build_params, false);
-        }
-        output_instance.done_log('Build completed.');
-    });
+async function build(params) {
+    _init_build(params);
+    output_instance.start_loading(`Building...`);
+    await _build();
+    build_server(build_params, false);
+    if ((0, types_1.valid_admin_repos)().includes(build_params.repo)) {
+        build_panel(build_params, false);
+    }
+    output_instance.done_log('Build completed.');
 }
 exports.build = build;
-function build_server(params, init = true) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (init) {
-            _init_build(params);
-        }
-        output_instance.start_loading(`Building server...`);
-        if (init) {
-            yield _build();
-        }
-        output_instance.done_log('Build server completed.');
-    });
+async function build_server(params, init = true) {
+    if (init) {
+        _init_build(params);
+    }
+    output_instance.start_loading(`Building server...`);
+    if (init) {
+        await _build();
+    }
+    output_instance.done_log('Build server completed.');
 }
 exports.build_server = build_server;
-function build_panel(params, init = true) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (init) {
-            _init_build(params);
-        }
-        output_instance.start_loading(`Building panel...`);
-        if (init) {
-            yield _build();
-        }
-        const urn_lib_pre = ` urn_log_prefix_type=true`;
-        // const urn_config_path = ` -c ${build_params.root}/uranio.toml`;
-        // const cmd_server = `NODE_ENV=production yarn uranio-panel-${build_params.repo} generate ${urn_lib_pre}`;
-        const cmd_server = `NODE_ENV=production yarn uranio-panel-${build_params.repo} build ${urn_lib_pre}`;
-        util_instance.spawn.log(cmd_server, 'panel', 'building panel');
-        output_instance.done_log('Build panel completed.');
-    });
+async function build_panel(params, init = true) {
+    if (init) {
+        _init_build(params);
+    }
+    output_instance.start_loading(`Building panel...`);
+    if (init) {
+        await _build();
+    }
+    const urn_lib_pre = ` urn_log_prefix_type=true`;
+    // const urn_config_path = ` -c ${build_params.root}/uranio.toml`;
+    // const cmd_server = `NODE_ENV=production yarn uranio-panel-${build_params.repo} generate ${urn_lib_pre}`;
+    const cmd_server = `NODE_ENV=production yarn uranio-panel-${build_params.repo} build ${urn_lib_pre}`;
+    util_instance.spawn.log(cmd_server, 'panel', 'building panel');
+    output_instance.done_log('Build panel completed.');
 }
 exports.build_panel = build_panel;
-function _build() {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield (0, transpose_1.transpose)(build_params);
-        yield (0, generate_1.generate)(build_params);
-    });
+async function _build() {
+    await (0, transpose_1.transpose)(build_params);
+    await (0, generate_1.generate)(build_params);
 }
 function _init_build(params) {
     build_params = (0, common_1.merge_params)(params);

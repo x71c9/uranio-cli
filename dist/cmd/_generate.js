@@ -6,7 +6,11 @@
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -22,15 +26,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -51,36 +46,32 @@ let register_path_server = `node_modules/uranio/src/server/register.ts`;
 let register_path_client = `node_modules/uranio/src/client/register.ts`;
 let compiled_register_path_server = `node_modules/uranio/dist/server/register.js`;
 let compiled_register_path_client = `node_modules/uranio/dist/client/register.js`;
-function generate(params, is_included = false) {
-    return __awaiter(this, void 0, void 0, function* () {
-        _init_generate(params);
-        _generate_register();
-        const generate_cmd = `yarn uranio-generate-${generate_params.repo}`;
-        util_instance.spawn.verbose_log(generate_cmd, 'generate', 'generating');
-        if (!is_included) {
-            output_instance.end_log('Generate completed.');
-        }
-    });
+async function generate(params, is_included = false) {
+    _init_generate(params);
+    _generate_register();
+    const generate_cmd = `yarn uranio-generate-${generate_params.repo}`;
+    util_instance.spawn.verbose_log(generate_cmd, 'generate', 'generating');
+    if (!is_included) {
+        output_instance.end_log('Generate completed.');
+    }
 }
 exports.generate = generate;
-function _generate_register() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const node_register_uranio_src = `node_modules/uranio/src`;
-        const node_register_src_server = `${node_register_uranio_src}/server/register.ts`;
-        const node_register_src_client = `${node_register_uranio_src}/client/register.ts`;
-        const node_register_uranio_dist = `node_modules/uranio/dist`;
-        const node_register_dist_server = `${node_register_uranio_dist}/server/register.js`;
-        const node_register_dist_client = `${node_register_uranio_dist}/client/register.js`;
-        register_path_server = `${generate_params.root}/${node_register_src_server}`;
-        register_path_client = `${generate_params.root}/${node_register_src_client}`;
-        compiled_register_path_server = `${generate_params.root}/${node_register_dist_server}`;
-        compiled_register_path_client = `${generate_params.root}/${node_register_dist_client}`;
-        _generate_server_register();
-        _generate_client_register();
-        _compile_register_server();
-        _compile_register_client();
-        output_instance.end_log('Generate register completed.');
-    });
+async function _generate_register() {
+    const node_register_uranio_src = `node_modules/uranio/src`;
+    const node_register_src_server = `${node_register_uranio_src}/server/register.ts`;
+    const node_register_src_client = `${node_register_uranio_src}/client/register.ts`;
+    const node_register_uranio_dist = `node_modules/uranio/dist`;
+    const node_register_dist_server = `${node_register_uranio_dist}/server/register.js`;
+    const node_register_dist_client = `${node_register_uranio_dist}/client/register.js`;
+    register_path_server = `${generate_params.root}/${node_register_src_server}`;
+    register_path_client = `${generate_params.root}/${node_register_src_client}`;
+    compiled_register_path_server = `${generate_params.root}/${node_register_dist_server}`;
+    compiled_register_path_client = `${generate_params.root}/${node_register_dist_client}`;
+    _generate_server_register();
+    _generate_client_register();
+    _compile_register_server();
+    _compile_register_client();
+    output_instance.end_log('Generate register completed.');
 }
 function _compile(src, dest) {
     esbuild.buildSync({

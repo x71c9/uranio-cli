@@ -36,7 +36,7 @@ exports.default_params = {
     color_debug: '#557685',
     root: '.',
 };
-const cloud_address = 'git+ssh://git@github.com/nbl7';
+const cloud_address = 'git+ssh://git@github.com/x71c9';
 exports.defaults = {
     folder: '.uranio',
     docker_folder: '.docker',

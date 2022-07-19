@@ -6,7 +6,11 @@
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -23,15 +27,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deinit = void 0;
 const urn_lib_1 = require("urn-lib");
@@ -43,72 +38,64 @@ const common_1 = require("./common");
 let output_instance;
 let util_instance;
 let deinit_params = defaults_1.default_params;
-function deinit(params) {
-    return __awaiter(this, void 0, void 0, function* () {
-        deinit_params = (0, common_1.merge_params)(params);
-        output_instance = output.create(deinit_params);
-        util_instance = util.create(deinit_params, output_instance);
-        if (!util_instance.is_initialized()) {
-            return;
-        }
-        yield _reset_package_json();
-        yield _remove_dockers();
-        _delete_files();
-        output_instance.end_log(`Deinitialization completed.`);
-    });
+async function deinit(params) {
+    deinit_params = (0, common_1.merge_params)(params);
+    output_instance = output.create(deinit_params);
+    util_instance = util.create(deinit_params, output_instance);
+    if (!util_instance.is_initialized()) {
+        return;
+    }
+    await _reset_package_json();
+    await _remove_dockers();
+    _delete_files();
+    output_instance.end_log(`Deinitialization completed.`);
 }
 exports.deinit = deinit;
-function _remove_dockers() {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (!util_instance.is_initialized()) {
-            output_instance.warn_log(`Uranio was not initliazed or is missing ${defaults_1.defaults.init_filepath} file.`);
-            output_instance.warn_log(`Some build artifacts might be still present.`);
-            return;
-        }
-        yield docker.tmp_remove(deinit_params, true);
-        yield docker.db_stop(deinit_params, true);
-        yield docker.db_remove(deinit_params, true);
-        yield docker.network_remove(deinit_params, true);
-        yield docker.stop(deinit_params, true);
-        yield docker.remove(deinit_params, true);
-        yield docker.unbuild(deinit_params, true);
-        yield docker.prune(deinit_params, true);
-    });
+async function _remove_dockers() {
+    if (!util_instance.is_initialized()) {
+        output_instance.warn_log(`Uranio was not initliazed or is missing ${defaults_1.defaults.init_filepath} file.`);
+        output_instance.warn_log(`Some build artifacts might be still present.`);
+        return;
+    }
+    await docker.tmp_remove(deinit_params, true);
+    await docker.db_stop(deinit_params, true);
+    await docker.db_remove(deinit_params, true);
+    await docker.network_remove(deinit_params, true);
+    await docker.stop(deinit_params, true);
+    await docker.remove(deinit_params, true);
+    await docker.unbuild(deinit_params, true);
+    await docker.prune(deinit_params, true);
 }
-function _delete_files() {
-    return __awaiter(this, void 0, void 0, function* () {
-        util_instance.fs.remove_directory(`${deinit_params.root}/.tmp`);
-        util_instance.fs.remove_directory(`${deinit_params.root}/dist`);
-        util_instance.fs.remove_directory(`${deinit_params.root}/node_modules`);
-        util_instance.fs.remove_file(`${deinit_params.root}/tsconfig.json`);
-        util_instance.fs.remove_file(`${deinit_params.root}/sample.env`);
-        util_instance.fs.remove_file(`${deinit_params.root}/uranio.toml`);
-        util_instance.fs.remove_file(`${deinit_params.root}/.eslintrc.js`);
-        util_instance.fs.remove_file(`${deinit_params.root}/.eslintignore`);
-        util_instance.fs.remove_file(`${deinit_params.root}/.stylelintrc.json`);
-        util_instance.fs.remove_file(`${deinit_params.root}/yarn.lock`);
-        util_instance.fs.remove_file(`${deinit_params.root}/yarn-error.log`);
-        util_instance.fs.remove_file(`${deinit_params.root}/package-lock.json`);
-        util_instance.fs.remove_file(`${deinit_params.root}/netlify.toml`);
-        util_instance.fs.remove_directory(`${deinit_params.root}/.netlify`);
-        util_instance.fs.remove_directory(`${deinit_params.root}/${defaults_1.defaults.folder}`);
-        // util_instance.fs.remove_file(`${deinit_params.root}/${defaults.init_filepath}`);
-    });
+async function _delete_files() {
+    util_instance.fs.remove_directory(`${deinit_params.root}/.tmp`);
+    util_instance.fs.remove_directory(`${deinit_params.root}/dist`);
+    util_instance.fs.remove_directory(`${deinit_params.root}/node_modules`);
+    util_instance.fs.remove_file(`${deinit_params.root}/tsconfig.json`);
+    util_instance.fs.remove_file(`${deinit_params.root}/sample.env`);
+    util_instance.fs.remove_file(`${deinit_params.root}/uranio.toml`);
+    util_instance.fs.remove_file(`${deinit_params.root}/.eslintrc.js`);
+    util_instance.fs.remove_file(`${deinit_params.root}/.eslintignore`);
+    util_instance.fs.remove_file(`${deinit_params.root}/.stylelintrc.json`);
+    util_instance.fs.remove_file(`${deinit_params.root}/yarn.lock`);
+    util_instance.fs.remove_file(`${deinit_params.root}/yarn-error.log`);
+    util_instance.fs.remove_file(`${deinit_params.root}/package-lock.json`);
+    util_instance.fs.remove_file(`${deinit_params.root}/netlify.toml`);
+    util_instance.fs.remove_directory(`${deinit_params.root}/.netlify`);
+    util_instance.fs.remove_directory(`${deinit_params.root}/${defaults_1.defaults.folder}`);
+    // util_instance.fs.remove_file(`${deinit_params.root}/${defaults.init_filepath}`);
 }
-function _reset_package_json() {
-    return __awaiter(this, void 0, void 0, function* () {
-        // _remove_package_aliases();
-        _remove_package_scripts();
-        _remove_package_resolutions();
-        const pack_data = util_instance.cmd.get_package_data(`${deinit_params.root}/package.json`);
-        // await util_instance.cmd.uninstall_dep('patch-package', 'patch');
-        // await util_instance.cmd.uninstall_dep('postinstall-postinstall', 'post');
-        yield util_instance.cmd.uninstall_uranio(pack_data);
-        yield util_instance.cmd.uninstall_core_dep(pack_data);
-        yield util_instance.cmd.uninstall_api_dep(pack_data);
-        yield util_instance.cmd.uninstall_trx_dep(pack_data);
-        yield util_instance.cmd.uninstall_adm_dep(pack_data);
-    });
+async function _reset_package_json() {
+    // _remove_package_aliases();
+    _remove_package_scripts();
+    _remove_package_resolutions();
+    const pack_data = util_instance.cmd.get_package_data(`${deinit_params.root}/package.json`);
+    // await util_instance.cmd.uninstall_dep('patch-package', 'patch');
+    // await util_instance.cmd.uninstall_dep('postinstall-postinstall', 'post');
+    await util_instance.cmd.uninstall_uranio(pack_data);
+    await util_instance.cmd.uninstall_core_dep(pack_data);
+    await util_instance.cmd.uninstall_api_dep(pack_data);
+    await util_instance.cmd.uninstall_trx_dep(pack_data);
+    await util_instance.cmd.uninstall_adm_dep(pack_data);
 }
 // function _remove_package_aliases(){
 //   output_instance.start_loading('Removing package.json aliases...');

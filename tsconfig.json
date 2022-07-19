@@ -1,29 +1,50 @@
 {
 	"compilerOptions": {
-		"target": "es6",
-		"module": "commonjs",
+		"alwaysStrict": true,
 		"allowJs": true,
-		"lib": [ "es2015" ],
+		"baseUrl": ".",
+		"declaration": true,
+		"esModuleInterop": true,
+		"experimentalDecorators": true,
+		"incremental": false,
+		"lib": [
+			"ESNext",
+			"ESNext.AsyncIterable",
+			"DOM"
+		],
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"noEmit": false,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitThis": true,
+		"noImplicitAny": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
 		"outDir": "./dist",
 		"rootDir": "./src",
+		"paths": {
+		},
+		"skipLibCheck": false,
+		"sourceMap": true,
 		"strict": true,
-		"declaration": true,
-		"noImplicitAny": true,
 		"strictNullChecks": true,
 		"strictFunctionTypes": true,
 		"strictPropertyInitialization": true,
-		"noImplicitThis": true,
-		"alwaysStrict": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"noFallthroughCasesInSwitch": true,
-		"moduleResolution": "node",
-		"esModuleInterop": true,
-		"experimentalDecorators": true,
-		"sourceMap": true,
+		"target": "ES2018",
+		"typeRoots": [
+			"node_modules/@types"
+		]
 	},
 	"include": [
-		"src/**/*",
+		"src/**/*"
 	],
-	"exclude": []
+	"exclude": [
+		"node_modules"
+	],
+	"watchOptions": {
+		"watchFile": "useFsEvents",
+		"watchDirectory": "useFsEvents",
+		"fallbackPolling": "dynamicPriority",
+		"synchronousWatchDirectory": true
+  }
 }

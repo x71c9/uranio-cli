@@ -19,7 +19,7 @@ function read_init_file(params) {
         return params;
     }
     try {
-        const cloned_params = Object.assign({}, params);
+        const cloned_params = { ...params };
         const rc_content = fs_1.default.readFileSync(rcfile_path, 'utf8');
         const rc_obj = urn_lib_1.urn_util.json.clean_parse(rc_content);
         cloned_params.repo = rc_obj.repo;
@@ -46,7 +46,7 @@ function merge_init_params(params) {
 }
 exports.merge_init_params = merge_init_params;
 function _merge_params(params, is_init = false) {
-    let merged_params = Object.assign({}, defaults_1.default_params);
+    let merged_params = { ...defaults_1.default_params };
     if (!is_init) {
         merged_params = read_init_file(params);
     }

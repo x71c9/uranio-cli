@@ -6,7 +6,11 @@
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -22,15 +26,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -51,73 +46,57 @@ class CMD {
         this.fs = fs.create(output);
         this.spawn = spawn.create(output);
     }
-    yarn_install() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const action = `yarn install`;
-            this.output.verbose_log(`Started ${action}`, 'pacman');
-            return new Promise((resolve, reject) => {
-                this.spawn.spin(`yarn install --verbose`, 'pacman', action, undefined, resolve, reject);
-            });
+    async yarn_install() {
+        const action = `yarn install`;
+        this.output.verbose_log(`Started ${action}`, 'pacman');
+        return new Promise((resolve, reject) => {
+            this.spawn.spin(`yarn install --verbose`, 'pacman', action, undefined, resolve, reject);
         });
     }
-    install_package(pack, context) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const action = `installing package [${pack}]`;
-            this.output.verbose_log(`Started ${action}`, context);
-            this.output.start_loading(`Installing package [${pack}]...`);
-            return new Promise((resolve, reject) => {
-                this.spawn.spin(_pacman_commands.install[this.params.pacman](pack), context || 'install', action, undefined, resolve, reject);
-            });
+    async install_package(pack, context) {
+        const action = `installing package [${pack}]`;
+        this.output.verbose_log(`Started ${action}`, context);
+        this.output.start_loading(`Installing package [${pack}]...`);
+        return new Promise((resolve, reject) => {
+            this.spawn.spin(_pacman_commands.install[this.params.pacman](pack), context || 'install', action, undefined, resolve, reject);
         });
     }
-    install_package_dev(pack, context) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const action = `installing dev package [${pack}]`;
-            this.output.verbose_log(`Started ${action}`, context);
-            this.output.start_loading(`Installing dev package [${pack}]...`);
-            return new Promise((resolve, reject) => {
-                this.spawn.spin(_pacman_commands.install_dev[this.params.pacman](pack), context || 'install', action, undefined, resolve, reject);
-            });
+    async install_package_dev(pack, context) {
+        const action = `installing dev package [${pack}]`;
+        this.output.verbose_log(`Started ${action}`, context);
+        this.output.start_loading(`Installing dev package [${pack}]...`);
+        return new Promise((resolve, reject) => {
+            this.spawn.spin(_pacman_commands.install_dev[this.params.pacman](pack), context || 'install', action, undefined, resolve, reject);
         });
     }
-    install_dep(repo, context) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const action = `installing dependencies [${repo}]`;
-            this.output.verbose_log(`Started ${action}`, context);
-            this.output.start_loading(`Installing dep [${repo}]...`);
-            return new Promise((resolve, reject) => {
-                this.spawn.spin(_pacman_commands.install[this.params.pacman](repo), context, action, undefined, resolve, reject);
-            });
+    async install_dep(repo, context) {
+        const action = `installing dependencies [${repo}]`;
+        this.output.verbose_log(`Started ${action}`, context);
+        this.output.start_loading(`Installing dep [${repo}]...`);
+        return new Promise((resolve, reject) => {
+            this.spawn.spin(_pacman_commands.install[this.params.pacman](repo), context, action, undefined, resolve, reject);
         });
     }
-    install_dep_dev(repo, context) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const action = `installing dev dependencies [${repo}]`;
-            this.output.verbose_log(`Started ${action}`, context);
-            this.output.start_loading(`Installing dep dev [${repo}]...`);
-            return new Promise((resolve, reject) => {
-                this.spawn.spin(_pacman_commands.install_dev[this.params.pacman](repo), context, action, undefined, resolve, reject);
-            });
+    async install_dep_dev(repo, context) {
+        const action = `installing dev dependencies [${repo}]`;
+        this.output.verbose_log(`Started ${action}`, context);
+        this.output.start_loading(`Installing dep dev [${repo}]...`);
+        return new Promise((resolve, reject) => {
+            this.spawn.spin(_pacman_commands.install_dev[this.params.pacman](repo), context, action, undefined, resolve, reject);
         });
     }
-    uninstall_dep(repo, context) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const action = `uninstalling dependencies [${repo}]`;
-            this.output.verbose_log(`Started ${action}`, context);
-            return new Promise((resolve, reject) => {
-                this.spawn.spin(_pacman_commands.uninstall[this.params.pacman](repo), context, action, undefined, resolve, reject);
-            });
+    async uninstall_dep(repo, context) {
+        const action = `uninstalling dependencies [${repo}]`;
+        this.output.verbose_log(`Started ${action}`, context);
+        return new Promise((resolve, reject) => {
+            this.spawn.spin(_pacman_commands.uninstall[this.params.pacman](repo), context, action, undefined, resolve, reject);
         });
     }
-    clone_repo(address, dest_folder, context = 'clrp', branch = 'master') {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this._clone_repo(address, dest_folder, context, branch);
-        });
+    async clone_repo(address, dest_folder, context = 'clrp', branch = 'master') {
+        return await this._clone_repo(address, dest_folder, context, branch);
     }
-    clone_repo_recursive(address, dest_folder, context = 'clrr', branch = 'master') {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this._clone_repo(address, dest_folder, context, branch, true);
-        });
+    async clone_repo_recursive(address, dest_folder, context = 'clrr', branch = 'master') {
+        return await this._clone_repo(address, dest_folder, context, branch, true);
     }
     get_package_data(package_json_path) {
         try {
@@ -190,103 +169,81 @@ class CMD {
         }
         this.fs.write_file(dotenv_path, content);
     }
-    install_core_dep() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.output.start_loading(`Installing core dep...`);
-            yield this.install_dep(defaults_1.defaults.core_dep_repo, 'core');
-            yield this.install_dep_dev(defaults_1.defaults.core_dep_dev_repo, 'core');
-            this.output.done_log(`Installed core dependencies.`, 'core');
+    async install_core_dep() {
+        this.output.start_loading(`Installing core dep...`);
+        await this.install_dep(defaults_1.defaults.core_dep_repo, 'core');
+        await this.install_dep_dev(defaults_1.defaults.core_dep_dev_repo, 'core');
+        this.output.done_log(`Installed core dependencies.`, 'core');
+        return true;
+    }
+    async install_api_dep() {
+        this.output.start_loading(`Installing api dep...`);
+        await this.install_dep(defaults_1.defaults.api_dep_repo, 'api');
+        await this.install_dep_dev(defaults_1.defaults.api_dep_dev_repo, 'api');
+        this.output.done_log(`Installed api dependencies.`, 'api');
+        return true;
+    }
+    async install_trx_dep() {
+        this.output.start_loading(`Installing trx dep...`);
+        await this.install_dep(defaults_1.defaults.trx_dep_repo, 'trx');
+        await this.install_dep_dev(defaults_1.defaults.trx_dep_dev_repo, 'trx');
+        this.output.done_log(`Installed trx dependencies.`, 'trx');
+        return true;
+    }
+    async install_adm_dep() {
+        this.output.start_loading(`Installing adm dep...`);
+        await this.install_dep(defaults_1.defaults.adm_dep_repo, 'adm');
+        await this.install_dep_dev(defaults_1.defaults.adm_dep_dev_repo, 'adm');
+        this.output.done_log(`Installed adm dependencies.`, 'adm');
+        return true;
+    }
+    async uninstall_uranio(pack_data) {
+        if (this.dependency_exists('uranio', pack_data)) {
+            await this.uninstall_dep('uranio', 'urn');
+        }
+        return true;
+    }
+    async uninstall_core_dep(pack_data) {
+        await this._uninstall_uranio_dep(defaults_1.defaults.core_dep_repo, 'core', pack_data);
+        await this._uninstall_uranio_dep(defaults_1.defaults.core_dep_dev_repo, 'core', pack_data);
+        return true;
+    }
+    async uninstall_api_dep(pack_data) {
+        await this._uninstall_uranio_dep(defaults_1.defaults.api_dep_repo, 'api', pack_data);
+        await this._uninstall_uranio_dep(defaults_1.defaults.api_dep_dev_repo, 'api', pack_data);
+        return true;
+    }
+    async uninstall_trx_dep(pack_data) {
+        await this._uninstall_uranio_dep(defaults_1.defaults.trx_dep_repo, 'trx', pack_data);
+        await this._uninstall_uranio_dep(defaults_1.defaults.trx_dep_dev_repo, 'trx', pack_data);
+        return true;
+    }
+    async uninstall_adm_dep(pack_data) {
+        await this._uninstall_uranio_dep(defaults_1.defaults.adm_dep_repo, 'adm', pack_data);
+        await this._uninstall_uranio_dep(defaults_1.defaults.adm_dep_dev_repo, 'adm', pack_data);
+        return true;
+    }
+    async _uninstall_uranio_dep(repo, context, pack_data) {
+        const short_repo = (repo.substr(0, 3) === 'ssh' || repo.substr(0, 7) === 'git+ssh') ?
+            repo.split('/').slice(-1)[0].replace('uranio', 'urn') : repo;
+        if (this.dependency_exists(short_repo, pack_data)) {
+            this.output.start_loading(`Uninstalling ${short_repo} dep...`);
+            const dep_folder = `${this.params.root}/node_modules/${short_repo}`;
+            this.fs.remove_directory(dep_folder, context);
+            await this.uninstall_dep(`${short_repo}`, context);
+            this.output.done_log(`Uninstalled ${short_repo} dependencies.`, context);
             return true;
-        });
+        }
     }
-    install_api_dep() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.output.start_loading(`Installing api dep...`);
-            yield this.install_dep(defaults_1.defaults.api_dep_repo, 'api');
-            yield this.install_dep_dev(defaults_1.defaults.api_dep_dev_repo, 'api');
-            this.output.done_log(`Installed api dependencies.`, 'api');
-            return true;
-        });
-    }
-    install_trx_dep() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.output.start_loading(`Installing trx dep...`);
-            yield this.install_dep(defaults_1.defaults.trx_dep_repo, 'trx');
-            yield this.install_dep_dev(defaults_1.defaults.trx_dep_dev_repo, 'trx');
-            this.output.done_log(`Installed trx dependencies.`, 'trx');
-            return true;
-        });
-    }
-    install_adm_dep() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.output.start_loading(`Installing adm dep...`);
-            yield this.install_dep(defaults_1.defaults.adm_dep_repo, 'adm');
-            yield this.install_dep_dev(defaults_1.defaults.adm_dep_dev_repo, 'adm');
-            this.output.done_log(`Installed adm dependencies.`, 'adm');
-            return true;
-        });
-    }
-    uninstall_uranio(pack_data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.dependency_exists('uranio', pack_data)) {
-                yield this.uninstall_dep('uranio', 'urn');
-            }
-            return true;
-        });
-    }
-    uninstall_core_dep(pack_data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this._uninstall_uranio_dep(defaults_1.defaults.core_dep_repo, 'core', pack_data);
-            yield this._uninstall_uranio_dep(defaults_1.defaults.core_dep_dev_repo, 'core', pack_data);
-            return true;
-        });
-    }
-    uninstall_api_dep(pack_data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this._uninstall_uranio_dep(defaults_1.defaults.api_dep_repo, 'api', pack_data);
-            yield this._uninstall_uranio_dep(defaults_1.defaults.api_dep_dev_repo, 'api', pack_data);
-            return true;
-        });
-    }
-    uninstall_trx_dep(pack_data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this._uninstall_uranio_dep(defaults_1.defaults.trx_dep_repo, 'trx', pack_data);
-            yield this._uninstall_uranio_dep(defaults_1.defaults.trx_dep_dev_repo, 'trx', pack_data);
-            return true;
-        });
-    }
-    uninstall_adm_dep(pack_data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this._uninstall_uranio_dep(defaults_1.defaults.adm_dep_repo, 'adm', pack_data);
-            yield this._uninstall_uranio_dep(defaults_1.defaults.adm_dep_dev_repo, 'adm', pack_data);
-            return true;
-        });
-    }
-    _uninstall_uranio_dep(repo, context, pack_data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const short_repo = (repo.substr(0, 3) === 'ssh' || repo.substr(0, 7) === 'git+ssh') ?
-                repo.split('/').slice(-1)[0].replace('uranio', 'urn') : repo;
-            if (this.dependency_exists(short_repo, pack_data)) {
-                this.output.start_loading(`Uninstalling ${short_repo} dep...`);
-                const dep_folder = `${this.params.root}/node_modules/${short_repo}`;
-                this.fs.remove_directory(dep_folder, context);
-                yield this.uninstall_dep(`${short_repo}`, context);
-                this.output.done_log(`Uninstalled ${short_repo} dependencies.`, context);
-                return true;
-            }
-        });
-    }
-    _clone_repo(address, dest_folder, context = '_clr', branch = 'master', recursive = false) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const action = `cloning repo [${address}]`;
-            this.output.verbose_log(`Started ${action}`, context);
-            return new Promise((resolve, reject) => {
-                const branch_str = (branch !== 'master' && typeof branch === 'string') ?
-                    `-b ${branch} ` : '';
-                let cmd = `git clone ${branch_str}${address} ${dest_folder} --progress`;
-                cmd += (recursive === true) ? ` --recurse-submodules` : '';
-                this.spawn.spin(cmd, context, action, undefined, resolve, reject);
-            });
+    async _clone_repo(address, dest_folder, context = '_clr', branch = 'master', recursive = false) {
+        const action = `cloning repo [${address}]`;
+        this.output.verbose_log(`Started ${action}`, context);
+        return new Promise((resolve, reject) => {
+            const branch_str = (branch !== 'master' && typeof branch === 'string') ?
+                `-b ${branch} ` : '';
+            let cmd = `git clone ${branch_str}${address} ${dest_folder} --progress`;
+            cmd += (recursive === true) ? ` --recurse-submodules` : '';
+            this.spawn.spin(cmd, context, action, undefined, resolve, reject);
         });
     }
 }

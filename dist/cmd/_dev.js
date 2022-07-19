@@ -6,7 +6,11 @@
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -22,15 +26,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -57,20 +52,18 @@ let watch_src_scanned = false;
 // const nuxt_color = '#677cc7';
 // const tscw_color = '#734de3';
 const watc_color = '#687a6a';
-function dev(params) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (params.docker === true) {
-            yield docker.start(params);
-        }
-        else {
-            _init_params(params);
-            yield _init_dev();
-            // await _dev_server();
-            // if(valid_client_repos().includes(dev_params.repo)){
-            //   await _dev_client();
-            // }
-        }
-    });
+async function dev(params) {
+    if (params.docker === true) {
+        await docker.start(params);
+    }
+    else {
+        _init_params(params);
+        await _init_dev();
+        // await _dev_server();
+        // if(valid_client_repos().includes(dev_params.repo)){
+        //   await _dev_client();
+        // }
+    }
 }
 exports.dev = dev;
 // export async function dev_server(params:Partial<Params>):Promise<void>{
@@ -440,17 +433,15 @@ function _init_params(params) {
     util_instance = util.create(dev_params, output_instance);
     // util_instance.must_be_initialized();
 }
-function _init_dev() {
-    return __awaiter(this, void 0, void 0, function* () {
-        // await transpose(dev_params, true);
-        // await generate_register(dev_params, true);
-        // await generate(dev_params, true);
-        // await build(dev_params, true);
-        // if(valid_hooks_repos().includes(dev_params.repo)){
-        //   hooks(dev_params, true);
-        // }
-        _watch();
-    });
+async function _init_dev() {
+    // await transpose(dev_params, true);
+    // await generate_register(dev_params, true);
+    // await generate(dev_params, true);
+    // await build(dev_params, true);
+    // if(valid_hooks_repos().includes(dev_params.repo)){
+    //   hooks(dev_params, true);
+    // }
+    _watch();
 }
 function _watch() {
     const src_path = `${dev_params.root}/src/`;
@@ -459,7 +450,7 @@ function _watch() {
     util_instance.watch(src_path, `watching \`src\` folder.`, () => {
         output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
         watch_src_scanned = true;
-    }, (_event, _path) => __awaiter(this, void 0, void 0, function* () {
+    }, async (_event, _path) => {
         const basename = path_1.default.basename(_path);
         const extension = path_1.default.extname(basename);
         const not_valid_extensions = ['.swp', '.swo'];
@@ -500,7 +491,7 @@ function _watch() {
         // ){
         //   _replace_netlify_function_file();
         // }
-    }));
+    });
 }
 // function _fix_mongodb_saslprep_requirement(){
 //   const dist_dir = `${dev_params.root}/dist`;
