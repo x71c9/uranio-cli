@@ -118,6 +118,7 @@ async function _dev_server() {
     _is_dev_server = true;
     // _fix_mongodb_saslprep_requirement();
     const args = (is_docker === true) ? ['urn_log_prefix_type=true'] : [];
+    // Forever module needs for ensuring that a given script runs continuously
     _service_child = new forever_monitor_1.default.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`, {
         args: args,
         // watch: true,
