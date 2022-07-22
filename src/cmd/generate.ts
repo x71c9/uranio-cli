@@ -21,6 +21,10 @@
  * - Generating the hook types in node_modules/uranio-trx
  * - Generating the client_toml module in node_modules/uranio
  *
+ * A copy of uranio-schema generated in node_modules will be copied to
+ * .uranio/uranio-schema. This will allow the text editor to read the repo
+ * with better support.
+ *
  * @packageDocumentation
  */
 
@@ -154,7 +158,6 @@ async function _generate(args:string){
 }
 
 function _copy_uranio_schema_repo(){
-	
 	const uranio_schema_path =
 		`${generate_params.root}/node_modules/uranio-schema/dist/typ/atom.d.ts`;
 	const schema_copy_path =
