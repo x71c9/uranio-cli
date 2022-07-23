@@ -5,7 +5,6 @@
  * Method `transpose` copies files from the project `src` folder into
  * uranio node_modules folders:
  * - node_modules/uranio
- * - node_modules/uranio-trx
  *
  * Depending from which folder is copying it will do different things.
  *
@@ -141,15 +140,15 @@ async function _transpose_file(file_path) {
     const server_src_dir = `${src_path}/server`;
     const admin_src_dir = `${src_path}/admin`;
     if (file_path.includes(atoms_src_dir)) {
-        await _transpose_atom_dir_file(file_path);
+        _transpose_atom_dir_file(file_path);
     }
     else if ((0, types_1.valid_deploy_repos)().includes(transpose_params.repo)
         && file_path.includes(server_src_dir)) {
-        await _transpose_server_dir_file(file_path);
+        _transpose_server_dir_file(file_path);
     }
     else if ((0, types_1.valid_admin_repos)().includes(transpose_params.repo)
         && file_path.includes(admin_src_dir)) {
-        await _transpose_admin_dir_file(file_path);
+        _transpose_admin_dir_file(file_path);
     }
     output_instance.done_verbose_log(`Transpose file completed. [${file_path}]`);
 }
@@ -418,9 +417,15 @@ function _replace_import(text, file_path, parent_folder) {
     const printed = recast.print(parsed_ast, { useTabs: true }).code;
     return printed;
 }
-function _transpose_server_dir_file(_file_path) {
-    output_instance.verbose_log(`Transpose server dir file [${_file_path}].`);
-    //TODO
+function _transpose_server_dir_file(file_path) {
+    output_instance.verbose_log(`Transpose server dir file [${file_path}].`);
+    const server_dir = `${transpose_params.root}/src/server/`;
+    const relative_path = file_path.replace(server_dir, '');
+    const node_delta_server = `${transpose_params.root}/node_modules/uranio/src/server/delta`;
+    const node_dest_path = `${node_delta_server}/${relative_path}`;
+    util_instance.fs.copy_file(file_path, node_dest_path);
+    const node_dist_path = _dest_dist_path(node_dest_path);
+    _compile(node_dest_path, node_dist_path);
 }
 function _transpose_admin_dir_file(_file_path) {
     output_instance.verbose_log(`Transpose admin dir file [${_file_path}].`);

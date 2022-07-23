@@ -301,7 +301,15 @@ function _copy_assets() {
     _copy_toml();
     _copy_tsconfigs();
     _copy_index();
+    _copy_atoms();
     // _copy_eslint_files();
+}
+function _copy_atoms() {
+    const ass_atoms_filepath = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets/main/atoms`;
+    const dest = `${init_params.root}/src/atoms`;
+    if (!util_instance.fs.exists(dest)) {
+        util_instance.fs.copy_directory(ass_atoms_filepath, dest, 'book');
+    }
 }
 function _copy_sample() {
     const sample_file = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets/env/sample.env`;

@@ -4,7 +4,6 @@
  * Method `transpose` copies files from the project `src` folder into
  * uranio node_modules folders:
  * - node_modules/uranio
- * - node_modules/uranio-trx
  *
  * Depending from which folder is copying it will do different things.
  *

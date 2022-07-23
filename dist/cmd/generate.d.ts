@@ -21,6 +21,10 @@
  * - Generating the hook types in node_modules/uranio-trx
  * - Generating the client_toml module in node_modules/uranio
  *
+ * A copy of uranio-schema generated in node_modules will be copied to
+ * .uranio/uranio-schema. This will allow the text editor to read the repo
+ * with better support.
+ *
  * @packageDocumentation
  */
 import { Params } from '../types';

@@ -4,7 +4,6 @@
  * Method `transpose` copies files from the project `src` folder into
  * uranio node_modules folders:
  * - node_modules/uranio
- * - node_modules/uranio-trx
  *
  * Depending from which folder is copying it will do different things.
  *
@@ -172,21 +171,21 @@ async function _transpose_file(file_path:string):Promise<void>{
 	
 	if(file_path.includes(atoms_src_dir)){
 		
-		await _transpose_atom_dir_file(file_path);
+		_transpose_atom_dir_file(file_path);
 		
 	}else if(
 		valid_deploy_repos().includes(transpose_params.repo)
 		&& file_path.includes(server_src_dir)
 	){
 		
-		await _transpose_server_dir_file(file_path);
+		_transpose_server_dir_file(file_path);
 		
 	}else if(
 		valid_admin_repos().includes(transpose_params.repo)
 		&& file_path.includes(admin_src_dir)
 	){
 		
-		await _transpose_admin_dir_file(file_path);
+		_transpose_admin_dir_file(file_path);
 		
 	}
 	
@@ -548,9 +547,19 @@ function _replace_import(text:string, file_path:string, parent_folder:string){
 }
 
 
-function _transpose_server_dir_file(_file_path:string){
-		output_instance.verbose_log(`Transpose server dir file [${_file_path}].`);
-	//TODO
+function _transpose_server_dir_file(file_path:string){
+	output_instance.verbose_log(`Transpose server dir file [${file_path}].`);
+	
+	const server_dir = `${transpose_params.root}/src/server/`;
+	const relative_path = file_path.replace(server_dir, '');
+	
+	const node_delta_server = `${transpose_params.root}/node_modules/uranio/src/server/delta`;
+	const node_dest_path = `${node_delta_server}/${relative_path}`;
+	
+	util_instance.fs.copy_file(file_path, node_dest_path);
+	
+	const node_dist_path = _dest_dist_path(node_dest_path);
+	_compile(node_dest_path, node_dist_path);
 }
 
 function _transpose_admin_dir_file(_file_path:string){
