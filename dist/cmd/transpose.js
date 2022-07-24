@@ -9,12 +9,13 @@
  * Depending from which folder is copying it will do different things.
  *
  * 1) SRC Atom Folder
- * It copies and process all file from src/atoms to:
+ * It copies and process/compile all file from src/atoms to:
  * -- node_modules/uranio/src/atoms/server
  * -- node_modules/uranio/src/atoms/client
  *
  * 2) SRC Server Folder
- * TODO
+ * It copies and compile all file from src/server to:
+ * -- node_modules/uranio/src/aroms/server
  *
  * 2) SRC Admin Folder
  * TODO
@@ -272,14 +273,22 @@ function _dest_dist_path(filepath) {
     return `${dir_name}/${file_name}.js`;
 }
 function _compile(src_path, dest_path) {
-    esbuild.buildSync({
-        entryPoints: [src_path],
-        outfile: dest_path,
-        platform: 'node',
-        format: 'cjs',
-        // sourcemap: true,
-        // minify: true
-    });
+    if (path_1.default.extname(src_path) === '.json') {
+        const dest_dirname = path_1.default.dirname(dest_path);
+        const dest_basename = path_1.default.basename(dest_path, '.js');
+        const dest_json = path_1.default.join(dest_dirname, `${dest_basename}.json`);
+        util_instance.fs.copy_file(src_path, dest_json);
+    }
+    else {
+        esbuild.buildSync({
+            entryPoints: [src_path],
+            outfile: dest_path,
+            platform: 'node',
+            format: 'cjs',
+            // sourcemap: true,
+            // minify: true
+        });
+    }
 }
 function _process_route_register_definition_client(text, atom_name, route_name) {
     let updated_text = text;

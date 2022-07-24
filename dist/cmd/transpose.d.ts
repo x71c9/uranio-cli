@@ -8,12 +8,13 @@
  * Depending from which folder is copying it will do different things.
  *
  * 1) SRC Atom Folder
- * It copies and process all file from src/atoms to:
+ * It copies and process/compile all file from src/atoms to:
  * -- node_modules/uranio/src/atoms/server
  * -- node_modules/uranio/src/atoms/client
  *
  * 2) SRC Server Folder
- * TODO
+ * It copies and compile all file from src/server to:
+ * -- node_modules/uranio/src/aroms/server
  *
  * 2) SRC Admin Folder
  * TODO
