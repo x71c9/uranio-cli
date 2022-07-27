@@ -95,7 +95,7 @@ export async function init(params:Partial<Params>)
 		}
 		await docker.db_create(init_params);
 		await docker.db_start(init_params);
-		// docker.update_env();
+		docker.update_env();
 	}
 	
 	_remove_tmp();

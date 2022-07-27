@@ -119,7 +119,7 @@ export async function docker(params:Partial<Params>, args:Arguments)
 		case 'env':{
 			switch(args._[2]){
 				case 'update':{
-					await update_env(docker_params);
+					update_env(docker_params);
 					break;
 				}
 				default:{
@@ -201,7 +201,7 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 	cmd += ` -v ${toml_path}:/app/uranio.toml`;
 	cmd += ` -v $(pwd)/package.json:/app/package.json`;
 	cmd += ` -v $(pwd)/node_modules/:/app/node_modules/`;
-	// cmd += ` -v $(pwd)/.uranio/:/app/.uranio/`;
+	cmd += ` -v $(pwd)/.uranio/uranio-schema:/app/.uranio/uranio-schema`;
 	cmd += ` --name ${container_name}`;
 	if(typeof entrypoint === 'string'){
 		cmd += ` --entrypoint="${entrypoint}"`;
