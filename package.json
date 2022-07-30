@@ -5,14 +5,15 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
-		"init": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js init -fvw -r api -x [CL] --branch master\"",
-		"build": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js build -fvw -r api -x [CL] --branch master\"",
-		"dev": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js dev --branch master\"",
-		"help": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -h -x --branch master\"",
-		"ver": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v --branch master\"",
-		"watch": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -vu --branch master\"",
-		"transpose": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js transpose -vu \"",
-		"generate:register": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js generate:register -vu \""
+		"build": "yarn tsc -b",
+		"dev:init": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js init -fvw -r api -x [CL] --branch master\"",
+		"dev:build": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js build -fvw -r api -x [CL] --branch master\"",
+		"dev:dev": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js dev --branch master\"",
+		"dev:help": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -h -x --branch master\"",
+		"dev:ver": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v --branch master\"",
+		"dev:watch": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -vu --branch master\"",
+		"dev:transpose": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js transpose -vu \"",
+		"dev:generate:register": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js generate:register -vu \""
 	},
 	"engines": {
 		"node": ">=14"
