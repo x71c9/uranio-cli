@@ -45,7 +45,7 @@ const common_1 = require("./cmd/common");
 let output_instance;
 let util_instance;
 let process_params = defaults_1.default_params;
-function uranio_process(args) {
+async function uranio_process(args) {
     process_params.spin = true;
     if (!_cmd_that_do_not_need_root(args)) {
         _set_root(args);
@@ -57,7 +57,7 @@ function uranio_process(args) {
     output_instance = output.create(process_params);
     util_instance = util.create(process_params, output_instance);
     _init_log();
-    _switch_command(args);
+    await _switch_command(args);
 }
 exports.uranio_process = uranio_process;
 function _cmd_that_do_not_need_root(args) {
@@ -118,6 +118,13 @@ function _log_root() {
 }
 function _set_args(params, args) {
     // Paramters with default value = false
+    const prod = args.p || args.prod;
+    if (prod == true) {
+        params.prod = true;
+    }
+    if (typeof args.noprod === 'boolean' && !!args.noprod !== !params.prod) {
+        params.prod = !args.noprod;
+    }
     const force = args.f || args.force;
     if (force == true) {
         params.force = true;
@@ -244,7 +251,7 @@ function _set_args(params, args) {
     if (typeof branch === 'string' && branch !== '') {
         params.branch = branch;
     }
-    const pacman = args.p || args.pacman;
+    const pacman = args.m || args.pacman;
     if (typeof pacman === 'string' && pacman != '') {
         (0, common_1.check_pacman)(pacman);
         params.pacman = pacman;
@@ -416,7 +423,7 @@ function _return_version() {
     }
     return version;
 }
-function _switch_command(args) {
+async function _switch_command(args) {
     const full_cmd = args._[0] || '';
     const splitted_cmd = full_cmd.split(':');
     let cmd = splitted_cmd[0];
@@ -431,6 +438,11 @@ function _switch_command(args) {
         case 'version': {
             output_instance.stop_loading();
             output_instance.log(_return_version());
+            break;
+        }
+        case 'reinit': {
+            await (0, index_1.deinit)(process_params);
+            (0, index_1.prompt_init)(process_params, args);
             break;
         }
         case 'init': {

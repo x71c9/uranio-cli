@@ -50,7 +50,8 @@ export async function start_server(params:Partial<Params>, init=true)
 	
 	const urn_lib_pre = ` urn_log_prefix_type=true`;
 	const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
-	const cmd_server = `NODE_ENV=production yarn uranio-webservice-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
+	const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
+	const cmd_server = `${node_env}yarn uranio-webservice-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
 	util_instance.spawn.log(cmd_server, 'start', 'starting server');
 	
 }
@@ -66,7 +67,8 @@ export async function start_panel(params:Partial<Params>, init=true)
 	
 	const urn_lib_pre = ` urn_log_prefix_type=true`;
 	// const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
-	const cmd_server = `NODE_ENV=production yarn uranio-panel-${start_params.repo} start${urn_lib_pre}`;
+	const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
+	const cmd_server = `${node_env}yarn uranio-panel-${start_params.repo} start${urn_lib_pre}`;
 	util_instance.spawn.log(cmd_server, 'start', 'starting panel');
 	
 }

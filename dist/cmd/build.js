@@ -74,7 +74,8 @@ async function build_panel(params, init = true) {
     const urn_lib_pre = ` urn_log_prefix_type=true`;
     // const urn_config_path = ` -c ${build_params.root}/uranio.toml`;
     // const cmd_server = `NODE_ENV=production yarn uranio-panel-${build_params.repo} generate ${urn_lib_pre}`;
-    const cmd_server = `NODE_ENV=production yarn uranio-panel-${build_params.repo} build ${urn_lib_pre}`;
+    const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
+    const cmd_server = `${node_env}yarn uranio-panel-${build_params.repo} build ${urn_lib_pre}`;
     util_instance.spawn.log(cmd_server, 'panel', 'building panel');
     output_instance.done_log('Build panel completed.');
 }

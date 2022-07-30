@@ -8,6 +8,7 @@ export declare type Repo = keyof typeof abstract_repos;
 export declare type PacMan = keyof typeof abstract_pacman;
 export declare type DB = keyof typeof abstract_db;
 export declare type Params = {
+    prod: boolean;
     force: boolean;
     verbose: boolean;
     debug: boolean;

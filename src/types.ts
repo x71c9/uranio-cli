@@ -12,6 +12,7 @@ export type PacMan = keyof typeof abstract_pacman;
 export type DB = keyof typeof abstract_db;
 
 export type Params = {
+	prod: boolean
 	force: boolean
 	verbose: boolean
 	debug: boolean

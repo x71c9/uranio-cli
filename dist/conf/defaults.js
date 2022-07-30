@@ -7,6 +7,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaults = exports.default_params = void 0;
 exports.default_params = {
+    prod: false,
     force: false,
     verbose: false,
     debug: false,

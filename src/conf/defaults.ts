@@ -7,6 +7,7 @@
 import {Params} from '../types';
 
 export const default_params:Params = {
+	prod: false,
 	force: false,
 	verbose: false,
 	debug: false,

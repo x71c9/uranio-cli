@@ -53,8 +53,8 @@ let util_instance:util.UtilInstance;
 
 let process_params = default_params as Params;
 
-export function uranio_process(args:Arguments)
-		:void{
+export async function uranio_process(args:Arguments)
+		:Promise<void>{
 	
 	process_params.spin = true;
 	
@@ -75,7 +75,7 @@ export function uranio_process(args:Arguments)
 	
 	_init_log();
 	
-	_switch_command(args);
+	await _switch_command(args);
 	
 }
 
@@ -151,6 +151,15 @@ function _set_args(params:Params, args:Arguments)
 		:Params{
 	
 	// Paramters with default value = false
+	
+	const prod = args.p || args.prod;
+	
+	if(prod == true){
+		params.prod = true;
+	}
+	if(typeof args.noprod === 'boolean' && !!args.noprod !== !params.prod){
+		params.prod = !args.noprod;
+	}
 	
 	const force = args.f || args.force;
 	
@@ -318,7 +327,7 @@ function _set_args(params:Params, args:Arguments)
 		params.branch = branch;
 	}
 	
-	const pacman = args.p || args.pacman;
+	const pacman = args.m || args.pacman;
 	
 	if(typeof pacman === 'string' && pacman != ''){
 		check_pacman(pacman);
@@ -512,7 +521,7 @@ function _return_version(){
 	return version;
 }
 
-function _switch_command(args:Arguments){
+async function _switch_command(args:Arguments){
 	const full_cmd = args._[0] || '';
 	const splitted_cmd = full_cmd.split(':');
 	let cmd = splitted_cmd[0];
@@ -527,6 +536,11 @@ function _switch_command(args:Arguments){
 		case 'version':{
 			output_instance.stop_loading();
 			output_instance.log(_return_version());
+			break;
+		}
+		case 'reinit':{
+			await deinit(process_params);
+			prompt_init(process_params, args);
 			break;
 		}
 		case 'init':{

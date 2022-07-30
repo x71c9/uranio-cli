@@ -4,4 +4,4 @@
  * @packageDocumentation
  */
 import { Arguments } from './types';
-export declare function uranio_process(args: Arguments): void;
+export declare function uranio_process(args: Arguments): Promise<void>;
