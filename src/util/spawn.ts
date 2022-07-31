@@ -72,6 +72,36 @@ class Spawn {
 		return this._spawn(command, context, action, true, false, true, color, resolve, reject, detached);
 	}
 	
+	public async spin_promise(command:string, context:string, action:string, color?:string, detached=false){
+		return await new Promise((resolve, reject) => {
+			return this.spin(command, context, action, color, resolve, reject, detached);
+		});
+	}
+	
+	public async log_promise(command:string, context:string, action:string, color?:string, detached=false){
+		return await new Promise((resolve, reject) => {
+			return this.log(command, context, action, color, resolve, reject, detached);
+		});
+	}
+	
+	public async verbose_log_promise(command:string, context:string, action:string, color?:string, detached=false){
+		return await new Promise((resolve, reject) => {
+			return this.verbose_log(command, context, action, color, resolve, reject, detached);
+		});
+	}
+	
+	public async spin_and_log_promise(command:string, context:string, action:string, color?:string, detached=false){
+		return await new Promise((resolve, reject) => {
+			return this.spin_and_log(command, context, action, color, resolve, reject, detached);
+		});
+	}
+	
+	public async spin_and_verbose_log_promise(command:string, context:string, action:string, color?:string, detached=false){
+		return await new Promise((resolve, reject) => {
+			return this.spin_and_verbose_log(command, context, action, color, resolve, reject, detached);
+		});
+	}
+	
 	private _spawn(
 		command:string,
 		context:string,

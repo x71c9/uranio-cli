@@ -43,31 +43,35 @@ let util_instance;
 let build_params = defaults_1.default_params;
 async function build(params) {
     _init_build(params);
-    output_instance.start_loading(`Building...`);
+    // output_instance.start_loading(`Building...`);
     await _build();
-    build_server(build_params, false);
+    await build_server(build_params, false);
     if ((0, types_1.valid_admin_repos)().includes(build_params.repo)) {
-        build_panel(build_params, false);
+        await build_panel(build_params, false);
     }
     output_instance.done_log('Build completed.');
+    process.exit(0);
 }
 exports.build = build;
 async function build_server(params, init = true) {
     if (init) {
         _init_build(params);
     }
-    output_instance.start_loading(`Building server...`);
+    // output_instance.start_loading(`Building server...`);
     if (init) {
         await _build();
     }
     output_instance.done_log('Build server completed.');
+    if (init) {
+        process.exit(0);
+    }
 }
 exports.build_server = build_server;
 async function build_panel(params, init = true) {
     if (init) {
         _init_build(params);
     }
-    output_instance.start_loading(`Building panel...`);
+    // output_instance.start_loading(`Building panel...`);
     if (init) {
         await _build();
     }
@@ -76,8 +80,11 @@ async function build_panel(params, init = true) {
     // const cmd_server = `NODE_ENV=production yarn uranio-panel-${build_params.repo} generate ${urn_lib_pre}`;
     const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
     const cmd_server = `${node_env}yarn uranio-panel-${build_params.repo} build ${urn_lib_pre}`;
-    util_instance.spawn.log(cmd_server, 'panel', 'building panel');
+    await util_instance.spawn.log_promise(cmd_server, 'panel', 'building panel');
     output_instance.done_log('Build panel completed.');
+    if (init) {
+        process.exit(0);
+    }
 }
 exports.build_panel = build_panel;
 async function _build() {

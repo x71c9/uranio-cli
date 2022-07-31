@@ -77,6 +77,31 @@ class Spawn {
         this.output.debug_log(command, 'spin and verbose');
         return this._spawn(command, context, action, true, false, true, color, resolve, reject, detached);
     }
+    async spin_promise(command, context, action, color, detached = false) {
+        return await new Promise((resolve, reject) => {
+            return this.spin(command, context, action, color, resolve, reject, detached);
+        });
+    }
+    async log_promise(command, context, action, color, detached = false) {
+        return await new Promise((resolve, reject) => {
+            return this.log(command, context, action, color, resolve, reject, detached);
+        });
+    }
+    async verbose_log_promise(command, context, action, color, detached = false) {
+        return await new Promise((resolve, reject) => {
+            return this.verbose_log(command, context, action, color, resolve, reject, detached);
+        });
+    }
+    async spin_and_log_promise(command, context, action, color, detached = false) {
+        return await new Promise((resolve, reject) => {
+            return this.spin_and_log(command, context, action, color, resolve, reject, detached);
+        });
+    }
+    async spin_and_verbose_log_promise(command, context, action, color, detached = false) {
+        return await new Promise((resolve, reject) => {
+            return this.spin_and_verbose_log(command, context, action, color, resolve, reject, detached);
+        });
+    }
     _spawn(command, context, action, spin, log, verbose, color, resolve, reject, detached = false) {
         if (spin && verbose) {
             this.output.start_loading(command);

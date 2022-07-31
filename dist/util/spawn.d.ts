@@ -17,6 +17,11 @@ declare class Spawn {
     verbose_log(command: string, context: string, action: string, color?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
     spin_and_log(command: string, context: string, action: string, color?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
     spin_and_verbose_log(command: string, context: string, action: string, color?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
+    spin_promise(command: string, context: string, action: string, color?: string, detached?: boolean): Promise<unknown>;
+    log_promise(command: string, context: string, action: string, color?: string, detached?: boolean): Promise<unknown>;
+    verbose_log_promise(command: string, context: string, action: string, color?: string, detached?: boolean): Promise<unknown>;
+    spin_and_log_promise(command: string, context: string, action: string, color?: string, detached?: boolean): Promise<unknown>;
+    spin_and_verbose_log_promise(command: string, context: string, action: string, color?: string, detached?: boolean): Promise<unknown>;
     private _spawn;
 }
 export declare type SpawnInstance = InstanceType<typeof Spawn>;
