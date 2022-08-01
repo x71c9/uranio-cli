@@ -53,7 +53,7 @@ async function build(params) {
     process.exit(0);
 }
 exports.build = build;
-async function build_server(params, init = true) {
+async function build_server(params, init = true, exit = true) {
     if (init) {
         _init_build(params);
     }
@@ -62,7 +62,7 @@ async function build_server(params, init = true) {
         await _build();
     }
     output_instance.done_log('Build server completed.');
-    if (init) {
+    if (exit) {
         process.exit(0);
     }
 }

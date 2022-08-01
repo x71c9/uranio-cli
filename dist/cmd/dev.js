@@ -104,7 +104,7 @@ function _init_params(params) {
     util_instance = util.create(dev_params, output_instance);
 }
 async function _init_dev() {
-    await (0, build_1.build_server)(dev_params);
+    await (0, build_1.build_server)(dev_params, true, false);
     _tsc_watch();
     _watch();
 }

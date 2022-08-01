@@ -125,7 +125,7 @@ function _init_params(params:Partial<Params>)
 
 async function _init_dev(){
 	
-	await build_server(dev_params);
+	await build_server(dev_params, true, false);
 	
 	_tsc_watch();
 	

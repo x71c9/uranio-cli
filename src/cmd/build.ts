@@ -48,7 +48,7 @@ export async function build(params:Params)
 	
 }
 
-export async function build_server(params:Params, init=true)
+export async function build_server(params:Params, init=true, exit=true)
 		:Promise<void>{
 	
 	if(init){
@@ -63,7 +63,7 @@ export async function build_server(params:Params, init=true)
 	
 	output_instance.done_log('Build server completed.');
 	
-	if(init){
+	if(exit){
 		process.exit(0);
 	}
 }
