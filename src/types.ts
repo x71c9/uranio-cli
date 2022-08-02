@@ -37,9 +37,9 @@ export type Params = {
 	pacman: PacMan
 	// deploy: Deploy
 	db: DB
-	color_log: string
-	color_verbose: string
-	color_debug: string
+	// color_log: string
+	// color_verbose: string
+	// color_debug: string
 	root: string
 }
 

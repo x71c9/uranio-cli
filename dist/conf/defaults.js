@@ -32,9 +32,12 @@ exports.default_params = {
     pacman: 'yarn',
     // deploy: 'netlify',
     db: 'mongo',
-    color_log: '#859900',
-    color_verbose: '#668899',
-    color_debug: '#557685',
+    // color_log: '#859900',
+    // color_debug: '#557685',
+    // color_verbose: '#668899',
+    // color_log: 'magenta',
+    // color_debug: 'blu',
+    // color_verbose: 'dimgray',
     root: '.',
 };
 const cloud_address = 'git+ssh://git@github.com/x71c9';

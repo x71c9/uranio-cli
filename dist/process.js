@@ -275,18 +275,18 @@ function _set_args(params, args) {
         (0, common_1.check_db)(db);
         params.db = db;
     }
-    const color_log = args.d || args.color_log;
-    if (typeof color_log === 'string' && color_log != '') {
-        params.color_log = color_log;
-    }
-    const color_verbose = args.o || args.color_verbose;
-    if (typeof color_verbose === 'string' && color_verbose != '') {
-        params.color_verbose = color_verbose;
-    }
-    const color_debug = args.o || args.color_debug;
-    if (typeof color_debug === 'string' && color_debug != '') {
-        params.color_debug = color_debug;
-    }
+    // const color_log = args.d || args.color_log;
+    // if(typeof color_log === 'string' && color_log != ''){
+    // 	params.color_log = color_log;
+    // }
+    // const color_verbose = args.o || args.color_verbose;
+    // if(typeof color_verbose === 'string' && color_verbose != ''){
+    // 	params.color_verbose = color_verbose;
+    // }
+    // const color_debug = args.o || args.color_debug;
+    // if(typeof color_debug === 'string' && color_debug != ''){
+    // 	params.color_debug = color_debug;
+    // }
     // Root parameter
     // let root = args.s || args.root;
     // if(typeof root === 'string' && root !== ''){
@@ -336,7 +336,7 @@ function _folder_is_valid(folder_path) {
             try {
                 const content = fs_1.default.readFileSync(package_json_path, 'utf8');
                 const pack = urn_lib_1.urn_util.json.clean_parse(content);
-                if (pack.name === 'uranio-cli' || (pack.name === 'uranio' && pack.uranio == true)) {
+                if (pack.name === 'uranio' || (pack.name === 'uranio-monorepo' && pack.uranio == true)) {
                     return false;
                 }
                 return true;
@@ -361,7 +361,7 @@ function _folder_is_uranio(folder_path) {
             try {
                 const content = fs_1.default.readFileSync(package_json_path, 'utf8');
                 const pack = urn_lib_1.urn_util.json.clean_parse(content);
-                if (pack.name === 'uranio') {
+                if (pack.name === 'uranio-monorepo') {
                     return true;
                 }
                 return false;
