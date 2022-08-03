@@ -16,8 +16,9 @@ async function help() {
     console.log(`commands:`);
     console.log(`  init ............... init uranio repo.`);
     console.log(`  deinit ............. deinit uranio repo.`);
+    console.log(`  reinit ............. deinit and init uranio repo.`);
     console.log(`  dev ................ start uranio development mode.`);
-    console.log(`  transpose .......... transpose atom books.`);
+    console.log(`  transpose .......... transpose files to uranio repo.`);
     console.log(`  info ............... show uranio info for this repo.`);
     console.log(`  version ............ show package version.`);
     console.log(`  help ............... show help menu [this one].`);
@@ -36,8 +37,8 @@ async function help() {
     console.log(`  --db ............... set db type [mongo] - it needs docker installed.`);
     console.log(``);
     console.log(`list of output options`);
-    console.log(`  -v --verbose ....... log in verbose mode.`);
-    console.log(`  -u --debug ......... log in debug mode.`);
+    console.log(`  -v --verbose ....... log in verbose mode [output more info].`);
+    console.log(`  -u --debug ......... log in debug mode [output even more info].`);
     console.log(`  -n --hide .......... do not output log.`);
     console.log(`  -b --blank ......... log with no colors.`);
     console.log(`  -w --fullwidth ..... log in full width.`);
@@ -47,9 +48,9 @@ async function help() {
     console.log(`  -l --filelog ....... save log on file.`);
     console.log(`  -i --spin .......... log with spinner.`);
     console.log(`  -e --native ........ log in native mode.`);
-    console.log(`  -d --color_log ..... log color.`);
-    console.log(`  -o --color_verbose . verbose log color.`);
-    console.log(`  -q --color_debug ... debug log color.`);
+    // console.log(`  -d --color_log ..... log color.`);
+    // console.log(`  -o --color_verbose . verbose log color.`);
+    // console.log(`  -q --color_debug ... debug log color.`);
     console.log(``);
     console.log(``);
     process.exit(0);

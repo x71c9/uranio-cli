@@ -52,11 +52,11 @@ let dev_params = defaults_1.default_params;
 let watch_src_scanned = false;
 let watch_toml_scanned = false;
 // const nuxt_color = '#677cc7';
-const tscw_color = '#734de3';
-const watc_color = '#687a6a';
+// const tscw_color = '#734de3';
+// const watc_color = '#687a6a';
 // const pane_color = '#4f9ee3';
 // const pane_color = '#7464C3';
-const pane_color = '#00AA7E';
+// const pane_color = '#00AA7E';
 let _service_child;
 // let _service_time:ReturnType<typeof setTimeout>;
 let _is_dev_server = false;
@@ -112,7 +112,7 @@ async function _dev_panel() {
     // uranio-panel-adm dev doesn't need Forever to reaload (like the server)
     // because it reloads itself by launching Nuxt dev service.
     const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev`;
-    util_instance.spawn.log(cmd_dev_panel, 'dev', 'developing panel', pane_color);
+    util_instance.spawn.verbose_log(cmd_dev_panel, 'developing panel');
 }
 async function _dev_server() {
     _is_dev_server = true;
@@ -137,13 +137,13 @@ async function _dev_server() {
 }
 function _tsc_watch() {
     const tsc_watch = `yarn tsc -w`;
-    util_instance.spawn.log(tsc_watch, 'tsc', 'watching types', tscw_color);
+    util_instance.spawn.verbose_log(tsc_watch, 'watching types');
 }
 function _watch() {
     const src_path = `${dev_params.root}/src/`;
-    output_instance.log(`Watching \`src\` folder [${src_path}] ...`, 'wtch');
+    output_instance.log(`Watching \`src\` folder [${src_path}] ...`);
     util_instance.watch(src_path, `watching \`src\` folder.`, () => {
-        output_instance.done_log(`Initial scanner completed for [${src_path}].`, 'wtch');
+        output_instance.done_log(`Initial scanner completed for [${src_path}].`);
         watch_src_scanned = true;
     }, async (_event, _path) => {
         const basename = path_1.default.basename(_path);
@@ -154,11 +154,11 @@ function _watch() {
         }
         if (!watch_src_scanned) {
             if (_event === 'add' || _event === 'addDir') {
-                output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
+                output_instance.verbose_log(`${_event} ${_path}`);
             }
             return false;
         }
-        output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
+        output_instance.log(`${_event} ${_path}`);
         await (0, transpose_1.transpose)(dev_params, _path, _event);
         await (0, generate_1.generate)(dev_params, _path, _event);
         if (_is_dev_server && _valid_reload_extensions.includes(extension)) {
@@ -167,23 +167,23 @@ function _watch() {
             _service_child.restart();
             // }, 500);
         }
-        output_instance.done_log(`[src watch] Built [${_event}] [${_path}].`, 'wtch');
+        output_instance.done_log(`[src watch] Built [${_event}] [${_path}].`);
     });
     if (!util_instance.fs.exists(dev_params.config)) {
         return;
     }
-    output_instance.log(`Watching \`uranio.toml\` file [${dev_params.config}] ...`, 'wtch');
+    output_instance.log(`Watching \`uranio.toml\` file [${dev_params.config}] ...`);
     util_instance.watch(dev_params.config, `watching \`toml\` file.`, () => {
-        output_instance.done_log(`Initial scanner completed for [${dev_params.config}].`, 'wtch');
+        output_instance.done_log(`Initial scanner completed for [${dev_params.config}].`);
         watch_toml_scanned = true;
     }, async (_event, _path) => {
         if (!watch_toml_scanned) {
             if (_event === 'add' || _event === 'addDir') {
-                output_instance.verbose_log(`${_event} ${_path}`, 'wtch', watc_color);
+                output_instance.verbose_log(`${_event} ${_path}`);
             }
             return false;
         }
-        output_instance.log(`${_event} ${_path}`, 'wtch', watc_color);
+        output_instance.log(`${_event} ${_path}`);
         await (0, generate_1.generate)(dev_params, _path, _event);
         if (_is_dev_server) {
             // clearTimeout(_service_time);
@@ -191,7 +191,7 @@ function _watch() {
             _service_child.restart();
             // }, 500);
         }
-        output_instance.done_log(`[toml watch] Generated [${_event}] [${_path}].`, 'wtch');
+        output_instance.done_log(`[toml watch] Generated [${_event}] [${_path}].`);
     });
 }
 // function _fix_mongodb_saslprep_requirement(){

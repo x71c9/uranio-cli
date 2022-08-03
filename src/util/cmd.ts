@@ -42,119 +42,63 @@ class CMD {
 	public async yarn_install()
 			:Promise<any>{
 		const action = `yarn install`;
-		this.output.verbose_log(`Started ${action}`, 'pacman');
-		return new Promise((resolve, reject) => {
-			this.spawn.spin(
-				`yarn install --verbose`,
-				'pacman',
-				action,
-				undefined,
-				resolve,
-				reject
-			);
-		});
+		this.output.verbose_log(`Started ${action}`);
+		return await this.spawn.spin_promise(`yarn install --verbose`, action);
 	}
 	
-	public async install_package(pack:string, context?:string)
+	public async install_package(pack:string)
 			:Promise<any>{
 		const action = `installing package [${pack}]`;
-		this.output.verbose_log(`Started ${action}`, context);
+		this.output.verbose_log(`Started ${action}`);
 		this.output.start_loading(`Installing package [${pack}]...`);
-		return new Promise((resolve, reject) => {
-			this.spawn.spin(
-				_pacman_commands.install[this.params.pacman](pack),
-				context || 'install',
-				action,
-				undefined,
-				resolve,
-				reject
-			);
-		});
+		return await this.spawn.spin_promise(_pacman_commands.install[this.params.pacman](pack), action);
 	}
 	
-	public async install_package_dev(pack:string, context?:string)
+	public async install_package_dev(pack:string)
 			:Promise<any>{
 		const action = `installing dev package [${pack}]`;
-		this.output.verbose_log(`Started ${action}`, context);
+		this.output.verbose_log(`Started ${action}`);
 		this.output.start_loading(`Installing dev package [${pack}]...`);
-		return new Promise((resolve, reject) => {
-			this.spawn.spin(
-				_pacman_commands.install_dev[this.params.pacman](pack),
-				context || 'install',
-				action,
-				undefined,
-				resolve,
-				reject
-			);
-		});
+		return await this.spawn.spin_promise(_pacman_commands.install_dev[this.params.pacman](pack), action);
 	}
 	
-	public async install_dep(repo:string, context:string)
+	public async install_dep(repo:string)
 			:Promise<any>{
 		const action = `installing dependencies [${repo}]`;
-		this.output.verbose_log(`Started ${action}`, context);
+		this.output.verbose_log(`Started ${action}`);
 		this.output.start_loading(`Installing dep [${repo}]...`);
-		return new Promise((resolve, reject) => {
-			this.spawn.spin(
-				_pacman_commands.install[this.params.pacman](repo),
-				context,
-				action,
-				undefined,
-				resolve,
-				reject
-			);
-		});
+		return await this.spawn.spin_promise(_pacman_commands.install[this.params.pacman](repo), action);
 	}
 	
-	public async install_dep_dev(repo:string, context:string)
+	public async install_dep_dev(repo:string)
 			:Promise<any>{
 		const action = `installing dev dependencies [${repo}]`;
-		this.output.verbose_log(`Started ${action}`, context);
+		this.output.verbose_log(`Started ${action}`);
 		this.output.start_loading(`Installing dep dev [${repo}]...`);
-		return new Promise((resolve, reject) => {
-			this.spawn.spin(
-				_pacman_commands.install_dev[this.params.pacman](repo),
-				context,
-				action,
-				undefined,
-				resolve,
-				reject
-			);
-		});
+		return await this.spawn.spin_promise(_pacman_commands.install_dev[this.params.pacman](repo), action);
 	}
 
-	public async uninstall_dep(repo:string, context:string)
+	public async uninstall_dep(repo:string)
 			:Promise<any>{
 		const action = `uninstalling dependencies [${repo}]`;
-		this.output.verbose_log(`Started ${action}`, context);
-		return new Promise((resolve, reject) => {
-			this.spawn.spin(
-				_pacman_commands.uninstall[this.params.pacman](repo),
-				context,
-				action,
-				undefined,
-				resolve,
-				reject
-			);
-		});
+		this.output.verbose_log(`Started ${action}`);
+		return await this.spawn.spin_promise(_pacman_commands.uninstall[this.params.pacman](repo), action);
 	}
 	
 	public async clone_repo(
 		address:string,
 		dest_folder:string,
-		context='clrp',
 		branch='master'
 	):Promise<any>{
-		return await this._clone_repo(address, dest_folder, context, branch);
+		return await this._clone_repo(address, dest_folder, branch);
 	}
 	
 	public async clone_repo_recursive(
 		address:string,
 		dest_folder:string,
-		context='clrr',
 		branch='master'
 	):Promise<any>{
-		return await this._clone_repo(address, dest_folder, context, branch, true);
+		return await this._clone_repo(address, dest_folder, branch, true);
 	}
 	
 	public get_package_data(package_json_path:string){
@@ -241,77 +185,77 @@ class CMD {
 	
 	public async install_core_dep(){
 		this.output.start_loading(`Installing core dep...`);
-		await this.install_dep(defaults.core_dep_repo, 'core');
-		await this.install_dep_dev(defaults.core_dep_dev_repo, 'core');
-		this.output.done_log(`Installed core dependencies.`, 'core');
+		await this.install_dep(defaults.core_dep_repo);
+		await this.install_dep_dev(defaults.core_dep_dev_repo);
+		this.output.done_log(`Installed core dependencies.`);
 		return true;
 	}
 	
 	public async install_api_dep(){
 		this.output.start_loading(`Installing api dep...`);
-		await this.install_dep(defaults.api_dep_repo, 'api');
-		await this.install_dep_dev(defaults.api_dep_dev_repo, 'api');
-		this.output.done_log(`Installed api dependencies.`, 'api');
+		await this.install_dep(defaults.api_dep_repo);
+		await this.install_dep_dev(defaults.api_dep_dev_repo);
+		this.output.done_log(`Installed api dependencies.`);
 		return true;
 	}
 	
 	public async install_trx_dep(){
 		this.output.start_loading(`Installing trx dep...`);
-		await this.install_dep(defaults.trx_dep_repo, 'trx');
-		await this.install_dep_dev(defaults.trx_dep_dev_repo, 'trx');
-		this.output.done_log(`Installed trx dependencies.`, 'trx');
+		await this.install_dep(defaults.trx_dep_repo);
+		await this.install_dep_dev(defaults.trx_dep_dev_repo);
+		this.output.done_log(`Installed trx dependencies.`);
 		return true;
 	}
 	
 	public async install_adm_dep(){
 		this.output.start_loading(`Installing adm dep...`);
-		await this.install_dep(defaults.adm_dep_repo, 'adm');
-		await this.install_dep_dev(defaults.adm_dep_dev_repo, 'adm');
-		this.output.done_log(`Installed adm dependencies.`, 'adm');
+		await this.install_dep(defaults.adm_dep_repo);
+		await this.install_dep_dev(defaults.adm_dep_dev_repo);
+		this.output.done_log(`Installed adm dependencies.`);
 		return true;
 	}
 	
 	public async uninstall_uranio(pack_data:any){
 		if(this.dependency_exists('uranio', pack_data)){
-			await this.uninstall_dep('uranio', 'urn');
+			await this.uninstall_dep('uranio');
 		}
 		return true;
 	}
 	
 	public async uninstall_core_dep(pack_data?:any){
-		await this._uninstall_uranio_dep(defaults.core_dep_repo, 'core', pack_data);
-		await this._uninstall_uranio_dep(defaults.core_dep_dev_repo, 'core', pack_data);
+		await this._uninstall_uranio_dep(defaults.core_dep_repo, pack_data);
+		await this._uninstall_uranio_dep(defaults.core_dep_dev_repo, pack_data);
 		return true;
 	}
 	
 	public async uninstall_api_dep(pack_data?:any){
-		await this._uninstall_uranio_dep(defaults.api_dep_repo, 'api', pack_data);
-		await this._uninstall_uranio_dep(defaults.api_dep_dev_repo, 'api', pack_data);
+		await this._uninstall_uranio_dep(defaults.api_dep_repo, pack_data);
+		await this._uninstall_uranio_dep(defaults.api_dep_dev_repo, pack_data);
 		return true;
 	}
 	
 	public async uninstall_trx_dep(pack_data?:any){
-		await this._uninstall_uranio_dep(defaults.trx_dep_repo, 'trx', pack_data);
-		await this._uninstall_uranio_dep(defaults.trx_dep_dev_repo, 'trx', pack_data);
+		await this._uninstall_uranio_dep(defaults.trx_dep_repo, pack_data);
+		await this._uninstall_uranio_dep(defaults.trx_dep_dev_repo, pack_data);
 		return true;
 	}
 	
 	public async uninstall_adm_dep(pack_data?:any){
-		await this._uninstall_uranio_dep(defaults.adm_dep_repo, 'adm', pack_data);
-		await this._uninstall_uranio_dep(defaults.adm_dep_dev_repo, 'adm', pack_data);
+		await this._uninstall_uranio_dep(defaults.adm_dep_repo, pack_data);
+		await this._uninstall_uranio_dep(defaults.adm_dep_dev_repo, pack_data);
 		return true;
 	}
 	
-	private async _uninstall_uranio_dep(repo:string, context:string, pack_data?:any){
+	private async _uninstall_uranio_dep(repo:string, pack_data?:any){
 		const short_repo =
-			(repo.substr(0,3) === 'ssh' || repo.substr(0,7) === 'git+ssh') ?
+			(repo.substring(0,3) === 'ssh' || repo.substring(0,7) === 'git+ssh') ?
 				repo.split('/').slice(-1)[0].replace('uranio', 'urn') : repo;
 		if(this.dependency_exists(short_repo, pack_data)){
 			this.output.start_loading(`Uninstalling ${short_repo} dep...`);
 			const dep_folder = `${this.params.root}/node_modules/${short_repo}`;
-			this.fs.remove_directory(dep_folder, context);
-			await this.uninstall_dep(`${short_repo}`, context);
-			this.output.done_log(`Uninstalled ${short_repo} dependencies.`, context);
+			this.fs.remove_directory(dep_folder);
+			await this.uninstall_dep(`${short_repo}`);
+			this.output.done_log(`Uninstalled ${short_repo} dependencies.`);
 			return true;
 		}
 	}
@@ -319,18 +263,17 @@ class CMD {
 	private async _clone_repo(
 		address:string,
 		dest_folder:string,
-		context='_clr',
 		branch='master',
 		recursive=false
 	){
 		const action = `cloning repo [${address}]`;
-		this.output.verbose_log(`Started ${action}`, context);
+		this.output.verbose_log(`Started ${action}`);
 		return new Promise((resolve, reject) => {
 			const branch_str = (branch !== 'master' && typeof branch === 'string') ?
 				`-b ${branch} ` : '';
 			let cmd = `git clone ${branch_str}${address} ${dest_folder} --progress`;
 			cmd += (recursive === true) ? ` --recurse-submodules` : '';
-			this.spawn.spin(cmd, context, action, undefined, resolve, reject);
+			this.spawn.spin(cmd, action, resolve, reject);
 		});
 	}
 	

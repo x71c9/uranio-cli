@@ -35,7 +35,6 @@ exports.uranio_process = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const urn_lib_1 = require("urn-lib");
-// import {Arguments, Repo, PacMan, Deploy, Params, DB} from './types';
 const types_1 = require("./types");
 const output = __importStar(require("./output/index"));
 const util = __importStar(require("./util/index"));
@@ -53,7 +52,6 @@ async function uranio_process(args) {
     process_params = (0, common_1.read_init_file)(process_params);
     process_params = _set_args(process_params, args);
     process.chdir(process_params.root);
-    // process_params = _autoset_is_dot(process_params, args);
     output_instance = output.create(process_params);
     util_instance = util.create(process_params, output_instance);
     _init_log();
@@ -96,12 +94,6 @@ function _set_root(args) {
         process_params.root = _get_project_root();
     }
 }
-// function _autoset_is_dot(params:Params, args:Arguments):Params{
-//   if(typeof args.is_dot === 'undefined' && check_if_is_dot(params.root)){
-//     params.is_dot = true;
-//   }
-//   return params;
-// }
 function _init_log() {
     const log_file_path = `${process_params.root}/${defaults_1.defaults.log_filepath}`;
     if (!util_instance.fs.exists(log_file_path)) {
@@ -111,13 +103,13 @@ function _init_log() {
     _log_root();
 }
 function _log_arguments(params) {
-    output_instance.debug_log(JSON.stringify(params), 'args');
+    output_instance.debug_log(JSON.stringify(params));
 }
 function _log_root() {
-    output_instance.verbose_log(`$URNROOT$Project root [${process_params.root}]`, 'root');
+    output_instance.verbose_log(`$URNROOT$Project root [${process_params.root}]`);
 }
 function _set_args(params, args) {
-    // Paramters with default value = false
+    /* Paramters with default value = false */
     const prod = args.p || args.prod;
     if (prod == true) {
         params.prod = true;
@@ -132,6 +124,13 @@ function _set_args(params, args) {
     if (typeof args.noforce === 'boolean' && !!args.noforce !== !params.force) {
         params.force = !args.noforce;
     }
+    const debug = args.u || args.debug;
+    if (debug == true) {
+        params.debug = true;
+    }
+    if (typeof args.nodebug === 'boolean' && !!args.nodebug !== !params.debug) {
+        params.debug = !args.nodebug;
+    }
     const verbose = args.v || args.verbose;
     if (verbose == true) {
         params.verbose = true;
@@ -139,12 +138,9 @@ function _set_args(params, args) {
     if (typeof args.noverbose === 'boolean' && !!args.noverbose !== !params.verbose) {
         params.verbose = !args.noverbose;
     }
-    const debug = args.u || args.debug;
-    if (debug == true) {
-        params.debug = true;
-    }
-    if (typeof args.nodebug === 'boolean' && !!args.nodebug !== !params.debug) {
-        params.debug = !args.nodebug;
+    // If debug mode is one also verbose mode must be on.
+    if (params.debug === true) {
+        params.verbose = true;
     }
     const hide = args.n || args.hide;
     if (hide == true) {
@@ -154,7 +150,7 @@ function _set_args(params, args) {
         params.hide = !args.nohide;
     }
     const blank = args.b || args.blank;
-    if (blank == true) {
+    if (blank == true || process.env.NO_COLOR == 'true') {
         params.blank = true;
     }
     if (typeof args.noblank === 'boolean' && !!args.noblank !== !params.blank) {
@@ -181,10 +177,6 @@ function _set_args(params, args) {
     if (typeof args.noinside_ntl === 'boolean' && !!args.noinside_ntl !== !params.inside_ntl) {
         params.inside_ntl = !args.noinside_ntl;
     }
-    // const is_dot = args.is_dot;
-    // if(is_dot == true){
-    //   params.is_dot = true;
-    // }
     const time = args.t || args.time;
     if (time == true) {
         params.time = true;
@@ -220,7 +212,7 @@ function _set_args(params, args) {
     if (typeof args.nodocker_db === 'boolean' && !!args.nodocker_db !== !params.docker_db) {
         params.docker_db = !args.nodocker_db;
     }
-    // Paramteters with default value = true
+    /* Paramteters with default value = true */
     const filelog = args.l || args.filelog;
     if (filelog == false || filelog == 'false') {
         params.filelog = false;
@@ -242,7 +234,7 @@ function _set_args(params, args) {
     if (typeof args.nocolor_uranio === 'boolean' && !!args.nocolor_uranio !== !params.color_uranio) {
         params.color_uranio = !args.nocolor_uranio;
     }
-    // Parameters with default value type = string
+    /* Parameters with default value type = string */
     const prefix = args.x || args.prefix;
     if (typeof prefix === 'string' && prefix !== '') {
         params.prefix = prefix;
@@ -265,28 +257,23 @@ function _set_args(params, args) {
     if (typeof config === 'string' && config != '') {
         params.config = config;
     }
-    // const deploy = args.d || args.deploy;
-    // if(typeof deploy === 'string' && deploy != ''){
-    //   check_deploy(deploy);
-    //   params.deploy = deploy as Deploy;
-    // }
     const db = args.db;
     if (typeof db === 'string' && db !== '') {
         (0, common_1.check_db)(db);
         params.db = db;
     }
-    const color_log = args.d || args.color_log;
-    if (typeof color_log === 'string' && color_log != '') {
-        params.color_log = color_log;
-    }
-    const color_verbose = args.o || args.color_verbose;
-    if (typeof color_verbose === 'string' && color_verbose != '') {
-        params.color_verbose = color_verbose;
-    }
-    const color_debug = args.o || args.color_debug;
-    if (typeof color_debug === 'string' && color_debug != '') {
-        params.color_debug = color_debug;
-    }
+    // const color_log = args.d || args.color_log;
+    // if(typeof color_log === 'string' && color_log != ''){
+    // 	params.color_log = color_log;
+    // }
+    // const color_verbose = args.o || args.color_verbose;
+    // if(typeof color_verbose === 'string' && color_verbose != ''){
+    // 	params.color_verbose = color_verbose;
+    // }
+    // const color_debug = args.o || args.color_debug;
+    // if(typeof color_debug === 'string' && color_debug != ''){
+    // 	params.color_debug = color_debug;
+    // }
     // Root parameter
     // let root = args.s || args.root;
     // if(typeof root === 'string' && root !== ''){
@@ -336,7 +323,7 @@ function _folder_is_valid(folder_path) {
             try {
                 const content = fs_1.default.readFileSync(package_json_path, 'utf8');
                 const pack = urn_lib_1.urn_util.json.clean_parse(content);
-                if (pack.name === 'uranio-cli' || (pack.name === 'uranio' && pack.uranio == true)) {
+                if (pack.name === 'uranio' || (pack.name === 'uranio-monorepo' && pack.uranio == true)) {
                     return false;
                 }
                 return true;
@@ -361,7 +348,7 @@ function _folder_is_uranio(folder_path) {
             try {
                 const content = fs_1.default.readFileSync(package_json_path, 'utf8');
                 const pack = urn_lib_1.urn_util.json.clean_parse(content);
-                if (pack.name === 'uranio') {
+                if (pack.name === 'uranio-monorepo') {
                     return true;
                 }
                 return false;

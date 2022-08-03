@@ -31,9 +31,6 @@ export declare type Params = {
     repo: Repo;
     pacman: PacMan;
     db: DB;
-    color_log: string;
-    color_verbose: string;
-    color_debug: string;
     root: string;
 };
 export declare type Arguments = minimist.ParsedArgs;

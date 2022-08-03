@@ -172,12 +172,12 @@ function _remove_package_scripts(){
 				package_json_path,
 				JSON.stringify(package_data, null, '\t')
 			);
-			output_instance.done_log(`Updated package.json scripts.`, 'alias');
+			output_instance.done_log(`Updated package.json scripts.`);
 		}catch(ex){
-			output_instance.error_log(`Cannot update ${package_json_path}.`, 'alias');
+			output_instance.error_log(`Cannot update ${package_json_path}.`);
 		}
 	}catch(ex){
-		output_instance.error_log(`Cannot parse ${package_json_path}.`, 'alias');
+		output_instance.error_log(`Cannot parse ${package_json_path}.`);
 	}
 }
 
@@ -204,8 +204,8 @@ function _remove_package_resolutions(){
 			package_json_path,
 			JSON.stringify(package_data, null, '\t')
 		);
-		output_instance.done_log(`Updated package.json resolutions.`, 'alias');
+		output_instance.done_log(`Updated package.json resolutions.`);
 	}catch(ex){
-		output_instance.error_log(`Cannot update ${package_json_path}.`, 'alias');
+		output_instance.error_log(`Cannot update ${package_json_path}.`);
 	}
 }

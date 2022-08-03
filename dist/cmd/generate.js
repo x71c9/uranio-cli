@@ -134,7 +134,7 @@ async function _generate(args) {
             root_uranio = `${generate_params.root}/${generate_params.config}`;
         }
         const generate_cmd = `yarn uranio-generate-${generate_params.repo} -c ${root_uranio} ${args}`;
-        util_instance.spawn.verbose_log(generate_cmd, 'generate', 'generating', undefined, resolve, reject);
+        util_instance.spawn.debug_log(generate_cmd, 'generating', resolve, reject);
     });
     _copy_uranio_schema_repo();
     // output_instance.done_log('Generate completed.');
@@ -224,7 +224,7 @@ function _register_text(parent_folder) {
                 text += `export * from '../atoms/${parent_folder}/${atom_folder}/routes/${base_route_filename}';\n`;
             }
         }
-        output_instance.verbose_log(`Exported atom [${atom_folder}].`, `atms`);
+        output_instance.verbose_log(`Exported atom [${atom_folder}].`);
     }
     text += `export {};\n`;
     return text;
