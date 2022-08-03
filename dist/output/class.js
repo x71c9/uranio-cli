@@ -70,7 +70,7 @@ class Output {
         const prefixed = this._prefix_color(text, 'verbose');
         const formatted = this._format_text(prefixed);
         const read = this._read_text(formatted, 'verbose');
-        this._log(read, true);
+        this._log(read, (this.params.verbose === true));
     }
     debug_log(text) {
         if (this.params.debug === false) {
@@ -79,7 +79,7 @@ class Output {
         const prefixed = this._prefix_color(text, 'debug');
         const formatted = this._format_text(prefixed);
         const read = this._read_text(formatted, 'debug');
-        this._log(read, true);
+        this._log(read, (this.params.debug === true));
     }
     done_log(text) {
         this._go_previous();
@@ -157,6 +157,9 @@ class Output {
         }
     }
     _read_text(text, type) {
+        if (this.params.color_uranio === false) {
+            return text;
+        }
         if (this._has_prefixed_color(text) === false && this._has_prefixed_type(text) === false) {
             switch (type) {
                 case 'log': {
