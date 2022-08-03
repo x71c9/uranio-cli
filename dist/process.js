@@ -227,13 +227,13 @@ function _set_args(params, args) {
     if (typeof args.nospin === 'boolean' && !!args.nospin !== !params.spin) {
         params.spin = !args.nospin;
     }
-    const color_uranio = args.color_uranio;
-    if (color_uranio == false || color_uranio == 'false') {
-        params.color_uranio = false;
-    }
-    if (typeof args.nocolor_uranio === 'boolean' && !!args.nocolor_uranio !== !params.color_uranio) {
-        params.color_uranio = !args.nocolor_uranio;
-    }
+    // const color_uranio = args.color_uranio;
+    // if(color_uranio == false || color_uranio == 'false'){
+    // 	params.color_uranio = false;
+    // }
+    // if(typeof args.nocolor_uranio === 'boolean' && !!args.nocolor_uranio !== !params.color_uranio){
+    // 	params.color_uranio = !args.nocolor_uranio;
+    // }
     /* Parameters with default value type = string */
     const prefix = args.x || args.prefix;
     if (typeof prefix === 'string' && prefix !== '') {

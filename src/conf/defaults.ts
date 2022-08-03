@@ -23,7 +23,7 @@ export const default_params:Params = {
 	docker_db: false,
 	filelog: true,
 	spin: true,
-	color_uranio:true,
+	// color_uranio:true,
 	prefix: '',
 	branch: 'master',
 	config: 'uranio.toml',

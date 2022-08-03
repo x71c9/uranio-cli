@@ -115,28 +115,6 @@ class Output {
 		}
 	}
 	
-	public error_log(text:string)
-			:void{
-		this.stop_loading();
-		// const error_text = `${chalk.bgHex(`#4a3030`).hex(`#8b6666`)(`[ERROR] ${text}`)}`;
-		// const error_text = `${chalk.hex(`#922424`)(`[ERROR] ${text}`)}`;
-		// const error_text = `${chalk.hex(`#874040`)(`[ERROR] ${text}`)}`;
-		// const error_text = chalk.red(`[ERROR] ${text}`);
-		// this.log(error_text);
-		const prefixed = this._prefix_color(text, 'error');
-		const formatted = this._format_text(prefixed);
-		const read = this._read_text(formatted, 'error');
-		this._log(read, true);
-	}
-	
-	public warn_log(text:string)
-			:void{
-		this.stop_loading();
-		// const warn_text = `${chalk.hex(`#d0a800`)(`[WARN] ${text}`)}`;
-		const warn_text = chalk.yellow(`[WARN] ${text}`);
-		this.log(warn_text);
-	}
-	
 	public end_log(text:string)
 			:void{
 		this.stop_loading();
@@ -146,12 +124,42 @@ class Output {
 		this.log(end_text);
 	}
 	
+	public error_log(text:string)
+			:void{
+		this.stop_loading();
+		// const error_text = `${chalk.bgHex(`#4a3030`).hex(`#8b6666`)(`[ERROR] ${text}`)}`;
+		// const error_text = `${chalk.hex(`#922424`)(`[ERROR] ${text}`)}`;
+		// const error_text = `${chalk.hex(`#874040`)(`[ERROR] ${text}`)}`;
+		// const error_text = chalk.red(`[ERROR] ${text}`);
+		// this.log(error_text);
+		const prefixed = this._prefix_color(`[ERROR] ${text}`, 'error');
+		const formatted = this._format_text(prefixed);
+		const read = this._read_text(formatted, 'error');
+		this._log(read, true);
+	}
+	
+	public warn_log(text:string)
+			:void{
+		this.stop_loading();
+		// const warn_text = `${chalk.hex(`#d0a800`)(`[WARN] ${text}`)}`;
+		// const warn_text = chalk.yellow(`[WARN] ${text}`);
+		// this.log(warn_text);
+		const prefixed = this._prefix_color(`[WARN] ${text}`, 'warn');
+		const formatted = this._format_text(prefixed);
+		const read = this._read_text(formatted, 'warn');
+		this._log(read, true);
+	}
+	
 	public wrong_end_log(text:string)
 			:void{
 		this.stop_loading();
 		const end_text = `${defaults.wrong_char} ${text}`;
-		// this.log((!this.params.blank) ? chalk.red(end_text) : end_text);
-		this.log(end_text);
+		// // this.log((!this.params.blank) ? chalk.red(end_text) : end_text);
+		// this.log(end_text);
+		const prefixed = this._prefix_color(`[FAILED] ${end_text}`, 'error');
+		const formatted = this._format_text(prefixed);
+		const read = this._read_text(formatted, 'error');
+		this._log(read, true);
 	}
 	
 	public start_loading(text:string)
@@ -200,13 +208,17 @@ class Output {
 	}
 	
 	private _read_text(text:string, type:LogType){
-		if(this.params.color_uranio === false){
+		// if(this.params.color_uranio === false){
+		// 	return text;
+		// }
+		if(this.params.prefix_color === true){
 			return text;
 		}
 		if(this._has_prefixed_color(text) === false && this._has_prefixed_type(text) === false){
 			switch(type){
 				case 'log':{
-					return chalk.magenta(text);
+					// return chalk.magenta(text);
+					return chalk.green(text);
 				}
 				case 'verbose':{
 					return chalk.blue(text);
@@ -226,10 +238,14 @@ class Output {
 	}
 	
 	private _prefix_color(text:string, type:LogType){
+		if(this.params.prefix_color === false){
+			return text;
+		}
 		let color = '';
 		switch(type){
 			case 'log':{
-				color = '#magenta';
+				// color = '#magenta';
+				color = '#green';
 				break;
 			}
 			case 'verbose':{
@@ -249,7 +265,7 @@ class Output {
 				break;
 			}
 		}
-		return (this.params.prefix_color === true) ? `[c${color}]${text}` : text;
+		return `[c${color}]${text}`;
 	}
 	
 	private _log(text:string, out=false){
@@ -571,6 +587,7 @@ class Output {
 			return '';
 		}
 		return (this.params.blank === false) ? chalk.magenta(text) : text;
+		// return (this.params.blank === false) ? chalk.green(text) : text;
 		// return (this.params.blank === false) ? chalk.hex('#A633FF')(text) : text;
 	}
 	

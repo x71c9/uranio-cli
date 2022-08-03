@@ -12,9 +12,9 @@ declare class Output {
     debug_log(text: string): void;
     done_log(text: string): void;
     done_verbose_log(text: string): void;
+    end_log(text: string): void;
     error_log(text: string): void;
     warn_log(text: string): void;
-    end_log(text: string): void;
     wrong_end_log(text: string): void;
     start_loading(text: string): void;
     stop_loading(): void;

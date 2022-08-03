@@ -128,14 +128,15 @@ async function _generate_client_config() {
 async function _generate(args) {
     // _init_generate(params);
     await _generate_register();
-    await new Promise((resolve, reject) => {
-        let root_uranio = generate_params.config;
-        if (generate_params.config[0] !== '/') {
-            root_uranio = `${generate_params.root}/${generate_params.config}`;
-        }
-        const generate_cmd = `yarn uranio-generate-${generate_params.repo} -c ${root_uranio} ${args}`;
-        util_instance.spawn.debug_log(generate_cmd, 'generating', resolve, reject);
-    });
+    let root_uranio = generate_params.config;
+    if (generate_params.config[0] !== '/') {
+        root_uranio = `${generate_params.root}/${generate_params.config}`;
+    }
+    // const final_args = (is_docker === true) ? `${args} urn_log_prefix_type=true` : args;
+    const final_args = `${args} urn_log_prefix_type=true`;
+    // const final_args = `${args}`;
+    const generate_cmd = `yarn uranio-generate-${generate_params.repo} -c ${root_uranio} ${final_args}`;
+    util_instance.spawn.debug_log_promise(generate_cmd, 'generating');
     _copy_uranio_schema_repo();
     // output_instance.done_log('Generate completed.');
 }

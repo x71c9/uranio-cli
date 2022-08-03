@@ -31,13 +31,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dev_panel = exports.dev_server = exports.dev = void 0;
+exports._watch = exports.dev_panel = exports.dev_server = exports.dev = void 0;
 const path_1 = __importDefault(require("path"));
 const forever_monitor_1 = __importDefault(require("forever-monitor"));
 const is_docker_1 = __importDefault(require("is-docker"));
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
 const defaults_1 = require("../conf/defaults");
+// import {Params} from '../types';
 const types_1 = require("../types");
 const generate_1 = require("./generate");
 const transpose_1 = require("./transpose");
@@ -106,18 +107,23 @@ function _init_params(params) {
 async function _init_dev() {
     await (0, build_1.build_server)(dev_params, true, false);
     _tsc_watch();
-    _watch();
+    // _watch();
 }
 async function _dev_panel() {
     // uranio-panel-adm dev doesn't need Forever to reaload (like the server)
     // because it reloads itself by launching Nuxt dev service.
-    const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev`;
-    util_instance.spawn.verbose_log(cmd_dev_panel, 'developing panel');
+    const args = (is_docker === true) ? ' urn_log_prefix_type=true' : '';
+    // const args = ' urn_log_prefix_type=true';
+    // const args = '';
+    const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev${args}`;
+    util_instance.spawn.debug_log(cmd_dev_panel, 'developing panel');
 }
 async function _dev_server() {
     _is_dev_server = true;
     // _fix_mongodb_saslprep_requirement();
-    const args = (is_docker === true) ? ['urn_log_prefix_type=true'] : [];
+    // const args = (is_docker === true) ? ['urn_log_prefix_type=true'] : [];
+    const args = ['urn_log_prefix_type=true'];
+    // const args:string[] = [];
     // Forever module needs for ensuring that a given script runs continuously
     _service_child = new forever_monitor_1.default.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`, {
         args: args,
@@ -136,8 +142,8 @@ async function _dev_server() {
     });
 }
 function _tsc_watch() {
-    const tsc_watch = `yarn tsc -w`;
-    util_instance.spawn.verbose_log(tsc_watch, 'watching types');
+    // const tsc_watch = `yarn tsc -w`;
+    // util_instance.spawn.verbose_log(tsc_watch, 'watching types');
 }
 function _watch() {
     const src_path = `${dev_params.root}/src/`;
@@ -194,6 +200,7 @@ function _watch() {
         output_instance.done_log(`[toml watch] Generated [${_event}] [${_path}].`);
     });
 }
+exports._watch = _watch;
 // function _fix_mongodb_saslprep_requirement(){
 //   const dist_dir = `${dev_params.root}/dist`;
 //   if(!util_instance.fs.exists(dist_dir)){

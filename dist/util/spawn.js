@@ -173,8 +173,10 @@ class Spawn {
             this.output.stop_loading();
             switch (code) {
                 case 0: {
-                    this.output.done_log(`Done ${action}`);
-                    if (verbose || spin) {
+                    if (!verbose && !debug) {
+                        this.output.done_log(`Done ${action}`);
+                    }
+                    if (verbose) {
                         this.output.done_verbose_log(`Done ${action}`);
                     }
                     return (resolve) ? resolve(true) : true;

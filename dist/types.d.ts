@@ -24,7 +24,6 @@ export declare type Params = {
     docker_db: boolean;
     filelog: boolean;
     spin: boolean;
-    color_uranio: boolean;
     prefix: string;
     branch: string;
     config: string;
