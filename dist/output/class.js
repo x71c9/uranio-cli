@@ -39,6 +39,24 @@ class Output {
     constructor(params) {
         this.params = params;
     }
+    // public log(text:string, context='log', color?:string)
+    // 		:void{
+    // 	const colored_text = this._color_text(text, 'log', color);
+    // 	const final_color = (typeof color === 'string') ? color : this.params.color_log;
+    // 	this._log(this._prefix_color(colored_text, final_color), context, true);
+    // }
+    // public verbose_log(text:string, context='vlog', color?:string)
+    // 		:void{
+    // 	const colored_text = this._color_text(text, 'verbose', color);
+    // 	const final_color = (typeof color === 'string') ? color : this.params.color_verbose;
+    // 	this._log(this._prefix_color(colored_text, final_color), context, (this.params.verbose === true));
+    // }
+    // public debug_log(text:string, context='dlog', color?:string)
+    // 		:void{
+    // 	const colored_text = this._color_text(text, 'debug', color);
+    // 	const final_color = (typeof color === 'string') ? color : this.params.color_debug;
+    // 	this._log(this._prefix_color(colored_text, final_color), context, (this.params.debug === true));
+    // }
     log(text) {
         const prefixed = this._prefix_color(text, 'log');
         const formatted = this._format_text(prefixed);
@@ -63,24 +81,6 @@ class Output {
         const read = this._read_text(formatted, 'debug');
         this._log(read, true);
     }
-    // public log(text:string, context='log', color?:string)
-    // 		:void{
-    // 	const colored_text = this._color_text(text, 'log', color);
-    // 	const final_color = (typeof color === 'string') ? color : this.params.color_log;
-    // 	this._log(this._prefix_color(colored_text, final_color), context, true);
-    // }
-    // public verbose_log(text:string, context='vlog', color?:string)
-    // 		:void{
-    // 	const colored_text = this._color_text(text, 'verbose', color);
-    // 	const final_color = (typeof color === 'string') ? color : this.params.color_verbose;
-    // 	this._log(this._prefix_color(colored_text, final_color), context, (this.params.verbose === true));
-    // }
-    // public debug_log(text:string, context='dlog', color?:string)
-    // 		:void{
-    // 	const colored_text = this._color_text(text, 'debug', color);
-    // 	const final_color = (typeof color === 'string') ? color : this.params.color_debug;
-    // 	this._log(this._prefix_color(colored_text, final_color), context, (this.params.debug === true));
-    // }
     done_log(text) {
         this._go_previous();
         this.log(`${defaults_1.defaults.check_char} ${text}`);
@@ -96,8 +96,12 @@ class Output {
         // const error_text = `${chalk.bgHex(`#4a3030`).hex(`#8b6666`)(`[ERROR] ${text}`)}`;
         // const error_text = `${chalk.hex(`#922424`)(`[ERROR] ${text}`)}`;
         // const error_text = `${chalk.hex(`#874040`)(`[ERROR] ${text}`)}`;
-        const error_text = chalk_1.default.red(`[ERROR] ${text}`);
-        this.log(error_text);
+        // const error_text = chalk.red(`[ERROR] ${text}`);
+        // this.log(error_text);
+        const prefixed = this._prefix_color(text, 'error');
+        const formatted = this._format_text(prefixed);
+        const read = this._read_text(formatted, 'error');
+        this._log(read, true);
     }
     warn_log(text) {
         this.stop_loading();
@@ -109,12 +113,14 @@ class Output {
         this.stop_loading();
         const end_text = `${defaults_1.defaults.check_char} ${text}`;
         // this.log((!this.params.blank) ? chalk.yellow(end_text) : end_text, 'end');
-        this.log((!this.params.blank) ? chalk_1.default.magenta(end_text) : end_text);
+        // this.log((!this.params.blank) ? chalk.magenta(end_text) : end_text);
+        this.log(end_text);
     }
     wrong_end_log(text) {
         this.stop_loading();
         const end_text = `${defaults_1.defaults.wrong_char} ${text}`;
-        this.log((!this.params.blank) ? chalk_1.default.red(end_text) : end_text);
+        // this.log((!this.params.blank) ? chalk.red(end_text) : end_text);
+        this.log(end_text);
     }
     start_loading(text) {
         if (this.params.hide === true) {
@@ -162,28 +168,41 @@ class Output {
                 case 'debug': {
                     return chalk_1.default.gray(text);
                 }
+                case 'error': {
+                    return chalk_1.default.red(text);
+                }
+                case 'warn': {
+                    return chalk_1.default.yellow(text);
+                }
             }
         }
         return this._read_color(text);
     }
     _prefix_color(text, type) {
+        let color = '';
         switch (type) {
             case 'log': {
-                const color = '#magenta';
-                return (this.params.prefix_color === true) ?
-                    `[c${color}]${text}` : text;
+                color = '#magenta';
+                break;
             }
             case 'verbose': {
-                const color = 'blue';
-                return (this.params.prefix_color === true) ?
-                    `[c${color}]${text}` : text;
+                color = '#blue';
+                break;
             }
             case 'debug': {
-                const color = 'gray';
-                return (this.params.prefix_color === true) ?
-                    `[c${color}]${text}` : text;
+                color = '#gray';
+                break;
+            }
+            case 'error': {
+                color = '#red';
+                break;
+            }
+            case 'warn': {
+                color = '#yellow';
+                break;
             }
         }
+        return (this.params.prefix_color === true) ? `[c${color}]${text}` : text;
     }
     _log(text, out = false) {
         if (this.params.filelog) {
