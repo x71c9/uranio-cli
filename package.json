@@ -7,8 +7,9 @@
 	"types": "dist/index.d.ts",
 	"scripts": {
 		"build": "yarn tsc -b",
-		"dev:init": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js init -fvw -r api -x [CL] --branch master\"",
-		"dev:build": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js build -fvw -r api -x [CL] --branch master\"",
+		"dev:init": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js init -fivw -r api -x [CL] --branch master\"",
+		"dev:build": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js build -fvt -r api -x [CL] --branch master\"",
+		"dev:build:w": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js build -fvwt -r api --branch master\"",
 		"dev:dev": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js dev --branch master\"",
 		"dev:help": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -h -x --branch master\"",
 		"dev:ver": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v --branch master\"",

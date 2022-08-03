@@ -18,8 +18,9 @@ export async function help():Promise<void> {
 	console.log(`commands:`);
 	console.log(`  init ............... init uranio repo.`);
 	console.log(`  deinit ............. deinit uranio repo.`);
+	console.log(`  reinit ............. deinit and init uranio repo.`);
 	console.log(`  dev ................ start uranio development mode.`);
-	console.log(`  transpose .......... transpose atom books.`);
+	console.log(`  transpose .......... transpose files to uranio repo.`);
 	console.log(`  info ............... show uranio info for this repo.`);
 	console.log(`  version ............ show package version.`);
 	console.log(`  help ............... show help menu [this one].`);
@@ -49,9 +50,9 @@ export async function help():Promise<void> {
 	console.log(`  -l --filelog ....... save log on file.`);
 	console.log(`  -i --spin .......... log with spinner.`);
 	console.log(`  -e --native ........ log in native mode.`);
-	console.log(`  -d --color_log ..... log color.`);
-	console.log(`  -o --color_verbose . verbose log color.`);
-	console.log(`  -q --color_debug ... debug log color.`);
+	// console.log(`  -d --color_log ..... log color.`);
+	// console.log(`  -o --color_verbose . verbose log color.`);
+	// console.log(`  -q --color_debug ... debug log color.`);
 	
 	console.log(``);
 	console.log(``);

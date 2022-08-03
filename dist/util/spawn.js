@@ -54,63 +54,63 @@ class Spawn {
         this.output = output;
     }
     exec_sync(command) {
-        this.output.verbose_log(command, 'exec');
+        this.output.verbose_log(command);
         cp.execSync(command);
     }
-    spin(command, context, action, color, resolve, reject, detached = false) {
-        this.output.debug_log(command, 'spin');
-        return this._spawn(command, context, action, true, false, false, color, resolve, reject, detached);
+    spin(command, action, resolve, reject, detached = false) {
+        this.output.debug_log(command);
+        return this._spawn(command, action, true, false, false, resolve, reject, detached);
     }
-    log(command, context, action, color, resolve, reject, detached = false) {
-        this.output.debug_log(command, 'log');
-        return this._spawn(command, context, action, false, true, false, color, resolve, reject, detached);
+    log(command, action, resolve, reject, detached = false) {
+        this.output.debug_log(command);
+        return this._spawn(command, action, false, true, false, resolve, reject, detached);
     }
-    verbose_log(command, context, action, color, resolve, reject, detached = false) {
-        this.output.debug_log(command, 'verbose log');
-        return this._spawn(command, context, action, false, false, true, color, resolve, reject, detached);
+    verbose_log(command, action, resolve, reject, detached = false) {
+        this.output.debug_log(command);
+        return this._spawn(command, action, false, false, true, resolve, reject, detached);
     }
-    spin_and_log(command, context, action, color, resolve, reject, detached = false) {
-        this.output.debug_log(command, 'spin and log');
-        return this._spawn(command, context, action, true, true, false, color, resolve, reject, detached);
+    spin_and_log(command, action, resolve, reject, detached = false) {
+        this.output.debug_log(command);
+        return this._spawn(command, action, true, true, false, resolve, reject, detached);
     }
-    spin_and_verbose_log(command, context, action, color, resolve, reject, detached = false) {
-        this.output.debug_log(command, 'spin and verbose');
-        return this._spawn(command, context, action, true, false, true, color, resolve, reject, detached);
+    spin_and_verbose_log(command, action, resolve, reject, detached = false) {
+        this.output.debug_log(command);
+        return this._spawn(command, action, true, false, true, resolve, reject, detached);
     }
-    async spin_promise(command, context, action, color, detached = false) {
+    async spin_promise(command, action, detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.spin(command, context, action, color, resolve, reject, detached);
+            return this.spin(command, action, resolve, reject, detached);
         });
     }
-    async log_promise(command, context, action, color, detached = false) {
+    async log_promise(command, action, detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.log(command, context, action, color, resolve, reject, detached);
+            return this.log(command, action, resolve, reject, detached);
         });
     }
-    async verbose_log_promise(command, context, action, color, detached = false) {
+    async verbose_log_promise(command, action, detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.verbose_log(command, context, action, color, resolve, reject, detached);
+            return this.verbose_log(command, action, resolve, reject, detached);
         });
     }
-    async spin_and_log_promise(command, context, action, color, detached = false) {
+    async spin_and_log_promise(command, action, detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.spin_and_log(command, context, action, color, resolve, reject, detached);
+            return this.spin_and_log(command, action, resolve, reject, detached);
         });
     }
-    async spin_and_verbose_log_promise(command, context, action, color, detached = false) {
+    async spin_and_verbose_log_promise(command, action, detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.spin_and_verbose_log(command, context, action, color, resolve, reject, detached);
+            return this.spin_and_verbose_log(command, action, resolve, reject, detached);
         });
     }
-    _spawn(command, context, action, spin, log, verbose, color, resolve, reject, detached = false) {
+    _spawn(command, action, spin, log, verbose, resolve, reject, detached = false) {
         if (spin && verbose) {
             this.output.start_loading(command);
         }
         if (log) {
-            this.output.log(command, context, color);
+            this.output.log(command);
         }
         else if (verbose) {
-            this.output.verbose_log(command, context, color);
+            this.output.verbose_log(command);
         }
         const child = cp.spawn(command, { shell: true, detached: detached });
         if (child.stdout) {
@@ -127,10 +127,10 @@ class Spawn {
                         continue;
                     }
                     if (log) {
-                        this.output.log(plain_text, context, color);
+                        this.output.log(plain_text);
                     }
                     if (verbose) {
-                        this.output.verbose_log(plain_text, context, color);
+                        this.output.verbose_log(plain_text);
                     }
                     _append(child_outputs[child.pid || 'pid0'], plain_text);
                 }
@@ -150,17 +150,17 @@ class Spawn {
                         continue;
                     }
                     if (log) {
-                        this.output.log(plain_text, context, color);
+                        this.output.log(plain_text);
                     }
                     if (verbose) {
-                        this.output.verbose_log(plain_text, context, color);
+                        this.output.verbose_log(plain_text);
                     }
                     _append(child_outputs[child.pid || 'pid0'], plain_text);
                 }
             });
         }
         child.on('error', (err) => {
-            this.output.error_log(`${err}`, context);
+            this.output.error_log(`${err}`);
             return (reject) ? reject() : false;
         });
         child.on('close', (code) => {
@@ -168,10 +168,10 @@ class Spawn {
             switch (code) {
                 case 0: {
                     if (log) {
-                        this.output.done_log(`Done ${action}`, context);
+                        this.output.done_log(`Done ${action}`);
                     }
                     if (verbose || spin) {
-                        this.output.done_verbose_log(`Done ${action}`, context);
+                        this.output.done_verbose_log(`Done ${action}`);
                     }
                     return (resolve) ? resolve(true) : true;
                 }
@@ -179,8 +179,8 @@ class Spawn {
                     if (code !== null) {
                         _print_cached_output(child_outputs[child.pid || 'pid0'], this.output);
                     }
-                    this.output.error_log(`Error on: ${command}`, context);
-                    this.output.error_log(`Child process exited with code ${code}`, context);
+                    this.output.error_log(`Error on: ${command}`);
+                    this.output.error_log(`Child process exited with code ${code}`);
                     // return (reject) ? reject() : false;
                 }
             }

@@ -137,13 +137,12 @@ function _init_log(){
 }
 
 function _log_arguments(params:Params){
-	output_instance.debug_log(JSON.stringify(params), 'args');
+	output_instance.debug_log(JSON.stringify(params));
 }
 
 function _log_root(){
 	output_instance.verbose_log(
-		`$URNROOT$Project root [${process_params.root}]`,
-		'root'
+		`$URNROOT$Project root [${process_params.root}]`
 	);
 }
 
@@ -170,6 +169,15 @@ function _set_args(params:Params, args:Arguments)
 		params.force = !args.noforce;
 	}
 	
+	const debug = args.u || args.debug;
+	
+	if(debug == true){
+		params.debug = true;
+	}
+	if(typeof args.nodebug === 'boolean' && !!args.nodebug !== !params.debug){
+		params.debug = !args.nodebug;
+	}
+	
 	const verbose = args.v || args.verbose;
 	
 	if(verbose == true){
@@ -179,13 +187,9 @@ function _set_args(params:Params, args:Arguments)
 		params.verbose = !args.noverbose;
 	}
 	
-	const debug = args.u || args.debug;
-	
-	if(debug == true){
-		params.debug = true;
-	}
-	if(typeof args.nodebug === 'boolean' && !!args.nodebug !== !params.debug){
-		params.debug = !args.nodebug;
+	// If debug mode is one also verbose mode must be on.
+	if(params.debug === true){
+		params.verbose = true;
 	}
 	
 	const hide = args.n || args.hide;
@@ -199,7 +203,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const blank = args.b || args.blank;
 	
-	if(blank == true){
+	if(blank == true || process.env.NO_COLOR == 'true'){
 		params.blank = true;
 	}
 	if(typeof args.noblank === 'boolean' && !!args.noblank !== !params.blank){

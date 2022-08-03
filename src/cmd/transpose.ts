@@ -203,7 +203,7 @@ function _validate_exists_path(full_path:string){
 	if(!full_path || !util_instance.fs.exists(full_path)){
 		let err_msg = '';
 		err_msg += `Invalid file path [${full_path}].`;
-		output_instance.error_log(err_msg, 'trsp');
+		output_instance.error_log(err_msg);
 		return false;
 	}
 	
@@ -214,7 +214,7 @@ function _validate_exists_path(full_path:string){
 function _validate_path(full_path:string){
 	
 	if(typeof full_path !== 'string' || full_path === ''){
-		output_instance.error_log('Invalid path.', 'trsp');
+		output_instance.error_log('Invalid path.');
 		process.exit(1);
 	}
 		
@@ -236,7 +236,7 @@ function _validate_path(full_path:string){
 		let err_msg = '';
 		err_msg += `Invalid file path [${full_path}].`;
 		err_msg += ` File must be in [${transpose_params.root}/src/].`;
-		output_instance.error_log(err_msg, 'trsp');
+		output_instance.error_log(err_msg);
 		return false;
 	}
 	

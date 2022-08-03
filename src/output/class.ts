@@ -4,11 +4,11 @@
  * @packageDocumentation
  */
 
-// import dateFormat from 'dateformat';
+import dateFormat from 'dateformat';
 
 import chalk from 'chalk';
 
-// import fs from 'fs';
+import fs from 'fs';
 
 import isDocker from 'is-docker';
 
@@ -35,19 +35,22 @@ class Output {
 		
 	}
 	
-	public log(text:string, _context='log', _color?:string)
+	public log(text:string)
 			:void{
-		console.log(chalk.magenta(text));
+		const formatted = this._format_text(text);
+		this._log(chalk.magenta(formatted));
 	}
 	
-	public verbose_log(text:string, _context='vlog', _color?:string)
+	public verbose_log(text:string)
 			:void{
-		console.log(chalk.blue(text));
+		const formatted = this._format_text(text);
+		this._log(chalk.blue(formatted));
 	}
 	
-	public debug_log(text:string, _context='dlog', _color?:string)
+	public debug_log(text:string)
 			:void{
-		console.log(chalk.dim(text));
+		const formatted = this._format_text(text);
+		this._log(chalk.dim(formatted));
 	}
 	
 	// public log(text:string, context='log', color?:string)
@@ -71,48 +74,51 @@ class Output {
 	// 	this._log(this._prefix_color(colored_text, final_color), context, (this.params.debug === true));
 	// }
 	
-	public done_log(text:string, context='done')
+	public done_log(text:string)
 			:void{
 		this._go_previous();
-		this.log(`${defaults.check_char} ${text}`, context);
+		this.log(`${defaults.check_char} ${text}`);
 	}
 	
-	public done_verbose_log(text:string, context='vdne')
+	public done_verbose_log(text:string)
 			:void{
 		if(this.params.verbose){
 			this._go_previous();
-			this.verbose_log(`${text}`, context);
+			this.verbose_log(`${text}`);
 		}
 	}
 	
-	public error_log(text:string, context='errr')
+	public error_log(text:string)
 			:void{
 		this.stop_loading();
 		// const error_text = `${chalk.bgHex(`#4a3030`).hex(`#8b6666`)(`[ERROR] ${text}`)}`;
 		// const error_text = `${chalk.hex(`#922424`)(`[ERROR] ${text}`)}`;
-		const error_text = `${chalk.hex(`#874040`)(`[ERROR] ${text}`)}`;
-		this.log(error_text, context);
+		// const error_text = `${chalk.hex(`#874040`)(`[ERROR] ${text}`)}`;
+		const error_text = chalk.red(`[ERROR] ${text}`);
+		this.log(error_text);
 	}
 	
-	public warn_log(text:string, context='errr')
+	public warn_log(text:string)
 			:void{
 		this.stop_loading();
-		const warn_text = `${chalk.hex(`#d0a800`)(`[WARN] ${text}`)}`;
-		this.log(warn_text, context);
+		// const warn_text = `${chalk.hex(`#d0a800`)(`[WARN] ${text}`)}`;
+		const warn_text = chalk.yellow(`[WARN] ${text}`);
+		this.log(warn_text);
 	}
 	
 	public end_log(text:string)
 			:void{
 		this.stop_loading();
 		const end_text = `${defaults.check_char} ${text}`;
-		this.log((!this.params.blank) ? chalk.yellow(end_text) : end_text, 'end');
+		// this.log((!this.params.blank) ? chalk.yellow(end_text) : end_text, 'end');
+		this.log((!this.params.blank) ? chalk.magenta(end_text) : end_text);
 	}
 	
 	public wrong_end_log(text:string)
 			:void{
 		this.stop_loading();
 		const end_text = `${defaults.wrong_char} ${text}`;
-		this.log((!this.params.blank) ? chalk.red(end_text) : end_text, 'end');
+		this.log((!this.params.blank) ? chalk.red(end_text) : end_text);
 	}
 	
 	public start_loading(text:string)
@@ -155,30 +161,100 @@ class Output {
 		const text_with_current = (is_docker) ? noroot_text : `${chopped_current} ${noroot_text}`;
 		spinner.text = this._spinner_text_color(text_with_current);
 		if(spinner.text.length > process.stdout.columns){
-			spinner.text = spinner.text.substr(0, process.stdout.columns - 2);
+			spinner.text = spinner.text.substring(0, process.stdout.columns - 2);
 		}
 	}
 	
-	// private _log(text:string, context='log', out=false){
-	// 	const output_text = (!this.params.native) ?
-	// 		this._format_text(text, context) : text + '\n';
-	// 	if(this.params.filelog){
-	// 		_log_to_file(output_text);
-	// 	}
-	// 	if(out){
-	// 		let was_spinning = false;
-	// 		if(spinner.isSpinning){
-	// 			was_spinning = true;
-	// 			this.stop_loading();
-	// 		}
-	// 		if(this.params.hide === false){
-	// 			process.stdout.write(output_text);
-	// 		}
-	// 		if(this.params.spin === true && was_spinning){
-	// 			spinner.start();
-	// 		}
-	// 	}
-	// }
+	private _log(text:string, out=false){
+		if(this.params.filelog){
+			_log_to_file(text);
+		}
+		if(out){
+			let was_spinning = false;
+			if(spinner.isSpinning){
+				was_spinning = true;
+				this.stop_loading();
+			}
+			if(this.params.hide === false){
+				process.stdout.write(text);
+			}
+			if(this.params.spin === true && was_spinning){
+				spinner.start();
+			}
+		}
+	}
+	
+	private _format_text(text:string){
+		
+		let time = dateFormat(new Date(), defaults.time_format);
+		time = (this.params.time === true) ? `[${time}]` : '';
+		text = this._replace_root_string(text);
+		const prefix = this.params.prefix;
+		
+		if(this.params.fullwidth === true){
+			return this._full_width(text, prefix, time);
+		}
+		
+		let output_text = prefix + ((prefix.length > 0) ? ' ' : '');
+		output_text += time;
+		if(time.length > 0){
+			output_text += ' ';
+		}
+		output_text += text;
+		output_text += `\n`;
+		return output_text;
+		
+	}
+	
+	private _full_width(text:string, prefix:string, time:string){
+		
+		let output_text = prefix + ((prefix.length > 0) ? ' ' : '');
+		
+		let text_lenght = 0;
+		text_lenght += prefix.length + 1;
+		
+		if(text.length > process.stdout.columns - prefix.length - 4){
+			text = text.substring(0, process.stdout.columns - prefix.length - 6);
+			text += ' ...';
+		}
+		
+		// eslint-disable-next-line no-control-regex
+		text_lenght += text.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '').length;
+		// eslint-disable-next-line no-control-regex
+		const count_tabs = (text.match(new RegExp("\t", "g")) || []).length;
+		
+		text_lenght += count_tabs * 7;
+		text_lenght += time.length;
+		text_lenght += 1;
+		
+		if(this.params.time){
+			text_lenght += 2;
+		}
+		
+		let gap_lenght = process.stdout.columns - text_lenght;
+		
+		if(gap_lenght < 0 && gap_lenght > -9){
+			time = time.replace(dateFormat(new Date, "yy-mm-dd'T'"), '');
+			gap_lenght += 9;
+		}else if(gap_lenght <= -9){
+			time = '';
+			gap_lenght += 24;
+		}
+		
+		let dot = '.';
+		
+		output_text += text + ' ';
+		for(let i = 0; i < gap_lenght; i++){
+			output_text += dot;
+		}
+		if(time.length > 0){
+			output_text += ' ';
+		}
+		output_text += time;
+		output_text += `\n`;
+		return output_text;
+		
+	}
 	
 	// private _format_text(text:string, context='frmt'){
 	// 	let time = dateFormat(new Date(), defaults.time_format);
@@ -330,17 +406,17 @@ class Output {
 	// 	return processed_text;
 	// }
 	
-	// private _replace_root_string(str:string)
-	// 		:string{
-	// 	if(str.indexOf('$URNROOT$') !== -1){
-	// 		return str.replace('$URNROOT$','');
-	// 	}
-	// 	if(this.params.root == '.'){
-	// 		return str;
-	// 	}
-	// 	const regex = new RegExp(`${this.params.root}`, 'g');
-	// 	return str.replace(regex, '__root');
-	// }
+	private _replace_root_string(str:string)
+			:string{
+		if(str.indexOf('$URNROOT$') !== -1){
+			return str.replace('$URNROOT$','');
+		}
+		if(this.params.root == '.'){
+			return str;
+		}
+		const regex = new RegExp(`${this.params.root}`, 'g');
+		return str.replace(regex, '__root');
+	}
 	
 	private _spinner_text_color(text?:string):string{
 		if(!text){
@@ -413,10 +489,10 @@ class Output {
 // 	return _remove_color_prefix(processed_text);
 // }
 
-// function _log_to_file(text:string)
-// 		:void{
-// 	fs.appendFileSync(defaults.log_filepath, text);
-// }
+function _log_to_file(text:string)
+		:void{
+	fs.appendFileSync(defaults.log_filepath, text);
+}
 
 export type OutputInstance = InstanceType<typeof Output>;
 

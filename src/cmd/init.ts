@@ -290,15 +290,12 @@ async function _ask_for_repo(args:Arguments){
 function _log_important_params(){
 	output_instance.verbose_log(
 		`$URNROOT$Project root: [${init_params.root}]`,
-		'root'
 	);
 	output_instance.verbose_log(
 		`Selected repository: [${init_params.repo}]`,
-		'repo'
 	);
 	output_instance.verbose_log(
 		`Selected pacman: [${init_params.pacman}]`,
-		'pacman'
 	);
 	// if(valid_deploy_repos().includes(init_params.repo)){
 	//   output_instance.verbose_log(
@@ -309,8 +306,8 @@ function _log_important_params(){
 }
 
 function _create_tmp_dir(){
-	util_instance.fs.remove_directory(defaults.tmp_folder, 'tmp');
-	util_instance.fs.create_directory(defaults.tmp_folder, 'tmp');
+	util_instance.fs.remove_directory(defaults.tmp_folder);
+	util_instance.fs.create_directory(defaults.tmp_folder);
 }
 
 async function _clone_assets_repo(){
@@ -318,10 +315,9 @@ async function _clone_assets_repo(){
 	await util_instance.cmd.clone_repo(
 		defaults.assets_repo,
 		`${init_params.root}/${defaults.tmp_folder}/uranio-assets`,
-		'assets',
 		init_params.branch
 	);
-	output_instance.done_log(`Cloned assets repo.`, 'assets');
+	output_instance.done_log(`Cloned assets repo.`);
 }
 
 async function _clone_uranio_schema(){
@@ -329,19 +325,18 @@ async function _clone_uranio_schema(){
 	await util_instance.cmd.clone_repo(
 		defaults.schema_repo,
 		`${init_params.root}/${defaults.tmp_folder}/uranio-schema`,
-		'assets',
 		init_params.branch
 	);
-	output_instance.done_log(`Cloned schema repo.`, 'assets');
+	output_instance.done_log(`Cloned schema repo.`);
 }
 
 function _copy_schema(){
 	const dot_schema = `${init_params.root}/${defaults.folder}/uranio-schema`;
-	util_instance.fs.remove_directory(dot_schema, 'tmp');
-	util_instance.fs.create_directory(dot_schema, 'tmp');
+	util_instance.fs.remove_directory(dot_schema);
+	util_instance.fs.create_directory(dot_schema);
 	const schema_dist =
 		`${init_params.root}/${defaults.tmp_folder}/uranio-schema/dist`;
-	util_instance.fs.copy_directory(schema_dist, `${dot_schema}/dist`, 'book');
+	util_instance.fs.copy_directory(schema_dist, `${dot_schema}/dist`);
 }
 
 function _copy_assets(){
@@ -358,7 +353,7 @@ function _copy_atoms(){
 		`${init_params.root}/${defaults.tmp_folder}/uranio-assets/main/atoms`;
 	const dest = `${init_params.root}/src/atoms`;
 	if(!util_instance.fs.exists(dest)){
-		util_instance.fs.copy_directory(ass_atoms_filepath, dest, 'book');
+		util_instance.fs.copy_directory(ass_atoms_filepath, dest);
 	}
 }
 
@@ -366,7 +361,7 @@ function _copy_sample(){
 	const sample_file =
 		`${init_params.root}/${defaults.tmp_folder}/uranio-assets/env/sample.env`;
 	const dest = `${init_params.root}/sample.env`;
-	util_instance.fs.copy_file(sample_file, dest, 'book');
+	util_instance.fs.copy_file(sample_file, dest);
 }
 
 function _copy_toml(){
@@ -374,7 +369,7 @@ function _copy_toml(){
 		`${init_params.root}/${defaults.tmp_folder}/uranio-assets/toml/uranio.toml`;
 	const dest = `${init_params.root}/uranio.toml`;
 	if(!util_instance.fs.exists(dest)){
-		util_instance.fs.copy_file(ass_toml_filepath, dest, 'book');
+		util_instance.fs.copy_file(ass_toml_filepath, dest);
 	}
 }
 
@@ -383,7 +378,7 @@ function _copy_index(){
 		`${init_params.root}/${defaults.tmp_folder}/uranio-assets/main/index.ts`;
 	const dest = `${init_params.root}/src/atoms/index.ts`;
 	if(!util_instance.fs.exists(dest)){
-		util_instance.fs.copy_file(index_filepath, dest, 'index');
+		util_instance.fs.copy_file(index_filepath, dest);
 	}
 }
 
@@ -393,11 +388,11 @@ function _copy_tsconfigs(){
 	
 	const dot_tsc_file = `${ts_dir}/root/tsconfig.json`;
 	const dot_dest = `${dot_folder}/tsconfig.json`;
-	util_instance.fs.copy_file(dot_tsc_file, dot_dest, 'tsco');
+	util_instance.fs.copy_file(dot_tsc_file, dot_dest);
 	
 	const bld_tsc_file = `${ts_dir}/builder/tsconfig.json`;
 	const bld_dest = `${init_params.root}/tsconfig.json`;
-	util_instance.fs.copy_file(bld_tsc_file, bld_dest, 'tsco');
+	util_instance.fs.copy_file(bld_tsc_file, bld_dest);
 }
 
 // function _copy_eslint_files(){
@@ -471,7 +466,7 @@ async function _init_pacman(){
 	if(init_params.pacman === 'yarn' && !util_instance.fs.exists(yarn_lock)){
 		await util_instance.cmd.yarn_install();
 	}
-	output_instance.done_verbose_log(`Pacman initialized.`, 'pacman');
+	output_instance.done_verbose_log(`Pacman initialized.`);
 }
 
 function _remove_tmp(){
@@ -480,11 +475,9 @@ function _remove_tmp(){
 	);
 	util_instance.fs.remove_directory(
 		`${init_params.root}/${defaults.tmp_folder}`,
-		'tmp'
 	);
 	output_instance.done_verbose_log(
 		`Removed tmp folder [${defaults.tmp_folder}].`,
-		'tmp'
 	);
 }
 
@@ -508,7 +501,7 @@ function _create_init_file(){
 	
 	util_instance.fs.write_file(init_filepath, content);
 	util_instance.pretty(init_filepath, 'json');
-	output_instance.done_log(`Created file [${init_filepath}].`, 'rcfl');
+	output_instance.done_log(`Created file [${init_filepath}].`);
 }
 
 function _create_dot_env(){
@@ -543,7 +536,6 @@ async function _install_packages(){
 	await _install_repo_package(init_params.repo);
 	output_instance.done_log(
 		`Installed package [${init_params.repo}].`,
-		'repo'
 	);
 }
 
@@ -569,7 +561,7 @@ function _ignore_files(){
 	output_instance.start_loading(`Adding entries to .gitignore...`);
 	const gitignore = `${init_params.root}/.gitignore`;
 	if(!util_instance.fs.exists(gitignore)){
-		util_instance.fs.create_file(gitignore, 'giti');
+		util_instance.fs.create_file(gitignore);
 	}
 	let content = util_instance.fs.read_file(gitignore, 'utf8');
 	if(content.indexOf(defaults.folder+'/') === -1){
@@ -586,7 +578,7 @@ function _ignore_files(){
 	}
 	util_instance.fs.write_file(gitignore, content);
 	const log_msg = `Added entries to .gitignore.`;
-	output_instance.done_log(log_msg, '.git');
+	output_instance.done_log(log_msg);
 }
 
 function _update_resolutions(){
@@ -604,9 +596,9 @@ function _update_resolutions(){
 			package_json_path,
 			JSON.stringify(package_data, null, '\t')
 		);
-		output_instance.done_log(`Updated package.json resolutions.`, 'packdata');
+		output_instance.done_log(`Updated package.json resolutions.`);
 	}catch(ex){
-		output_instance.error_log(`Cannot update ${package_json_path}.`, 'packdata');
+		output_instance.error_log(`Cannot update ${package_json_path}.`);
 	}
 }
 
@@ -632,12 +624,12 @@ function _update_package_scripts(){
 				package_json_path,
 				JSON.stringify(package_data, null, '\t')
 			);
-			output_instance.done_log(`Updated package.json scripts.`, 'scripts');
+			output_instance.done_log(`Updated package.json scripts.`);
 		}catch(ex){
-			output_instance.error_log(`Cannot update ${package_json_path}.`, 'scripts');
+			output_instance.error_log(`Cannot update ${package_json_path}.`);
 		}
 	}catch(ex){
-		output_instance.error_log(`Cannot parse ${package_json_path}.`, 'scripts');
+		output_instance.error_log(`Cannot parse ${package_json_path}.`);
 	}
 }
 
@@ -645,12 +637,10 @@ function _create_dot_dir(){
 	output_instance.start_loading(`Creating ${defaults.folder} folder...`);
 	util_instance.fs.remove_directory(
 		`${init_params.root}/${defaults.folder}`,
-		'init'
 	);
 	util_instance.fs.create_directory(
 		`${init_params.root}/${defaults.folder}`,
-		'init'
 	);
-	output_instance.done_log(`Created folder ${defaults.folder}.`, 'init');
+	output_instance.done_log(`Created folder ${defaults.folder}.`);
 }
 

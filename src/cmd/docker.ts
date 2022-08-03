@@ -157,7 +157,7 @@ export async function build(params:Partial<Params>)
 	cmd += ` --build-arg project=${project_name}`;
 	// cmd += ` --build-arg deploy=${docker_params.deploy}`;
 	cmd += ` .`;
-	await _execute_spin_verbose(cmd, 'docker', 'building');
+	await _execute_spin_verbose(cmd, 'building');
 	output_instance.done_log(
 		`Docker image built ${image_name}`
 	);
@@ -207,7 +207,7 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 		cmd += ` --entrypoint="${entrypoint}"`;
 	}
 	cmd += ` ${image_name}`;
-	await _execute_spin_verbose(cmd, 'docker', 'creating');
+	await _execute_spin_verbose(cmd, 'creating');
 	
 	output_instance.done_log(
 		`Docker container created ${container_name}`
@@ -221,7 +221,7 @@ export async function start(params:Partial<Params>):Promise<void>{
 	const container_name = _get_container_name();
 	let cmd = '';
 	cmd += `docker start -i ${container_name}`;
-	await _execute_log(cmd, 'docker', 'starting');
+	await _execute_log(cmd, 'starting');
 	output_instance.done_log(
 		`Docker image started ${container_name}`
 	);
@@ -262,7 +262,7 @@ export async function stop(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd += ` || true`;
 	}
-	await _execute_spin_verbose(cmd, 'docker', 'stopping');
+	await _execute_spin_verbose(cmd, 'stopping');
 	output_instance.done_log(
 		`Docker container stopped ${container_name}`
 	);
@@ -277,7 +277,7 @@ export async function remove(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd += ` || true`;
 	}
-	await _execute_spin_verbose(cmd, 'docker', 'creating');
+	await _execute_spin_verbose(cmd, 'creating');
 	output_instance.done_log(
 		`Docker container removed ${container_name}`
 	);
@@ -293,7 +293,7 @@ export async function unbuild(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd += ` || true`;
 	}
-	await _execute_spin_verbose(cmd, 'docker', `removing image ${image_name}`);
+	await _execute_spin_verbose(cmd, `removing image ${image_name}`);
 	output_instance.done_log(
 		`Docker image removed ${image_name}`
 	);
@@ -311,7 +311,7 @@ export async function db_create(params:Partial<Params>)
 	cmd += ` --network ${network_name}`;
 	cmd += ` -v ~/mongo/data-${project_name}:/data/db -p ${port}:${port}`;
 	cmd += ` mongo:5`;
-	await _execute_spin_verbose(cmd, `docker`, `creating db ${docker_params.db}`);
+	await _execute_spin_verbose(cmd, `creating db ${docker_params.db}`);
 	output_instance.done_log(
 		`Docker db container created ${db_container_name}`
 	);
@@ -323,7 +323,7 @@ export async function db_start(params:Partial<Params>)
 	const db_container_name = _get_db_container_name();
 	let cmd = '';
 	cmd += `docker start ${db_container_name}`;
-	await _execute_spin_verbose(cmd, `docker`, `starting db ${docker_params.db}`);
+	await _execute_spin_verbose(cmd, `starting db ${docker_params.db}`);
 	output_instance.done_log(
 		`Docker db container started ${db_container_name}`
 	);
@@ -338,7 +338,7 @@ export async function db_stop(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd += ` || true`;
 	}
-	await _execute_spin_verbose(cmd, `docker`, `stopping db ${docker_params.db}`);
+	await _execute_spin_verbose(cmd, `stopping db ${docker_params.db}`);
 	output_instance.done_log(
 		`Docker db container stopped ${db_container_name}`
 	);
@@ -353,7 +353,7 @@ export async function db_remove(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd += ` || true`;
 	}
-	await _execute_spin_verbose(cmd, `docker`, `removing db ${docker_params.db}`);
+	await _execute_spin_verbose(cmd, `removing db ${docker_params.db}`);
 	output_instance.done_log(
 		`Docker db container removed ${db_container_name}`
 	);
@@ -371,7 +371,7 @@ export async function tmp_remove(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd_rm += ` || true`;
 	}
-	await _execute_spin_verbose(cmd_rm, 'docker', `removing tmp container tmp_${container_name}`);
+	await _execute_spin_verbose(cmd_rm, `removing tmp container tmp_${container_name}`);
 	output_instance.done_log(
 		`Docker removed tmp container tmp_${container_name}`
 	);
@@ -385,7 +385,7 @@ export async function network_create(params:Partial<Params>, continue_on_fail=fa
 	if(continue_on_fail){
 		cmd_rm += ` || true`;
 	}
-	await _execute_spin_verbose(cmd_rm, 'docker', `creating network ${network_name}`);
+	await _execute_spin_verbose(cmd_rm, `creating network ${network_name}`);
 	output_instance.done_log(
 		`Docker created network ${network_name}`
 	);
@@ -399,7 +399,7 @@ export async function network_remove(params:Partial<Params>, continue_on_fail=fa
 	if(continue_on_fail){
 		cmd_rm += ` || true`;
 	}
-	await _execute_spin_verbose(cmd_rm, 'docker', `creating network ${network_name}`);
+	await _execute_spin_verbose(cmd_rm, `creating network ${network_name}`);
 	output_instance.done_log(
 		`Docker removed network ${network_name}`
 	);
@@ -414,7 +414,7 @@ export async function prune(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd_prune += ` || true`;
 	}
-	await _execute_spin_verbose(cmd_prune, 'docker', `deleteing builder cache`);
+	await _execute_spin_verbose(cmd_prune, `deleteing builder cache`);
 	output_instance.done_log(
 		`Docker builder cache deleted.`
 	);
@@ -425,16 +425,16 @@ async function _copy_compiled(){
 	const container_name = _get_container_name();
 	let cmd_create = '';
 	cmd_create += `docker create --name tmp_${container_name} ${image_name}`;
-	await _execute_spin_verbose(cmd_create, 'docker', `creating tmp container tmp_${container_name}`);
+	await _execute_spin_verbose(cmd_create, `creating tmp container tmp_${container_name}`);
 	let cmd_cp_node = '';
 	cmd_cp_node += `docker cp tmp_${container_name}:/app/node_modules node_modules`;
-	await _execute_spin_verbose(cmd_cp_node, 'docker', `copying node_modules from tmp container tmp_${container_name}`);
+	await _execute_spin_verbose(cmd_cp_node, `copying node_modules from tmp container tmp_${container_name}`);
 	// let cmd_cp_uranio = '';
 	// cmd_cp_uranio += `docker cp tmp_${container_name}:/app/.uranio/. .uranio/`;
 	// await _execute_spin_verbose(cmd_cp_uranio, 'docker', `copying .uranio from tmp container tmp_${container_name}`);
 	let cmd_remove = '';
 	cmd_remove += `docker rm tmp_${container_name}`;
-	await _execute_spin_verbose(cmd_remove, 'docker', `removing tmp container tmp_${container_name}`);
+	await _execute_spin_verbose(cmd_remove, `removing tmp container tmp_${container_name}`);
 	output_instance.done_log(
 		`Docker copied files from tmp container tmp_${container_name}`
 	);
@@ -477,15 +477,14 @@ function _init_params(params:Partial<Params>)
 
 async function _clone_assets(){
 	output_instance.start_loading(`Cloning assets...`);
-	util_instance.fs.remove_directory(defaults.tmp_folder, 'assets');
-	util_instance.fs.create_directory(defaults.tmp_folder, 'assets');
+	util_instance.fs.remove_directory(defaults.tmp_folder);
+	util_instance.fs.create_directory(defaults.tmp_folder);
 	await util_instance.cmd.clone_repo(
 		defaults.assets_repo,
 		`${docker_params.root}/${defaults.tmp_folder}/uranio-assets`,
-		'assets',
 		docker_params.branch
 	);
-	output_instance.done_log(`Cloned assets repo.`, 'assets');
+	output_instance.done_log(`Cloned assets repo.`);
 }
 
 async function _download_dockerfiles(){
@@ -496,23 +495,23 @@ async function _download_dockerfiles(){
 	// const dest_folder = `${def_folder}/${defaults.docker_folder}`;
 	
 	if(!util_instance.fs.exists(docker_folder)){
-		util_instance.fs.create_directory(docker_folder, 'docker');
+		util_instance.fs.create_directory(docker_folder);
 	}
 	
 	const docker_file =
 		`${docker_params.root}/${defaults.tmp_folder}/uranio-assets/docker/Dockerfile`;
 	const dest = `${docker_folder}/Dockerfile`;
-	util_instance.fs.copy_file(docker_file, dest, 'docker');
+	util_instance.fs.copy_file(docker_file, dest);
 	
 	const dockerignore_file =
 		`${docker_params.root}/${defaults.tmp_folder}/uranio-assets/docker/.dockerignore`;
 	const ignore_dest = `${docker_folder}/.dockerignore`;
-	util_instance.fs.copy_file(dockerignore_file, ignore_dest, 'docker');
+	util_instance.fs.copy_file(dockerignore_file, ignore_dest);
 	
 	const docker_bash =
 		`${docker_params.root}/${defaults.tmp_folder}/uranio-assets/docker/.bash_docker`;
 	const bash_dest = `${docker_folder}/.bash_docker`;
-	util_instance.fs.copy_file(docker_bash, bash_dest, 'docker');
+	util_instance.fs.copy_file(docker_bash, bash_dest);
 	
 	_remove_tmp();
 	
@@ -524,11 +523,9 @@ function _remove_tmp(){
 	);
 	util_instance.fs.remove_directory(
 		`${docker_params.root}/${defaults.tmp_folder}`,
-		'tmp'
 	);
 	output_instance.done_verbose_log(
 		`Removed tmp folder [${defaults.tmp_folder}].`,
-		'tmp'
 	);
 }
 
@@ -545,26 +542,22 @@ function _remove_tmp(){
 //   });
 // }
 
-async function _execute_spin_verbose(cmd:string, context:string, action:string){
+async function _execute_spin_verbose(cmd:string, action:string){
 	return new Promise((resolve, reject) => {
 		util_instance.spawn.spin_and_verbose_log(
 			cmd,
-			context,
 			action,
-			undefined,
 			resolve,
 			reject
 		);
 	});
 }
 
-async function _execute_log(cmd:string, context:string, action:string){
+async function _execute_log(cmd:string, action:string){
 	return new Promise((resolve, reject) => {
 		util_instance.spawn.log(
 			cmd,
-			context,
 			action,
-			undefined,
 			resolve,
 			reject
 		);

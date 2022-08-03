@@ -9,9 +9,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = void 0;
-// import dateFormat from 'dateformat';
+const dateformat_1 = __importDefault(require("dateformat"));
 const chalk_1 = __importDefault(require("chalk"));
-// import fs from 'fs';
+const fs_1 = __importDefault(require("fs"));
 const is_docker_1 = __importDefault(require("is-docker"));
 const defaults_1 = require("../conf/defaults");
 const spinner_1 = require("./spinner");
@@ -27,14 +27,17 @@ class Output {
     constructor(params) {
         this.params = params;
     }
-    log(text, _context = 'log', _color) {
-        console.log(chalk_1.default.magenta(text));
+    log(text) {
+        const formatted = this._format_text(text);
+        this._log(chalk_1.default.magenta(formatted));
     }
-    verbose_log(text, _context = 'vlog', _color) {
-        console.log(chalk_1.default.blue(text));
+    verbose_log(text) {
+        const formatted = this._format_text(text);
+        this._log(chalk_1.default.blue(formatted));
     }
-    debug_log(text, _context = 'dlog', _color) {
-        console.log(chalk_1.default.dim(text));
+    debug_log(text) {
+        const formatted = this._format_text(text);
+        this._log(chalk_1.default.dim(formatted));
     }
     // public log(text:string, context='log', color?:string)
     // 		:void{
@@ -54,37 +57,40 @@ class Output {
     // 	const final_color = (typeof color === 'string') ? color : this.params.color_debug;
     // 	this._log(this._prefix_color(colored_text, final_color), context, (this.params.debug === true));
     // }
-    done_log(text, context = 'done') {
+    done_log(text) {
         this._go_previous();
-        this.log(`${defaults_1.defaults.check_char} ${text}`, context);
+        this.log(`${defaults_1.defaults.check_char} ${text}`);
     }
-    done_verbose_log(text, context = 'vdne') {
+    done_verbose_log(text) {
         if (this.params.verbose) {
             this._go_previous();
-            this.verbose_log(`${text}`, context);
+            this.verbose_log(`${text}`);
         }
     }
-    error_log(text, context = 'errr') {
+    error_log(text) {
         this.stop_loading();
         // const error_text = `${chalk.bgHex(`#4a3030`).hex(`#8b6666`)(`[ERROR] ${text}`)}`;
         // const error_text = `${chalk.hex(`#922424`)(`[ERROR] ${text}`)}`;
-        const error_text = `${chalk_1.default.hex(`#874040`)(`[ERROR] ${text}`)}`;
-        this.log(error_text, context);
+        // const error_text = `${chalk.hex(`#874040`)(`[ERROR] ${text}`)}`;
+        const error_text = chalk_1.default.red(`[ERROR] ${text}`);
+        this.log(error_text);
     }
-    warn_log(text, context = 'errr') {
+    warn_log(text) {
         this.stop_loading();
-        const warn_text = `${chalk_1.default.hex(`#d0a800`)(`[WARN] ${text}`)}`;
-        this.log(warn_text, context);
+        // const warn_text = `${chalk.hex(`#d0a800`)(`[WARN] ${text}`)}`;
+        const warn_text = chalk_1.default.yellow(`[WARN] ${text}`);
+        this.log(warn_text);
     }
     end_log(text) {
         this.stop_loading();
         const end_text = `${defaults_1.defaults.check_char} ${text}`;
-        this.log((!this.params.blank) ? chalk_1.default.yellow(end_text) : end_text, 'end');
+        // this.log((!this.params.blank) ? chalk.yellow(end_text) : end_text, 'end');
+        this.log((!this.params.blank) ? chalk_1.default.magenta(end_text) : end_text);
     }
     wrong_end_log(text) {
         this.stop_loading();
         const end_text = `${defaults_1.defaults.wrong_char} ${text}`;
-        this.log((!this.params.blank) ? chalk_1.default.red(end_text) : end_text, 'end');
+        this.log((!this.params.blank) ? chalk_1.default.red(end_text) : end_text);
     }
     start_loading(text) {
         if (this.params.hide === true) {
@@ -116,29 +122,83 @@ class Output {
         const text_with_current = (is_docker) ? noroot_text : `${chopped_current} ${noroot_text}`;
         spinner_1.spinner.text = this._spinner_text_color(text_with_current);
         if (spinner_1.spinner.text.length > process.stdout.columns) {
-            spinner_1.spinner.text = spinner_1.spinner.text.substr(0, process.stdout.columns - 2);
+            spinner_1.spinner.text = spinner_1.spinner.text.substring(0, process.stdout.columns - 2);
         }
     }
-    // private _log(text:string, context='log', out=false){
-    // 	const output_text = (!this.params.native) ?
-    // 		this._format_text(text, context) : text + '\n';
-    // 	if(this.params.filelog){
-    // 		_log_to_file(output_text);
-    // 	}
-    // 	if(out){
-    // 		let was_spinning = false;
-    // 		if(spinner.isSpinning){
-    // 			was_spinning = true;
-    // 			this.stop_loading();
-    // 		}
-    // 		if(this.params.hide === false){
-    // 			process.stdout.write(output_text);
-    // 		}
-    // 		if(this.params.spin === true && was_spinning){
-    // 			spinner.start();
-    // 		}
-    // 	}
-    // }
+    _log(text, out = false) {
+        if (this.params.filelog) {
+            _log_to_file(text);
+        }
+        if (out) {
+            let was_spinning = false;
+            if (spinner_1.spinner.isSpinning) {
+                was_spinning = true;
+                this.stop_loading();
+            }
+            if (this.params.hide === false) {
+                process.stdout.write(text);
+            }
+            if (this.params.spin === true && was_spinning) {
+                spinner_1.spinner.start();
+            }
+        }
+    }
+    _format_text(text) {
+        let time = (0, dateformat_1.default)(new Date(), defaults_1.defaults.time_format);
+        time = (this.params.time === true) ? `[${time}]` : '';
+        text = this._replace_root_string(text);
+        const prefix = this.params.prefix;
+        if (this.params.fullwidth === true) {
+            return this._full_width(text, prefix, time);
+        }
+        let output_text = prefix + ((prefix.length > 0) ? ' ' : '');
+        output_text += time;
+        if (time.length > 0) {
+            output_text += ' ';
+        }
+        output_text += text;
+        output_text += `\n`;
+        return output_text;
+    }
+    _full_width(text, prefix, time) {
+        let output_text = prefix + ((prefix.length > 0) ? ' ' : '');
+        let text_lenght = 0;
+        text_lenght += prefix.length + 1;
+        if (text.length > process.stdout.columns - prefix.length - 4) {
+            text = text.substring(0, process.stdout.columns - prefix.length - 6);
+            text += ' ...';
+        }
+        // eslint-disable-next-line no-control-regex
+        text_lenght += text.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '').length;
+        // eslint-disable-next-line no-control-regex
+        const count_tabs = (text.match(new RegExp("\t", "g")) || []).length;
+        text_lenght += count_tabs * 7;
+        text_lenght += time.length;
+        text_lenght += 1;
+        if (this.params.time) {
+            text_lenght += 2;
+        }
+        let gap_lenght = process.stdout.columns - text_lenght;
+        if (gap_lenght < 0 && gap_lenght > -9) {
+            time = time.replace((0, dateformat_1.default)(new Date, "yy-mm-dd'T'"), '');
+            gap_lenght += 9;
+        }
+        else if (gap_lenght <= -9) {
+            time = '';
+            gap_lenght += 24;
+        }
+        let dot = '.';
+        output_text += text + ' ';
+        for (let i = 0; i < gap_lenght; i++) {
+            output_text += dot;
+        }
+        if (time.length > 0) {
+            output_text += ' ';
+        }
+        output_text += time;
+        output_text += `\n`;
+        return output_text;
+    }
     // private _format_text(text:string, context='frmt'){
     // 	let time = dateFormat(new Date(), defaults.time_format);
     // 	if(context.length < 4){
@@ -274,17 +334,16 @@ class Output {
     // 	processed_text = chalk.hex(hexa_color)(removed_prefix);
     // 	return processed_text;
     // }
-    // private _replace_root_string(str:string)
-    // 		:string{
-    // 	if(str.indexOf('$URNROOT$') !== -1){
-    // 		return str.replace('$URNROOT$','');
-    // 	}
-    // 	if(this.params.root == '.'){
-    // 		return str;
-    // 	}
-    // 	const regex = new RegExp(`${this.params.root}`, 'g');
-    // 	return str.replace(regex, '__root');
-    // }
+    _replace_root_string(str) {
+        if (str.indexOf('$URNROOT$') !== -1) {
+            return str.replace('$URNROOT$', '');
+        }
+        if (this.params.root == '.') {
+            return str;
+        }
+        const regex = new RegExp(`${this.params.root}`, 'g');
+        return str.replace(regex, '__root');
+    }
     _spinner_text_color(text) {
         if (!text) {
             return '';
@@ -298,6 +357,60 @@ class Output {
             this.spinner_text(spinner_1.spinner_texts[spinner_1.spinner_texts.length - 1]);
         }
     }
+}
+// function _is_uranio_native(text:string){
+// 	for(const pre of prefix_types){
+// 		if(text.indexOf(pre) !== -1){
+// 			return true;
+// 		}
+// 	}
+// 	return false;
+// }
+// function _remove_color_prefix(text:string):string{
+// 	const regex = new RegExp(/.?\[c#[0-9a-zA-Z]{0,6}\]/);
+// 	const match = regex.exec(text);
+// 	if(!match){
+// 		return text;
+// 	}
+// 	let removed_prefix = '';
+// 	if(match.index === 0 && text.substring(0,3) === '[c#'){ // Regex match also with another random char in front
+// 		removed_prefix = text.substring(0, match.index) + text.substring(match.index + 10, text.length);
+// 	}else{ // text might have something else in from "s6728 [c#666666]"
+// 		removed_prefix = text.substring(0, match.index + 1) + text.substring(match.index + 11, text.length);
+// 	}
+// 	return removed_prefix;
+// }
+// function _uranio_color(text:string){
+// 	let processed_text = text;
+// 	for(const pre of prefix_types){
+// 		const index = text.indexOf(pre);
+// 		if(index !== -1){
+// 			processed_text = processed_text.substring(0, index) + processed_text.substring(index + pre.length, processed_text.length);
+// 			switch(pre){
+// 				case '[fn_debug]':{
+// 					processed_text = chalk.cyan(processed_text);
+// 					break;
+// 				}
+// 				case '[debug___]':{
+// 					processed_text = chalk.blue(processed_text);
+// 					break;
+// 				}
+// 				case '[warn____]':{
+// 					processed_text = chalk.yellow(processed_text);
+// 					break;
+// 				}
+// 				case '[ERROR]':
+// 				case '[error___]':{
+// 					processed_text = chalk.red(processed_text);
+// 					break;
+// 				}
+// 			}
+// 		}
+// 	}
+// 	return _remove_color_prefix(processed_text);
+// }
+function _log_to_file(text) {
+    fs_1.default.appendFileSync(defaults_1.defaults.log_filepath, text);
 }
 function create(params) {
     // const full_params = merge_params(params);
