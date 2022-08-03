@@ -130,7 +130,7 @@ class Spawn {
 		if(spin){
 			this.output.start_loading(command);
 		}
-		this.output.log(`$ ${command}`);
+		this.output.verbose_log(`$ ${command}`);
 		
 		const child = cp.spawn(command, {shell: true, detached: detached});
 		

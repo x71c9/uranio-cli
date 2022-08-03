@@ -18,7 +18,7 @@ import {Params} from '../types';
 
 import {spinner, spinner_texts} from './spinner';
 
-type LogType = 'log' | 'verbose' | 'debug';
+type LogType = 'log' | 'verbose' | 'debug' | 'error' | 'warn';
 
 let spinner_current = '';
 
@@ -50,6 +50,27 @@ class Output {
 		
 	}
 	
+	// public log(text:string, context='log', color?:string)
+	// 		:void{
+	// 	const colored_text = this._color_text(text, 'log', color);
+	// 	const final_color = (typeof color === 'string') ? color : this.params.color_log;
+	// 	this._log(this._prefix_color(colored_text, final_color), context, true);
+	// }
+	
+	// public verbose_log(text:string, context='vlog', color?:string)
+	// 		:void{
+	// 	const colored_text = this._color_text(text, 'verbose', color);
+	// 	const final_color = (typeof color === 'string') ? color : this.params.color_verbose;
+	// 	this._log(this._prefix_color(colored_text, final_color), context, (this.params.verbose === true));
+	// }
+	
+	// public debug_log(text:string, context='dlog', color?:string)
+	// 		:void{
+	// 	const colored_text = this._color_text(text, 'debug', color);
+	// 	const final_color = (typeof color === 'string') ? color : this.params.color_debug;
+	// 	this._log(this._prefix_color(colored_text, final_color), context, (this.params.debug === true));
+	// }
+	
 	public log(text:string)
 			:void{
 		const prefixed = this._prefix_color(text, 'log');
@@ -80,27 +101,6 @@ class Output {
 		this._log(read, true);
 	}
 	
-	// public log(text:string, context='log', color?:string)
-	// 		:void{
-	// 	const colored_text = this._color_text(text, 'log', color);
-	// 	const final_color = (typeof color === 'string') ? color : this.params.color_log;
-	// 	this._log(this._prefix_color(colored_text, final_color), context, true);
-	// }
-	
-	// public verbose_log(text:string, context='vlog', color?:string)
-	// 		:void{
-	// 	const colored_text = this._color_text(text, 'verbose', color);
-	// 	const final_color = (typeof color === 'string') ? color : this.params.color_verbose;
-	// 	this._log(this._prefix_color(colored_text, final_color), context, (this.params.verbose === true));
-	// }
-	
-	// public debug_log(text:string, context='dlog', color?:string)
-	// 		:void{
-	// 	const colored_text = this._color_text(text, 'debug', color);
-	// 	const final_color = (typeof color === 'string') ? color : this.params.color_debug;
-	// 	this._log(this._prefix_color(colored_text, final_color), context, (this.params.debug === true));
-	// }
-	
 	public done_log(text:string)
 			:void{
 		this._go_previous();
@@ -121,8 +121,12 @@ class Output {
 		// const error_text = `${chalk.bgHex(`#4a3030`).hex(`#8b6666`)(`[ERROR] ${text}`)}`;
 		// const error_text = `${chalk.hex(`#922424`)(`[ERROR] ${text}`)}`;
 		// const error_text = `${chalk.hex(`#874040`)(`[ERROR] ${text}`)}`;
-		const error_text = chalk.red(`[ERROR] ${text}`);
-		this.log(error_text);
+		// const error_text = chalk.red(`[ERROR] ${text}`);
+		// this.log(error_text);
+		const prefixed = this._prefix_color(text, 'error');
+		const formatted = this._format_text(prefixed);
+		const read = this._read_text(formatted, 'error');
+		this._log(read, true);
 	}
 	
 	public warn_log(text:string)
@@ -138,14 +142,16 @@ class Output {
 		this.stop_loading();
 		const end_text = `${defaults.check_char} ${text}`;
 		// this.log((!this.params.blank) ? chalk.yellow(end_text) : end_text, 'end');
-		this.log((!this.params.blank) ? chalk.magenta(end_text) : end_text);
+		// this.log((!this.params.blank) ? chalk.magenta(end_text) : end_text);
+		this.log(end_text);
 	}
 	
 	public wrong_end_log(text:string)
 			:void{
 		this.stop_loading();
 		const end_text = `${defaults.wrong_char} ${text}`;
-		this.log((!this.params.blank) ? chalk.red(end_text) : end_text);
+		// this.log((!this.params.blank) ? chalk.red(end_text) : end_text);
+		this.log(end_text);
 	}
 	
 	public start_loading(text:string)
@@ -205,29 +211,42 @@ class Output {
 				case 'debug':{
 					return chalk.gray(text);
 				}
+				case 'error':{
+					return chalk.red(text);
+				}
+				case 'warn':{
+					return chalk.yellow(text);
+				}
 			}
 		}
 		return this._read_color(text);
 	}
 	
 	private _prefix_color(text:string, type:LogType){
+		let color = '';
 		switch(type){
 			case 'log':{
-				const color = '#magenta';
-				return (this.params.prefix_color === true) ?
-					`[c${color}]${text}` : text;
+				color = '#magenta';
+				break;
 			}
 			case 'verbose':{
-				const color = 'blue';
-				return (this.params.prefix_color === true) ?
-					`[c${color}]${text}` : text;
+				color = '#blue';
+				break;
 			}
 			case 'debug':{
-				const color = 'gray';
-				return (this.params.prefix_color === true) ?
-					`[c${color}]${text}` : text;
+				color = '#gray';
+				break;
+			}
+			case 'error':{
+				color = '#red';
+				break;
+			}
+			case 'warn':{
+				color = '#yellow';
+				break;
 			}
 		}
+		return (this.params.prefix_color === true) ? `[c${color}]${text}` : text;
 	}
 	
 	private _log(text:string, out=false){

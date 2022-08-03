@@ -431,7 +431,7 @@ class Output {
         }
     }
     _color_type(text) {
-        const regex = new RegExp(/\[(fn_debug|debug___|log_____|warn____|error___|ERROR)\]/);
+        const regex = new RegExp(/\[(fn_debug|debug___|warn____|error___|ERROR)\]/);
         const match = regex.exec(text);
         if (!match) {
             return text;
@@ -444,9 +444,6 @@ class Output {
             }
             case 'debug___': {
                 return chalk_1.default.blue(removed);
-            }
-            case 'log_____': {
-                return chalk_1.default.magenta(removed);
             }
             case 'warn____': {
                 return chalk_1.default.yellow(removed);
