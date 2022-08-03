@@ -35,7 +35,6 @@ exports.uranio_process = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const urn_lib_1 = require("urn-lib");
-// import {Arguments, Repo, PacMan, Deploy, Params, DB} from './types';
 const types_1 = require("./types");
 const output = __importStar(require("./output/index"));
 const util = __importStar(require("./util/index"));
@@ -53,7 +52,6 @@ async function uranio_process(args) {
     process_params = (0, common_1.read_init_file)(process_params);
     process_params = _set_args(process_params, args);
     process.chdir(process_params.root);
-    // process_params = _autoset_is_dot(process_params, args);
     output_instance = output.create(process_params);
     util_instance = util.create(process_params, output_instance);
     _init_log();
@@ -96,12 +94,6 @@ function _set_root(args) {
         process_params.root = _get_project_root();
     }
 }
-// function _autoset_is_dot(params:Params, args:Arguments):Params{
-//   if(typeof args.is_dot === 'undefined' && check_if_is_dot(params.root)){
-//     params.is_dot = true;
-//   }
-//   return params;
-// }
 function _init_log() {
     const log_file_path = `${process_params.root}/${defaults_1.defaults.log_filepath}`;
     if (!util_instance.fs.exists(log_file_path)) {
@@ -117,7 +109,7 @@ function _log_root() {
     output_instance.verbose_log(`$URNROOT$Project root [${process_params.root}]`);
 }
 function _set_args(params, args) {
-    // Paramters with default value = false
+    /* Paramters with default value = false */
     const prod = args.p || args.prod;
     if (prod == true) {
         params.prod = true;
@@ -185,10 +177,6 @@ function _set_args(params, args) {
     if (typeof args.noinside_ntl === 'boolean' && !!args.noinside_ntl !== !params.inside_ntl) {
         params.inside_ntl = !args.noinside_ntl;
     }
-    // const is_dot = args.is_dot;
-    // if(is_dot == true){
-    //   params.is_dot = true;
-    // }
     const time = args.t || args.time;
     if (time == true) {
         params.time = true;
@@ -224,7 +212,7 @@ function _set_args(params, args) {
     if (typeof args.nodocker_db === 'boolean' && !!args.nodocker_db !== !params.docker_db) {
         params.docker_db = !args.nodocker_db;
     }
-    // Paramteters with default value = true
+    /* Paramteters with default value = true */
     const filelog = args.l || args.filelog;
     if (filelog == false || filelog == 'false') {
         params.filelog = false;
@@ -246,7 +234,7 @@ function _set_args(params, args) {
     if (typeof args.nocolor_uranio === 'boolean' && !!args.nocolor_uranio !== !params.color_uranio) {
         params.color_uranio = !args.nocolor_uranio;
     }
-    // Parameters with default value type = string
+    /* Parameters with default value type = string */
     const prefix = args.x || args.prefix;
     if (typeof prefix === 'string' && prefix !== '') {
         params.prefix = prefix;
@@ -269,11 +257,6 @@ function _set_args(params, args) {
     if (typeof config === 'string' && config != '') {
         params.config = config;
     }
-    // const deploy = args.d || args.deploy;
-    // if(typeof deploy === 'string' && deploy != ''){
-    //   check_deploy(deploy);
-    //   params.deploy = deploy as Deploy;
-    // }
     const db = args.db;
     if (typeof db === 'string' && db !== '') {
         (0, common_1.check_db)(db);

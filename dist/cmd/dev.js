@@ -112,7 +112,7 @@ async function _dev_panel() {
     // uranio-panel-adm dev doesn't need Forever to reaload (like the server)
     // because it reloads itself by launching Nuxt dev service.
     const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev`;
-    util_instance.spawn.log(cmd_dev_panel, 'developing panel');
+    util_instance.spawn.verbose_log(cmd_dev_panel, 'developing panel');
 }
 async function _dev_server() {
     _is_dev_server = true;
@@ -137,7 +137,7 @@ async function _dev_server() {
 }
 function _tsc_watch() {
     const tsc_watch = `yarn tsc -w`;
-    util_instance.spawn.log(tsc_watch, 'watching types');
+    util_instance.spawn.verbose_log(tsc_watch, 'watching types');
 }
 function _watch() {
     const src_path = `${dev_params.root}/src/`;

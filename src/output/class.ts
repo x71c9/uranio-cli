@@ -18,16 +18,31 @@ import {Params} from '../types';
 
 import {spinner, spinner_texts} from './spinner';
 
+type LogType = 'log' | 'verbose' | 'debug';
+
 let spinner_current = '';
 
 const is_docker = isDocker();
 
-// const prefix_types = [
-// 	'[fn_debug]',
-// 	'[debug___]',
-// 	'[warn____]',
-// 	'[error___]'
-// ];
+const prefix_types = [
+	'[fn_debug]',
+	'[debug___]',
+	'[log_____]',
+	'[warn____]',
+	'[error___]'
+];
+
+const colors_16 = [
+	'black',
+	'white',
+	'gray',
+	'magenta',
+	'blue',
+	'red',
+	'yellow',
+	'green',
+	'cyan'
+];
 
 class Output {
 	
@@ -37,20 +52,32 @@ class Output {
 	
 	public log(text:string)
 			:void{
-		const formatted = this._format_text(text);
-		this._log(chalk.magenta(formatted));
+		const prefixed = this._prefix_color(text, 'log');
+		const formatted = this._format_text(prefixed);
+		const read = this._read_text(formatted, 'log');
+		this._log(read, true);
 	}
 	
 	public verbose_log(text:string)
 			:void{
-		const formatted = this._format_text(text);
-		this._log(chalk.blue(formatted));
+		if(this.params.verbose === false){
+			return;
+		}
+		const prefixed = this._prefix_color(text, 'verbose');
+		const formatted = this._format_text(prefixed);
+		const read = this._read_text(formatted, 'verbose');
+		this._log(read, true);
 	}
 	
 	public debug_log(text:string)
 			:void{
-		const formatted = this._format_text(text);
-		this._log(chalk.dim(formatted));
+		if(this.params.debug === false){
+			return;
+		}
+		const prefixed = this._prefix_color(text, 'debug');
+		const formatted = this._format_text(prefixed);
+		const read = this._read_text(formatted, 'debug');
+		this._log(read, true);
 	}
 	
 	// public log(text:string, context='log', color?:string)
@@ -161,7 +188,45 @@ class Output {
 		const text_with_current = (is_docker) ? noroot_text : `${chopped_current} ${noroot_text}`;
 		spinner.text = this._spinner_text_color(text_with_current);
 		if(spinner.text.length > process.stdout.columns){
-			spinner.text = spinner.text.substring(0, process.stdout.columns - 2);
+			// spinner.text = spinner.text.substring(0, process.stdout.columns - 2);
+			spinner.text = spinner.text.substring(0, process.stdout.columns);
+		}
+	}
+	
+	private _read_text(text:string, type:LogType){
+		if(this._has_prefixed_color(text) === false && this._has_prefixed_type(text) === false){
+			switch(type){
+				case 'log':{
+					return chalk.magenta(text);
+				}
+				case 'verbose':{
+					return chalk.blue(text);
+				}
+				case 'debug':{
+					return chalk.gray(text);
+				}
+			}
+		}
+		return this._read_color(text);
+	}
+	
+	private _prefix_color(text:string, type:LogType){
+		switch(type){
+			case 'log':{
+				const color = '#magenta';
+				return (this.params.prefix_color === true) ?
+					`[c${color}]${text}` : text;
+			}
+			case 'verbose':{
+				const color = 'blue';
+				return (this.params.prefix_color === true) ?
+					`[c${color}]${text}` : text;
+			}
+			case 'debug':{
+				const color = 'gray';
+				return (this.params.prefix_color === true) ?
+					`[c${color}]${text}` : text;
+			}
 		}
 	}
 	
@@ -229,6 +294,13 @@ class Output {
 		
 		if(this.params.time){
 			text_lenght += 2;
+		}
+		
+		if(this._has_prefixed_color(text)){
+			text_lenght -= this._prefixed_color_length(text);
+		}
+		if(this._has_prefixed_type(text)){
+			text_lenght -= 8;
 		}
 		
 		let gap_lenght = process.stdout.columns - text_lenght;
@@ -375,36 +447,90 @@ class Output {
 	// }
 	
 	// private _has_prefix_color(text:string):boolean{
-	// 	const regex = new RegExp(/.?\[c#[0-9a-zA-Z]{0,6}\]/);
-	// 	return (regex.test(text));
+	// 	const regex_hex = new RegExp(/.?\[c#[0-9a-zA-Z]{0,6}\]/);
+	// 	const regex_16b = new RegExp(/.?\[c#magenta\]|\[c#blue\]|\[c#gray\]|\[c#red\]|\[c#green\]|\[c#cyan\]|\[c#black\]|\[c#white\]/);
+	// 	return (regex_hex.test(text) || regex_16b.test(text));
 	// }
 	
-	// private _read_color(text:string):string{
-	// 	const regex = new RegExp(/.?\[c#[0-9a-zA-Z]{0,6}\]/);
-	// 	const match = regex.exec(text);
-	// 	if(!match){
-	// 		return text;
-	// 	}
-	// 	let processed_text = text;
-	// 	let color_prefix = '';
-	// 	let removed_prefix = '';
-	// 	if(match.index === 0 && text.substring(0,3) === '[c#'){ // Regex match also with another random char in front
-			
-	// 		color_prefix = text.substring(0, match.index + 10);
-	// 		removed_prefix =
-	// 			text.substring(0, match.index) + text.substring(match.index + 10, text.length);
-			
-	// 	}else{ // text might have something else in from "s6728 [c#666666]"
-			
-	// 		color_prefix = text.substring(match.index + 1, match.index + 11);
-	// 		removed_prefix =
-	// 			text.substring(0, match.index + 1) + text.substring(match.index + 11, text.length);
-			
-	// 	}
-	// 	const hexa_color = color_prefix.substring(2,9);
-	// 	processed_text = chalk.hex(hexa_color)(removed_prefix);
-	// 	return processed_text;
-	// }
+	private _has_prefixed_type(text:string):boolean{
+		for(const pre of prefix_types){
+			if(text.indexOf(pre) !== -1){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private _prefixed_color_length(text:string):number{
+		const regex = new RegExp(/\[c#([^\]]+)\] ?/g);
+		const match = regex.exec(text);
+		if(!match){
+			return 0;
+		}
+		const color = match[1];
+		return color.length + 4;
+	}
+	
+	private _has_prefixed_color(text:string):boolean{
+		const regex = new RegExp(/\[c#([^\]]+)\] ?/g);
+		const match = regex.exec(text);
+		if(!match){
+			return false
+		}
+		return true;
+	}
+	
+	/**
+	 * If there in the text there is something in the format [c#----]
+	 * i.e.: [c#magenta] | [c#FF6655]
+	 * or
+	 * uranio type i.e.: [debug___] | [log_____] | ...
+	 * it will return the text without the [c#----] | [<type>__] and with the
+	 * corrisponing color.
+	 */
+	private _read_color(text:string):string{
+		if(this._has_prefixed_type(text)){
+			return this._color_type(text);
+		}
+		const regex = new RegExp(/\[c#([^\]]+)\] ?/g);
+		const match = regex.exec(text);
+		if(!match){
+			return text;
+		}
+		const removed = text.replaceAll(match[0], '');
+		const color = match[1];
+		if(colors_16.includes(color) && typeof (chalk as any)[color] !== 'undefined'){
+			return (chalk as any)[color](removed);
+		}else{
+			return chalk.hex(`#${color}`)(removed);
+		}
+	}
+	
+	private _color_type(text:string){
+		const regex = new RegExp(/\[(fn_debug|debug___|warn____|error___|ERROR)\]/);
+		const match = regex.exec(text);
+		if(!match){
+			return text;
+		}
+		const removed = text.replaceAll(match[0], '');
+		const type = match[1];
+		switch(type){
+			case 'fn_debug':{
+				return chalk.gray(removed);
+			}
+			case 'debug___':{
+				return chalk.blue(removed);
+			}
+			case 'warn____':{
+				return chalk.yellow(removed);
+			}
+			case 'ERROR':
+			case 'error___':{
+				return chalk.red(removed);
+			}
+		}
+		return text;
+	}
 	
 	private _replace_root_string(str:string)
 			:string{
@@ -422,8 +548,8 @@ class Output {
 		if(!text){
 			return '';
 		}
-		// return (this.params.blank === false) ? chalk.magenta(text) : text;
-		return (this.params.blank === false) ? chalk.hex('#A633FF')(text) : text;
+		return (this.params.blank === false) ? chalk.magenta(text) : text;
+		// return (this.params.blank === false) ? chalk.hex('#A633FF')(text) : text;
 	}
 	
 	private _go_previous(){

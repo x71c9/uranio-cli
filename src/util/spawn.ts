@@ -48,27 +48,30 @@ class Spawn {
 	}
 	
 	public spin(command:string, action:string, resolve?:Resolve, reject?:Reject, detached=false){
-		this.output.debug_log(command);
 		return this._spawn(command, action, true, false, false, resolve, reject, detached);
 	}
 	
 	public log(command:string, action:string, resolve?:Resolve, reject?:Reject, detached=false){
-		this.output.debug_log(command);
-		return this._spawn(command, action, false, true, false, resolve, reject, detached);
+		return this._spawn(command, action, false, false, false, resolve, reject, detached);
 	}
 	
 	public verbose_log(command:string, action:string, resolve?:Resolve, reject?:Reject, detached=false){
-		this.output.debug_log(command);
+		return this._spawn(command, action, false, true, false, resolve, reject, detached);
+	}
+	
+	public debug_log(command:string, action:string, resolve?:Resolve, reject?:Reject, detached=false){
 		return this._spawn(command, action, false, false, true, resolve, reject, detached);
 	}
 	
 	public spin_and_log(command:string, action:string, resolve?:Resolve, reject?:Reject, detached=false){
-		this.output.debug_log(command);
-		return this._spawn(command, action, true, true, false, resolve, reject, detached);
+		return this._spawn(command, action, true, false, false, resolve, reject, detached);
 	}
 	
 	public spin_and_verbose_log(command:string, action:string, resolve?:Resolve, reject?:Reject, detached=false){
-		this.output.debug_log(command);
+		return this._spawn(command, action, true, true, false, resolve, reject, detached);
+	}
+	
+	public spin_and_debug_log(command:string, action:string, resolve?:Resolve, reject?:Reject, detached=false){
 		return this._spawn(command, action, true, false, true, resolve, reject, detached);
 	}
 	
@@ -90,6 +93,12 @@ class Spawn {
 		});
 	}
 	
+	public async debug_log_promise(command:string, action:string, detached=false){
+		return await new Promise((resolve, reject) => {
+			return this.debug_log(command, action, resolve, reject, detached);
+		});
+	}
+	
 	public async spin_and_log_promise(command:string, action:string, detached=false){
 		return await new Promise((resolve, reject) => {
 			return this.spin_and_log(command, action, resolve, reject, detached);
@@ -102,24 +111,26 @@ class Spawn {
 		});
 	}
 	
+	public async spin_and_debug_log_promise(command:string, action:string, detached=false){
+		return await new Promise((resolve, reject) => {
+			return this.spin_and_debug_log(command, action, resolve, reject, detached);
+		});
+	}
+	
 	private _spawn(
 		command:string,
 		action:string,
 		spin:boolean,
-		log:boolean,
 		verbose:boolean,
+		debug:boolean,
 		resolve?:Resolve,
 		reject?:Reject,
 		detached=false
 	){
-		if(spin && verbose){
+		if(spin){
 			this.output.start_loading(command);
 		}
-		if(log){
-			this.output.log(command);
-		}else if(verbose){
-			this.output.verbose_log(command);
-		}
+		this.output.log(`$ ${command}`);
 		
 		const child = cp.spawn(command, {shell: true, detached: detached});
 		
@@ -136,11 +147,11 @@ class Spawn {
 					if(plain_text === ''){
 						continue;
 					}
-					if(log){
-						this.output.log(plain_text);
-					}
 					if(verbose){
 						this.output.verbose_log(plain_text);
+					}
+					if(debug){
+						this.output.debug_log(plain_text);
 					}
 					_append(child_outputs[child.pid || 'pid0'], plain_text);
 				}
@@ -160,11 +171,11 @@ class Spawn {
 					if(plain_text === ''){
 						continue;
 					}
-					if(log){
-						this.output.log(plain_text);
-					}
 					if(verbose){
 						this.output.verbose_log(plain_text);
+					}
+					if(debug){
+						this.output.debug_log(plain_text);
 					}
 					_append(child_outputs[child.pid || 'pid0'], plain_text);
 				}
@@ -180,9 +191,7 @@ class Spawn {
 			this.output.stop_loading();
 			switch(code){
 				case 0:{
-					if(log){
-						this.output.done_log(`Done ${action}`);
-					}
+					this.output.done_log(`Done ${action}`);
 					if(verbose || spin){
 						this.output.done_verbose_log(`Done ${action}`);
 					}

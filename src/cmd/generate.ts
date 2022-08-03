@@ -148,7 +148,7 @@ async function _generate(args:string){
 			root_uranio = `${generate_params.root}/${generate_params.config}`;
 		}
 		const generate_cmd = `yarn uranio-generate-${generate_params.repo} -c ${root_uranio} ${args}`;
-		util_instance.spawn.verbose_log(generate_cmd, 'generating', resolve, reject);
+		util_instance.spawn.debug_log(generate_cmd, 'generating', resolve, reject);
 	});
 	
 	_copy_uranio_schema_repo();

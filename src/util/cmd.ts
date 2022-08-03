@@ -43,14 +43,7 @@ class CMD {
 			:Promise<any>{
 		const action = `yarn install`;
 		this.output.verbose_log(`Started ${action}`);
-		return new Promise((resolve, reject) => {
-			this.spawn.spin(
-				`yarn install --verbose`,
-				action,
-				resolve,
-				reject
-			);
-		});
+		return await this.spawn.spin_promise(`yarn install --verbose`, action);
 	}
 	
 	public async install_package(pack:string)
@@ -58,14 +51,7 @@ class CMD {
 		const action = `installing package [${pack}]`;
 		this.output.verbose_log(`Started ${action}`);
 		this.output.start_loading(`Installing package [${pack}]...`);
-		return new Promise((resolve, reject) => {
-			this.spawn.spin(
-				_pacman_commands.install[this.params.pacman](pack),
-				action,
-				resolve,
-				reject
-			);
-		});
+		return await this.spawn.spin_promise(_pacman_commands.install[this.params.pacman](pack), action);
 	}
 	
 	public async install_package_dev(pack:string)
@@ -73,14 +59,7 @@ class CMD {
 		const action = `installing dev package [${pack}]`;
 		this.output.verbose_log(`Started ${action}`);
 		this.output.start_loading(`Installing dev package [${pack}]...`);
-		return new Promise((resolve, reject) => {
-			this.spawn.spin(
-				_pacman_commands.install_dev[this.params.pacman](pack),
-				action,
-				resolve,
-				reject
-			);
-		});
+		return await this.spawn.spin_promise(_pacman_commands.install_dev[this.params.pacman](pack), action);
 	}
 	
 	public async install_dep(repo:string)
@@ -88,14 +67,7 @@ class CMD {
 		const action = `installing dependencies [${repo}]`;
 		this.output.verbose_log(`Started ${action}`);
 		this.output.start_loading(`Installing dep [${repo}]...`);
-		return new Promise((resolve, reject) => {
-			this.spawn.spin(
-				_pacman_commands.install[this.params.pacman](repo),
-				action,
-				resolve,
-				reject
-			);
-		});
+		return await this.spawn.spin_promise(_pacman_commands.install[this.params.pacman](repo), action);
 	}
 	
 	public async install_dep_dev(repo:string)
@@ -103,28 +75,14 @@ class CMD {
 		const action = `installing dev dependencies [${repo}]`;
 		this.output.verbose_log(`Started ${action}`);
 		this.output.start_loading(`Installing dep dev [${repo}]...`);
-		return new Promise((resolve, reject) => {
-			this.spawn.spin(
-				_pacman_commands.install_dev[this.params.pacman](repo),
-				action,
-				resolve,
-				reject
-			);
-		});
+		return await this.spawn.spin_promise(_pacman_commands.install_dev[this.params.pacman](repo), action);
 	}
 
 	public async uninstall_dep(repo:string)
 			:Promise<any>{
 		const action = `uninstalling dependencies [${repo}]`;
 		this.output.verbose_log(`Started ${action}`);
-		return new Promise((resolve, reject) => {
-			this.spawn.spin(
-				_pacman_commands.uninstall[this.params.pacman](repo),
-				action,
-				resolve,
-				reject
-			);
-		});
+		return await this.spawn.spin_promise(_pacman_commands.uninstall[this.params.pacman](repo), action);
 	}
 	
 	public async clone_repo(

@@ -15,13 +15,17 @@ declare class Spawn {
     spin(command: string, action: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
     log(command: string, action: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
     verbose_log(command: string, action: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
+    debug_log(command: string, action: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
     spin_and_log(command: string, action: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
     spin_and_verbose_log(command: string, action: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
+    spin_and_debug_log(command: string, action: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
     spin_promise(command: string, action: string, detached?: boolean): Promise<unknown>;
     log_promise(command: string, action: string, detached?: boolean): Promise<unknown>;
     verbose_log_promise(command: string, action: string, detached?: boolean): Promise<unknown>;
+    debug_log_promise(command: string, action: string, detached?: boolean): Promise<unknown>;
     spin_and_log_promise(command: string, action: string, detached?: boolean): Promise<unknown>;
     spin_and_verbose_log_promise(command: string, action: string, detached?: boolean): Promise<unknown>;
+    spin_and_debug_log_promise(command: string, action: string, detached?: boolean): Promise<unknown>;
     private _spawn;
 }
 export declare type SpawnInstance = InstanceType<typeof Spawn>;

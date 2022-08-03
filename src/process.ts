@@ -10,7 +10,6 @@ import path from 'path';
 
 import {urn_util} from 'urn-lib';
 
-// import {Arguments, Repo, PacMan, Deploy, Params, DB} from './types';
 import {Arguments, Repo, PacMan, Params, DB, valid_admin_repos} from './types';
 
 import * as output from './output/index';
@@ -40,11 +39,9 @@ import {default_params, defaults} from './conf/defaults';
 
 import {
 	check_repo,
-	// check_deploy,
 	check_pacman,
 	check_db,
 	read_init_file,
-	// check_if_is_dot
 } from './cmd/common';
 
 let output_instance:output.OutputInstance;
@@ -67,8 +64,6 @@ export async function uranio_process(args:Arguments)
 	process_params = _set_args(process_params, args);
 	
 	process.chdir(process_params.root);
-	
-	// process_params = _autoset_is_dot(process_params, args);
 	
 	output_instance = output.create(process_params);
 	util_instance = util.create(process_params, output_instance);
@@ -118,13 +113,6 @@ function _set_root(args:Arguments){
 		
 }
 
-// function _autoset_is_dot(params:Params, args:Arguments):Params{
-//   if(typeof args.is_dot === 'undefined' && check_if_is_dot(params.root)){
-//     params.is_dot = true;
-//   }
-//   return params;
-// }
-
 function _init_log(){
 	
 	const log_file_path = `${process_params.root}/${defaults.log_filepath}`;
@@ -149,7 +137,7 @@ function _log_root(){
 function _set_args(params:Params, args:Arguments)
 		:Params{
 	
-	// Paramters with default value = false
+	/* Paramters with default value = false */
 	
 	const prod = args.p || args.prod;
 	
@@ -237,12 +225,6 @@ function _set_args(params:Params, args:Arguments)
 		params.inside_ntl = !args.noinside_ntl;
 	}
 	
-	// const is_dot = args.is_dot;
-	
-	// if(is_dot == true){
-	//   params.is_dot = true;
-	// }
-	
 	const time = args.t || args.time;
 	
 	if(time == true){
@@ -288,7 +270,7 @@ function _set_args(params:Params, args:Arguments)
 		params.docker_db = !args.nodocker_db;
 	}
 	
-	// Paramteters with default value = true
+	/* Paramteters with default value = true */
 	
 	const filelog = args.l || args.filelog;
 	
@@ -317,7 +299,7 @@ function _set_args(params:Params, args:Arguments)
 		params.color_uranio = !args.nocolor_uranio;
 	}
 	
-	// Parameters with default value type = string
+	/* Parameters with default value type = string */
 	
 	const prefix = args.x || args.prefix;
 	
@@ -350,13 +332,6 @@ function _set_args(params:Params, args:Arguments)
 	if(typeof config === 'string' && config != ''){
 		params.config = config;
 	}
-	
-	// const deploy = args.d || args.deploy;
-	
-	// if(typeof deploy === 'string' && deploy != ''){
-	//   check_deploy(deploy);
-	//   params.deploy = deploy as Deploy;
-	// }
 	
 	const db = args.db;
 	

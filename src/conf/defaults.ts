@@ -16,7 +16,6 @@ export const default_params:Params = {
 	fullwidth: false,
 	native: false,
 	inside_ntl: false,
-	// is_dot: false,
 	time: false,
 	context: false,
 	prefix_color: false,
@@ -30,7 +29,6 @@ export const default_params:Params = {
 	config: 'uranio.toml',
 	repo: 'adm',
 	pacman: 'yarn',
-	// deploy: 'netlify',
 	db: 'mongo',
 	// color_log: '#859900',
 	// color_debug: '#557685',
@@ -71,8 +69,3 @@ export const defaults = {
 	check_char: '✔',
 	wrong_char: '✗',
 } as const;
-
-// export const jsonfile_path = `${defaults.folder}/${defaults.json_filename}`;
-// export const jsonfile_path = `${defaults.json_filename}`;
-
-

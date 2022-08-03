@@ -22,9 +22,7 @@ import {
 	Repo,
 	abstract_repos,
 	abstract_pacman,
-	// abstract_deploy,
 	abstract_db,
-	// valid_deploy_repos,
 	valid_admin_repos,
 } from '../types';
 
@@ -33,7 +31,6 @@ import {title} from './title';
 import {
 	merge_init_params,
 	check_repo,
-	// check_deploy,
 	check_pacman,
 	package_scripts,
 	adm_package_scripts,

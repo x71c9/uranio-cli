@@ -32,8 +32,6 @@ export async function build(params:Params)
 	
 	_init_build(params);
 	
-	// output_instance.start_loading(`Building...`);
-	
 	await _build();
 	
 	await build_server(build_params, false);
@@ -87,7 +85,7 @@ export async function build_panel(params:Params, init=true)
 	const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
 	const cmd_server = `${node_env}yarn uranio-panel-${build_params.repo} build ${urn_lib_pre}`;
 	
-	await util_instance.spawn.log_promise(cmd_server, 'building panel');
+	await util_instance.spawn.verbose_log_promise(cmd_server, 'building panel');
 	
 	output_instance.done_log('Build panel completed.');
 	
