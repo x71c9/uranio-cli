@@ -107,7 +107,7 @@ function _init_params(params) {
 async function _init_dev() {
     await (0, build_1.build_server)(dev_params, true, false);
     _tsc_watch();
-    // _watch();
+    _watch();
 }
 async function _dev_panel() {
     // uranio-panel-adm dev doesn't need Forever to reaload (like the server)
@@ -142,8 +142,8 @@ async function _dev_server() {
     });
 }
 function _tsc_watch() {
-    // const tsc_watch = `yarn tsc -w`;
-    // util_instance.spawn.verbose_log(tsc_watch, 'watching types');
+    const tsc_watch = `yarn tsc -w`;
+    util_instance.spawn.verbose_log(tsc_watch, 'watching types');
 }
 function _watch() {
     const src_path = `${dev_params.root}/src/`;

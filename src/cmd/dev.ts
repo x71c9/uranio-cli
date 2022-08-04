@@ -130,7 +130,7 @@ async function _init_dev(){
 	
 	_tsc_watch();
 	
-	// _watch();
+	_watch();
 }
 
 async function _dev_panel(){
@@ -181,8 +181,8 @@ async function _dev_server(){
 
 function _tsc_watch(){
 	
-	// const tsc_watch = `yarn tsc -w`;
-	// util_instance.spawn.verbose_log(tsc_watch, 'watching types');
+	const tsc_watch = `yarn tsc -w`;
+	util_instance.spawn.verbose_log(tsc_watch, 'watching types');
 	
 }
 
