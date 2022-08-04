@@ -93,7 +93,7 @@ class Output {
     }
     end_log(text) {
         this.stop_loading();
-        const end_text = `${defaults_1.defaults.check_char} ${text}`;
+        const end_text = `${defaults_1.defaults.check_char}${defaults_1.defaults.check_char}  ${text}`;
         // this.log((!this.params.blank) ? chalk.yellow(end_text) : end_text, 'end');
         // this.log((!this.params.blank) ? chalk.magenta(end_text) : end_text);
         this.log(end_text);
@@ -163,6 +163,13 @@ class Output {
             // spinner.text = spinner.text.substring(0, process.stdout.columns - 2);
             spinner_1.spinner.text = spinner_1.spinner.text.substring(0, process.stdout.columns);
         }
+    }
+    clean_chunk(chunk) {
+        const plain_text = chunk
+            .toString()
+            .replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
+            .replace(/\r?\n|\r/g, ' ');
+        return plain_text;
     }
     _read_text(text, type) {
         // if(this.params.color_uranio === false){

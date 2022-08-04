@@ -52,10 +52,10 @@ async function init(params) {
     util_instance = util.create(init_params, output_instance);
     dot_folder = `${init_params.root}/${defaults_1.defaults.folder}`;
     init_filepath = `${dot_folder}/${defaults_1.defaults.init_filepath}`;
+    _log_important_params();
     _create_tmp_dir();
     await _clone_assets_repo();
     await _clone_uranio_schema();
-    _log_important_params();
     _create_dot_dir();
     _create_init_file();
     _create_src_dirs();
@@ -154,7 +154,8 @@ async function _ask_for_docker(args) {
                 type: 'confirm',
                 name: 'docker',
                 message: confirm_msg,
-                suffix: suffix
+                suffix: suffix,
+                default: false
             }
         ]).then(async (answers) => {
             if (answers.docker === true) {
@@ -179,7 +180,8 @@ async function _ask_for_docker_db(args) {
                 type: 'confirm',
                 name: 'docker_db',
                 message: confirm_msg,
-                suffix: suffix
+                suffix: suffix,
+                default: false
             }
         ]).then(async (answers) => {
             if (answers.docker_db === true) {
@@ -265,9 +267,11 @@ async function _ask_for_repo(args) {
 //   }
 // }
 function _log_important_params() {
+    output_instance.verbose_log(`--------------------------------------------`);
     output_instance.verbose_log(`$URNROOT$Project root: [${init_params.root}]`);
     output_instance.verbose_log(`Selected repository: [${init_params.repo}]`);
     output_instance.verbose_log(`Selected pacman: [${init_params.pacman}]`);
+    output_instance.verbose_log(`--------------------------------------------`);
     // if(valid_deploy_repos().includes(init_params.repo)){
     //   output_instance.verbose_log(
     //     `Selected deploy: [${init_params.deploy}]`,
@@ -295,6 +299,7 @@ function _copy_schema() {
     util_instance.fs.create_directory(dot_schema);
     const schema_dist = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-schema/dist`;
     util_instance.fs.copy_directory(schema_dist, `${dot_schema}/dist`);
+    output_instance.done_log(`Copied uranio-schema.`);
 }
 function _copy_assets() {
     _copy_sample();
@@ -303,6 +308,7 @@ function _copy_assets() {
     _copy_index();
     _copy_atoms();
     // _copy_eslint_files();
+    output_instance.done_log(`Copied assets.`);
 }
 function _copy_atoms() {
     const ass_atoms_filepath = `${init_params.root}/${defaults_1.defaults.tmp_folder}/uranio-assets/main/atoms`;
@@ -399,6 +405,7 @@ function _create_src_dirs() {
     if ((0, types_1.valid_admin_repos)().includes(init_params.repo)) {
         _create_src_admin_dir();
     }
+    output_instance.done_log(`Created src directory [${src_folder}].`);
 }
 async function _init_pacman() {
     output_instance.start_loading(`Initializing pacman...`);
@@ -406,7 +413,7 @@ async function _init_pacman() {
     if (init_params.pacman === 'yarn' && !util_instance.fs.exists(yarn_lock)) {
         await util_instance.cmd.yarn_install();
     }
-    output_instance.done_verbose_log(`Pacman initialized.`);
+    output_instance.done_log(`Pacman initialized.`);
 }
 function _remove_tmp() {
     output_instance.start_loading(`Removing tmp folder [${defaults_1.defaults.tmp_folder}]...`);
@@ -440,6 +447,7 @@ function _create_dot_env() {
         return;
     }
     util_instance.fs.copy_file(`${init_params.root}/sample.env`, dot_env_path);
+    output_instance.done_log(`Created dot env [${dot_env_path}].`);
 }
 async function _install_dev_dep() {
     if ((0, types_1.valid_admin_repos)().includes(init_params.repo)) {

@@ -4,8 +4,12 @@
  *
  * @packageDocumentation
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaults = exports.default_params = void 0;
+const chalk_1 = __importDefault(require("chalk"));
 exports.default_params = {
     prod: false,
     force: false,
@@ -66,5 +70,8 @@ exports.defaults = {
     core_dep_dev_repo: `${cloud_address}/uranio-core-dep-dev`,
     check_char: '✔',
     wrong_char: '✗',
+    prefix_tsc: chalk_1.default.magenta('[~]'),
+    prefix_srv: chalk_1.default.gray('[~]'),
+    prefix_pnl: chalk_1.default.green('[~]')
 };
 //# sourceMappingURL=defaults.js.map

@@ -34,7 +34,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports._watch = exports.dev_panel = exports.dev_server = exports.dev = void 0;
 const path_1 = __importDefault(require("path"));
 const forever_monitor_1 = __importDefault(require("forever-monitor"));
-const is_docker_1 = __importDefault(require("is-docker"));
+// import isDocker from 'is-docker';
+// import chalk from 'chalk';
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
 const defaults_1 = require("../conf/defaults");
@@ -45,7 +46,7 @@ const transpose_1 = require("./transpose");
 const build_1 = require("./build");
 const common_1 = require("./common");
 const docker = __importStar(require("./docker"));
-const is_docker = (0, is_docker_1.default)();
+// const is_docker = isDocker();
 let output_instance;
 let util_instance;
 let dev_params = defaults_1.default_params;
@@ -112,11 +113,11 @@ async function _init_dev() {
 async function _dev_panel() {
     // uranio-panel-adm dev doesn't need Forever to reaload (like the server)
     // because it reloads itself by launching Nuxt dev service.
-    const args = (is_docker === true) ? ' urn_log_prefix_type=true' : '';
-    // const args = ' urn_log_prefix_type=true';
+    // const args = (is_docker === true) ? ' urn_log_prefix_type=true' : '';
+    const args = ' urn_log_prefix_type=true';
     // const args = '';
     const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev${args}`;
-    util_instance.spawn.debug_log(cmd_dev_panel, 'developing panel');
+    util_instance.spawn.verbose_log(cmd_dev_panel, 'developing panel', defaults_1.defaults.prefix_pnl);
 }
 async function _dev_server() {
     _is_dev_server = true;
@@ -126,6 +127,7 @@ async function _dev_server() {
     // const args:string[] = [];
     // Forever module needs for ensuring that a given script runs continuously
     _service_child = new forever_monitor_1.default.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`, {
+        silent: true,
         args: args,
         // watch: true,
         // watchDirectory: `${dev_params.root}/src`
@@ -140,14 +142,27 @@ async function _dev_server() {
     _service_child.on('exit:code', function (code) {
         output_instance.done_log('Forever detected [dev server] exited with code ' + code);
     });
+    _service_child.on('stdout', function (chunk) {
+        // process.stdout.write(`${prefix} ${data.toString()}`);
+        // process.stdout.write(data.toString());
+        const splitted_chunk = chunk.toString().split('\n');
+        for (const split of splitted_chunk) {
+            let plain_text = output_instance.clean_chunk(split);
+            if (plain_text === '') {
+                continue;
+            }
+            plain_text = `${defaults_1.defaults.prefix_srv} ${plain_text}`;
+            output_instance.verbose_log(plain_text);
+        }
+    });
 }
 function _tsc_watch() {
     const tsc_watch = `yarn tsc -w`;
-    util_instance.spawn.verbose_log(tsc_watch, 'watching types');
+    util_instance.spawn.verbose_log(tsc_watch, 'watching types', defaults_1.defaults.prefix_tsc);
 }
 function _watch() {
     const src_path = `${dev_params.root}/src/`;
-    output_instance.log(`Watching \`src\` folder [${src_path}] ...`);
+    output_instance.verbose_log(`Watching \`src\` folder [${src_path}] ...`);
     util_instance.watch(src_path, `watching \`src\` folder.`, () => {
         output_instance.done_log(`Initial scanner completed for [${src_path}].`);
         watch_src_scanned = true;
@@ -178,7 +193,7 @@ function _watch() {
     if (!util_instance.fs.exists(dev_params.config)) {
         return;
     }
-    output_instance.log(`Watching \`uranio.toml\` file [${dev_params.config}] ...`);
+    output_instance.verbose_log(`Watching \`uranio.toml\` file [${dev_params.config}] ...`);
     util_instance.watch(dev_params.config, `watching \`toml\` file.`, () => {
         output_instance.done_log(`Initial scanner completed for [${dev_params.config}].`);
         watch_toml_scanned = true;

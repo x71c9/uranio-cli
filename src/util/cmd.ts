@@ -273,7 +273,7 @@ class CMD {
 				`-b ${branch} ` : '';
 			let cmd = `git clone ${branch_str}${address} ${dest_folder} --progress`;
 			cmd += (recursive === true) ? ` --recurse-submodules` : '';
-			this.spawn.spin(cmd, action, resolve, reject);
+			this.spawn.spin(cmd, action, '', resolve, reject);
 		});
 	}
 	

@@ -57,67 +57,68 @@ class Spawn {
         this.output.verbose_log(command);
         cp.execSync(command);
     }
-    spin(command, action, resolve, reject, detached = false) {
-        return this._spawn(command, action, true, false, false, resolve, reject, detached);
+    spin(command, action, prefix = '', resolve, reject, detached = false) {
+        return this._spawn(command, action, true, false, false, prefix, resolve, reject, detached);
     }
-    log(command, action, resolve, reject, detached = false) {
-        return this._spawn(command, action, false, false, false, resolve, reject, detached);
+    log(command, action, prefix = '', resolve, reject, detached = false) {
+        return this._spawn(command, action, false, false, false, prefix, resolve, reject, detached);
     }
-    verbose_log(command, action, resolve, reject, detached = false) {
-        return this._spawn(command, action, false, true, false, resolve, reject, detached);
+    verbose_log(command, action, prefix = '', resolve, reject, detached = false) {
+        return this._spawn(command, action, false, true, false, prefix, resolve, reject, detached);
     }
-    debug_log(command, action, resolve, reject, detached = false) {
-        return this._spawn(command, action, false, false, true, resolve, reject, detached);
+    debug_log(command, action, prefix = '', resolve, reject, detached = false) {
+        return this._spawn(command, action, false, false, true, prefix, resolve, reject, detached);
     }
-    spin_and_log(command, action, resolve, reject, detached = false) {
-        return this._spawn(command, action, true, false, false, resolve, reject, detached);
+    spin_and_log(command, action, prefix = '', resolve, reject, detached = false) {
+        return this._spawn(command, action, true, false, false, prefix, resolve, reject, detached);
     }
-    spin_and_verbose_log(command, action, resolve, reject, detached = false) {
-        return this._spawn(command, action, true, true, false, resolve, reject, detached);
+    spin_and_verbose_log(command, action, prefix = '', resolve, reject, detached = false) {
+        return this._spawn(command, action, true, true, false, prefix, resolve, reject, detached);
     }
-    spin_and_debug_log(command, action, resolve, reject, detached = false) {
-        return this._spawn(command, action, true, false, true, resolve, reject, detached);
+    spin_and_debug_log(command, action, prefix = '', resolve, reject, detached = false) {
+        return this._spawn(command, action, true, false, true, prefix, resolve, reject, detached);
     }
-    async spin_promise(command, action, detached = false) {
+    async spin_promise(command, action, prefix = '', detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.spin(command, action, resolve, reject, detached);
+            return this.spin(command, action, prefix, resolve, reject, detached);
         });
     }
-    async log_promise(command, action, detached = false) {
+    async log_promise(command, action, prefix = '', detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.log(command, action, resolve, reject, detached);
+            return this.log(command, action, prefix, resolve, reject, detached);
         });
     }
-    async verbose_log_promise(command, action, detached = false) {
+    async verbose_log_promise(command, action, prefix = '', detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.verbose_log(command, action, resolve, reject, detached);
+            return this.verbose_log(command, action, prefix, resolve, reject, detached);
         });
     }
-    async debug_log_promise(command, action, detached = false) {
+    async debug_log_promise(command, action, prefix = '', detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.debug_log(command, action, resolve, reject, detached);
+            return this.debug_log(command, action, prefix, resolve, reject, detached);
         });
     }
-    async spin_and_log_promise(command, action, detached = false) {
+    async spin_and_log_promise(command, action, prefix = '', detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.spin_and_log(command, action, resolve, reject, detached);
+            return this.spin_and_log(command, action, prefix, resolve, reject, detached);
         });
     }
-    async spin_and_verbose_log_promise(command, action, detached = false) {
+    async spin_and_verbose_log_promise(command, action, prefix = '', detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.spin_and_verbose_log(command, action, resolve, reject, detached);
+            return this.spin_and_verbose_log(command, action, prefix, resolve, reject, detached);
         });
     }
-    async spin_and_debug_log_promise(command, action, detached = false) {
+    async spin_and_debug_log_promise(command, action, prefix = '', detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.spin_and_debug_log(command, action, resolve, reject, detached);
+            return this.spin_and_debug_log(command, action, prefix, resolve, reject, detached);
         });
     }
-    _spawn(command, action, spin, verbose, debug, resolve, reject, detached = false) {
+    _spawn(command, action, spin, verbose, debug, prefix, resolve, reject, detached = false) {
         if (spin) {
             this.output.start_loading(command);
         }
-        this.output.verbose_log(`$ ${command}`);
+        const prefix_command = (prefix) ? `${prefix} ` : '';
+        this.output.verbose_log(`${prefix_command}$ ${command}`);
         const child = cp.spawn(command, { shell: true, detached: detached });
         if (child.stdout) {
             child.stdout.setEncoding('utf8');
@@ -128,9 +129,12 @@ class Spawn {
                 }
                 const splitted_chunk = chunk.split('\n');
                 for (const split of splitted_chunk) {
-                    const plain_text = _clean_chunk(split);
+                    let plain_text = this.output.clean_chunk(split);
                     if (plain_text === '') {
                         continue;
+                    }
+                    if (prefix) {
+                        plain_text = `${prefix} ${plain_text}`;
                     }
                     if (verbose) {
                         this.output.verbose_log(plain_text);
@@ -151,9 +155,12 @@ class Spawn {
                 }
                 const splitted_chunk = chunk.split('\n');
                 for (const split of splitted_chunk) {
-                    const plain_text = _clean_chunk(split);
+                    let plain_text = this.output.clean_chunk(split);
                     if (plain_text === '') {
                         continue;
+                    }
+                    if (prefix) {
+                        plain_text = `${prefix} ${plain_text}`;
                     }
                     if (verbose) {
                         this.output.verbose_log(plain_text);
@@ -215,11 +222,4 @@ function create(output) {
     return new Spawn(output);
 }
 exports.create = create;
-function _clean_chunk(chunk) {
-    const plain_text = chunk
-        .toString()
-        .replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
-        .replace(/\r?\n|\r/g, ' ');
-    return plain_text;
-}
 //# sourceMappingURL=spawn.js.map

@@ -121,7 +121,7 @@ class Util {
 				{ useTabs: true, tabWidth: 2, parser: parser }
 			);
 			this.fs.write_file(filepath, pretty_string);
-			this.output.done_verbose_log(`Prettier [${filepath}] done.`);
+			this.output.debug_log(`Prettier [${filepath}] done.`);
 		}catch(e){
 			const err = e as Error;
 			this.output.error_log(`Cannot pretty file. ${err.message}`);

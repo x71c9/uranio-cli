@@ -118,7 +118,7 @@ class Output {
 	public end_log(text:string)
 			:void{
 		this.stop_loading();
-		const end_text = `${defaults.check_char} ${text}`;
+		const end_text = `${defaults.check_char}${defaults.check_char}  ${text}`;
 		// this.log((!this.params.blank) ? chalk.yellow(end_text) : end_text, 'end');
 		// this.log((!this.params.blank) ? chalk.magenta(end_text) : end_text);
 		this.log(end_text);
@@ -205,6 +205,14 @@ class Output {
 			// spinner.text = spinner.text.substring(0, process.stdout.columns - 2);
 			spinner.text = spinner.text.substring(0, process.stdout.columns);
 		}
+	}
+	
+	public clean_chunk(chunk:string){
+		const plain_text = chunk
+			.toString()
+			.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '') // eslint-disable-line no-control-regex
+			.replace(/\r?\n|\r/g, ' ');
+		return plain_text;
 	}
 	
 	private _read_text(text:string, type:LogType){

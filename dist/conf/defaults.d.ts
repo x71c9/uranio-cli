@@ -32,4 +32,7 @@ export declare const defaults: {
     readonly core_dep_dev_repo: "git+ssh://git@github.com/x71c9/uranio-core-dep-dev";
     readonly check_char: "✔";
     readonly wrong_char: "✗";
+    readonly prefix_tsc: string;
+    readonly prefix_srv: string;
+    readonly prefix_pnl: string;
 };

@@ -58,6 +58,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generate = void 0;
 const path_1 = __importDefault(require("path"));
 const esbuild = __importStar(require("esbuild"));
+// import chalk from 'chalk';
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
@@ -133,10 +134,11 @@ async function _generate(args) {
         root_uranio = `${generate_params.root}/${generate_params.config}`;
     }
     // const final_args = (is_docker === true) ? `${args} urn_log_prefix_type=true` : args;
-    const final_args = `${args} urn_log_prefix_type=true`;
-    // const final_args = `${args}`;
+    // const final_args = `${args} urn_log_prefix_type=true`;
+    const final_args = `${args}`;
     const generate_cmd = `yarn uranio-generate-${generate_params.repo} -c ${root_uranio} ${final_args}`;
-    util_instance.spawn.debug_log_promise(generate_cmd, 'generating');
+    // await util_instance.spawn.debug_log_promise(generate_cmd, 'generating all', chalk.red('[G]'));
+    await util_instance.spawn.debug_log_promise(generate_cmd, 'generating all', '[G]');
     _copy_uranio_schema_repo();
     // output_instance.done_log('Generate completed.');
 }

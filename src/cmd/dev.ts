@@ -8,13 +8,15 @@ import path from 'path';
 
 import forever from 'forever-monitor';
 
-import isDocker from 'is-docker';
+// import isDocker from 'is-docker';
+
+// import chalk from 'chalk';
 
 import * as output from '../output/index';
 
 import * as util from '../util/index';
 
-import {default_params} from '../conf/defaults';
+import {default_params, defaults} from '../conf/defaults';
 
 // import {Params} from '../types';
 import {Params, valid_admin_repos} from '../types';
@@ -29,7 +31,7 @@ import {merge_params} from './common';
 
 import * as docker from './docker';
 
-const is_docker = isDocker();
+// const is_docker = isDocker();
 
 let output_instance:output.OutputInstance;
 
@@ -138,12 +140,12 @@ async function _dev_panel(){
 	// uranio-panel-adm dev doesn't need Forever to reaload (like the server)
 	// because it reloads itself by launching Nuxt dev service.
 	
-	const args = (is_docker === true) ? ' urn_log_prefix_type=true' : '';
-	// const args = ' urn_log_prefix_type=true';
+	// const args = (is_docker === true) ? ' urn_log_prefix_type=true' : '';
+	const args = ' urn_log_prefix_type=true';
 	// const args = '';
 	
 	const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev${args}`;
-	util_instance.spawn.debug_log(cmd_dev_panel, 'developing panel');
+	util_instance.spawn.verbose_log(cmd_dev_panel, 'developing panel', defaults.prefix_pnl);
 	
 }
 async function _dev_server(){
@@ -158,6 +160,7 @@ async function _dev_server(){
 	
 	// Forever module needs for ensuring that a given script runs continuously
 	_service_child = new forever.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`,{
+		silent: true,
 		args: args,
 		// watch: true,
 		// watchDirectory: `${dev_params.root}/src`
@@ -177,12 +180,26 @@ async function _dev_server(){
 		output_instance.done_log('Forever detected [dev server] exited with code ' + code);
 	});
 	
+	_service_child.on('stdout', function(chunk){
+		// process.stdout.write(`${prefix} ${data.toString()}`);
+		// process.stdout.write(data.toString());
+		const splitted_chunk = chunk.toString().split('\n');
+		for(const split of splitted_chunk){
+			let plain_text = output_instance.clean_chunk(split);
+			if(plain_text === ''){
+				continue;
+			}
+			plain_text = `${defaults.prefix_srv} ${plain_text}`;
+			output_instance.verbose_log(plain_text);
+		}
+	});
+	
 }
 
 function _tsc_watch(){
 	
 	const tsc_watch = `yarn tsc -w`;
-	util_instance.spawn.verbose_log(tsc_watch, 'watching types');
+	util_instance.spawn.verbose_log(tsc_watch, 'watching types', defaults.prefix_tsc);
 	
 }
 
@@ -190,7 +207,7 @@ export function _watch(){
 	
 	const src_path = `${dev_params.root}/src/`;
 	
-	output_instance.log(`Watching \`src\` folder [${src_path}] ...`);
+	output_instance.verbose_log(`Watching \`src\` folder [${src_path}] ...`);
 	
 	util_instance.watch(
 		src_path,
@@ -238,7 +255,7 @@ export function _watch(){
 		return;
 	}
 	
-	output_instance.log(`Watching \`uranio.toml\` file [${dev_params.config}] ...`);
+	output_instance.verbose_log(`Watching \`uranio.toml\` file [${dev_params.config}] ...`);
 	
 	util_instance.watch(
 		dev_params.config,

@@ -4,6 +4,8 @@
  * @packageDocumentation
  */
 
+import chalk from 'chalk';
+
 import {Params} from '../types';
 
 export const default_params:Params = {
@@ -68,4 +70,7 @@ export const defaults = {
 	core_dep_dev_repo: `${cloud_address}/uranio-core-dep-dev`,
 	check_char: '✔',
 	wrong_char: '✗',
+	prefix_tsc: chalk.magenta('[~]'),
+	prefix_srv: chalk.gray('[~]'),
+	prefix_pnl: chalk.green('[~]')
 } as const;

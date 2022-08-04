@@ -19,6 +19,7 @@ declare class Output {
     start_loading(text: string): void;
     stop_loading(): void;
     spinner_text(text: string): void;
+    clean_chunk(chunk: string): string;
     private _read_text;
     private _prefix_color;
     private _log;

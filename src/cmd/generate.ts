@@ -32,6 +32,8 @@ import path from 'path';
 
 import * as esbuild from 'esbuild';
 
+// import chalk from 'chalk';
+
 import {defaults, default_params} from '../conf/defaults';
 
 import * as output from '../output/index';
@@ -148,11 +150,12 @@ async function _generate(args:string){
 	}
 	
 	// const final_args = (is_docker === true) ? `${args} urn_log_prefix_type=true` : args;
-	const final_args = `${args} urn_log_prefix_type=true`;
-	// const final_args = `${args}`;
+	// const final_args = `${args} urn_log_prefix_type=true`;
+	const final_args = `${args}`;
 	
 	const generate_cmd = `yarn uranio-generate-${generate_params.repo} -c ${root_uranio} ${final_args}`;
-	util_instance.spawn.debug_log_promise(generate_cmd, 'generating');
+	// await util_instance.spawn.debug_log_promise(generate_cmd, 'generating all', chalk.red('[G]'));
+	await util_instance.spawn.debug_log_promise(generate_cmd, 'generating all', '[G]');
 	
 	_copy_uranio_schema_repo();
 	
