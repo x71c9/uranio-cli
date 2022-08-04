@@ -182,7 +182,7 @@ async function _dev_server(){
 	
 	_service_child.on('stdout', function(chunk){
 		// process.stdout.write(`${prefix} ${data.toString()}`);
-		// process.stdout.write(data.toString());
+		// process.stdout.write(chunk.toString());
 		const splitted_chunk = chunk.toString().split('\n');
 		for(const split of splitted_chunk){
 			let plain_text = output_instance.clean_chunk(split);
