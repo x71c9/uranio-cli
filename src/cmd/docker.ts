@@ -200,7 +200,7 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 	cmd += ` -v $(pwd)/package.json:/app/package.json`;
 	cmd += ` -v $(pwd)/node_modules/:/app/node_modules/`;
 	cmd += ` -v $(pwd)/.uranio/uranio-schema:/app/.uranio/uranio-schema`;
-	cmd += ` -v $(pwd)/cert:/app/cert`;
+	cmd += ` -v $(pwd)/cert/:/app/cert/`;
 	cmd += ` --name ${container_name}`;
 	if(typeof entrypoint === 'string'){
 		cmd += ` --entrypoint="${entrypoint}"`;
