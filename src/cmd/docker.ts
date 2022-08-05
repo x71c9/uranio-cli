@@ -155,7 +155,7 @@ export async function build(params:Partial<Params>)
 	cmd += ` --build-arg project=${project_name}`;
 	// cmd += ` --build-arg deploy=${docker_params.deploy}`;
 	cmd += ` .`;
-	await util_instance.spawn.spin_and_debug_log_promise(cmd, 'building');
+	await util_instance.spawn.spin_and_debug_log_promise(cmd, 'building', defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker image built ${image_name}`
 	);
@@ -205,7 +205,7 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 		cmd += ` --entrypoint="${entrypoint}"`;
 	}
 	cmd += ` ${image_name}`;
-	await util_instance.spawn.spin_and_debug_log_promise(cmd, 'creating');
+	await util_instance.spawn.spin_and_debug_log_promise(cmd, 'creating', defaults.prefix_docker);
 	
 	output_instance.done_log(
 		`Docker container created ${container_name}`
@@ -219,7 +219,7 @@ export async function start(params:Partial<Params>):Promise<void>{
 	const container_name = _get_container_name();
 	let cmd = '';
 	cmd += `docker start -i ${container_name}`;
-	await util_instance.spawn.verbose_log_promise(cmd, 'starting');
+	await util_instance.spawn.verbose_log_promise(cmd, 'starting', defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker image started ${container_name}`
 	);
@@ -260,7 +260,7 @@ export async function stop(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd += ` || true`;
 	}
-	await util_instance.spawn.spin_and_debug_log_promise(cmd, 'stopping');
+	await util_instance.spawn.spin_and_debug_log_promise(cmd, 'stopping', defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker container stopped ${container_name}`
 	);
@@ -275,7 +275,7 @@ export async function remove(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd += ` || true`;
 	}
-	await util_instance.spawn.spin_and_debug_log_promise(cmd, 'creating');
+	await util_instance.spawn.spin_and_debug_log_promise(cmd, 'creating', defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker container removed ${container_name}`
 	);
@@ -291,7 +291,7 @@ export async function unbuild(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd += ` || true`;
 	}
-	await util_instance.spawn.spin_and_debug_log_promise(cmd, `removing image ${image_name}`);
+	await util_instance.spawn.spin_and_debug_log_promise(cmd, `removing image ${image_name}`, defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker image removed ${image_name}`
 	);
@@ -309,7 +309,7 @@ export async function db_create(params:Partial<Params>)
 	cmd += ` --network ${network_name}`;
 	cmd += ` -v ~/mongo/data-${project_name}:/data/db -p ${port}:${port}`;
 	cmd += ` mongo:5`;
-	await util_instance.spawn.spin_and_debug_log_promise(cmd, `creating db ${docker_params.db}`);
+	await util_instance.spawn.spin_and_debug_log_promise(cmd, `creating db ${docker_params.db}`, defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker db container created ${db_container_name}`
 	);
@@ -321,7 +321,7 @@ export async function db_start(params:Partial<Params>)
 	const db_container_name = _get_db_container_name();
 	let cmd = '';
 	cmd += `docker start ${db_container_name}`;
-	await util_instance.spawn.spin_and_debug_log_promise(cmd, `starting db ${docker_params.db}`);
+	await util_instance.spawn.spin_and_debug_log_promise(cmd, `starting db ${docker_params.db}`, defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker db container started ${db_container_name}`
 	);
@@ -336,7 +336,7 @@ export async function db_stop(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd += ` || true`;
 	}
-	await util_instance.spawn.spin_and_debug_log_promise(cmd, `stopping db ${docker_params.db}`);
+	await util_instance.spawn.spin_and_debug_log_promise(cmd, `stopping db ${docker_params.db}`, defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker db container stopped ${db_container_name}`
 	);
@@ -351,7 +351,7 @@ export async function db_remove(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd += ` || true`;
 	}
-	await util_instance.spawn.spin_and_debug_log_promise(cmd, `removing db ${docker_params.db}`);
+	await util_instance.spawn.spin_and_debug_log_promise(cmd, `removing db ${docker_params.db}`, defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker db container removed ${db_container_name}`
 	);
@@ -369,7 +369,7 @@ export async function tmp_remove(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd_rm += ` || true`;
 	}
-	await util_instance.spawn.spin_and_debug_log_promise(cmd_rm, `removing tmp container tmp_${container_name}`);
+	await util_instance.spawn.spin_and_debug_log_promise(cmd_rm, `removing tmp container tmp_${container_name}`, defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker removed tmp container tmp_${container_name}`
 	);
@@ -383,7 +383,7 @@ export async function network_create(params:Partial<Params>, continue_on_fail=fa
 	if(continue_on_fail){
 		cmd_rm += ` || true`;
 	}
-	await util_instance.spawn.spin_and_debug_log_promise(cmd_rm, `creating network ${network_name}`);
+	await util_instance.spawn.spin_and_debug_log_promise(cmd_rm, `creating network ${network_name}`, defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker created network ${network_name}`
 	);
@@ -397,7 +397,7 @@ export async function network_remove(params:Partial<Params>, continue_on_fail=fa
 	if(continue_on_fail){
 		cmd_rm += ` || true`;
 	}
-	await util_instance.spawn.spin_and_debug_log_promise(cmd_rm, `creating network ${network_name}`);
+	await util_instance.spawn.spin_and_debug_log_promise(cmd_rm, `creating network ${network_name}`, defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker removed network ${network_name}`
 	);
@@ -412,7 +412,7 @@ export async function prune(params:Partial<Params>, continue_on_fail=false)
 	if(continue_on_fail){
 		cmd_prune += ` || true`;
 	}
-	await util_instance.spawn.spin_and_debug_log_promise(cmd_prune, `deleteing builder cache`);
+	await util_instance.spawn.spin_and_debug_log_promise(cmd_prune, `deleteing builder cache`, defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker builder cache deleted.`
 	);
@@ -423,16 +423,16 @@ async function _copy_compiled(){
 	const container_name = _get_container_name();
 	let cmd_create = '';
 	cmd_create += `docker create --name tmp_${container_name} ${image_name}`;
-	await util_instance.spawn.spin_and_debug_log_promise(cmd_create, `creating tmp container tmp_${container_name}`);
+	await util_instance.spawn.spin_and_debug_log_promise(cmd_create, `creating tmp container tmp_${container_name}`, defaults.prefix_docker);
 	let cmd_cp_node = '';
 	cmd_cp_node += `docker cp tmp_${container_name}:/app/node_modules node_modules`;
-	await util_instance.spawn.spin_and_debug_log_promise(cmd_cp_node, `copying node_modules from tmp container tmp_${container_name}`);
+	await util_instance.spawn.spin_and_debug_log_promise(cmd_cp_node, `copying node_modules from tmp container tmp_${container_name}`, defaults.prefix_docker);
 	// let cmd_cp_uranio = '';
 	// cmd_cp_uranio += `docker cp tmp_${container_name}:/app/.uranio/. .uranio/`;
 	// await util_instance.spawn.spin_and_debug_log_promise(cmd_cp_uranio, 'docker', `copying .uranio from tmp container tmp_${container_name}`);
 	let cmd_remove = '';
 	cmd_remove += `docker rm tmp_${container_name}`;
-	await util_instance.spawn.spin_and_debug_log_promise(cmd_remove, `removing tmp container tmp_${container_name}`);
+	await util_instance.spawn.spin_and_debug_log_promise(cmd_remove, `removing tmp container tmp_${container_name}`, defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker copied files from tmp container tmp_${container_name}`
 	);

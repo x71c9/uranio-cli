@@ -72,5 +72,11 @@ export const defaults = {
 	wrong_char: '✗',
 	prefix_tsc: chalk.magenta('[~]'),
 	prefix_srv: chalk.gray('[~]'),
-	prefix_pnl: chalk.green('[~]')
+	prefix_pnl: chalk.green('[~]'),
+	prefix_wtc: chalk.cyan('[~]'),
+	prefix_tsc_blank: '[tsc]',
+	prefix_srv_blank: '[srv]',
+	prefix_pnl_blank: '[pnl]',
+	prefix_wtc_blank: '[wtc]',
+	prefix_docker: '[DOCKER]'
 } as const;

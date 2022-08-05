@@ -7,20 +7,20 @@ import { Params } from '../types';
 declare class Output {
     params: Params;
     constructor(params: Params);
-    log(text: string): void;
-    verbose_log(text: string): void;
-    debug_log(text: string): void;
-    done_log(text: string): void;
-    done_verbose_log(text: string): void;
-    end_log(text: string): void;
-    error_log(text: string): void;
-    warn_log(text: string): void;
-    wrong_end_log(text: string): void;
+    log(text: string, prefix?: string): void;
+    verbose_log(text: string, prefix?: string): void;
+    debug_log(text: string, prefix?: string): void;
+    done_log(text: string, prefix?: string): void;
+    done_verbose_log(text: string, prefix?: string): void;
+    end_log(text: string, prefix?: string): void;
+    error_log(text: string, prefix?: string): void;
+    warn_log(text: string, prefix?: string): void;
+    wrong_end_log(text: string, prefix?: string): void;
     start_loading(text: string): void;
     stop_loading(): void;
     spinner_text(text: string): void;
     clean_chunk(chunk: string): string;
-    private _read_text;
+    private _read_and_color;
     private _prefix_color;
     private _log;
     private _format_text;
@@ -28,6 +28,7 @@ declare class Output {
     private _has_prefixed_type;
     private _prefixed_color_length;
     private _has_prefixed_color;
+    private _remove_prefixed_color;
     /**
      * If there in the text there is something in the format [c#----]
      * i.e.: [c#magenta] | [c#FF6655]

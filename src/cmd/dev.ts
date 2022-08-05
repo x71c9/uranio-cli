@@ -144,8 +144,9 @@ async function _dev_panel(){
 	const args = ' urn_log_prefix_type=true';
 	// const args = '';
 	
+	const prefix = (dev_params.blank === true) ? defaults.prefix_pnl_blank : defaults.prefix_pnl;
 	const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev${args}`;
-	util_instance.spawn.verbose_log(cmd_dev_panel, 'developing panel', defaults.prefix_pnl);
+	util_instance.spawn.verbose_log(cmd_dev_panel, 'developing panel', prefix);
 	
 }
 async function _dev_server(){
@@ -189,7 +190,8 @@ async function _dev_server(){
 			if(plain_text === ''){
 				continue;
 			}
-			plain_text = `${defaults.prefix_srv} ${plain_text}`;
+			const prefix = (dev_params.blank === true) ? defaults.prefix_srv_blank : defaults.prefix_srv;
+			plain_text = `${prefix} ${plain_text}`;
 			output_instance.verbose_log(plain_text);
 		}
 	});
@@ -199,7 +201,8 @@ async function _dev_server(){
 function _tsc_watch(){
 	
 	const tsc_watch = `yarn tsc -w`;
-	util_instance.spawn.verbose_log(tsc_watch, 'watching types', defaults.prefix_tsc);
+	const prefix = (dev_params.blank === true) ? defaults.prefix_tsc_blank : defaults.prefix_tsc;
+	util_instance.spawn.verbose_log(tsc_watch, 'watching types', prefix);
 	
 }
 

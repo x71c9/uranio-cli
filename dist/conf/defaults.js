@@ -72,6 +72,12 @@ exports.defaults = {
     wrong_char: '✗',
     prefix_tsc: chalk_1.default.magenta('[~]'),
     prefix_srv: chalk_1.default.gray('[~]'),
-    prefix_pnl: chalk_1.default.green('[~]')
+    prefix_pnl: chalk_1.default.green('[~]'),
+    prefix_wtc: chalk_1.default.cyan('[~]'),
+    prefix_tsc_blank: '[tsc]',
+    prefix_srv_blank: '[srv]',
+    prefix_pnl_blank: '[pnl]',
+    prefix_wtc_blank: '[wtc]',
+    prefix_docker: '[DOCKER]'
 };
 //# sourceMappingURL=defaults.js.map

@@ -116,8 +116,9 @@ async function _dev_panel() {
     // const args = (is_docker === true) ? ' urn_log_prefix_type=true' : '';
     const args = ' urn_log_prefix_type=true';
     // const args = '';
+    const prefix = (dev_params.blank === true) ? defaults_1.defaults.prefix_pnl_blank : defaults_1.defaults.prefix_pnl;
     const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev${args}`;
-    util_instance.spawn.verbose_log(cmd_dev_panel, 'developing panel', defaults_1.defaults.prefix_pnl);
+    util_instance.spawn.verbose_log(cmd_dev_panel, 'developing panel', prefix);
 }
 async function _dev_server() {
     _is_dev_server = true;
@@ -151,14 +152,16 @@ async function _dev_server() {
             if (plain_text === '') {
                 continue;
             }
-            plain_text = `${defaults_1.defaults.prefix_srv} ${plain_text}`;
+            const prefix = (dev_params.blank === true) ? defaults_1.defaults.prefix_srv_blank : defaults_1.defaults.prefix_srv;
+            plain_text = `${prefix} ${plain_text}`;
             output_instance.verbose_log(plain_text);
         }
     });
 }
 function _tsc_watch() {
     const tsc_watch = `yarn tsc -w`;
-    util_instance.spawn.verbose_log(tsc_watch, 'watching types', defaults_1.defaults.prefix_tsc);
+    const prefix = (dev_params.blank === true) ? defaults_1.defaults.prefix_tsc_blank : defaults_1.defaults.prefix_tsc;
+    util_instance.spawn.verbose_log(tsc_watch, 'watching types', prefix);
 }
 function _watch() {
     const src_path = `${dev_params.root}/src/`;

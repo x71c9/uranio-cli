@@ -71,60 +71,80 @@ class Output {
 	// 	this._log(this._prefix_color(colored_text, final_color), context, (this.params.debug === true));
 	// }
 	
-	public log(text:string)
+	public log(text:string, prefix?:string)
 			:void{
+		if(prefix){
+			text = `${prefix} ${text}`;
+		}
 		const prefixed = this._prefix_color(text, 'log');
 		const formatted = this._format_text(prefixed);
-		const read = this._read_text(formatted, 'log');
+		const read = this._read_and_color(formatted, 'log');
 		this._log(read, true);
 	}
 	
-	public verbose_log(text:string)
+	public verbose_log(text:string, prefix?:string)
 			:void{
 		if(this.params.verbose === false){
 			return;
 		}
+		if(prefix){
+			text = `${prefix} ${text}`;
+		}
 		const prefixed = this._prefix_color(text, 'verbose');
 		const formatted = this._format_text(prefixed);
-		const read = this._read_text(formatted, 'verbose');
+		const read = this._read_and_color(formatted, 'verbose');
 		this._log(read, (this.params.verbose === true));
 	}
 	
-	public debug_log(text:string)
+	public debug_log(text:string, prefix?:string)
 			:void{
 		if(this.params.debug === false){
 			return;
 		}
+		if(prefix){
+			text = `${prefix} ${text}`;
+		}
 		const prefixed = this._prefix_color(text, 'debug');
 		const formatted = this._format_text(prefixed);
-		const read = this._read_text(formatted, 'debug');
+		const read = this._read_and_color(formatted, 'debug');
 		this._log(read, (this.params.debug === true));
 	}
 	
-	public done_log(text:string)
+	public done_log(text:string, prefix?:string)
 			:void{
 		this._go_previous();
-		this.log(`${defaults.check_char} ${text}`);
-	}
-	
-	public done_verbose_log(text:string)
-			:void{
-		if(this.params.verbose){
-			this._go_previous();
-			this.verbose_log(`${text}`);
+		text = `${defaults.check_char} ${text}`;
+		if(prefix){
+			text = `${prefix} ${text}`;
 		}
+		this.log(text);
 	}
 	
-	public end_log(text:string)
+	public done_verbose_log(text:string, prefix?:string)
+			:void{
+		if(this.params.verbose === false){
+			return;
+		}
+		this._go_previous();
+		if(prefix){
+			text = `${prefix} ${text}`;
+		}
+		this.verbose_log(`${text}`);
+	}
+	
+	public end_log(text:string, prefix?:string)
 			:void{
 		this.stop_loading();
-		const end_text = `${defaults.check_char}${defaults.check_char}  ${text}`;
+		let end_text = `${defaults.check_char}${defaults.check_char}  ${text}`;
+		if(prefix){
+			end_text = `${prefix} ${end_text}`;
+		}
 		// this.log((!this.params.blank) ? chalk.yellow(end_text) : end_text, 'end');
 		// this.log((!this.params.blank) ? chalk.magenta(end_text) : end_text);
 		this.log(end_text);
 	}
 	
-	public error_log(text:string)
+	public error_log(text:string, prefix?:string)
 			:void{
 		this.stop_loading();
 		// const error_text = `${chalk.bgHex(`#4a3030`).hex(`#8b6666`)(`[ERROR] ${text}`)}`;
@@ -134,11 +154,14 @@ class Output {
 		// this.log(error_text);
 		const prefixed = this._prefix_color(`[ERROR] ${text}`, 'error');
 		const formatted = this._format_text(prefixed);
-		const read = this._read_text(formatted, 'error');
+		const read = this._read_and_color(formatted, 'error');
+		if(prefix){
+			text = `${prefix} ${text}`;
+		}
 		this._log(read, true);
 	}
 	
-	public warn_log(text:string)
+	public warn_log(text:string, prefix?:string)
 			:void{
 		this.stop_loading();
 		// const warn_text = `${chalk.hex(`#d0a800`)(`[WARN] ${text}`)}`;
@@ -146,11 +169,14 @@ class Output {
 		// this.log(warn_text);
 		const prefixed = this._prefix_color(`[WARN] ${text}`, 'warn');
 		const formatted = this._format_text(prefixed);
-		const read = this._read_text(formatted, 'warn');
+		const read = this._read_and_color(formatted, 'warn');
+		if(prefix){
+			text = `${prefix} ${text}`;
+		}
 		this._log(read, true);
 	}
 	
-	public wrong_end_log(text:string)
+	public wrong_end_log(text:string, prefix?:string)
 			:void{
 		this.stop_loading();
 		const end_text = `${defaults.wrong_char} ${text}`;
@@ -158,7 +184,10 @@ class Output {
 		// this.log(end_text);
 		const prefixed = this._prefix_color(`[FAILED] ${end_text}`, 'error');
 		const formatted = this._format_text(prefixed);
-		const read = this._read_text(formatted, 'error');
+		const read = this._read_and_color(formatted, 'error');
+		if(prefix){
+			text = `${prefix} ${text}`;
+		}
 		this._log(read, true);
 	}
 	
@@ -215,11 +244,11 @@ class Output {
 		return plain_text;
 	}
 	
-	private _read_text(text:string, type:LogType){
+	private _read_and_color(text:string, type:LogType){
 		// if(this.params.color_uranio === false){
 		// 	return text;
 		// }
-		if(this.params.prefix_color === true){
+		if(this.params.prefix_color === true || this.params.blank === true){
 			return text;
 		}
 		if(this._has_prefixed_color(text) === false && this._has_prefixed_type(text) === false){
@@ -526,6 +555,15 @@ class Output {
 		return true;
 	}
 	
+	private _remove_prefixed_color(text:string):string{
+		const regex = new RegExp(/\[c#([^\]]+)\] ?/g);
+		const match = text.match(regex);
+		if(!match){
+			return text;
+		}
+		return text.replaceAll(match[0], '');
+	}
+	
 	/**
 	 * If there in the text there is something in the format [c#----]
 	 * i.e.: [c#magenta] | [c#FF6655]
@@ -557,6 +595,9 @@ class Output {
 		const match = regex.exec(text);
 		if(!match){
 			return text;
+		}
+		if(this._has_prefixed_color(text)){
+			text = this._remove_prefixed_color(text);
 		}
 		const removed = text.replaceAll(match[0], '');
 		const type = match[1];

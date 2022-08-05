@@ -93,6 +93,17 @@ async function prompt_init(params, args) {
     util_instance = util.create(init_params, output_instance);
     console.clear();
     (0, title_1.title)();
+    if (util_instance.is_initialized()) {
+        let msg = '';
+        msg += `It appears the repo is already initialized.\n`;
+        msg += `Run \`uranio reinit\` in order to reset and initialize again.`;
+        console.log(msg);
+        process.exit(0);
+    }
+    else {
+        await _ask_for_pacman(args);
+    }
+    // No need for this anymore.
     if (util_instance.is_initialized() && init_params.force === false) {
         let confirm_msg = '';
         confirm_msg += `It appears the repo is already initialized.\n`;

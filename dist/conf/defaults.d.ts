@@ -35,4 +35,10 @@ export declare const defaults: {
     readonly prefix_tsc: string;
     readonly prefix_srv: string;
     readonly prefix_pnl: string;
+    readonly prefix_wtc: string;
+    readonly prefix_tsc_blank: "[tsc]";
+    readonly prefix_srv_blank: "[srv]";
+    readonly prefix_pnl_blank: "[pnl]";
+    readonly prefix_wtc_blank: "[wtc]";
+    readonly prefix_docker: "[DOCKER]";
 };
