@@ -211,7 +211,8 @@ class Output {
             switch (type) {
                 case 'log': {
                     // return chalk.magenta(text);
-                    return chalk_1.default.green(text);
+                    // return chalk.green(text);
+                    return chalk_1.default.cyan(text);
                 }
                 case 'verbose': {
                     return chalk_1.default.blue(text);
@@ -237,7 +238,8 @@ class Output {
         switch (type) {
             case 'log': {
                 // color = '#magenta';
-                color = '#green';
+                // color = '#green';
+                color = '#cyan';
                 break;
             }
             case 'verbose': {
@@ -312,10 +314,13 @@ class Output {
         if (this.params.time) {
             text_lenght += 2;
         }
-        if (this._has_prefixed_color(text)) {
+        if (this._has_prefixed_color(text) && this._has_prefixed_type(text)) {
+            text_lenght -= this._prefixed_color_length(text) + 10;
+        }
+        else if (this._has_prefixed_color(text)) {
             text_lenght -= this._prefixed_color_length(text);
         }
-        if (this._has_prefixed_type(text)) {
+        else if (this._has_prefixed_type(text)) {
             text_lenght -= 8;
         }
         let gap_lenght = process.stdout.columns - text_lenght;
