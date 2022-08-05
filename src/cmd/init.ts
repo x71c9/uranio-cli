@@ -124,29 +124,29 @@ export async function prompt_init(params:Params, args:Arguments)
 	}
 	
 	// No need for this anymore.
-	if(util_instance.is_initialized() && init_params.force === false){
-		let confirm_msg = '';
-		confirm_msg += `It appears the repo is already initialized.\n`;
-		confirm_msg += `? Are you sure you want to proceed?\n`;
-		const suffix = `? All data will be lost and replaced.`;
-		inquirer.
-			prompt([
-				{
-					type: 'confirm',
-					name: 'proceed',
-					message: confirm_msg,
-					suffix: suffix
-				}
-			]).then(async (answer) => {
-				if(answer.proceed && answer.proceed === true){
-					await _ask_for_pacman(args);
-				}else{
-					process.exit(0);
-				}
-			});
-	}else{
-		await _ask_for_pacman(args);
-	}
+	// if(util_instance.is_initialized() && init_params.force === false){
+	// 	let confirm_msg = '';
+	// 	confirm_msg += `It appears the repo is already initialized.\n`;
+	// 	confirm_msg += `? Are you sure you want to proceed?\n`;
+	// 	const suffix = `? All data will be lost and replaced.`;
+	// 	inquirer.
+	// 		prompt([
+	// 			{
+	// 				type: 'confirm',
+	// 				name: 'proceed',
+	// 				message: confirm_msg,
+	// 				suffix: suffix
+	// 			}
+	// 		]).then(async (answer) => {
+	// 			if(answer.proceed && answer.proceed === true){
+	// 				await _ask_for_pacman(args);
+	// 			}else{
+	// 				process.exit(0);
+	// 			}
+	// 		});
+	// }else{
+	// 	await _ask_for_pacman(args);
+	// }
 	
 }
 
