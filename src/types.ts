@@ -11,25 +11,33 @@ export type PacMan = keyof typeof abstract_pacman;
 // export type Deploy = keyof typeof abstract_deploy;
 export type DB = keyof typeof abstract_db;
 
+export enum LogLevel {
+	NONE = 0,
+	ERROR = 1,
+	WARN = 2,
+	LOG = 3,
+	DEBUG = 4,
+	FN_DEBUG = 5
+}
+
 export type Params = {
 	prod: boolean
 	force: boolean
 	verbose: boolean
 	debug: boolean
 	hide: boolean
-	blank: boolean
+	no_colors: boolean
+	prefix_loglevel: boolean
 	fullwidth: boolean
 	native: boolean
 	inside_ntl: boolean
-	// is_dot: boolean
 	time: boolean
 	context: boolean
-	prefix_color: boolean
+	// prefix_color: boolean
 	docker: boolean
 	docker_db: boolean
 	filelog: boolean
 	spin: boolean
-	// color_uranio: boolean
 	prefix: string
 	branch: string
 	config: string
@@ -37,10 +45,8 @@ export type Params = {
 	pacman: PacMan
 	// deploy: Deploy
 	db: DB
-	// color_log: string
-	// color_verbose: string
-	// color_debug: string
 	root: string
+	log_level: LogLevel
 }
 
 export type Arguments = minimist.ParsedArgs;
@@ -81,6 +87,15 @@ export const abstract_pacman = {
 
 export const abstract_db = {
 	mongo: ''
+} as const;
+
+export const abstract_loglevel = {
+	none: '',
+	error: '',
+	warn: '',
+	log: '',
+	debug: '',
+	fn_debug: ''
 } as const;
 
 export function valid_repos()
@@ -151,6 +166,14 @@ export function valid_db()
 	return vals;
 }
 
+export function valid_loglevel()
+		:string[]{
+	const vals:string[] = [];
+	for(const k in abstract_loglevel){
+		vals.push(k);
+	}
+	return vals;
+}
 // export type InitParams = Partial<Params> & {
 //   root: string
 //   repo?: Repo

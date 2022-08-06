@@ -43,7 +43,7 @@ class Spawn {
 	constructor(public output:out.OutputInstance){}
 	
 	public exec_sync(command:string){
-		this.output.verbose_log(command);
+		this.output.debug_log(command);
 		cp.execSync(command);
 	}
 	
@@ -132,7 +132,7 @@ class Spawn {
 			this.output.start_loading(command);
 		}
 		const prefix_command = (prefix) ? `${prefix} ` : '';
-		this.output.verbose_log(`${prefix_command}$ ${command}`);
+		this.output.debug_log(`${prefix_command}$ ${command}`);
 		
 		const child = cp.spawn(command, {shell: true, detached: detached});
 		
@@ -153,10 +153,10 @@ class Spawn {
 						plain_text = `${prefix} ${plain_text}`;
 					}
 					if(verbose){
-						this.output.verbose_log(plain_text);
+						this.output.debug_log(plain_text);
 					}
 					if(debug){
-						this.output.debug_log(plain_text);
+						this.output.fndebug_log(plain_text);
 					}
 					_append(child_outputs[child.pid || 'pid0'], plain_text);
 				}
@@ -180,10 +180,10 @@ class Spawn {
 						plain_text = `${prefix} ${plain_text}`;
 					}
 					if(verbose){
-						this.output.verbose_log(plain_text);
+						this.output.debug_log(plain_text);
 					}
 					if(debug){
-						this.output.debug_log(plain_text);
+						this.output.fndebug_log(plain_text);
 					}
 					_append(child_outputs[child.pid || 'pid0'], plain_text);
 				}
@@ -203,7 +203,7 @@ class Spawn {
 						this.output.done_log(`Done ${action}`);
 					}
 					if(verbose){
-						this.output.done_verbose_log(`Done ${action}`);
+						this.output.done_debug_log(`Done ${action}`);
 					}
 					return (resolve) ? resolve(true) : true;
 				}

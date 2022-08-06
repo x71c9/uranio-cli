@@ -16,7 +16,9 @@
 		"dev:dev": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js dev --branch master\"",
 		"dev:help": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -h -x --branch master\"",
 		"dev:ver": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -v --branch master\"",
-		"dev:watch": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -vu --branch master\"",
+		"dev:watch": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -u --branch master\"",
+		"dev:output": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -utw --branch master -x [PREFIX]\"",
+		"dev:output:prefix": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js -utw --branch master -x [PREFIX] --prefix_loglevel\"",
 		"dev:transpose": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js transpose -vu \"",
 		"dev:generate:register": "yarn tsc-watch --onSuccess \"node -r source-map-support/register ./dist/sh.js generate:register -vu \""
 	},

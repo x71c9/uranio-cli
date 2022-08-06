@@ -10,7 +10,15 @@ import path from 'path';
 
 import {urn_util} from 'urn-lib';
 
-import {Arguments, Repo, PacMan, Params, DB, valid_admin_repos} from './types';
+import {
+	Arguments,
+	Repo,
+	PacMan,
+	Params,
+	DB,
+	LogLevel,
+	valid_admin_repos
+} from './types';
 
 import * as output from './output/index';
 
@@ -41,6 +49,7 @@ import {
 	check_repo,
 	check_pacman,
 	check_db,
+	check_loglevel,
 	read_init_file,
 } from './cmd/common';
 
@@ -125,11 +134,11 @@ function _init_log(){
 }
 
 function _log_arguments(params:Params){
-	output_instance.debug_log(JSON.stringify(params));
+	output_instance.fndebug_log(JSON.stringify(params));
 }
 
 function _log_root(){
-	output_instance.verbose_log(
+	output_instance.debug_log(
 		`$URNROOT$Project root [${process_params.root}]`
 	);
 }
@@ -157,15 +166,6 @@ function _set_args(params:Params, args:Arguments)
 		params.force = !args.noforce;
 	}
 	
-	const debug = args.u || args.debug;
-	
-	if(debug == true){
-		params.debug = true;
-	}
-	if(typeof args.nodebug === 'boolean' && !!args.nodebug !== !params.debug){
-		params.debug = !args.nodebug;
-	}
-	
 	const verbose = args.v || args.verbose;
 	
 	if(verbose == true){
@@ -174,13 +174,28 @@ function _set_args(params:Params, args:Arguments)
 	if(typeof args.noverbose === 'boolean' && !!args.noverbose !== !params.verbose){
 		params.verbose = !args.noverbose;
 	}
-	
-	// If debug mode is one also verbose mode must be on.
-	if(params.debug === true){
-		params.verbose = true;
+	if(params.verbose === true){
+		params.log_level = LogLevel.DEBUG;
 	}
 	
-	const hide = args.n || args.hide;
+	const debug = args.u || args.debug;
+	
+	if(debug == true){
+		params.debug = true;
+	}
+	if(typeof args.nodebug === 'boolean' && !!args.nodebug !== !params.debug){
+		params.debug = !args.nodebug;
+	}
+	if(params.debug === true){
+		params.log_level = LogLevel.FN_DEBUG;
+	}
+	
+	// If debug mode is one also verbose mode must be on.
+	// if(params.debug === true){
+	// 	params.verbose = true;
+	// }
+	
+	const hide = args.h || args.hide;
 	
 	if(hide == true){
 		params.hide = true;
@@ -189,13 +204,22 @@ function _set_args(params:Params, args:Arguments)
 		params.hide = !args.nohide;
 	}
 	
-	const blank = args.b || args.blank;
+	const no_colors = args.n || args.no_colors;
 	
-	if(blank == true || process.env.NO_COLOR == 'true'){
-		params.blank = true;
+	if(no_colors == true || process.env.NO_COLOR == 'true'){
+		params.no_colors = true;
 	}
-	if(typeof args.noblank === 'boolean' && !!args.noblank !== !params.blank){
-		params.blank = !args.noblank;
+	if(typeof args.nono_colors === 'boolean' && !!args.nono_colors !== !params.no_colors){
+		params.no_colors = !args.nono_colors;
+	}
+	
+	const prefix_loglevel = args.f || args.prefix_loglevel;
+	
+	if(prefix_loglevel == true){
+		params.prefix_loglevel = true;
+	}
+	if(typeof args.noprefix_loglevel === 'boolean' && !!args.noprefix_loglevel !== !params.prefix_loglevel){
+		params.prefix_loglevel = !args.noprefix_loglevel;
 	}
 	
 	const fullwidth = args.w || args.fullwidth;
@@ -243,14 +267,14 @@ function _set_args(params:Params, args:Arguments)
 		params.context = !args.nocontext;
 	}
 	
-	const prefix_color = args.prefix_color;
+	// const prefix_color = args.prefix_color;
 	
-	if(prefix_color == true){
-		params.prefix_color = true;
-	}
-	if(typeof args.noprefix_color === 'boolean' && !!args.noprefix_color !== !params.prefix_color){
-		params.prefix_color = !args.noprefix_color;
-	}
+	// if(prefix_color == true){
+	// 	params.prefix_color = true;
+	// }
+	// if(typeof args.noprefix_color === 'boolean' && !!args.noprefix_color !== !params.prefix_color){
+	// 	params.prefix_color = !args.noprefix_color;
+	// }
 	
 	const docker = args.k || args.docker;
 	
@@ -272,7 +296,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	/* Paramteters with default value = true */
 	
-	const filelog = args.l || args.filelog;
+	const filelog = args.g || args.filelog;
 	
 	if(filelog == false || filelog == 'false'){
 		params.filelog = false;
@@ -307,7 +331,7 @@ function _set_args(params:Params, args:Arguments)
 		params.prefix = prefix;
 	}
 	
-	const branch = args.g || args.branch;
+	const branch = args.b || args.branch;
 	
 	if(typeof branch === 'string' && branch !== ''){
 		params.branch = branch;
@@ -338,6 +362,38 @@ function _set_args(params:Params, args:Arguments)
 	if(typeof db === 'string' && db !== ''){
 		check_db(db);
 		params.db = db as DB;
+	}
+	
+	const log_level = args.l || args.log_level;
+	
+	if(typeof log_level === 'string' && log_level !== ''){
+		check_loglevel(db);
+		switch(log_level){
+			case 'none':{
+				params.log_level = LogLevel.NONE;
+				break;
+			}
+			case 'error':{
+				params.log_level = LogLevel.ERROR;
+				break;
+			}
+			case 'warn':{
+				params.log_level = LogLevel.WARN;
+				break;
+			}
+			case 'log':{
+				params.log_level = LogLevel.LOG;
+				break;
+			}
+			case 'debug':{
+				params.log_level = LogLevel.DEBUG;
+				break;
+			}
+			case 'fn_debug':{
+				params.log_level = LogLevel.FN_DEBUG;
+				break;
+			}
+		}
 	}
 	
 	// const color_log = args.d || args.color_log;

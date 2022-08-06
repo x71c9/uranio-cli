@@ -111,7 +111,7 @@ function _is_valid_extension(ext) {
 }
 async function _generate_all() {
     await _generate('');
-    output_instance.done_verbose_log('Generate all completed.');
+    output_instance.done_debug_log('Generate all completed.');
 }
 async function _generate_atoms() {
     await _generate(`urn_command=atoms`);
@@ -227,7 +227,7 @@ function _register_text(parent_folder) {
                 text += `export * from '../atoms/${parent_folder}/${atom_folder}/routes/${base_route_filename}';\n`;
             }
         }
-        output_instance.verbose_log(`Exported atom [${atom_folder}].`);
+        output_instance.debug_log(`Exported atom [${atom_folder}].`);
     }
     text += `export {};\n`;
     return text;

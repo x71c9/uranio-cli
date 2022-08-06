@@ -14,27 +14,37 @@ const chalk_1 = __importDefault(require("chalk"));
 const fs_1 = __importDefault(require("fs"));
 const is_docker_1 = __importDefault(require("is-docker"));
 const defaults_1 = require("../conf/defaults");
+const types_1 = require("../types");
 const spinner_1 = require("./spinner");
 let spinner_current = '';
 const is_docker = (0, is_docker_1.default)();
-const prefix_types = [
-    '[fn_debug]',
-    '[debug___]',
-    '[log_____]',
-    '[warn____]',
-    '[error___]'
-];
-const colors_16 = [
-    'black',
-    'white',
-    'gray',
-    'magenta',
-    'blue',
-    'red',
-    'yellow',
-    'green',
-    'cyan'
-];
+// const prefix_types = [
+// 	'[fn_debug]',
+// 	'[debug___]',
+// 	'[log_____]',
+// 	'[warn____]',
+// 	'[error___]',
+// 	'[none____]'
+// ];
+const prefix_type_by_type = {
+    0: '[none____]',
+    1: '[error___]',
+    2: '[warn____]',
+    3: '[log_____]',
+    4: '[debug___]',
+    5: '[fn_debug]',
+};
+// const colors_16 = [
+// 	'black',
+// 	'white',
+// 	'gray',
+// 	'magenta',
+// 	'blue',
+// 	'red',
+// 	'yellow',
+// 	'green',
+// 	'cyan'
+// ];
 class Output {
     constructor(params) {
         this.params = params;
@@ -57,113 +67,78 @@ class Output {
     // 	const final_color = (typeof color === 'string') ? color : this.params.color_debug;
     // 	this._log(this._prefix_color(colored_text, final_color), context, (this.params.debug === true));
     // }
-    log(text, prefix) {
-        if (prefix) {
-            text = `${prefix} ${text}`;
+    error_log(text, prefix) {
+        if (this.params.log_level < types_1.LogLevel.ERROR) {
+            return;
         }
-        const prefixed = this._prefix_color(text, 'log');
+        this.stop_loading();
+        const prefixed = this._prefixes(text, types_1.LogLevel.ERROR, prefix);
         const formatted = this._format_text(prefixed);
-        const read = this._read_and_color(formatted, 'log');
+        const read = this._color_type(formatted, types_1.LogLevel.ERROR);
         this._log(read, true);
     }
-    verbose_log(text, prefix) {
-        if (this.params.verbose === false) {
+    warn_log(text, prefix) {
+        if (this.params.log_level < types_1.LogLevel.WARN) {
             return;
         }
-        if (prefix) {
-            text = `${prefix} ${text}`;
-        }
-        const prefixed = this._prefix_color(text, 'verbose');
+        const prefixed = this._prefixes(text, types_1.LogLevel.WARN, prefix);
         const formatted = this._format_text(prefixed);
-        const read = this._read_and_color(formatted, 'verbose');
-        this._log(read, (this.params.verbose === true));
+        const read = this._color_type(formatted, types_1.LogLevel.WARN);
+        this._log(read, true);
+    }
+    log(text, prefix) {
+        if (this.params.log_level < types_1.LogLevel.LOG) {
+            return;
+        }
+        const prefixed = this._prefixes(text, types_1.LogLevel.LOG, prefix);
+        const formatted = this._format_text(prefixed);
+        const read = this._color_type(formatted, types_1.LogLevel.LOG);
+        this._log(read, true);
     }
     debug_log(text, prefix) {
-        if (this.params.debug === false) {
+        if (this.params.log_level < types_1.LogLevel.DEBUG) {
             return;
         }
-        if (prefix) {
-            text = `${prefix} ${text}`;
-        }
-        const prefixed = this._prefix_color(text, 'debug');
+        const prefixed = this._prefixes(text, types_1.LogLevel.DEBUG, prefix);
         const formatted = this._format_text(prefixed);
-        const read = this._read_and_color(formatted, 'debug');
-        this._log(read, (this.params.debug === true));
+        const read = this._color_type(formatted, types_1.LogLevel.DEBUG);
+        this._log(read, true);
+    }
+    fndebug_log(text, prefix) {
+        if (this.params.log_level < types_1.LogLevel.FN_DEBUG) {
+            return;
+        }
+        const prefixed = this._prefixes(text, types_1.LogLevel.FN_DEBUG, prefix);
+        const formatted = this._format_text(prefixed);
+        const read = this._color_type(formatted, types_1.LogLevel.FN_DEBUG);
+        this._log(read, true);
     }
     done_log(text, prefix) {
         this._go_previous();
         text = `${defaults_1.defaults.check_char} ${text}`;
-        if (prefix) {
-            text = `${prefix} ${text}`;
-        }
-        this.log(text);
+        this.log(text, prefix);
     }
-    done_verbose_log(text, prefix) {
-        if (this.params.verbose === false) {
-            return;
+    done_debug_log(text, prefix) {
+        if (this.params.log_level >= types_1.LogLevel.DEBUG) {
+            this._go_previous();
         }
-        this._go_previous();
-        if (prefix) {
-            text = `${prefix} ${text}`;
-        }
-        this.verbose_log(`${text}`);
+        // text = `${defaults.check_char} ${text}`;
+        this.debug_log(text, prefix);
     }
     end_log(text, prefix) {
         this.stop_loading();
-        let end_text = `${defaults_1.defaults.check_char}${defaults_1.defaults.check_char}  ${text}`;
-        if (prefix) {
-            end_text = `${prefix} ${end_text}`;
-        }
-        // this.log((!this.params.blank) ? chalk.yellow(end_text) : end_text, 'end');
-        // this.log((!this.params.blank) ? chalk.magenta(end_text) : end_text);
-        this.log(end_text);
-    }
-    error_log(text, prefix) {
-        this.stop_loading();
-        // const error_text = `${chalk.bgHex(`#4a3030`).hex(`#8b6666`)(`[ERROR] ${text}`)}`;
-        // const error_text = `${chalk.hex(`#922424`)(`[ERROR] ${text}`)}`;
-        // const error_text = `${chalk.hex(`#874040`)(`[ERROR] ${text}`)}`;
-        // const error_text = chalk.red(`[ERROR] ${text}`);
-        // this.log(error_text);
-        const prefixed = this._prefix_color(`[ERROR] ${text}`, 'error');
-        const formatted = this._format_text(prefixed);
-        const read = this._read_and_color(formatted, 'error');
-        if (prefix) {
-            text = `${prefix} ${text}`;
-        }
-        this._log(read, true);
-    }
-    warn_log(text, prefix) {
-        this.stop_loading();
-        // const warn_text = `${chalk.hex(`#d0a800`)(`[WARN] ${text}`)}`;
-        // const warn_text = chalk.yellow(`[WARN] ${text}`);
-        // this.log(warn_text);
-        const prefixed = this._prefix_color(`[WARN] ${text}`, 'warn');
-        const formatted = this._format_text(prefixed);
-        const read = this._read_and_color(formatted, 'warn');
-        if (prefix) {
-            text = `${prefix} ${text}`;
-        }
-        this._log(read, true);
+        let end_text = `${defaults_1.defaults.check_char}${defaults_1.defaults.check_char} ${text}`;
+        this.log(end_text, prefix);
     }
     wrong_end_log(text, prefix) {
-        this.stop_loading();
-        const end_text = `${defaults_1.defaults.wrong_char} ${text}`;
-        // // this.log((!this.params.blank) ? chalk.red(end_text) : end_text);
-        // this.log(end_text);
-        const prefixed = this._prefix_color(`[FAILED] ${end_text}`, 'error');
-        const formatted = this._format_text(prefixed);
-        const read = this._read_and_color(formatted, 'error');
-        if (prefix) {
-            text = `${prefix} ${text}`;
-        }
-        this._log(read, true);
+        text = `[FAILED] ${text}`;
+        this.error_log(text, prefix);
     }
     start_loading(text) {
         if (this.params.hide === true) {
             return;
         }
-        if (this.params.blank === true) {
+        if (this.params.no_colors === true) {
             spinner_1.spinner.color = 'white';
         }
         let noroot_text = text;
@@ -200,67 +175,50 @@ class Output {
             .replace(/\r?\n|\r/g, ' ');
         return plain_text;
     }
-    _read_and_color(text, type) {
-        // if(this.params.color_uranio === false){
-        // 	return text;
-        // }
-        if (this.params.prefix_color === true || this.params.blank === true) {
-            return text;
+    _prefixes(text, type, prefix) {
+        let final_text = text;
+        if (prefix) {
+            final_text = `${prefix} ${final_text}`;
         }
-        if (this._has_prefixed_color(text) === false && this._has_prefixed_type(text) === false) {
-            switch (type) {
-                case 'log': {
-                    // return chalk.magenta(text);
-                    // return chalk.green(text);
-                    return chalk_1.default.cyan(text);
-                }
-                case 'verbose': {
-                    return chalk_1.default.blue(text);
-                }
-                case 'debug': {
-                    return chalk_1.default.gray(text);
-                }
-                case 'error': {
-                    return chalk_1.default.red(text);
-                }
-                case 'warn': {
-                    return chalk_1.default.yellow(text);
-                }
-            }
+        if (this.params.prefix) {
+            final_text = `${this.params.prefix.toString()} ${final_text}`;
         }
-        return this._read_color(text);
+        if (this.params.prefix_loglevel === true) {
+            final_text = `${prefix_type_by_type[type]} ${final_text}`;
+        }
+        return final_text;
     }
-    _prefix_color(text, type) {
-        if (this.params.prefix_color === false) {
-            return text;
-        }
-        let color = '';
-        switch (type) {
-            case 'log': {
-                // color = '#magenta';
-                // color = '#green';
-                color = '#cyan';
-                break;
-            }
-            case 'verbose': {
-                color = '#blue';
-                break;
-            }
-            case 'debug': {
-                color = '#gray';
-                break;
-            }
-            case 'error': {
-                color = '#red';
-                break;
-            }
-            case 'warn': {
-                color = '#yellow';
-                break;
-            }
-        }
-        return `[c${color}]${text}`;
-    }
+    // private _prefix_color(text:string, type:LogLevel){
+    // 	if(this.params.prefix_color === false){
+    // 		return text;
+    // 	}
+    // 	let color = '';
+    // 	switch(type){
+    // 		case 'log':{
+    // 			// color = '#magenta';
+    // 			// color = '#green';
+    // 			color = '#cyan';
+    // 			break;
+    // 		}
+    // 		case 'verbose':{
+    // 			color = '#blue';
+    // 			break;
+    // 		}
+    // 		case 'debug':{
+    // 			color = '#gray';
+    // 			break;
+    // 		}
+    // 		case 'error':{
+    // 			color = '#red';
+    // 			break;
+    // 		}
+    // 		case 'warn':{
+    // 			color = '#yellow';
+    // 			break;
+    // 		}
+    // 	}
+    // 	return `[c${color}]${text}`;
+    // }
     _log(text, out = false) {
         if (this.params.filelog) {
             _log_to_file(text);
@@ -283,11 +241,10 @@ class Output {
         let time = (0, dateformat_1.default)(new Date(), defaults_1.defaults.time_format);
         time = (this.params.time === true) ? `[${time}]` : '';
         text = this._replace_root_string(text);
-        const prefix = this.params.prefix;
         if (this.params.fullwidth === true) {
-            return this._full_width(text, prefix, time);
+            return this._full_width(text, time);
         }
-        let output_text = prefix + ((prefix.length > 0) ? ' ' : '');
+        let output_text = '';
         output_text += time;
         if (time.length > 0) {
             output_text += ' ';
@@ -296,12 +253,11 @@ class Output {
         output_text += `\n`;
         return output_text;
     }
-    _full_width(text, prefix, time) {
-        let output_text = prefix + ((prefix.length > 0) ? ' ' : '');
+    _full_width(text, time) {
+        let output_text = '';
         let text_lenght = 0;
-        text_lenght += prefix.length + 1;
-        if (text.length > process.stdout.columns - prefix.length - 4) {
-            text = text.substring(0, process.stdout.columns - prefix.length - 6);
+        if (text.length > process.stdout.columns - 4) {
+            text = text.substring(0, process.stdout.columns - 6);
             text += ' ...';
         }
         // eslint-disable-next-line no-control-regex
@@ -314,15 +270,13 @@ class Output {
         if (this.params.time) {
             text_lenght += 2;
         }
-        if (this._has_prefixed_color(text) && this._has_prefixed_type(text)) {
-            text_lenght -= this._prefixed_color_length(text) + 10;
-        }
-        else if (this._has_prefixed_color(text)) {
-            text_lenght -= this._prefixed_color_length(text);
-        }
-        else if (this._has_prefixed_type(text)) {
-            text_lenght -= 8;
-        }
+        // if(this._has_prefixed_color(text) && this._has_prefixed_logtype(text)){
+        // 	text_lenght -= this._prefixed_color_length(text) + 10;
+        // }else if(this._has_prefixed_color(text)){
+        // 	text_lenght -= this._prefixed_color_length(text);
+        // }else if(this._has_prefixed_logtype(text)){
+        // 	text_lenght -= 8;
+        // }
         let gap_lenght = process.stdout.columns - text_lenght;
         if (gap_lenght < 0 && gap_lenght > -9) {
             time = time.replace((0, dateformat_1.default)(new Date, "yy-mm-dd'T'"), '');
@@ -435,7 +389,7 @@ class Output {
     // 	if(_is_uranio_native(text) && this.params.color_uranio === true){
     // 		colored_text = _uranio_color(colored_text);
     // 	}else if(this._has_prefix_color(colored_text)){
-    // 		colored_text = this._read_color(colored_text);
+    // 		colored_text = this._color_type(colored_text);
     // 	}else{
     // 		let default_color = this.params.color_log;
     // 		switch(type){
@@ -458,39 +412,54 @@ class Output {
     // 	const regex_16b = new RegExp(/.?\[c#magenta\]|\[c#blue\]|\[c#gray\]|\[c#red\]|\[c#green\]|\[c#cyan\]|\[c#black\]|\[c#white\]/);
     // 	return (regex_hex.test(text) || regex_16b.test(text));
     // }
-    _has_prefixed_type(text) {
-        for (const pre of prefix_types) {
-            if (text.indexOf(pre) !== -1) {
-                return true;
-            }
-        }
-        return false;
-    }
-    _prefixed_color_length(text) {
-        const regex = new RegExp(/\[c#([^\]]+)\] ?/g);
-        const match = regex.exec(text);
-        if (!match) {
-            return 0;
-        }
-        const color = match[1];
-        return color.length + 4;
-    }
-    _has_prefixed_color(text) {
-        const regex = new RegExp(/\[c#([^\]]+)\] ?/g);
-        const match = regex.exec(text);
-        if (!match) {
-            return false;
-        }
-        return true;
-    }
-    _remove_prefixed_color(text) {
-        const regex = new RegExp(/\[c#([^\]]+)\] ?/g);
-        const match = text.match(regex);
-        if (!match) {
-            return text;
-        }
-        return text.replaceAll(match[0], '');
-    }
+    // private _filter_log_level(text:string, level:LogLevel){
+    // 	const prefixed_loglevel = this._get_prefixed_loglevel(text);
+    // 	if(prefixed_loglevel > level){
+    // 		return '';
+    // 	}
+    // 	return text;
+    // }
+    // private _has_prefixed_loglevel(text:string):boolean{
+    // 	for(const pre of prefix_types){
+    // 		if(text.indexOf(pre) !== -1){
+    // 			return true;
+    // 		}
+    // 	}
+    // 	return false;
+    // }
+    // private _has_prefixed_logtype(text:string):boolean{
+    // 	for(const pre of prefix_types){
+    // 		if(text.indexOf(pre) !== -1){
+    // 			return true;
+    // 		}
+    // 	}
+    // 	return false;
+    // }
+    // private _prefixed_color_length(text:string):number{
+    // 	const regex = new RegExp(/\[c#([^\]]+)\] ?/g);
+    // 	const match = regex.exec(text);
+    // 	if(!match){
+    // 		return 0;
+    // 	}
+    // 	const color = match[1];
+    // 	return color.length + 4;
+    // }
+    // private _has_prefixed_color(text:string):boolean{
+    // 	const regex = new RegExp(/\[c#([^\]]+)\] ?/g);
+    // 	const match = regex.exec(text);
+    // 	if(!match){
+    // 		return false
+    // 	}
+    // 	return true;
+    // }
+    // private _remove_prefixed_color(text:string):string{
+    // 	const regex = new RegExp(/\[c#([^\]]+)\] ?/g);
+    // 	const match = text.match(regex);
+    // 	if(!match){
+    // 		return text;
+    // 	}
+    // 	return text.replaceAll(match[0], '');
+    // }
     /**
      * If there in the text there is something in the format [c#----]
      * i.e.: [c#magenta] | [c#FF6655]
@@ -499,48 +468,52 @@ class Output {
      * it will return the text without the [c#----] | [<type>__] and with the
      * corrisponing color.
      */
-    _read_color(text) {
-        if (this._has_prefixed_type(text)) {
-            return this._color_type(text);
-        }
-        const regex = new RegExp(/\[c#([^\]]+)\] ?/g);
-        const match = regex.exec(text);
-        if (!match) {
+    // private _color_type(text:string):string{
+    // 	if(this._has_prefixed_logtype(text)){
+    // 		return this._color_type(text);
+    // 	}
+    // 	// const regex = new RegExp(/\[c#([^\]]+)\] ?/g);
+    // 	// const match = regex.exec(text);
+    // 	// if(!match){
+    // 	// 	return text;
+    // 	// }
+    // 	// const removed = text.replaceAll(match[0], '');
+    // 	// const color = match[1];
+    // 	// if(colors_16.includes(color) && typeof (chalk as any)[color] !== 'undefined'){
+    // 	// 	return (chalk as any)[color](removed);
+    // 	// }else{
+    // 	// 	return chalk.hex(`#${color}`)(removed);
+    // 	// }
+    // }
+    _color_type(text, level) {
+        if (this.params.prefix_loglevel === true) {
             return text;
         }
-        const removed = text.replaceAll(match[0], '');
-        const color = match[1];
-        if (colors_16.includes(color) && typeof chalk_1.default[color] !== 'undefined') {
-            return chalk_1.default[color](removed);
-        }
-        else {
-            return chalk_1.default.hex(`#${color}`)(removed);
-        }
-    }
-    _color_type(text) {
-        const regex = new RegExp(/\[(fn_debug|debug___|warn____|error___|ERROR)\]/);
-        const match = regex.exec(text);
-        if (!match) {
-            return text;
-        }
-        if (this._has_prefixed_color(text)) {
-            text = this._remove_prefixed_color(text);
-        }
-        const removed = text.replaceAll(match[0], '');
-        const type = match[1];
-        switch (type) {
-            case 'fn_debug': {
-                return chalk_1.default.gray(removed);
+        // const regex = new RegExp(/\[(fn_debug|debug___|warn____|error___|ERROR)\]/);
+        // const match = regex.exec(text);
+        // if(!match){
+        // 	return text;
+        // }
+        // if(this._has_prefixed_color(text)){
+        // 	text = this._remove_prefixed_color(text);
+        // }
+        // const removed = text.replaceAll(match[0], '');
+        // const type = match[1];
+        switch (level) {
+            case types_1.LogLevel.FN_DEBUG: {
+                return chalk_1.default.gray(text);
             }
-            case 'debug___': {
-                return chalk_1.default.blue(removed);
+            case types_1.LogLevel.DEBUG: {
+                return chalk_1.default.blue(text);
             }
-            case 'warn____': {
-                return chalk_1.default.yellow(removed);
+            case types_1.LogLevel.LOG: {
+                return chalk_1.default.cyan(text);
             }
-            case 'ERROR':
-            case 'error___': {
-                return chalk_1.default.red(removed);
+            case types_1.LogLevel.WARN: {
+                return chalk_1.default.yellow(text);
+            }
+            case types_1.LogLevel.ERROR: {
+                return chalk_1.default.red(text);
             }
         }
         return text;
@@ -559,7 +532,7 @@ class Output {
         if (!text) {
             return '';
         }
-        return (this.params.blank === false) ? chalk_1.default.magenta(text) : text;
+        return (this.params.no_colors === false) ? chalk_1.default.magenta(text) : text;
         // return (this.params.blank === false) ? chalk.green(text) : text;
         // return (this.params.blank === false) ? chalk.hex('#A633FF')(text) : text;
     }

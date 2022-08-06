@@ -8,7 +8,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.adm_package_scripts = exports.package_scripts = exports.check_if_is_dot = exports.check_db = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_init_params = exports.merge_params = exports.read_init_file = void 0;
+exports.adm_package_scripts = exports.package_scripts = exports.check_if_is_dot = exports.check_loglevel = exports.check_db = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_init_params = exports.merge_params = exports.read_init_file = void 0;
 const fs_1 = __importDefault(require("fs"));
 const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
@@ -107,6 +107,17 @@ function check_db(db) {
     }
 }
 exports.check_db = check_db;
+function check_loglevel(level) {
+    if (!urn_lib_1.urn_util.object.has_key(types_1.abstract_loglevel, level)) {
+        const valid_ll_str = (0, types_1.valid_loglevel)().join(', ');
+        let end_log = '';
+        end_log += `Wrong log_level value. `;
+        end_log += `LogLevel value must be one of the following [${valid_ll_str}]\n`;
+        process.stderr.write(end_log);
+        process.exit(1);
+    }
+}
+exports.check_loglevel = check_loglevel;
 function check_if_is_dot(path) {
     const data = fs_1.default.readdirSync(path);
     if (!data) {

@@ -103,10 +103,10 @@ function _init_log() {
     _log_root();
 }
 function _log_arguments(params) {
-    output_instance.debug_log(JSON.stringify(params));
+    output_instance.fndebug_log(JSON.stringify(params));
 }
 function _log_root() {
-    output_instance.verbose_log(`$URNROOT$Project root [${process_params.root}]`);
+    output_instance.debug_log(`$URNROOT$Project root [${process_params.root}]`);
 }
 function _set_args(params, args) {
     /* Paramters with default value = false */
@@ -124,13 +124,6 @@ function _set_args(params, args) {
     if (typeof args.noforce === 'boolean' && !!args.noforce !== !params.force) {
         params.force = !args.noforce;
     }
-    const debug = args.u || args.debug;
-    if (debug == true) {
-        params.debug = true;
-    }
-    if (typeof args.nodebug === 'boolean' && !!args.nodebug !== !params.debug) {
-        params.debug = !args.nodebug;
-    }
     const verbose = args.v || args.verbose;
     if (verbose == true) {
         params.verbose = true;
@@ -138,23 +131,43 @@ function _set_args(params, args) {
     if (typeof args.noverbose === 'boolean' && !!args.noverbose !== !params.verbose) {
         params.verbose = !args.noverbose;
     }
-    // If debug mode is one also verbose mode must be on.
-    if (params.debug === true) {
-        params.verbose = true;
+    if (params.verbose === true) {
+        params.log_level = types_1.LogLevel.DEBUG;
     }
-    const hide = args.n || args.hide;
+    const debug = args.u || args.debug;
+    if (debug == true) {
+        params.debug = true;
+    }
+    if (typeof args.nodebug === 'boolean' && !!args.nodebug !== !params.debug) {
+        params.debug = !args.nodebug;
+    }
+    if (params.debug === true) {
+        params.log_level = types_1.LogLevel.FN_DEBUG;
+    }
+    // If debug mode is one also verbose mode must be on.
+    // if(params.debug === true){
+    // 	params.verbose = true;
+    // }
+    const hide = args.h || args.hide;
     if (hide == true) {
         params.hide = true;
     }
     if (typeof args.nohide === 'boolean' && !!args.nohide !== !params.hide) {
         params.hide = !args.nohide;
     }
-    const blank = args.b || args.blank;
-    if (blank == true || process.env.NO_COLOR == 'true') {
-        params.blank = true;
+    const no_colors = args.n || args.no_colors;
+    if (no_colors == true || process.env.NO_COLOR == 'true') {
+        params.no_colors = true;
     }
-    if (typeof args.noblank === 'boolean' && !!args.noblank !== !params.blank) {
-        params.blank = !args.noblank;
+    if (typeof args.nono_colors === 'boolean' && !!args.nono_colors !== !params.no_colors) {
+        params.no_colors = !args.nono_colors;
+    }
+    const prefix_loglevel = args.f || args.prefix_loglevel;
+    if (prefix_loglevel == true) {
+        params.prefix_loglevel = true;
+    }
+    if (typeof args.noprefix_loglevel === 'boolean' && !!args.noprefix_loglevel !== !params.prefix_loglevel) {
+        params.prefix_loglevel = !args.noprefix_loglevel;
     }
     const fullwidth = args.w || args.fullwidth;
     if (fullwidth == true) {
@@ -191,13 +204,13 @@ function _set_args(params, args) {
     if (typeof args.nocontext === 'boolean' && !!args.nocontext !== !params.context) {
         params.context = !args.nocontext;
     }
-    const prefix_color = args.prefix_color;
-    if (prefix_color == true) {
-        params.prefix_color = true;
-    }
-    if (typeof args.noprefix_color === 'boolean' && !!args.noprefix_color !== !params.prefix_color) {
-        params.prefix_color = !args.noprefix_color;
-    }
+    // const prefix_color = args.prefix_color;
+    // if(prefix_color == true){
+    // 	params.prefix_color = true;
+    // }
+    // if(typeof args.noprefix_color === 'boolean' && !!args.noprefix_color !== !params.prefix_color){
+    // 	params.prefix_color = !args.noprefix_color;
+    // }
     const docker = args.k || args.docker;
     if (docker == true) {
         params.docker = true;
@@ -213,7 +226,7 @@ function _set_args(params, args) {
         params.docker_db = !args.nodocker_db;
     }
     /* Paramteters with default value = true */
-    const filelog = args.l || args.filelog;
+    const filelog = args.g || args.filelog;
     if (filelog == false || filelog == 'false') {
         params.filelog = false;
     }
@@ -239,7 +252,7 @@ function _set_args(params, args) {
     if (typeof prefix === 'string' && prefix !== '') {
         params.prefix = prefix;
     }
-    const branch = args.g || args.branch;
+    const branch = args.b || args.branch;
     if (typeof branch === 'string' && branch !== '') {
         params.branch = branch;
     }
@@ -261,6 +274,36 @@ function _set_args(params, args) {
     if (typeof db === 'string' && db !== '') {
         (0, common_1.check_db)(db);
         params.db = db;
+    }
+    const log_level = args.l || args.log_level;
+    if (typeof log_level === 'string' && log_level !== '') {
+        (0, common_1.check_loglevel)(db);
+        switch (log_level) {
+            case 'none': {
+                params.log_level = types_1.LogLevel.NONE;
+                break;
+            }
+            case 'error': {
+                params.log_level = types_1.LogLevel.ERROR;
+                break;
+            }
+            case 'warn': {
+                params.log_level = types_1.LogLevel.WARN;
+                break;
+            }
+            case 'log': {
+                params.log_level = types_1.LogLevel.LOG;
+                break;
+            }
+            case 'debug': {
+                params.log_level = types_1.LogLevel.DEBUG;
+                break;
+            }
+            case 'fn_debug': {
+                params.log_level = types_1.LogLevel.FN_DEBUG;
+                break;
+            }
+        }
     }
     // const color_log = args.d || args.color_log;
     // if(typeof color_log === 'string' && color_log != ''){

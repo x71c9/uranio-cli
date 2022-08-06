@@ -5,7 +5,16 @@
  * @packageDocumentation
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.valid_db = exports.valid_pacman = exports.valid_admin_repos = exports.valid_hooks_repos = exports.valid_client_repos = exports.valid_deploy_repos = exports.valid_repos = exports.abstract_db = exports.abstract_pacman = exports.abstract_admin_repos = exports.abstract_hooks_repos = exports.abstract_deploy_repos = exports.abstract_repos = void 0;
+exports.valid_loglevel = exports.valid_db = exports.valid_pacman = exports.valid_admin_repos = exports.valid_hooks_repos = exports.valid_client_repos = exports.valid_deploy_repos = exports.valid_repos = exports.abstract_loglevel = exports.abstract_db = exports.abstract_pacman = exports.abstract_admin_repos = exports.abstract_hooks_repos = exports.abstract_deploy_repos = exports.abstract_repos = exports.LogLevel = void 0;
+var LogLevel;
+(function (LogLevel) {
+    LogLevel[LogLevel["NONE"] = 0] = "NONE";
+    LogLevel[LogLevel["ERROR"] = 1] = "ERROR";
+    LogLevel[LogLevel["WARN"] = 2] = "WARN";
+    LogLevel[LogLevel["LOG"] = 3] = "LOG";
+    LogLevel[LogLevel["DEBUG"] = 4] = "DEBUG";
+    LogLevel[LogLevel["FN_DEBUG"] = 5] = "FN_DEBUG";
+})(LogLevel = exports.LogLevel || (exports.LogLevel = {}));
 exports.abstract_repos = {
     core: '',
     api: '',
@@ -34,6 +43,14 @@ exports.abstract_pacman = {
 // } as const;
 exports.abstract_db = {
     mongo: ''
+};
+exports.abstract_loglevel = {
+    none: '',
+    error: '',
+    warn: '',
+    log: '',
+    debug: '',
+    fn_debug: ''
 };
 function valid_repos() {
     const vals = [];
@@ -95,4 +112,12 @@ function valid_db() {
     return vals;
 }
 exports.valid_db = valid_db;
+function valid_loglevel() {
+    const vals = [];
+    for (const k in exports.abstract_loglevel) {
+        vals.push(k);
+    }
+    return vals;
+}
+exports.valid_loglevel = valid_loglevel;
 //# sourceMappingURL=types.js.map

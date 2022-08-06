@@ -523,7 +523,7 @@ function _remove_tmp(){
 	util_instance.fs.remove_directory(
 		`${docker_params.root}/${defaults.tmp_folder}`,
 	);
-	output_instance.done_verbose_log(
+	output_instance.done_debug_log(
 		`Removed tmp folder [${defaults.tmp_folder}].`,
 	);
 }

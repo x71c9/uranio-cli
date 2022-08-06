@@ -72,9 +72,9 @@ class Util {
 	public is_initialized(){
 		const is = (this.fs.exists(`${this.params.root}/${defaults.folder}/${defaults.init_filepath}`));
 		if(is){
-			this.output.verbose_log(`Uranio is initialized.`);
+			this.output.debug_log(`Uranio is initialized.`);
 		}else{
-			this.output.verbose_log(`Uranio is not initialized.`);
+			this.output.debug_log(`Uranio is not initialized.`);
 		}
 		return is;
 	}
@@ -84,9 +84,9 @@ class Util {
 	//     `${this.params.root}/${defaults.docker_folder}/${defaults.json_filename}`
 	//   ));
 	//   if(is){
-	//     this.output.verbose_log(`Uranio [docker] is initialized.`);
+	//     this.output.debug_log(`Uranio [docker] is initialized.`);
 	//   }else{
-	//     this.output.verbose_log(`Uranio [docker] is not initialized.`);
+	//     this.output.debug_log(`Uranio [docker] is not initialized.`);
 	//   }
 	//   return is;
 	// }
@@ -121,7 +121,7 @@ class Util {
 				{ useTabs: true, tabWidth: 2, parser: parser }
 			);
 			this.fs.write_file(filepath, pretty_string);
-			this.output.debug_log(`Prettier [${filepath}] done.`);
+			this.output.fndebug_log(`Prettier [${filepath}] done.`);
 		}catch(e){
 			const err = e as Error;
 			this.output.error_log(`Cannot pretty file. ${err.message}`);

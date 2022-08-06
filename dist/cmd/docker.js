@@ -435,7 +435,7 @@ async function _download_dockerfiles() {
 function _remove_tmp() {
     output_instance.start_loading(`Removing tmp folder [${defaults_1.defaults.tmp_folder}]...`);
     util_instance.fs.remove_directory(`${docker_params.root}/${defaults_1.defaults.tmp_folder}`);
-    output_instance.done_verbose_log(`Removed tmp folder [${defaults_1.defaults.tmp_folder}].`);
+    output_instance.done_debug_log(`Removed tmp folder [${defaults_1.defaults.tmp_folder}].`);
 }
 function update_env(params) {
     if (params) {

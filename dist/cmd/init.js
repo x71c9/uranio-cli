@@ -276,13 +276,13 @@ async function _ask_for_repo(args) {
 //   }
 // }
 function _log_important_params() {
-    output_instance.verbose_log(`--------------------------------------------`);
-    output_instance.verbose_log(`$URNROOT$Project root: [${init_params.root}]`);
-    output_instance.verbose_log(`Selected repository: [${init_params.repo}]`);
-    output_instance.verbose_log(`Selected pacman: [${init_params.pacman}]`);
-    output_instance.verbose_log(`--------------------------------------------`);
+    output_instance.debug_log(`--------------------------------------------`);
+    output_instance.debug_log(`$URNROOT$Project root: [${init_params.root}]`);
+    output_instance.debug_log(`Selected repository: [${init_params.repo}]`);
+    output_instance.debug_log(`Selected pacman: [${init_params.pacman}]`);
+    output_instance.debug_log(`--------------------------------------------`);
     // if(valid_deploy_repos().includes(init_params.repo)){
-    //   output_instance.verbose_log(
+    //   output_instance.debug_log(
     //     `Selected deploy: [${init_params.deploy}]`,
     //     'dply'
     //   );
@@ -427,7 +427,7 @@ async function _init_pacman() {
 function _remove_tmp() {
     output_instance.start_loading(`Removing tmp folder [${defaults_1.defaults.tmp_folder}]...`);
     util_instance.fs.remove_directory(`${init_params.root}/${defaults_1.defaults.tmp_folder}`);
-    output_instance.done_verbose_log(`Removed tmp folder [${defaults_1.defaults.tmp_folder}].`);
+    output_instance.done_debug_log(`Removed tmp folder [${defaults_1.defaults.tmp_folder}].`);
 }
 function _create_init_file() {
     output_instance.start_loading('Creating rc file...');

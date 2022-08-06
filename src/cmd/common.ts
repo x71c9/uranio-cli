@@ -20,7 +20,9 @@ import {
 	// abstract_deploy,
 	// valid_deploy,
 	abstract_db,
-	valid_db
+	valid_db,
+	abstract_loglevel,
+	valid_loglevel
 } from '../types';
 
 export function read_init_file(params:Params):Params;
@@ -121,6 +123,18 @@ export function check_db(db:string)
 		let end_log = '';
 		end_log += `Wrong db value. `;
 		end_log += `DB value must be one of the following [${valid_db_str}]\n`;
+		process.stderr.write(end_log);
+		process.exit(1);
+	}
+}
+
+export function check_loglevel(level:string)
+		:void{
+	if(!urn_util.object.has_key(abstract_loglevel, level)){
+		const valid_ll_str = valid_loglevel().join(', ');
+		let end_log = '';
+		end_log += `Wrong log_level value. `;
+		end_log += `LogLevel value must be one of the following [${valid_ll_str}]\n`;
 		process.stderr.write(end_log);
 		process.exit(1);
 	}

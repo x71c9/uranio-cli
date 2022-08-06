@@ -21,59 +21,59 @@ class FS {
         //   return false;
         // }
         const is = fs_1.default.statSync(path).isDirectory();
-        this.output.debug_log(`Is directory sync [${path}] [${is}]`);
+        this.output.fndebug_log(`Is directory sync [${path}] [${is}]`);
         return is;
     }
     exists(path) {
         const exists = fs_1.default.existsSync(path);
-        this.output.debug_log(`Exists sync [${path}] [${exists}]`);
+        this.output.fndebug_log(`Exists sync [${path}] [${exists}]`);
         return exists;
     }
     read_file(file_path, encoding) {
         const read_file = fs_1.default.readFileSync(file_path, { encoding: encoding || 'utf8' });
-        this.output.debug_log(`Opened file sync [${file_path}]`);
+        this.output.fndebug_log(`Opened file sync [${file_path}]`);
         return read_file;
     }
     read_dir(dir_path) {
         const read_dir = fs_1.default.readdirSync(dir_path);
-        this.output.debug_log(`Read directory sync [${dir_path}]`);
+        this.output.fndebug_log(`Read directory sync [${dir_path}]`);
         return read_dir;
     }
     write_file(file_path, content, encoding) {
         fs_1.default.mkdirSync(path_1.default.dirname(file_path), { recursive: true });
         const wrote_file = fs_1.default.writeFileSync(file_path, content, { encoding: encoding || 'utf8' });
-        this.output.debug_log(`Wrote file sync [${file_path}]`);
+        this.output.fndebug_log(`Wrote file sync [${file_path}]`);
         return wrote_file;
     }
     create_file_async(file_path) {
         fs_1.default.writeFile(file_path, '', () => {
-            this.output.debug_log(`Created file async [${file_path}]`);
+            this.output.fndebug_log(`Created file async [${file_path}]`);
         });
     }
     create_file(file_path) {
         fs_1.default.writeFileSync(file_path, '');
-        this.output.debug_log(`Created file sync [${file_path}]`);
+        this.output.fndebug_log(`Created file sync [${file_path}]`);
     }
     create_directory_async(dir_path) {
         fs_1.default.mkdir(dir_path, () => {
-            this.output.debug_log(`Created directory async [${dir_path}]`);
+            this.output.fndebug_log(`Created directory async [${dir_path}]`);
         });
     }
     create_directory(dir_path) {
         fs_1.default.mkdirSync(dir_path);
-        this.output.debug_log(`Created directory sync [${dir_path}]`);
+        this.output.fndebug_log(`Created directory sync [${dir_path}]`);
     }
     copy_file_async(src, dest) {
         fs_1.default.mkdir(path_1.default.dirname(dest), { recursive: true }, () => {
             fs_1.default.copyFile(src, dest, () => {
-                this.output.debug_log(`Copied file async [${src}] to [${dest}]`);
+                this.output.fndebug_log(`Copied file async [${src}] to [${dest}]`);
             });
         });
     }
     copy_file(src, dest) {
         fs_1.default.mkdirSync(path_1.default.dirname(dest), { recursive: true });
         fs_1.default.copyFileSync(src, dest);
-        this.output.debug_log(`Copied file sync [${src}] to [${dest}]`);
+        this.output.fndebug_log(`Copied file sync [${src}] to [${dest}]`);
     }
     /**
      * It will copy all files in src folder inside dest folder.
@@ -112,14 +112,14 @@ class FS {
                 this.copy_file(current_src, target_src);
             }
         }
-        this.output.debug_log(`Copied directory sync [${src}] to [${dest}]`);
+        this.output.fndebug_log(`Copied directory sync [${src}] to [${dest}]`);
     }
     remove_file_async(file_path) {
         if (!fs_1.default.existsSync(file_path)) {
             return;
         }
         fs_1.default.unlink(file_path, () => {
-            this.output.debug_log(`Removed file async [${file_path}]`);
+            this.output.fndebug_log(`Removed file async [${file_path}]`);
         });
     }
     remove_file(file_path) {
@@ -127,7 +127,7 @@ class FS {
             return;
         }
         fs_1.default.unlinkSync(file_path);
-        this.output.debug_log(`Removed file sync [${file_path}]`);
+        this.output.fndebug_log(`Removed file sync [${file_path}]`);
     }
     remove_directory_async(dir_path) {
         if (!fs_1.default.existsSync(dir_path)) {
@@ -138,7 +138,7 @@ class FS {
         //   this.output.verbose_log(`Removed directory async [${dir_path}]`);
         // });
         fs_1.default.rm(dir_path, { recursive: true }, () => {
-            this.output.debug_log(`Removed directory async [${dir_path}]`);
+            this.output.fndebug_log(`Removed directory async [${dir_path}]`);
         });
     }
     remove_directory(dir_path) {
@@ -147,7 +147,7 @@ class FS {
         }
         // fs.rmdirSync(dir_path, {recursive: true});
         fs_1.default.rmSync(dir_path, { recursive: true });
-        this.output.debug_log(`Removed directory sync [${dir_path}]`);
+        this.output.fndebug_log(`Removed directory sync [${dir_path}]`);
     }
 }
 function create(output) {
