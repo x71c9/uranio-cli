@@ -33,7 +33,8 @@ const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
 const defaults_1 = require("../conf/defaults");
 const common_1 = require("./common");
-// import * as docker from './docker';
+const docker = __importStar(require("./docker"));
+const build_1 = require("./build");
 const types_1 = require("../types");
 let output_instance;
 let util_instance;
@@ -41,9 +42,15 @@ let start_params = defaults_1.default_params;
 async function start(params) {
     _init_params(params);
     output_instance.start_loading(`Starting...`);
-    start_server(start_params, false);
-    if ((0, types_1.valid_admin_repos)().includes(start_params.repo)) {
-        start_panel(start_params, false);
+    if (params.docker === true) {
+        await docker.start(start_params);
+    }
+    else {
+        await _init_start();
+        start_server(start_params, false);
+        if ((0, types_1.valid_admin_repos)().includes(start_params.repo)) {
+            start_panel(start_params, false);
+        }
     }
 }
 exports.start = start;
@@ -52,11 +59,19 @@ async function start_server(params, init = true) {
         _init_params(params);
     }
     output_instance.start_loading(`Starting server...`);
-    const urn_lib_pre = ` urn_log_prefix_type=true`;
-    const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
-    const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
-    const cmd_server = `${node_env}yarn uranio-webservice-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
-    util_instance.spawn.verbose_log(cmd_server, 'starting server', defaults_1.defaults.prefix_srv);
+    if (params.docker === true) {
+        await docker.start_server(start_params);
+    }
+    else {
+        if (init) {
+            await _init_start();
+        }
+        const urn_lib_pre = ` urn_log_prefix_type=true`;
+        const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
+        const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
+        const cmd_server = `${node_env}yarn uranio-webservice-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
+        util_instance.spawn.verbose_log(cmd_server, 'starting server', defaults_1.defaults.prefix_srv);
+    }
 }
 exports.start_server = start_server;
 async function start_panel(params, init = true) {
@@ -64,13 +79,24 @@ async function start_panel(params, init = true) {
         _init_params(params);
     }
     output_instance.start_loading(`Starting panel...`);
-    const urn_lib_pre = ` urn_log_prefix_type=true`;
-    // const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
-    const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
-    const cmd_server = `${node_env}yarn uranio-panel-${start_params.repo} start${urn_lib_pre}`;
-    util_instance.spawn.verbose_log(cmd_server, 'starting panel', defaults_1.defaults.prefix_pnl);
+    if (params.docker === true) {
+        await docker.start_panel(start_params);
+    }
+    else {
+        if (init) {
+            await _init_start();
+        }
+        const urn_lib_pre = ` urn_log_prefix_type=true`;
+        // const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
+        const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
+        const cmd_server = `${node_env}yarn uranio-panel-${start_params.repo} start${urn_lib_pre}`;
+        util_instance.spawn.verbose_log(cmd_server, 'starting panel', defaults_1.defaults.prefix_pnl);
+    }
 }
 exports.start_panel = start_panel;
+async function _init_start() {
+    await (0, build_1.build_server)(start_params, true, false);
+}
 function _init_params(params) {
     params.spin = false;
     start_params = (0, common_1.merge_params)(params);
