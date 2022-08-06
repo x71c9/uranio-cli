@@ -134,27 +134,27 @@ function _set_args(params, args) {
     if (params.verbose === true) {
         params.log_level = types_1.LogLevel.DEBUG;
     }
-    const debug = args.u || args.debug;
-    if (debug == true) {
-        params.debug = true;
+    const trace = args.u || args.trace;
+    if (trace == true) {
+        params.trace = true;
     }
-    if (typeof args.nodebug === 'boolean' && !!args.nodebug !== !params.debug) {
-        params.debug = !args.nodebug;
+    if (typeof args.notrace === 'boolean' && !!args.notrace !== !params.trace) {
+        params.trace = !args.notrace;
     }
-    if (params.debug === true) {
-        params.log_level = types_1.LogLevel.FN_DEBUG;
+    if (params.trace === true) {
+        params.log_level = types_1.LogLevel.TRACE;
     }
     // If debug mode is one also verbose mode must be on.
     // if(params.debug === true){
     // 	params.verbose = true;
     // }
-    const hide = args.h || args.hide;
-    if (hide == true) {
-        params.hide = true;
-    }
-    if (typeof args.nohide === 'boolean' && !!args.nohide !== !params.hide) {
-        params.hide = !args.nohide;
-    }
+    // const hide = args.h || args.hide;
+    // if(hide == true){
+    // 	params.hide = true;
+    // }
+    // if(typeof args.nohide === 'boolean' && !!args.nohide !== !params.hide){
+    // 	params.hide = !args.nohide;
+    // }
     const no_colors = args.n || args.no_colors;
     if (no_colors == true || process.env.NO_COLOR == 'true') {
         params.no_colors = true;
@@ -176,13 +176,13 @@ function _set_args(params, args) {
     if (typeof args.nofullwidth === 'boolean' && !!args.nofullwidth !== !params.fullwidth) {
         params.fullwidth = !args.nofullwidth;
     }
-    const native = args.e || args.native;
-    if (native == true) {
-        params.native = true;
-    }
-    if (typeof args.nonative === 'boolean' && !!args.nonative !== !params.native) {
-        params.native = !args.nonative;
-    }
+    // const native = args.e || args.native;
+    // if(native == true){
+    // 	params.native = true;
+    // }
+    // if(typeof args.nonative === 'boolean' && !!args.nonative !== !params.native){
+    // 	params.native = !args.nonative;
+    // }
     const inside_ntl = args.inside_ntl;
     if (inside_ntl == true) {
         params.inside_ntl = true;
@@ -197,13 +197,13 @@ function _set_args(params, args) {
     if (typeof args.notime === 'boolean' && !!args.notime !== !params.time) {
         params.time = !args.notime;
     }
-    const context = args.a || args.context;
-    if (context == true) {
-        params.context = true;
-    }
-    if (typeof args.nocontext === 'boolean' && !!args.nocontext !== !params.context) {
-        params.context = !args.nocontext;
-    }
+    // const context = args.a || args.context;
+    // if(context == true){
+    // 	params.context = true;
+    // }
+    // if(typeof args.nocontext === 'boolean' && !!args.nocontext !== !params.context){
+    // 	params.context = !args.nocontext;
+    // }
     // const prefix_color = args.prefix_color;
     // if(prefix_color == true){
     // 	params.prefix_color = true;
@@ -299,8 +299,8 @@ function _set_args(params, args) {
                 params.log_level = types_1.LogLevel.DEBUG;
                 break;
             }
-            case 'fn_debug': {
-                params.log_level = types_1.LogLevel.FN_DEBUG;
+            case 'trace': {
+                params.log_level = types_1.LogLevel.TRACE;
                 break;
             }
         }

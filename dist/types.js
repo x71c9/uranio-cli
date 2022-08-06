@@ -13,7 +13,7 @@ var LogLevel;
     LogLevel[LogLevel["WARN"] = 2] = "WARN";
     LogLevel[LogLevel["LOG"] = 3] = "LOG";
     LogLevel[LogLevel["DEBUG"] = 4] = "DEBUG";
-    LogLevel[LogLevel["FN_DEBUG"] = 5] = "FN_DEBUG";
+    LogLevel[LogLevel["TRACE"] = 5] = "TRACE";
 })(LogLevel = exports.LogLevel || (exports.LogLevel = {}));
 exports.abstract_repos = {
     core: '',
@@ -50,7 +50,7 @@ exports.abstract_loglevel = {
     warn: '',
     log: '',
     debug: '',
-    fn_debug: ''
+    trace: ''
 };
 function valid_repos() {
     const vals = [];

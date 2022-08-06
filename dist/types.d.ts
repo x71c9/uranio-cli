@@ -13,21 +13,18 @@ export declare enum LogLevel {
     WARN = 2,
     LOG = 3,
     DEBUG = 4,
-    FN_DEBUG = 5
+    TRACE = 5
 }
 export declare type Params = {
     prod: boolean;
     force: boolean;
     verbose: boolean;
-    debug: boolean;
-    hide: boolean;
+    trace: boolean;
     no_colors: boolean;
     prefix_loglevel: boolean;
     fullwidth: boolean;
-    native: boolean;
     inside_ntl: boolean;
     time: boolean;
-    context: boolean;
     docker: boolean;
     docker_db: boolean;
     filelog: boolean;
@@ -74,7 +71,7 @@ export declare const abstract_loglevel: {
     readonly warn: "";
     readonly log: "";
     readonly debug: "";
-    readonly fn_debug: "";
+    readonly trace: "";
 };
 export declare function valid_repos(): string[];
 export declare function valid_deploy_repos(): string[];

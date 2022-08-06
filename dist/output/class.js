@@ -19,20 +19,20 @@ const spinner_1 = require("./spinner");
 let spinner_current = '';
 const is_docker = (0, is_docker_1.default)();
 // const prefix_types = [
-// 	'[fn_debug]',
-// 	'[debug___]',
-// 	'[log_____]',
-// 	'[warn____]',
-// 	'[error___]',
-// 	'[none____]'
+// 	'[trace]',
+// 	'[debug]',
+// 	'[log__]',
+// 	'[warn_]',
+// 	'[error]',
+// 	'[none_]'
 // ];
 const prefix_type_by_type = {
-    0: '[none____]',
-    1: '[error___]',
-    2: '[warn____]',
-    3: '[log_____]',
-    4: '[debug___]',
-    5: '[fn_debug]',
+    0: '[none_]',
+    1: '[error]',
+    2: '[warn_]',
+    3: '[log__]',
+    4: '[debug]',
+    5: '[trace]',
 };
 // const colors_16 = [
 // 	'black',
@@ -105,12 +105,12 @@ class Output {
         this._log(read, true);
     }
     fndebug_log(text, prefix) {
-        if (this.params.log_level < types_1.LogLevel.FN_DEBUG) {
+        if (this.params.log_level < types_1.LogLevel.TRACE) {
             return;
         }
-        const prefixed = this._prefixes(text, types_1.LogLevel.FN_DEBUG, prefix);
+        const prefixed = this._prefixes(text, types_1.LogLevel.TRACE, prefix);
         const formatted = this._format_text(prefixed);
-        const read = this._color_type(formatted, types_1.LogLevel.FN_DEBUG);
+        const read = this._color_type(formatted, types_1.LogLevel.TRACE);
         this._log(read, true);
     }
     done_log(text, prefix) {
@@ -135,7 +135,7 @@ class Output {
         this.error_log(text, prefix);
     }
     start_loading(text) {
-        if (this.params.hide === true) {
+        if (this.params.log_level === types_1.LogLevel.NONE) {
             return;
         }
         if (this.params.no_colors === true) {
@@ -229,9 +229,7 @@ class Output {
                 was_spinning = true;
                 this.stop_loading();
             }
-            if (this.params.hide === false) {
-                process.stdout.write(text);
-            }
+            process.stdout.write(text);
             if (this.params.spin === true && was_spinning) {
                 spinner_1.spinner.start();
             }
@@ -489,7 +487,7 @@ class Output {
         if (this.params.prefix_loglevel === true) {
             return text;
         }
-        // const regex = new RegExp(/\[(fn_debug|debug___|warn____|error___|ERROR)\]/);
+        // const regex = new RegExp(/\[(trace|debug___|warn____|error___|ERROR)\]/);
         // const match = regex.exec(text);
         // if(!match){
         // 	return text;
@@ -500,7 +498,7 @@ class Output {
         // const removed = text.replaceAll(match[0], '');
         // const type = match[1];
         switch (level) {
-            case types_1.LogLevel.FN_DEBUG: {
+            case types_1.LogLevel.TRACE: {
                 return chalk_1.default.gray(text);
             }
             case types_1.LogLevel.DEBUG: {
@@ -572,7 +570,7 @@ class Output {
 // 		if(index !== -1){
 // 			processed_text = processed_text.substring(0, index) + processed_text.substring(index + pre.length, processed_text.length);
 // 			switch(pre){
-// 				case '[fn_debug]':{
+// 				case '[trace]':{
 // 					processed_text = chalk.cyan(processed_text);
 // 					break;
 // 				}

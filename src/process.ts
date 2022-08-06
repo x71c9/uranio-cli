@@ -178,16 +178,16 @@ function _set_args(params:Params, args:Arguments)
 		params.log_level = LogLevel.DEBUG;
 	}
 	
-	const debug = args.u || args.debug;
+	const trace = args.u || args.trace;
 	
-	if(debug == true){
-		params.debug = true;
+	if(trace == true){
+		params.trace = true;
 	}
-	if(typeof args.nodebug === 'boolean' && !!args.nodebug !== !params.debug){
-		params.debug = !args.nodebug;
+	if(typeof args.notrace === 'boolean' && !!args.notrace !== !params.trace){
+		params.trace = !args.notrace;
 	}
-	if(params.debug === true){
-		params.log_level = LogLevel.FN_DEBUG;
+	if(params.trace === true){
+		params.log_level = LogLevel.TRACE;
 	}
 	
 	// If debug mode is one also verbose mode must be on.
@@ -195,14 +195,14 @@ function _set_args(params:Params, args:Arguments)
 	// 	params.verbose = true;
 	// }
 	
-	const hide = args.h || args.hide;
+	// const hide = args.h || args.hide;
 	
-	if(hide == true){
-		params.hide = true;
-	}
-	if(typeof args.nohide === 'boolean' && !!args.nohide !== !params.hide){
-		params.hide = !args.nohide;
-	}
+	// if(hide == true){
+	// 	params.hide = true;
+	// }
+	// if(typeof args.nohide === 'boolean' && !!args.nohide !== !params.hide){
+	// 	params.hide = !args.nohide;
+	// }
 	
 	const no_colors = args.n || args.no_colors;
 	
@@ -231,14 +231,14 @@ function _set_args(params:Params, args:Arguments)
 		params.fullwidth = !args.nofullwidth;
 	}
 	
-	const native = args.e || args.native;
+	// const native = args.e || args.native;
 	
-	if(native == true){
-		params.native = true;
-	}
-	if(typeof args.nonative === 'boolean' && !!args.nonative !== !params.native){
-		params.native = !args.nonative;
-	}
+	// if(native == true){
+	// 	params.native = true;
+	// }
+	// if(typeof args.nonative === 'boolean' && !!args.nonative !== !params.native){
+	// 	params.native = !args.nonative;
+	// }
 	
 	const inside_ntl = args.inside_ntl;
 	
@@ -258,14 +258,14 @@ function _set_args(params:Params, args:Arguments)
 		params.time = !args.notime;
 	}
 	
-	const context = args.a || args.context;
+	// const context = args.a || args.context;
 	
-	if(context == true){
-		params.context = true;
-	}
-	if(typeof args.nocontext === 'boolean' && !!args.nocontext !== !params.context){
-		params.context = !args.nocontext;
-	}
+	// if(context == true){
+	// 	params.context = true;
+	// }
+	// if(typeof args.nocontext === 'boolean' && !!args.nocontext !== !params.context){
+	// 	params.context = !args.nocontext;
+	// }
 	
 	// const prefix_color = args.prefix_color;
 	
@@ -389,8 +389,8 @@ function _set_args(params:Params, args:Arguments)
 				params.log_level = LogLevel.DEBUG;
 				break;
 			}
-			case 'fn_debug':{
-				params.log_level = LogLevel.FN_DEBUG;
+			case 'trace':{
+				params.log_level = LogLevel.TRACE;
 				break;
 			}
 		}

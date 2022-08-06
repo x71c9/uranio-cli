@@ -17,22 +17,22 @@ export enum LogLevel {
 	WARN = 2,
 	LOG = 3,
 	DEBUG = 4,
-	FN_DEBUG = 5
+	TRACE = 5
 }
 
 export type Params = {
 	prod: boolean
 	force: boolean
 	verbose: boolean
-	debug: boolean
-	hide: boolean
+	trace: boolean
+	// hide: boolean
 	no_colors: boolean
 	prefix_loglevel: boolean
 	fullwidth: boolean
-	native: boolean
+	// native: boolean
 	inside_ntl: boolean
 	time: boolean
-	context: boolean
+	// context: boolean
 	// prefix_color: boolean
 	docker: boolean
 	docker_db: boolean
@@ -95,7 +95,7 @@ export const abstract_loglevel = {
 	warn: '',
 	log: '',
 	debug: '',
-	fn_debug: ''
+	trace: ''
 } as const;
 
 export function valid_repos()
