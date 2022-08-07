@@ -168,12 +168,39 @@ class Output {
             spinner_1.spinner.text = spinner_1.spinner.text.substring(0, process.stdout.columns);
         }
     }
-    translate_loglevel(text) {
+    translate_loglevel(text, over) {
         const regex = new RegExp(/\[(trace|debug|log__|warn_|error)\]/);
         const match = regex.exec(text);
         if (!match) {
-            process.stdout.write(text);
-            process.stdout.write(`\n`);
+            if (!over) {
+                this._log(text + `\n`, true);
+            }
+            else {
+                switch (over) {
+                    case 'trace': {
+                        this.trace_log(text);
+                        break;
+                    }
+                    case 'debug': {
+                        this.debug_log(text);
+                        break;
+                    }
+                    case 'log': {
+                        this.log(text);
+                        break;
+                    }
+                    case 'warn': {
+                        this.warn_log(text);
+                        break;
+                    }
+                    case 'error': {
+                        this.error_log(text);
+                        break;
+                    }
+                }
+            }
+            // process.stdout.write(text);
+            // process.stdout.write(`\n`);
             return;
         }
         text = text.replaceAll(match[0], ''); // [trace] | [debug] | ...

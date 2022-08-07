@@ -15,6 +15,8 @@ type CachedOutput = {
 	[id:string]: string[]
 }
 
+type Over = 'trace' | 'debug' | 'log' | 'warn' | 'error' | ''
+
 const child_list:cp.ChildProcessWithoutNullStreams[] = [];
 
 // const child_list_detached:cp.ChildProcessWithoutNullStreams[] = [];
@@ -47,8 +49,8 @@ class Spawn {
 		cp.execSync(command);
 	}
 	
-	public native(command:string, action:string, prefix='', resolve?:Resolve, reject?:Reject, detached=false){
-		return this._native_spawn(command, action, false, prefix, resolve, reject, detached);
+	public native(command:string, action:string, over:Over='', prefix='', resolve?:Resolve, reject?:Reject, detached=false){
+		return this._native_spawn(command, action, false, over, prefix, resolve, reject, detached);
 	}
 	
 	public spin(command:string, action:string, prefix='', resolve?:Resolve, reject?:Reject, detached=false){
@@ -67,8 +69,8 @@ class Spawn {
 		return this._spawn(command, action, false, false, true, prefix, resolve, reject, detached);
 	}
 	
-	public spin_and_native(command:string, action:string, prefix='', resolve?:Resolve, reject?:Reject, detached=false){
-		return this._native_spawn(command, action, true, prefix, resolve, reject, detached);
+	public spin_and_native(command:string, action:string, over:Over='', prefix='', resolve?:Resolve, reject?:Reject, detached=false){
+		return this._native_spawn(command, action, true, over, prefix, resolve, reject, detached);
 	}
 	
 	public spin_and_log(command:string, action:string, prefix='', resolve?:Resolve, reject?:Reject, detached=false){
@@ -89,9 +91,9 @@ class Spawn {
 		});
 	}
 	
-	public async native_promise(command:string, action:string, prefix='', detached=false){
+	public async native_promise(command:string, action:string, over:Over='', prefix='', detached=false){
 		return await new Promise((resolve, reject) => {
-			return this.native(command, action, prefix, resolve, reject, detached);
+			return this.native(command, action, over, prefix, resolve, reject, detached);
 		});
 	}
 	
@@ -113,9 +115,9 @@ class Spawn {
 		});
 	}
 	
-	public async spin_and_native_promise(command:string, action:string, prefix='', detached=false){
+	public async spin_and_native_promise(command:string, action:string, over:Over='', prefix='', detached=false){
 		return await new Promise((resolve, reject) => {
-			return this.spin_and_native(command, action, prefix, resolve, reject, detached);
+			return this.spin_and_native(command, action, over, prefix, resolve, reject, detached);
 		});
 	}
 	
@@ -141,6 +143,7 @@ class Spawn {
 		command:string,
 		action:string,
 		spin: boolean,
+		over:Over='',
 		prefix?:string,
 		resolve?:Resolve,
 		reject?:Reject,
@@ -172,7 +175,7 @@ class Spawn {
 					if(prefix){
 						plain_text = `${prefix} ${plain_text}`;
 					}
-					this.output.translate_loglevel(plain_text);
+					this.output.translate_loglevel(plain_text, over);
 					// process.stdout.write(plain_text);
 					// process.stdout.write(`\n`);
 					_append(child_outputs[child.pid || 'pid0'], plain_text);
@@ -196,7 +199,7 @@ class Spawn {
 					if(prefix){
 						plain_text = `${prefix} ${plain_text}`;
 					}
-					this.output.translate_loglevel(plain_text);
+					this.output.translate_loglevel(plain_text, over);
 					// process.stdout.write(plain_text);
 					// process.stdout.write(`\n`);
 					_append(child_outputs[child.pid || 'pid0'], plain_text);

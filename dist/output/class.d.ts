@@ -19,7 +19,7 @@ declare class Output {
     start_loading(text: string): void;
     stop_loading(): void;
     spinner_text(text: string): void;
-    translate_loglevel(text: string): void;
+    translate_loglevel(text: string, over?: string): void;
     clean_chunk(chunk: string): string;
     private _prefixes;
     private _log;

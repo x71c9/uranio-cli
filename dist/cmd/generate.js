@@ -139,7 +139,7 @@ async function _generate(args) {
     const final_args = `${args} --prefix_loglevel`;
     const generate_cmd = `yarn uranio-generate-${generate_params.repo} -c ${root_uranio} ${final_args}`;
     // await util_instance.spawn.native_promise(generate_cmd, 'generating all', chalk.red('[G]'));
-    await util_instance.spawn.native_promise(generate_cmd, 'generating all', '[G]');
+    await util_instance.spawn.native_promise(generate_cmd, 'generating all', 'trace', '[G]');
     _copy_uranio_schema_repo();
     // output_instance.done_log('Generate completed.');
 }
