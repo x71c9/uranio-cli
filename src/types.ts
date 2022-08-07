@@ -93,7 +93,7 @@ export const abstract_loglevel = {
 	none: '',
 	error: '',
 	warn: '',
-	log: '',
+	info: '',
 	debug: '',
 	trace: ''
 } as const;

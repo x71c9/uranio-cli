@@ -48,7 +48,7 @@ exports.abstract_loglevel = {
     none: '',
     error: '',
     warn: '',
-    log: '',
+    info: '',
     debug: '',
     trace: ''
 };

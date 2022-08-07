@@ -176,12 +176,20 @@ class Output {
         }
     }
     translate_loglevel(text, over) {
+        if (this.params.log_level === 0) {
+            return;
+        }
         const regex = new RegExp(/\[(trace|debug|info_|warn_|error)\]/);
         const match = regex.exec(text);
         if (!match) {
             if (!over) {
-                if (text.length > 0) {
-                    this._log(text + `\n`, true);
+                if (text.length > 0 && this.params.log_level > 2) {
+                    if (text.indexOf('$ /') !== -1 || text.indexOf('yarn run') !== -1) {
+                        this.debug_log(text);
+                    }
+                    else {
+                        this._log(text + `\n`, true);
+                    }
                 }
             }
             else {

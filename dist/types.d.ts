@@ -69,7 +69,7 @@ export declare const abstract_loglevel: {
     readonly none: "";
     readonly error: "";
     readonly warn: "";
-    readonly log: "";
+    readonly info: "";
     readonly debug: "";
     readonly trace: "";
 };

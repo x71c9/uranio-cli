@@ -367,7 +367,7 @@ function _set_args(params:Params, args:Arguments)
 	const log_level = args.l || args.log_level;
 	
 	if(typeof log_level === 'string' && log_level !== ''){
-		check_loglevel(db);
+		check_loglevel(log_level);
 		switch(log_level){
 			case 'none':{
 				params.log_level = LogLevel.NONE;
