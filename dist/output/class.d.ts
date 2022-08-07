@@ -7,6 +7,7 @@ import { Params } from '../types';
 declare class Output {
     params: Params;
     constructor(params: Params);
+    white_log(text: string): void;
     error_log(text: string, prefix?: string): void;
     warn_log(text: string, prefix?: string): void;
     info_log(text: string, prefix?: string): void;

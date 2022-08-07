@@ -67,6 +67,11 @@ class Output {
     // 	const final_color = (typeof color === 'string') ? color : this.params.color_debug;
     // 	this._log(this._prefix_color(colored_text, final_color), context, (this.params.debug === true));
     // }
+    white_log(text) {
+        const formatted = this._format_text(text);
+        // const read = this._color_type(formatted);
+        this._log(formatted, true);
+    }
     error_log(text, prefix) {
         if (this.params.log_level < types_1.LogLevel.ERROR) {
             return;
@@ -186,9 +191,12 @@ class Output {
                 if (text.length > 0 && this.params.log_level > 2) {
                     if (text.indexOf('$ /') !== -1 || text.indexOf('yarn run') !== -1) {
                         this.debug_log(text);
+                        // }else if(text.indexOf('[DOCKER]') !== -1){
+                        // 	this.trace_log(text);
                     }
                     else {
-                        this._log(text + `\n`, true);
+                        this.white_log(`\u001b[0m${text}`); // \u001b[0m escape color
+                        // this._log(text + `\n`, true);
                     }
                 }
             }
@@ -267,7 +275,7 @@ class Output {
         if (this.params.prefix) {
             final_text = `${this.params.prefix.toString()} ${final_text}`;
         }
-        if (this.params.prefix_loglevel === true) {
+        if (this.params.prefix_loglevel === true && prefix_type_by_type[type]) {
             final_text = `${prefix_type_by_type[type]} ${final_text}`;
         }
         return final_text;

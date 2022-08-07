@@ -169,6 +169,9 @@ function _set_args(params, args) {
     if (typeof args.noprefix_loglevel === 'boolean' && !!args.noprefix_loglevel !== !params.prefix_loglevel) {
         params.prefix_loglevel = !args.noprefix_loglevel;
     }
+    if (params.prefix_loglevel === true) {
+        params.no_colors = true;
+    }
     const fullwidth = args.w || args.fullwidth;
     if (fullwidth == true) {
         params.fullwidth = true;

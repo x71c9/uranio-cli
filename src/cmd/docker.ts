@@ -220,7 +220,7 @@ export async function start(params:Partial<Params>):Promise<void>{
 	const container_name = _get_container_name();
 	let cmd = '';
 	cmd += `docker start -i ${container_name}`;
-	await util_instance.spawn.spin_and_native_promise(cmd, 'starting', 'trace', defaults.prefix_docker);
+	await util_instance.spawn.spin_and_native_promise(cmd, 'starting', '', defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker image started ${container_name}`
 	);

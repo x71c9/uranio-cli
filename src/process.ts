@@ -222,6 +222,10 @@ function _set_args(params:Params, args:Arguments)
 		params.prefix_loglevel = !args.noprefix_loglevel;
 	}
 	
+	if(params.prefix_loglevel === true){
+		params.no_colors = true;
+	}
+	
 	const fullwidth = args.w || args.fullwidth;
 	
 	if(fullwidth == true){
