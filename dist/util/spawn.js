@@ -57,6 +57,9 @@ class Spawn {
         this.output.debug_log(command);
         cp.execSync(command);
     }
+    native(command, action, prefix = '', resolve, reject, detached = false) {
+        return this._native_spawn(command, action, false, prefix, resolve, reject, detached);
+    }
     spin(command, action, prefix = '', resolve, reject, detached = false) {
         return this._spawn(command, action, true, false, false, prefix, resolve, reject, detached);
     }
@@ -68,6 +71,9 @@ class Spawn {
     }
     debug_log(command, action, prefix = '', resolve, reject, detached = false) {
         return this._spawn(command, action, false, false, true, prefix, resolve, reject, detached);
+    }
+    spin_and_native(command, action, prefix = '', resolve, reject, detached = false) {
+        return this._native_spawn(command, action, true, prefix, resolve, reject, detached);
     }
     spin_and_log(command, action, prefix = '', resolve, reject, detached = false) {
         return this._spawn(command, action, true, false, false, prefix, resolve, reject, detached);
@@ -81,6 +87,11 @@ class Spawn {
     async spin_promise(command, action, prefix = '', detached = false) {
         return await new Promise((resolve, reject) => {
             return this.spin(command, action, prefix, resolve, reject, detached);
+        });
+    }
+    async native_promise(command, action, prefix = '', detached = false) {
+        return await new Promise((resolve, reject) => {
+            return this.native(command, action, prefix, resolve, reject, detached);
         });
     }
     async log_promise(command, action, prefix = '', detached = false) {
@@ -98,6 +109,11 @@ class Spawn {
             return this.debug_log(command, action, prefix, resolve, reject, detached);
         });
     }
+    async spin_and_native_promise(command, action, prefix = '', detached = false) {
+        return await new Promise((resolve, reject) => {
+            return this.spin_and_native(command, action, prefix, resolve, reject, detached);
+        });
+    }
     async spin_and_log_promise(command, action, prefix = '', detached = false) {
         return await new Promise((resolve, reject) => {
             return this.spin_and_log(command, action, prefix, resolve, reject, detached);
@@ -112,6 +128,91 @@ class Spawn {
         return await new Promise((resolve, reject) => {
             return this.spin_and_debug_log(command, action, prefix, resolve, reject, detached);
         });
+    }
+    _native_spawn(command, action, spin, prefix, resolve, reject, detached = false) {
+        if (spin) {
+            this.output.start_loading(command);
+        }
+        // const prefix_command = (prefix) ? `${prefix} ` : '';
+        // this.output.debug_log(`${prefix_command}$ ${command}`);
+        this.output.debug_log(`$ ${command}`);
+        const child = cp.spawn(command, { shell: true, detached: detached });
+        if (child.stdout) {
+            child.stdout.setEncoding('utf8');
+            child.stdout.on('data', (chunk) => {
+                const splitted_chunk = chunk.split('\n');
+                for (const split of splitted_chunk) {
+                    if (spin) {
+                        const plain_spin_text = chunk.replace(/\r?\n|\r/g, ' ');
+                        this.output.spinner_text(plain_spin_text);
+                    }
+                    let plain_text = this.output.clean_chunk(split);
+                    if (plain_text === '') {
+                        continue;
+                    }
+                    if (prefix) {
+                        plain_text = `${prefix} ${plain_text}`;
+                    }
+                    this.output.translate_loglevel(plain_text);
+                    // process.stdout.write(plain_text);
+                    // process.stdout.write(`\n`);
+                    _append(child_outputs[child.pid || 'pid0'], plain_text);
+                }
+            });
+        }
+        if (child.stderr) {
+            child.stderr.setEncoding('utf8');
+            child.stderr.on('data', (chunk) => {
+                const splitted_chunk = chunk.split('\n');
+                for (const split of splitted_chunk) {
+                    if (spin) {
+                        const plain_spin_text = chunk.replace(/\r?\n|\r/g, ' ');
+                        this.output.spinner_text(plain_spin_text);
+                    }
+                    let plain_text = this.output.clean_chunk(split);
+                    if (plain_text === '') {
+                        continue;
+                    }
+                    if (prefix) {
+                        plain_text = `${prefix} ${plain_text}`;
+                    }
+                    this.output.translate_loglevel(plain_text);
+                    // process.stdout.write(plain_text);
+                    // process.stdout.write(`\n`);
+                    _append(child_outputs[child.pid || 'pid0'], plain_text);
+                }
+            });
+        }
+        child.on('error', (err) => {
+            this.output.error_log(`${err}`);
+            return (reject) ? reject() : false;
+        });
+        child.on('close', (code) => {
+            this.output.stop_loading();
+            switch (code) {
+                case 0: {
+                    // process.stdout.write(`Done ${action}`);
+                    // process.stdout.write(`\n`);
+                    this.output.done_debug_log(`Done ${action}`);
+                    return (resolve) ? resolve(true) : true;
+                }
+                default: {
+                    if (code !== null) {
+                        _print_cached_output(child_outputs[child.pid || 'pid0'], this.output);
+                    }
+                    this.output.error_log(`Error on: ${command}`);
+                    this.output.error_log(`Child process exited with code ${code}`);
+                    // return (reject) ? reject() : false;
+                }
+            }
+        });
+        // if(detached){
+        //   child_list_detached.push(child);
+        // }else{
+        child_list.push(child);
+        // }
+        child_outputs[child.pid || 'pid0'] = [];
+        return child;
     }
     _spawn(command, action, spin, verbose, debug, prefix, resolve, reject, detached = false) {
         if (spin) {
@@ -140,7 +241,7 @@ class Spawn {
                         this.output.debug_log(plain_text);
                     }
                     if (debug) {
-                        this.output.fndebug_log(plain_text);
+                        this.output.trace_log(plain_text);
                     }
                     _append(child_outputs[child.pid || 'pid0'], plain_text);
                 }
@@ -166,7 +267,7 @@ class Spawn {
                         this.output.debug_log(plain_text);
                     }
                     if (debug) {
-                        this.output.fndebug_log(plain_text);
+                        this.output.trace_log(plain_text);
                     }
                     _append(child_outputs[child.pid || 'pid0'], plain_text);
                 }

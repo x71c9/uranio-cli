@@ -42,14 +42,14 @@ async function help() {
     // console.log(`  -h --hide ............. do not output log.`);
     console.log(`  -n --no_colors ........ log with no colors.`);
     console.log(`  -w --fullwidth ........ log in full width.`);
-    console.log(`  -x --prefix ........... set a log prefix.`);
+    console.log(`  -e --prefix ........... set a log prefix.`);
     console.log(`  -t --time ............. log with timestamp.`);
     // console.log(`  -a --context .......... log with context.`);
     console.log(`  -g --filelog .......... save log on file.`);
     console.log(`  -i --spin ............. log with spinner.`);
     // console.log(`  -e --native ........... log in native mode.`);
     console.log(`  -l --log_level ........ log level [none, error, warn, log, debug, trace].`);
-    console.log(`  -f --prefix_loglevel .. prefix log type.`);
+    console.log(`  -x --prefix_loglevel .. prefix log type.`);
     // console.log(`  -d --color_log ..... log color.`);
     // console.log(`  -o --color_verbose . verbose log color.`);
     // console.log(`  -q --color_debug ... debug log color.`);

@@ -114,7 +114,7 @@ class Util {
         try {
             const pretty_string = prettier_1.default.format(content, { useTabs: true, tabWidth: 2, parser: parser });
             this.fs.write_file(filepath, pretty_string);
-            this.output.fndebug_log(`Prettier [${filepath}] done.`);
+            this.output.trace_log(`Prettier [${filepath}] done.`);
         }
         catch (e) {
             const err = e;

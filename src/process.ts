@@ -134,7 +134,7 @@ function _init_log(){
 }
 
 function _log_arguments(params:Params){
-	output_instance.fndebug_log(JSON.stringify(params));
+	output_instance.trace_log(JSON.stringify(params));
 }
 
 function _log_root(){
@@ -213,7 +213,7 @@ function _set_args(params:Params, args:Arguments)
 		params.no_colors = !args.nono_colors;
 	}
 	
-	const prefix_loglevel = args.f || args.prefix_loglevel;
+	const prefix_loglevel = args.x || args.prefix_loglevel;
 	
 	if(prefix_loglevel == true){
 		params.prefix_loglevel = true;
@@ -325,7 +325,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	/* Parameters with default value type = string */
 	
-	const prefix = args.x || args.prefix;
+	const prefix = args.e || args.prefix;
 	
 	if(typeof prefix === 'string' && prefix !== ''){
 		params.prefix = prefix;

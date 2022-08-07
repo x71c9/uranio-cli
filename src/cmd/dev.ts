@@ -141,12 +141,13 @@ async function _dev_panel(){
 	// because it reloads itself by launching Nuxt dev service.
 	
 	// const args = (is_docker === true) ? ' urn_log_prefix_type=true' : '';
-	const args = ' urn_log_prefix_type=true';
+	// const args = ' urn_log_prefix_type=true';
 	// const args = '';
+	const args = ' --prefix_loglevel';
 	
 	const prefix = (dev_params.no_colors === true) ? defaults.prefix_pnl_blank : defaults.prefix_pnl;
 	const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev${args}`;
-	util_instance.spawn.verbose_log(cmd_dev_panel, 'developing panel', prefix);
+	util_instance.spawn.native(cmd_dev_panel, 'developing panel', prefix);
 	
 }
 async function _dev_server(){
@@ -156,8 +157,9 @@ async function _dev_server(){
 	// _fix_mongodb_saslprep_requirement();
 	
 	// const args = (is_docker === true) ? ['urn_log_prefix_type=true'] : [];
-	const args = ['urn_log_prefix_type=true'];
+	// const args = ['urn_log_prefix_type=true'];
 	// const args:string[] = [];
+	const args:string[] = ['--prefix_loglevel'];
 	
 	// Forever module needs for ensuring that a given script runs continuously
 	_service_child = new forever.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`,{
@@ -202,7 +204,7 @@ function _tsc_watch(){
 	
 	const tsc_watch = `yarn tsc -w`;
 	const prefix = (dev_params.no_colors === true) ? defaults.prefix_tsc_blank : defaults.prefix_tsc;
-	util_instance.spawn.verbose_log(tsc_watch, 'watching types', prefix);
+	util_instance.spawn.native(tsc_watch, 'watching types', prefix);
 	
 }
 

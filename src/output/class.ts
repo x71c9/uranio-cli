@@ -128,7 +128,7 @@ class Output {
 		this._log(read, true);
 	}
 	
-	public fndebug_log(text:string, prefix?:string)
+	public trace_log(text:string, prefix?:string)
 			:void{
 		if(this.params.log_level < LogLevel.TRACE){
 			return;
@@ -214,6 +214,39 @@ class Output {
 		}
 	}
 	
+	public translate_loglevel(text:string):void{
+		const regex = new RegExp(/\[(trace|debug|log__|warn_|error)\]/);
+		const match = regex.exec(text);
+		if(!match){
+			process.stdout.write(text);
+			process.stdout.write(`\n`);
+			return;
+		}
+		text = text.replaceAll(match[0], ''); // [trace] | [debug] | ...
+		switch(match[1]){ // trace | debug | log__ | warn_ | error
+			case 'trace':{
+				this.trace_log(text);
+				break;
+			}
+			case 'debug':{
+				this.debug_log(text);
+				break;
+			}
+			case 'log__':{
+				this.log(text);
+				break;
+			}
+			case 'warn_':{
+				this.warn_log(text);
+				break;
+			}
+			case 'error':{
+				this.error_log(text);
+				break;
+			}
+		}
+	}
+	
 	public clean_chunk(chunk:string){
 		const plain_text = chunk
 			.toString()
@@ -221,6 +254,15 @@ class Output {
 			.replace(/\r?\n|\r/g, ' ');
 		return plain_text;
 	}
+	
+	// private _match_loglevel(text:string):RegExpExecArray|undefined{
+	// 	const regex = new RegExp(/\[(trace|debug|log__|warn_|error)\]/);
+	// 	const match = regex.exec(text);
+	// 	if(!match){
+	// 		return undefined;
+	// 	}
+	// 	return match;
+	// }
 	
 	private _prefixes(text:string, type:LogLevel, prefix?:string)
 			:string{

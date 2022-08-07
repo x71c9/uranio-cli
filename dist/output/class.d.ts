@@ -11,7 +11,7 @@ declare class Output {
     warn_log(text: string, prefix?: string): void;
     log(text: string, prefix?: string): void;
     debug_log(text: string, prefix?: string): void;
-    fndebug_log(text: string, prefix?: string): void;
+    trace_log(text: string, prefix?: string): void;
     done_log(text: string, prefix?: string): void;
     done_debug_log(text: string, prefix?: string): void;
     end_log(text: string, prefix?: string): void;
@@ -19,6 +19,7 @@ declare class Output {
     start_loading(text: string): void;
     stop_loading(): void;
     spinner_text(text: string): void;
+    translate_loglevel(text: string): void;
     clean_chunk(chunk: string): string;
     private _prefixes;
     private _log;

@@ -132,7 +132,7 @@ async function _transpose_all() {
     output_instance.done_debug_log(`Transpose all completed.`);
 }
 async function _transpose_file(file_path) {
-    output_instance.fndebug_log(`Transposing [${file_path}]...`);
+    output_instance.trace_log(`Transposing [${file_path}]...`);
     if (!_validate_exists_path(file_path)) {
         return;
     }
