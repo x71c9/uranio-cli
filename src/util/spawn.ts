@@ -15,7 +15,7 @@ type CachedOutput = {
 	[id:string]: string[]
 }
 
-type Over = 'trace' | 'debug' | 'log' | 'warn' | 'error' | ''
+type Over = 'trace' | 'debug' | 'info' | 'warn' | 'error' | ''
 
 const child_list:cp.ChildProcessWithoutNullStreams[] = [];
 
@@ -45,7 +45,7 @@ class Spawn {
 	constructor(public output:out.OutputInstance){}
 	
 	public exec_sync(command:string){
-		this.output.debug_log(command);
+		this.output.trace_log(command);
 		cp.execSync(command);
 	}
 	
@@ -57,15 +57,15 @@ class Spawn {
 		return this._spawn(command, action, true, false, false, prefix, resolve, reject, detached);
 	}
 	
-	public log(command:string, action:string, prefix='', resolve?:Resolve, reject?:Reject, detached=false){
+	public info_log(command:string, action:string, prefix='', resolve?:Resolve, reject?:Reject, detached=false){
 		return this._spawn(command, action, false, false, false, prefix, resolve, reject, detached);
 	}
 	
-	public verbose_log(command:string, action:string, prefix='', resolve?:Resolve, reject?:Reject, detached=false){
+	public debug_log(command:string, action:string, prefix='', resolve?:Resolve, reject?:Reject, detached=false){
 		return this._spawn(command, action, false, true, false, prefix, resolve, reject, detached);
 	}
 	
-	public debug_log(command:string, action:string, prefix='', resolve?:Resolve, reject?:Reject, detached=false){
+	public trace_log(command:string, action:string, prefix='', resolve?:Resolve, reject?:Reject, detached=false){
 		return this._spawn(command, action, false, false, true, prefix, resolve, reject, detached);
 	}
 	
@@ -81,7 +81,7 @@ class Spawn {
 		return this._spawn(command, action, true, true, false, prefix, resolve, reject, detached);
 	}
 	
-	public spin_and_debug_log(command:string, action:string, prefix='', resolve?:Resolve, reject?:Reject, detached=false){
+	public spint_and_trace_log(command:string, action:string, prefix='', resolve?:Resolve, reject?:Reject, detached=false){
 		return this._spawn(command, action, true, false, true, prefix, resolve, reject, detached);
 	}
 	
@@ -97,21 +97,21 @@ class Spawn {
 		});
 	}
 	
-	public async log_promise(command:string, action:string, prefix='', detached=false){
+	public async info_log_promise(command:string, action:string, prefix='', detached=false){
 		return await new Promise((resolve, reject) => {
-			return this.log(command, action, prefix, resolve, reject, detached);
-		});
-	}
-	
-	public async verbose_log_promise(command:string, action:string, prefix='', detached=false){
-		return await new Promise((resolve, reject) => {
-			return this.verbose_log(command, action, prefix, resolve, reject, detached);
+			return this.info_log(command, action, prefix, resolve, reject, detached);
 		});
 	}
 	
 	public async debug_log_promise(command:string, action:string, prefix='', detached=false){
 		return await new Promise((resolve, reject) => {
 			return this.debug_log(command, action, prefix, resolve, reject, detached);
+		});
+	}
+	
+	public async trace_log_promise(command:string, action:string, prefix='', detached=false){
+		return await new Promise((resolve, reject) => {
+			return this.trace_log(command, action, prefix, resolve, reject, detached);
 		});
 	}
 	
@@ -133,9 +133,9 @@ class Spawn {
 		});
 	}
 	
-	public async spin_and_debug_log_promise(command:string, action:string, prefix='', detached=false){
+	public async spin_and_trace_log_promise(command:string, action:string, prefix='', detached=false){
 		return await new Promise((resolve, reject) => {
-			return this.spin_and_debug_log(command, action, prefix, resolve, reject, detached);
+			return this.spint_and_trace_log(command, action, prefix, resolve, reject, detached);
 		});
 	}
 	
@@ -153,9 +153,7 @@ class Spawn {
 		if(spin){
 			this.output.start_loading(command);
 		}
-		// const prefix_command = (prefix) ? `${prefix} ` : '';
-		// this.output.debug_log(`${prefix_command}$ ${command}`);
-		this.output.debug_log(`$ ${command}`);
+		this.output.trace_log(`$ ${command}`);
 		
 		const child = cp.spawn(command, {shell: true, detached: detached});
 		
@@ -176,8 +174,6 @@ class Spawn {
 						plain_text = `${prefix} ${plain_text}`;
 					}
 					this.output.translate_loglevel(plain_text, over);
-					// process.stdout.write(plain_text);
-					// process.stdout.write(`\n`);
 					_append(child_outputs[child.pid || 'pid0'], plain_text);
 				}
 			});
@@ -200,8 +196,6 @@ class Spawn {
 						plain_text = `${prefix} ${plain_text}`;
 					}
 					this.output.translate_loglevel(plain_text, over);
-					// process.stdout.write(plain_text);
-					// process.stdout.write(`\n`);
 					_append(child_outputs[child.pid || 'pid0'], plain_text);
 				}
 			});
@@ -216,12 +210,7 @@ class Spawn {
 			this.output.stop_loading();
 			switch(code){
 				case 0:{
-					
-					// process.stdout.write(`Done ${action}`);
-					// process.stdout.write(`\n`);
-					
 					this.output.done_debug_log(`Done ${action}`);
-					
 					return (resolve) ? resolve(true) : true;
 				}
 				default:{

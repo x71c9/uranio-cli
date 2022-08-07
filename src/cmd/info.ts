@@ -56,7 +56,7 @@ function _info_init(params:Params){
 }
 
 function _repo_not_initialized(){
-	output_instance.log(
+	output_instance.info_log(
 		`This repo is not initialized. In order to initialize it run: \`uranio init\`.`
 	);
 	process.exit(0);

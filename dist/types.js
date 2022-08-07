@@ -11,7 +11,7 @@ var LogLevel;
     LogLevel[LogLevel["NONE"] = 0] = "NONE";
     LogLevel[LogLevel["ERROR"] = 1] = "ERROR";
     LogLevel[LogLevel["WARN"] = 2] = "WARN";
-    LogLevel[LogLevel["LOG"] = 3] = "LOG";
+    LogLevel[LogLevel["INFO"] = 3] = "INFO";
     LogLevel[LogLevel["DEBUG"] = 4] = "DEBUG";
     LogLevel[LogLevel["TRACE"] = 5] = "TRACE";
 })(LogLevel = exports.LogLevel || (exports.LogLevel = {}));

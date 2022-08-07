@@ -54,7 +54,7 @@ class Spawn {
         this.output = output;
     }
     exec_sync(command) {
-        this.output.debug_log(command);
+        this.output.trace_log(command);
         cp.execSync(command);
     }
     native(command, action, over = '', prefix = '', resolve, reject, detached = false) {
@@ -63,13 +63,13 @@ class Spawn {
     spin(command, action, prefix = '', resolve, reject, detached = false) {
         return this._spawn(command, action, true, false, false, prefix, resolve, reject, detached);
     }
-    log(command, action, prefix = '', resolve, reject, detached = false) {
+    info_log(command, action, prefix = '', resolve, reject, detached = false) {
         return this._spawn(command, action, false, false, false, prefix, resolve, reject, detached);
     }
-    verbose_log(command, action, prefix = '', resolve, reject, detached = false) {
+    debug_log(command, action, prefix = '', resolve, reject, detached = false) {
         return this._spawn(command, action, false, true, false, prefix, resolve, reject, detached);
     }
-    debug_log(command, action, prefix = '', resolve, reject, detached = false) {
+    trace_log(command, action, prefix = '', resolve, reject, detached = false) {
         return this._spawn(command, action, false, false, true, prefix, resolve, reject, detached);
     }
     spin_and_native(command, action, over = '', prefix = '', resolve, reject, detached = false) {
@@ -81,7 +81,7 @@ class Spawn {
     spin_and_verbose_log(command, action, prefix = '', resolve, reject, detached = false) {
         return this._spawn(command, action, true, true, false, prefix, resolve, reject, detached);
     }
-    spin_and_debug_log(command, action, prefix = '', resolve, reject, detached = false) {
+    spint_and_trace_log(command, action, prefix = '', resolve, reject, detached = false) {
         return this._spawn(command, action, true, false, true, prefix, resolve, reject, detached);
     }
     async spin_promise(command, action, prefix = '', detached = false) {
@@ -94,19 +94,19 @@ class Spawn {
             return this.native(command, action, over, prefix, resolve, reject, detached);
         });
     }
-    async log_promise(command, action, prefix = '', detached = false) {
+    async info_log_promise(command, action, prefix = '', detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.log(command, action, prefix, resolve, reject, detached);
-        });
-    }
-    async verbose_log_promise(command, action, prefix = '', detached = false) {
-        return await new Promise((resolve, reject) => {
-            return this.verbose_log(command, action, prefix, resolve, reject, detached);
+            return this.info_log(command, action, prefix, resolve, reject, detached);
         });
     }
     async debug_log_promise(command, action, prefix = '', detached = false) {
         return await new Promise((resolve, reject) => {
             return this.debug_log(command, action, prefix, resolve, reject, detached);
+        });
+    }
+    async trace_log_promise(command, action, prefix = '', detached = false) {
+        return await new Promise((resolve, reject) => {
+            return this.trace_log(command, action, prefix, resolve, reject, detached);
         });
     }
     async spin_and_native_promise(command, action, over = '', prefix = '', detached = false) {
@@ -124,18 +124,16 @@ class Spawn {
             return this.spin_and_verbose_log(command, action, prefix, resolve, reject, detached);
         });
     }
-    async spin_and_debug_log_promise(command, action, prefix = '', detached = false) {
+    async spin_and_trace_log_promise(command, action, prefix = '', detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.spin_and_debug_log(command, action, prefix, resolve, reject, detached);
+            return this.spint_and_trace_log(command, action, prefix, resolve, reject, detached);
         });
     }
     _native_spawn(command, action, spin, over = '', prefix, resolve, reject, detached = false) {
         if (spin) {
             this.output.start_loading(command);
         }
-        // const prefix_command = (prefix) ? `${prefix} ` : '';
-        // this.output.debug_log(`${prefix_command}$ ${command}`);
-        this.output.debug_log(`$ ${command}`);
+        this.output.trace_log(`$ ${command}`);
         const child = cp.spawn(command, { shell: true, detached: detached });
         if (child.stdout) {
             child.stdout.setEncoding('utf8');
@@ -154,8 +152,6 @@ class Spawn {
                         plain_text = `${prefix} ${plain_text}`;
                     }
                     this.output.translate_loglevel(plain_text, over);
-                    // process.stdout.write(plain_text);
-                    // process.stdout.write(`\n`);
                     _append(child_outputs[child.pid || 'pid0'], plain_text);
                 }
             });
@@ -177,8 +173,6 @@ class Spawn {
                         plain_text = `${prefix} ${plain_text}`;
                     }
                     this.output.translate_loglevel(plain_text, over);
-                    // process.stdout.write(plain_text);
-                    // process.stdout.write(`\n`);
                     _append(child_outputs[child.pid || 'pid0'], plain_text);
                 }
             });
@@ -191,8 +185,6 @@ class Spawn {
             this.output.stop_loading();
             switch (code) {
                 case 0: {
-                    // process.stdout.write(`Done ${action}`);
-                    // process.stdout.write(`\n`);
                     this.output.done_debug_log(`Done ${action}`);
                     return (resolve) ? resolve(true) : true;
                 }

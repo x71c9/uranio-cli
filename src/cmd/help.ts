@@ -52,9 +52,6 @@ export async function help():Promise<void> {
 	// console.log(`  -e --native ........... log in native mode.`);
 	console.log(`  -l --log_level ........ log level [none, error, warn, log, debug, trace].`);
 	console.log(`  -x --prefix_loglevel .. prefix log type.`);
-	// console.log(`  -d --color_log ..... log color.`);
-	// console.log(`  -o --color_verbose . verbose log color.`);
-	// console.log(`  -q --color_debug ... debug log color.`);
 	
 	console.log(``);
 	console.log(``);

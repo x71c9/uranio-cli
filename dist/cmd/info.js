@@ -63,7 +63,7 @@ function _info_init(params) {
     util_instance = util.create(info_params, output_instance);
 }
 function _repo_not_initialized() {
-    output_instance.log(`This repo is not initialized. In order to initialize it run: \`uranio init\`.`);
+    output_instance.info_log(`This repo is not initialized. In order to initialize it run: \`uranio init\`.`);
     process.exit(0);
 }
 function _check_if_is_initialized() {

@@ -335,7 +335,7 @@ async function _unlink_file(file_path:string){
 
 function _transpose_atom_dir_file(file_path:string){
 	
-	output_instance.debug_log(`Transpose atom dir file [${file_path}].`);
+	output_instance.trace_log(`Transpose atom dir file [${file_path}].`);
 	
 	const atoms_dir = `${transpose_params.root}/src/atoms/`;
 	const relative_path = file_path.replace(atoms_dir, '');
@@ -556,7 +556,7 @@ function _replace_import(text:string, file_path:string, parent_folder:string){
 
 
 function _transpose_server_dir_file(file_path:string){
-	output_instance.debug_log(`Transpose server dir file [${file_path}].`);
+	output_instance.trace_log(`Transpose server dir file [${file_path}].`);
 	
 	const server_dir = `${transpose_params.root}/src/server/`;
 	const relative_path = file_path.replace(server_dir, '');
@@ -571,7 +571,7 @@ function _transpose_server_dir_file(file_path:string){
 }
 
 function _transpose_admin_dir_file(_file_path:string){
-		output_instance.debug_log(`Transpose admin dir file [${_file_path}].`);
+		output_instance.trace_log(`Transpose admin dir file [${_file_path}].`);
 	//TODO
 }
 

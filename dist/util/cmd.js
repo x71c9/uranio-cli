@@ -48,36 +48,36 @@ class CMD {
     }
     async yarn_install() {
         const action = `yarn install`;
-        this.output.debug_log(`Started ${action}`);
+        this.output.trace_log(`Started ${action}`);
         return await this.spawn.spin_promise(`yarn install --verbose`, action);
     }
     async install_package(pack) {
         const action = `installing package [${pack}]`;
-        this.output.debug_log(`Started ${action}`);
+        this.output.trace_log(`Started ${action}`);
         this.output.start_loading(`Installing package [${pack}]...`);
         return await this.spawn.spin_promise(_pacman_commands.install[this.params.pacman](pack), action);
     }
     async install_package_dev(pack) {
         const action = `installing dev package [${pack}]`;
-        this.output.debug_log(`Started ${action}`);
+        this.output.trace_log(`Started ${action}`);
         this.output.start_loading(`Installing dev package [${pack}]...`);
         return await this.spawn.spin_promise(_pacman_commands.install_dev[this.params.pacman](pack), action);
     }
     async install_dep(repo) {
         const action = `installing dependencies [${repo}]`;
-        this.output.debug_log(`Started ${action}`);
+        this.output.trace_log(`Started ${action}`);
         this.output.start_loading(`Installing dep [${repo}]...`);
         return await this.spawn.spin_promise(_pacman_commands.install[this.params.pacman](repo), action);
     }
     async install_dep_dev(repo) {
         const action = `installing dev dependencies [${repo}]`;
-        this.output.debug_log(`Started ${action}`);
+        this.output.trace_log(`Started ${action}`);
         this.output.start_loading(`Installing dep dev [${repo}]...`);
         return await this.spawn.spin_promise(_pacman_commands.install_dev[this.params.pacman](repo), action);
     }
     async uninstall_dep(repo) {
         const action = `uninstalling dependencies [${repo}]`;
-        this.output.debug_log(`Started ${action}`);
+        this.output.trace_log(`Started ${action}`);
         return await this.spawn.spin_promise(_pacman_commands.uninstall[this.params.pacman](repo), action);
     }
     async clone_repo(address, dest_folder, branch = 'master') {
@@ -225,14 +225,13 @@ class CMD {
     }
     async _clone_repo(address, dest_folder, branch = 'master', recursive = false) {
         const action = `cloning repo [${address}]`;
-        this.output.debug_log(`Started ${action}`);
-        return new Promise((resolve, reject) => {
-            const branch_str = (branch !== 'master' && typeof branch === 'string') ?
-                `-b ${branch} ` : '';
-            let cmd = `git clone ${branch_str}${address} ${dest_folder} --progress`;
-            cmd += (recursive === true) ? ` --recurse-submodules` : '';
-            this.spawn.spin(cmd, action, '', resolve, reject);
-        });
+        this.output.trace_log(`Started ${action}`);
+        const branch_str = (branch !== 'master' && typeof branch === 'string') ?
+            `-b ${branch} ` : '';
+        let cmd = `git clone ${branch_str}${address} ${dest_folder} --progress`;
+        cmd += (recursive === true) ? ` --recurse-submodules` : '';
+        // return await this.spawn.spin_and_trace_log_promise(cmd, action, '');
+        return await this.spawn.spin_promise(cmd, action, '');
     }
 }
 function create(params, output) {

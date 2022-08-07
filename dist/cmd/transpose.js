@@ -238,7 +238,7 @@ async function _unlink_file(file_path) {
     }
 }
 function _transpose_atom_dir_file(file_path) {
-    output_instance.debug_log(`Transpose atom dir file [${file_path}].`);
+    output_instance.trace_log(`Transpose atom dir file [${file_path}].`);
     const atoms_dir = `${transpose_params.root}/src/atoms/`;
     const relative_path = file_path.replace(atoms_dir, '');
     const text = util_instance.fs.read_file(file_path);
@@ -427,7 +427,7 @@ function _replace_import(text, file_path, parent_folder) {
     return printed;
 }
 function _transpose_server_dir_file(file_path) {
-    output_instance.debug_log(`Transpose server dir file [${file_path}].`);
+    output_instance.trace_log(`Transpose server dir file [${file_path}].`);
     const server_dir = `${transpose_params.root}/src/server/`;
     const relative_path = file_path.replace(server_dir, '');
     const node_delta_server = `${transpose_params.root}/node_modules/uranio/src/server/delta`;
@@ -437,7 +437,7 @@ function _transpose_server_dir_file(file_path) {
     _compile(node_dest_path, node_dist_path);
 }
 function _transpose_admin_dir_file(_file_path) {
-    output_instance.debug_log(`Transpose admin dir file [${_file_path}].`);
+    output_instance.trace_log(`Transpose admin dir file [${_file_path}].`);
     //TODO
 }
 function _atom_with_name_argument(source, atom_name) {

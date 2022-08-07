@@ -9,11 +9,12 @@ declare class Output {
     constructor(params: Params);
     error_log(text: string, prefix?: string): void;
     warn_log(text: string, prefix?: string): void;
-    log(text: string, prefix?: string): void;
+    info_log(text: string, prefix?: string): void;
     debug_log(text: string, prefix?: string): void;
     trace_log(text: string, prefix?: string): void;
     done_log(text: string, prefix?: string): void;
     done_debug_log(text: string, prefix?: string): void;
+    done_trace_log(text: string, prefix?: string): void;
     end_log(text: string, prefix?: string): void;
     wrong_end_log(text: string, prefix?: string): void;
     start_loading(text: string): void;
@@ -29,7 +30,7 @@ declare class Output {
      * If there in the text there is something in the format [c#----]
      * i.e.: [c#magenta] | [c#FF6655]
      * or
-     * uranio type i.e.: [debug___] | [log_____] | ...
+     * uranio type i.e.: [debug___] | [info_] | ...
      * it will return the text without the [c#----] | [<type>__] and with the
      * corrisponing color.
      */

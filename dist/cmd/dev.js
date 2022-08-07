@@ -137,10 +137,10 @@ async function _dev_server() {
     });
     _service_child.start();
     _service_child.on('watch:restart', function (info) {
-        output_instance.log('Restarting [dev server] because ' + info.file + ' changed');
+        output_instance.info_log('Restarting [dev server] because ' + info.file + ' changed');
     });
     _service_child.on('restart', function (_info) {
-        output_instance.log('Forever restarting [dev server].');
+        output_instance.info_log('Forever restarting [dev server].');
     });
     _service_child.on('exit:code', function (code) {
         output_instance.done_log('Forever detected [dev server] exited with code ' + code);
@@ -163,7 +163,7 @@ async function _dev_server() {
 function _tsc_watch() {
     const tsc_watch = `yarn tsc -w`;
     const prefix = (dev_params.no_colors === true) ? defaults_1.defaults.prefix_tsc_blank : defaults_1.defaults.prefix_tsc;
-    util_instance.spawn.log(tsc_watch, 'watching types', prefix);
+    util_instance.spawn.info_log(tsc_watch, 'watching types', prefix);
 }
 function _watch() {
     const src_path = `${dev_params.root}/src/`;
@@ -184,7 +184,7 @@ function _watch() {
             }
             return false;
         }
-        output_instance.log(`${_event} ${_path}`);
+        output_instance.info_log(`${_event} ${_path}`);
         await (0, transpose_1.transpose)(dev_params, _path, _event);
         await (0, generate_1.generate)(dev_params, _path, _event);
         if (_is_dev_server && _valid_reload_extensions.includes(extension)) {
@@ -209,7 +209,7 @@ function _watch() {
             }
             return false;
         }
-        output_instance.log(`${_event} ${_path}`);
+        output_instance.info_log(`${_event} ${_path}`);
         await (0, generate_1.generate)(dev_params, _path, _event);
         if (_is_dev_server) {
             // clearTimeout(_service_time);

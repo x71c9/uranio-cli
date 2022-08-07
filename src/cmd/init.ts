@@ -494,7 +494,7 @@ function _remove_tmp(){
 	util_instance.fs.remove_directory(
 		`${init_params.root}/${defaults.tmp_folder}`,
 	);
-	output_instance.done_debug_log(
+	output_instance.done_trace_log(
 		`Removed tmp folder [${defaults.tmp_folder}].`,
 	);
 }

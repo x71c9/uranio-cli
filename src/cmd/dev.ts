@@ -172,11 +172,11 @@ async function _dev_server(){
 	_service_child.start();
 	
 	_service_child.on('watch:restart', function(info) {
-		output_instance.log('Restarting [dev server] because ' + info.file + ' changed');
+		output_instance.info_log('Restarting [dev server] because ' + info.file + ' changed');
 	});
 	
 	_service_child.on('restart', function(_info) {
-		output_instance.log('Forever restarting [dev server].');
+		output_instance.info_log('Forever restarting [dev server].');
 	});
 	
 	_service_child.on('exit:code', function(code) {
@@ -204,7 +204,7 @@ function _tsc_watch(){
 	
 	const tsc_watch = `yarn tsc -w`;
 	const prefix = (dev_params.no_colors === true) ? defaults.prefix_tsc_blank : defaults.prefix_tsc;
-	util_instance.spawn.log(tsc_watch, 'watching types', prefix);
+	util_instance.spawn.info_log(tsc_watch, 'watching types', prefix);
 	
 }
 
@@ -238,7 +238,7 @@ export function _watch(){
 				return false;
 			}
 			
-			output_instance.log(`${_event} ${_path}`);
+			output_instance.info_log(`${_event} ${_path}`);
 			
 			await transpose(dev_params, _path, _event);
 			
@@ -278,7 +278,7 @@ export function _watch(){
 				return false;
 			}
 			
-			output_instance.log(`${_event} ${_path}`);
+			output_instance.info_log(`${_event} ${_path}`);
 			
 			await generate(dev_params, _path, _event);
 			

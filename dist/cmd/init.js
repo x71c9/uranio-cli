@@ -427,7 +427,7 @@ async function _init_pacman() {
 function _remove_tmp() {
     output_instance.start_loading(`Removing tmp folder [${defaults_1.defaults.tmp_folder}]...`);
     util_instance.fs.remove_directory(`${init_params.root}/${defaults_1.defaults.tmp_folder}`);
-    output_instance.done_debug_log(`Removed tmp folder [${defaults_1.defaults.tmp_folder}].`);
+    output_instance.done_trace_log(`Removed tmp folder [${defaults_1.defaults.tmp_folder}].`);
 }
 function _create_init_file() {
     output_instance.start_loading('Creating rc file...');

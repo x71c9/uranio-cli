@@ -29,7 +29,7 @@ const is_docker = isDocker();
 // const prefix_types = [
 // 	'[trace]',
 // 	'[debug]',
-// 	'[log__]',
+// 	'[info_]',
 // 	'[warn_]',
 // 	'[error]',
 // 	'[none_]'
@@ -39,7 +39,7 @@ const prefix_type_by_type:StringByLogType = {
 	0: '[none_]',
 	1: '[error]',
 	2: '[warn_]',
-	3: '[log__]',
+	3: '[info_]',
 	4: '[debug]',
 	5: '[trace]',
 }
@@ -106,14 +106,14 @@ class Output {
 		this._log(read, true);
 	}
 	
-	public log(text:string, prefix?:string)
+	public info_log(text:string, prefix?:string)
 			:void{
-		if(this.params.log_level < LogLevel.LOG){
+		if(this.params.log_level < LogLevel.INFO){
 			return;
 		}
-		const prefixed = this._prefixes(text, LogLevel.LOG, prefix);
+		const prefixed = this._prefixes(text, LogLevel.INFO, prefix);
 		const formatted = this._format_text(prefixed);
-		const read = this._color_type(formatted, LogLevel.LOG);
+		const read = this._color_type(formatted, LogLevel.INFO);
 		this._log(read, true);
 	}
 	
@@ -144,7 +144,7 @@ class Output {
 			:void{
 		this._go_previous();
 		text = `${defaults.check_char} ${text}`;
-		this.log(text, prefix);
+		this.info_log(text, prefix);
 	}
 	
 	public done_debug_log(text:string, prefix?:string)
@@ -156,11 +156,20 @@ class Output {
 		this.debug_log(text, prefix);
 	}
 	
+	public done_trace_log(text:string, prefix?:string)
+			:void{
+		if(this.params.log_level >= LogLevel.TRACE){
+			this._go_previous();
+		}
+		// text = `${defaults.check_char} ${text}`;
+		this.trace_log(text, prefix);
+	}
+	
 	public end_log(text:string, prefix?:string)
 			:void{
 		this.stop_loading();
 		let end_text = `${defaults.check_char}${defaults.check_char} ${text}`;
-		this.log(end_text, prefix);
+		this.info_log(end_text, prefix);
 	}
 	
 	public wrong_end_log(text:string, prefix?:string)
@@ -216,11 +225,13 @@ class Output {
 	
 	public translate_loglevel(text:string, over?:string)
 				:void{
-		const regex = new RegExp(/\[(trace|debug|log__|warn_|error)\]/);
+		const regex = new RegExp(/\[(trace|debug|info_|warn_|error)\]/);
 		const match = regex.exec(text);
 		if(!match){
 			if(!over){
-				this._log(text + `\n`, true);
+				if(text.length > 0){
+					this._log(text + `\n`, true);
+				}
 			}else{
 				switch(over){
 					case 'trace':{
@@ -231,8 +242,8 @@ class Output {
 						this.debug_log(text);
 						break;
 					}
-					case 'log':{
-						this.log(text);
+					case 'info':{
+						this.info_log(text);
 						break;
 					}
 					case 'warn':{
@@ -250,7 +261,7 @@ class Output {
 			return;
 		}
 		text = text.replaceAll(match[0], ''); // [trace] | [debug] | ...
-		switch(match[1]){ // trace | debug | log__ | warn_ | error
+		switch(match[1]){ // trace | debug | info_ | warn_ | error
 			case 'trace':{
 				this.trace_log(text);
 				break;
@@ -259,8 +270,8 @@ class Output {
 				this.debug_log(text);
 				break;
 			}
-			case 'log__':{
-				this.log(text);
+			case 'info_':{
+				this.info_log(text);
 				break;
 			}
 			case 'warn_':{
@@ -283,7 +294,7 @@ class Output {
 	}
 	
 	// private _match_loglevel(text:string):RegExpExecArray|undefined{
-	// 	const regex = new RegExp(/\[(trace|debug|log__|warn_|error)\]/);
+	// 	const regex = new RegExp(/\[(trace|debug|info_|warn_|error)\]/);
 	// 	const match = regex.exec(text);
 	// 	if(!match){
 	// 		return undefined;
@@ -617,7 +628,7 @@ class Output {
 	 * If there in the text there is something in the format [c#----]
 	 * i.e.: [c#magenta] | [c#FF6655]
 	 * or
-	 * uranio type i.e.: [debug___] | [log_____] | ...
+	 * uranio type i.e.: [debug___] | [info_] | ...
 	 * it will return the text without the [c#----] | [<type>__] and with the
 	 * corrisponing color.
 	 */
@@ -660,7 +671,7 @@ class Output {
 			case LogLevel.DEBUG:{
 				return chalk.blue(text);
 			}
-			case LogLevel.LOG:{
+			case LogLevel.INFO:{
 				return chalk.cyan(text);
 			}
 			case LogLevel.WARN:{

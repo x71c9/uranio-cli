@@ -381,8 +381,8 @@ function _set_args(params:Params, args:Arguments)
 				params.log_level = LogLevel.WARN;
 				break;
 			}
-			case 'log':{
-				params.log_level = LogLevel.LOG;
+			case 'info':{
+				params.log_level = LogLevel.INFO;
 				break;
 			}
 			case 'debug':{
@@ -570,7 +570,7 @@ async function _switch_command(args:Arguments){
 		case '':
 		case 'version':{
 			output_instance.stop_loading();
-			output_instance.log(_return_version());
+			output_instance.info_log(_return_version());
 			break;
 		}
 		case 'reinit':{
