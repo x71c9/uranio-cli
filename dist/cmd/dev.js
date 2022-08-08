@@ -163,7 +163,7 @@ async function _dev_server() {
 function _tsc_watch() {
     const tsc_watch = `yarn tsc -w`;
     const prefix = (dev_params.no_colors === true) ? defaults_1.defaults.prefix_tsc_blank : defaults_1.defaults.prefix_tsc;
-    util_instance.spawn.info_log(tsc_watch, 'watching types', prefix);
+    util_instance.spawn.native(tsc_watch, 'watching types', 'debug', prefix);
 }
 function _watch() {
     const src_path = `${dev_params.root}/src/`;

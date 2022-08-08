@@ -204,7 +204,7 @@ function _tsc_watch(){
 	
 	const tsc_watch = `yarn tsc -w`;
 	const prefix = (dev_params.no_colors === true) ? defaults.prefix_tsc_blank : defaults.prefix_tsc;
-	util_instance.spawn.info_log(tsc_watch, 'watching types', prefix);
+	util_instance.spawn.native(tsc_watch, 'watching types', 'debug', prefix);
 	
 }
 
