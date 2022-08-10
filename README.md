@@ -67,28 +67,39 @@ Uranio requires [Node.js](https://nodejs.org), version 14 or above.
 To install `uranio`, run the following command from any directory
 in your terminal:
 
+#### Global installation (recommended)
+
 ```bash
 yarn global add uranio
 ```
-or if you are using npm
+<details>
+  <summary>or if you are using npm</summary>
+
 ```bash
 npm install -g uranio
 ```
+</details>
+
+#### Local installation
 
 When using the CLI in a CI environment we recommend installing it locally
 as a development dependency, instead of globally.
 
 > **Warning**
-> To install locally the command must be the following otherwise there will
+>
+> To install locally the command **must** be the following otherwise there will
 > be conflicts with package names.
 
 ```bash
 yarn add uranio-cli@npm:uranio
 ```
-or if you are using npm
+<details>
+  <summary>or if you are using npm</summary>
+
 ```bash
 npm install uranio-cli@npm:uranio
 ```
+</details>
 
 ### Usage
 
