@@ -11,7 +11,9 @@ Uranio command line interface.
 - [Usage](#usage)
 - [Commands](#commands)
 - [Getting started](#getting-started)
-- [How to develop](#how-to-develop)
+- [How to start developing](#how-to-start-develop)
+
+---
 
 ### About
 
@@ -60,6 +62,7 @@ on [Netlify](https://www.netlify.com/). -->
 
 `uranio-adm` creates a full Administration Panel that interact with the API.
 
+---
 
 ### Installation
 
@@ -101,6 +104,10 @@ npm install uranio-cli@npm:uranio
 ```
 </details>
 
+
+---
+
+
 ### Usage
 
 Installing the CLI globally provides access to the `uranio` command.
@@ -118,6 +125,9 @@ uranio help
 ```
 urn [command]
 ```
+
+---
+
 
 ### Commands
 
@@ -220,6 +230,7 @@ uranio
 ```
 This command prints `uranio` version.
 
+---
 
 ### Output options
 
@@ -238,6 +249,7 @@ This command prints `uranio` version.
 - `-o --color_verbose` (*string*) - verbose log color.
 - `-q --color_debug` (*string*) - debug log color.
 
+---
 
 ### Getting started
 
@@ -284,7 +296,9 @@ in the case of the `adm` repo.
 Now you can start developing.
 
 
-### How to develop
+---
+
+### How to start developing
 
 The first things that need to be defined in Uranio are `Atom`s.
 
