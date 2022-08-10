@@ -77,15 +77,17 @@ npm install -g uranio
 
 When using the CLI in a CI environment we recommend installing it locally
 as a development dependency, instead of globally.
-To install locally, run the following command from the root
-directory of your project:
+
+> **Warning**
+> To install locally the command must be the following otherwise there will
+> be conflicts with package names.
 
 ```bash
-yarn add --dev uranio
+yarn add uranio-cli@npm:uranio
 ```
 or if you are using npm
 ```bash
-npm install --save-dev uranio
+npm install uranio-cli@npm:uranio
 ```
 
 ### Usage
