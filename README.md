@@ -85,9 +85,6 @@ npm install -g uranio
 
 #### Local installation
 
-When using the CLI in a CI environment we recommend installing it locally
-as a development dependency, instead of globally.
-
 > **Warning**
 >
 > To install locally the command **must** be the following otherwise there will
