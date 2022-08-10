@@ -488,8 +488,8 @@ async function _install_dev_package(package_url) {
 }
 async function _install_repo_package(repo) {
     const package_url = defaults_1.defaults[`${repo}_repo`];
-    // return await util_instance.cmd.install_package(`uranio@${package_url}#${init_params.branch}`);
-    return await util_instance.cmd.install_package(`${package_url}#${init_params.branch}`);
+    return await util_instance.cmd.install_package(`uranio@${package_url}#${init_params.branch}`);
+    // return await util_instance.cmd.install_package(`${package_url}#${init_params.branch}`);
 }
 function _ignore_files() {
     output_instance.start_loading(`Adding entries to .gitignore...`);

@@ -177,10 +177,10 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 	// const port_client = dotenv.URN_CLIENT_PORT;
 	
 	const toml = util_instance.cmd.read_toml();
-	const port_server = toml.service_port || 777;
+	const port_server = toml.service_port || 7777;
 	const port_panel = toml.client_panel_port || 5454;
-	const dev_port_server = toml.dev_service_port || port_server;
-	const dev_port_panel = toml.client_dev_panel_port || port_panel;
+	// const port_server = toml.service_port || port_server;
+	// const port_panel = toml.client_panel_port || port_panel;
 	
 	const network_name = _get_network_name();
 	
@@ -192,8 +192,8 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 	cmd += ` --network ${network_name}`;
 	// cmd += ` -p ${port_server}:${port_server}`;
 	// cmd += ` -p ${port_panel}:${port_panel}`;
-	cmd += ` -p ${dev_port_server}:${dev_port_server}`;
-	cmd += ` -p ${dev_port_panel}:${dev_port_panel}`;
+	cmd += ` -p ${port_server}:${port_server}`;
+	cmd += ` -p ${port_panel}:${port_panel}`;
 	cmd += ` -v $(pwd)/src/:/app/src/`;
 	cmd += ` -v $(pwd)/.env:/app/.env`;
 	cmd += ` -v ${toml_path}:/app/uranio.toml`;
