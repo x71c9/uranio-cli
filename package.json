@@ -6,7 +6,6 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
-		"postinstall": "echo \"!!IMPORTANT!! Use `npm i uranio-cli@npm:uranio` if you are installing it locally.\"",
 		"build": "yarn tsc -b",
 		"plain:sh": "node -r source-map-support/register ./dist/sh.js ",
 		"dev:init": "yarn tsc-watch --onSuccess \"yarn plain:sh init -ftuw -r api -x [CL] --branch master --nospinner\"",

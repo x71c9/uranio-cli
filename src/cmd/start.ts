@@ -34,7 +34,6 @@ export async function start(params:Partial<Params>)
 	
 	output_instance.start_loading(`Starting...`);
 	
-	
 	if(params.docker === true){
 		
 		await docker.start(start_params);
