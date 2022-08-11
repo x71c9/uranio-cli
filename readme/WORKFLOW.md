@@ -88,12 +88,27 @@ List of commands:
 		`./node_modules/uranio/src/client/toml.ts` and compiled to
 		`./node_modules/uranio/dist/client/toml.js`;
 
-
 > **The following commands are valid only for `uranio-adm`**
 - **Build panel**
 
 	- RUN `uranio-panel-${repo} build`. This "binary" script runs: Nuxt build.
 
+- **One file compilation** !!(work in progress)!!
+
+	- Build a bundle file for WebService script;
+		- RUN `yarn esbuild __root/dist/service/ws.js`
+		- `--bundle`
+		- `--platform=node`
+		- `--minify`
+		- `--outfile=.uranio/bundles/ws.bundle.js`
+	
+	- Build a bundle file for Panel script; (NOT WORKING AT THE MOMENT)
+		- RUN `yarn esbuild __root/dist/panel/index.js`
+		- `--bundle`
+		- `--platform=node`
+		- `--minify`
+		- `--outfile=.uranio/bundles/panel.bundle.js`
+		
 
 ---
 

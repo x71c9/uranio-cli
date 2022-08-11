@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import {default_params} from '../conf/defaults';
+import {default_params, defaults} from '../conf/defaults';
 
 import * as output from '../output/index';
 
@@ -40,6 +40,7 @@ export async function build(params:Params)
 		await build_panel(build_params, false);
 	}
 	
+	
 	output_instance.done_log('Build completed.');
 	
 	process.exit(0);
@@ -59,6 +60,8 @@ export async function build_server(params:Params, init=true, exit=true)
 		await _build();
 	}
 	
+	await _bundle_service_ws();
+	
 	output_instance.done_log('Build server completed.');
 	
 	if(exit){
@@ -73,6 +76,7 @@ export async function build_panel(params:Params, init=true)
 		_init_build(params);
 	}
 	
+	await _bundle_panel_index();
 	// output_instance.start_loading(`Building panel...`);
 	
 	if(init){
@@ -101,6 +105,33 @@ async function _build(){
 	
 	await generate(build_params);
 	
+}
+
+// async function _create_bundles(){
+// 	await _bundle_service_ws();
+// 	await _bundle_panel_index();
+// }
+
+async function _bundle_service_ws(){
+	output_instance.start_loading(`Bundling service ws...`);
+	let cmd_service = '';
+	cmd_service += `yarn esbuild ${build_params.root}/dist/service/ws.js`;
+	cmd_service += `--bundle`;
+	cmd_service += `--platform=node`;
+	cmd_service += `--minify`;
+	cmd_service += `--outfile=${build_params.root}/${defaults.folder}/bundles/ws.bundle.js`;
+	await util_instance.spawn.native_promise(cmd_service, 'bundling webservice');
+}
+
+async function _bundle_panel_index(){
+	output_instance.start_loading(`Bundling panel index...`);
+	let cmd_service = '';
+	cmd_service += `yarn esbuild ${build_params.root}/dist/panel/index.js`;
+	cmd_service += `--bundle`;
+	cmd_service += `--platform=node`;
+	cmd_service += `--minify`;
+	cmd_service += `--outfile=${build_params.root}/${defaults.folder}/bundles/panel.bundle.js`;
+	await util_instance.spawn.native_promise(cmd_service, 'bundling panel');
 }
 
 function _init_build(params:Partial<Params>)
