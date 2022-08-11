@@ -57,7 +57,7 @@ async function build_server(params, init = true, exit = true) {
     if (init) {
         await _build();
     }
-    await _bundle_service_ws();
+    // await _bundle_service_ws();
     output_instance.done_log('Build server completed.');
     if (exit) {
         process.exit(0);
@@ -90,6 +90,7 @@ async function _build() {
 // 	await _bundle_service_ws();
 // 	await _bundle_panel_index();
 // }
+// @ts-ignore
 async function _bundle_service_ws() {
     output_instance.start_loading(`Bundling service ws...`);
     let cmd_service = '';
