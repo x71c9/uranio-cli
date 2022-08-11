@@ -211,16 +211,56 @@ class CMD {
         await this._uninstall_uranio_dep(defaults_1.defaults.adm_dep_dev_repo, pack_data);
         return true;
     }
+    async uninstall_core(pack_data) {
+        await this._uninstall_uranio_pack(defaults_1.defaults.core_repo, pack_data);
+        return true;
+    }
+    async uninstall_api(pack_data) {
+        await this._uninstall_uranio_pack(defaults_1.defaults.api_repo, pack_data);
+        return true;
+    }
+    async uninstall_trx(pack_data) {
+        await this._uninstall_uranio_pack(defaults_1.defaults.trx_repo, pack_data);
+        return true;
+    }
+    async uninstall_adm(pack_data) {
+        await this._uninstall_uranio_pack(defaults_1.defaults.adm_repo, pack_data);
+        return true;
+    }
     async _uninstall_uranio_dep(repo, pack_data) {
-        const short_repo = (repo.substring(0, 3) === 'ssh' || repo.substring(0, 7) === 'git+ssh') ?
+        let short_repo = (repo.substring(0, 3) === 'ssh' || repo.substring(0, 7) === 'git+ssh') ?
             repo.split('/').slice(-1)[0].replace('uranio', 'urn') : repo;
+        if (short_repo.indexOf('.git')) {
+            const splitted_git = short_repo.split('.git');
+            short_repo = splitted_git[0];
+        }
+        await this._uninstall_package(short_repo, pack_data);
+    }
+    async _uninstall_uranio_pack(repo, pack_data) {
+        let short_repo = (repo.substring(0, 3) === 'ssh' || repo.substring(0, 7) === 'git+ssh') ?
+            repo.split('/').slice(-1)[0] : repo;
+        if (short_repo.indexOf('.git')) {
+            const splitted_git = short_repo.split('.git');
+            short_repo = splitted_git[0];
+        }
+        await this._uninstall_package(short_repo, pack_data);
+    }
+    async _uninstall_package(short_repo, pack_data) {
         if (this.dependency_exists(short_repo, pack_data)) {
             this.output.start_loading(`Uninstalling ${short_repo} dep...`);
             const dep_folder = `${this.params.root}/node_modules/${short_repo}`;
-            this.fs.remove_directory(dep_folder);
-            await this.uninstall_dep(`${short_repo}`);
-            this.output.done_log(`Uninstalled ${short_repo} dependencies.`);
-            return true;
+            try {
+                await this.uninstall_dep(`${short_repo}`);
+                this.fs.remove_directory(dep_folder);
+                this.output.done_log(`Uninstalled ${short_repo} dependencies.`);
+                return true;
+            }
+            catch (error) {
+                const err = error;
+                this.output.warn_log(`[WARNING] Could not uninstall dependency.`);
+                this.output.warn_log(`[WARNING] ${err.message}.`);
+                this.output.warn_log(`[WARNING] Please remove ${short_repo} from package.json.`);
+            }
         }
     }
     async _clone_repo(address, dest_folder, branch = 'master', recursive = false) {

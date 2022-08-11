@@ -96,6 +96,10 @@ async function _reset_package_json() {
     await util_instance.cmd.uninstall_api_dep(pack_data);
     await util_instance.cmd.uninstall_trx_dep(pack_data);
     await util_instance.cmd.uninstall_adm_dep(pack_data);
+    await util_instance.cmd.uninstall_core(pack_data);
+    await util_instance.cmd.uninstall_api(pack_data);
+    await util_instance.cmd.uninstall_trx(pack_data);
+    await util_instance.cmd.uninstall_adm(pack_data);
 }
 // function _remove_package_aliases(){
 //   output_instance.start_loading('Removing package.json aliases...');

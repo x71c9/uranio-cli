@@ -246,17 +246,63 @@ class CMD {
 		return true;
 	}
 	
+	public async uninstall_core(pack_data?:any){
+		await this._uninstall_uranio_pack(defaults.core_repo, pack_data);
+		return true;
+	}
+	
+	public async uninstall_api(pack_data?:any){
+		await this._uninstall_uranio_pack(defaults.api_repo, pack_data);
+		return true;
+	}
+	
+	public async uninstall_trx(pack_data?:any){
+		await this._uninstall_uranio_pack(defaults.trx_repo, pack_data);
+		return true;
+	}
+	
+	public async uninstall_adm(pack_data?:any){
+		await this._uninstall_uranio_pack(defaults.adm_repo, pack_data);
+		return true;
+	}
+	
 	private async _uninstall_uranio_dep(repo:string, pack_data?:any){
-		const short_repo =
+		let short_repo =
 			(repo.substring(0,3) === 'ssh' || repo.substring(0,7) === 'git+ssh') ?
 				repo.split('/').slice(-1)[0].replace('uranio', 'urn') : repo;
+		if(short_repo.indexOf('.git')){
+			const splitted_git = short_repo.split('.git');
+			short_repo = splitted_git[0];
+		}
+		await this._uninstall_package(short_repo, pack_data);
+	}
+	
+	private async _uninstall_uranio_pack(repo:string, pack_data?:any){
+		let short_repo =
+			(repo.substring(0,3) === 'ssh' || repo.substring(0,7) === 'git+ssh') ?
+				repo.split('/').slice(-1)[0] : repo;
+		if(short_repo.indexOf('.git')){
+			const splitted_git = short_repo.split('.git');
+			short_repo = splitted_git[0];
+		}
+		await this._uninstall_package(short_repo, pack_data);
+	}
+	
+	private async _uninstall_package(short_repo:string, pack_data?:any){
 		if(this.dependency_exists(short_repo, pack_data)){
 			this.output.start_loading(`Uninstalling ${short_repo} dep...`);
 			const dep_folder = `${this.params.root}/node_modules/${short_repo}`;
-			this.fs.remove_directory(dep_folder);
-			await this.uninstall_dep(`${short_repo}`);
-			this.output.done_log(`Uninstalled ${short_repo} dependencies.`);
-			return true;
+			try{
+				await this.uninstall_dep(`${short_repo}`);
+				this.fs.remove_directory(dep_folder);
+				this.output.done_log(`Uninstalled ${short_repo} dependencies.`);
+				return true;
+			}catch(error){
+				const err = error as Error;
+				this.output.warn_log(`[WARNING] Could not uninstall dependency.`);
+				this.output.warn_log(`[WARNING] ${err.message}.`);
+				this.output.warn_log(`[WARNING] Please remove ${short_repo} from package.json.`);
+			}
 		}
 	}
 	
