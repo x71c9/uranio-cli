@@ -36,8 +36,6 @@ const types_1 = require("../types");
 const common_1 = require("./common");
 const transpose_1 = require("./transpose");
 const generate_1 = require("./generate");
-// const tscw_color = '#734de3';
-// const nuxt_color = '#677cc7';
 let output_instance;
 let util_instance;
 let build_params = defaults_1.default_params;
@@ -56,7 +54,6 @@ async function build_server(params, init = true, exit = true) {
     if (init) {
         _init_build(params);
     }
-    // output_instance.start_loading(`Building server...`);
     if (init) {
         await _build();
     }
@@ -71,15 +68,11 @@ async function build_panel(params, init = true) {
     if (init) {
         _init_build(params);
     }
-    await _bundle_panel_index();
-    // output_instance.start_loading(`Building panel...`);
+    // await _bundle_panel_index();
     if (init) {
         await _build();
     }
-    // const urn_lib_pre = ` urn_log_prefix_type=true`;
     const urn_lib_pre = ` --prefix_loglevel`;
-    // const urn_config_path = ` -c ${build_params.root}/uranio.toml`;
-    // const cmd_server = `NODE_ENV=production yarn uranio-panel-${build_params.repo} generate ${urn_lib_pre}`;
     const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
     const cmd_server = `${node_env}yarn uranio-panel-${build_params.repo} build ${urn_lib_pre}`;
     await util_instance.spawn.native_promise(cmd_server, 'building panel');
@@ -107,6 +100,7 @@ async function _bundle_service_ws() {
     cmd_service += `--outfile=${build_params.root}/${defaults_1.defaults.folder}/bundles/ws.bundle.js`;
     await util_instance.spawn.native_promise(cmd_service, 'bundling webservice');
 }
+// @ts-ignore
 async function _bundle_panel_index() {
     output_instance.start_loading(`Bundling panel index...`);
     let cmd_service = '';
