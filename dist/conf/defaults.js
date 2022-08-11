@@ -26,6 +26,7 @@ exports.default_params = {
     // prefix_color: false,
     docker: false,
     docker_db: false,
+    build: false,
     filelog: true,
     spin: true,
     prefix: '',

@@ -1,5 +1,5 @@
 /**
- * Dev command module
+ * Start command module
  *
  * @packageDocumentation
  */

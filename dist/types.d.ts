@@ -27,6 +27,7 @@ export declare type Params = {
     time: boolean;
     docker: boolean;
     docker_db: boolean;
+    build: boolean;
     filelog: boolean;
     spin: boolean;
     prefix: string;

@@ -36,6 +36,7 @@ export type Params = {
 	// prefix_color: boolean
 	docker: boolean
 	docker_db: boolean
+	build: boolean
 	filelog: boolean
 	spin: boolean
 	prefix: string

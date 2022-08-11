@@ -1,6 +1,6 @@
 "use strict";
 /**
- * Dev command module
+ * Start command module
  *
  * @packageDocumentation
  */
@@ -97,7 +97,9 @@ async function start_panel(params, init = true) {
 }
 exports.start_panel = start_panel;
 async function _init_start() {
-    await (0, build_1.build_server)(start_params, true, false);
+    if (start_params.build === true) {
+        await (0, build_1.build_server)(start_params, true, false);
+    }
 }
 function _init_params(params) {
     params.spin = false;

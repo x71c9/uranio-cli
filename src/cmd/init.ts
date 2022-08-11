@@ -57,12 +57,12 @@ export async function init(params:Partial<Params>)
 	init_filepath = `${dot_folder}/${defaults.init_filepath}`;
 	
 	_log_important_params();
-	_create_tmp_dir();
-	await _clone_assets_repo();
-	await _clone_uranio_schema();
 	_create_dot_dir();
 	_create_init_file();
 	_create_src_dirs();
+	_create_tmp_dir();
+	await _clone_assets_repo();
+	await _clone_uranio_schema();
 	_copy_assets();
 	_copy_schema();
 	_create_dot_env();

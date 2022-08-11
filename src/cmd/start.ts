@@ -1,5 +1,5 @@
 /**
- * Dev command module
+ * Start command module
  *
  * @packageDocumentation
  */
@@ -114,7 +114,9 @@ export async function start_panel(params:Partial<Params>, init=true)
 
 async function _init_start(){
 	
-	await build_server(start_params, true, false);
+	if(start_params.build === true){
+		await build_server(start_params, true, false);
+	}
 	
 }
 

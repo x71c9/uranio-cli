@@ -308,7 +308,8 @@ export async function db_create(params:Partial<Params>)
 	let cmd = '';
 	cmd += `docker create --name ${db_container_name}`;
 	cmd += ` --network ${network_name}`;
-	cmd += ` -v ~/mongo/data-${project_name}:/data/db -p ${port}:${port}`;
+	cmd += ` -v ~/mongo/data-${project_name}:/data/db`;
+	cmd += ` -p ${port}:${port}`;
 	cmd += ` mongo:5`;
 	await util_instance.spawn.spin_and_native_promise(cmd, `creating db ${docker_params.db}`, 'trace', defaults.prefix_docker);
 	output_instance.done_log(

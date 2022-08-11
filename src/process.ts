@@ -298,6 +298,15 @@ function _set_args(params:Params, args:Arguments)
 		params.docker_db = !args.nodocker_db;
 	}
 	
+	const build = args.a || args.build;
+	
+	if(build == true){
+		params.build = true;
+	}
+	if(typeof args.nobuild === 'boolean' && !!args.nobuild !== !params.build){
+		params.build = !args.nobuild;
+	}
+	
 	/* Paramteters with default value = true */
 	
 	const filelog = args.g || args.filelog;

@@ -35,6 +35,7 @@ export async function help():Promise<void> {
 	console.log(`  -f --force ............ run without prompts.`);
 	console.log(`  -b --branch ........... set branch to clone.`);
 	console.log(`  -k --docker ........... use docker - it needs docker installed.`);
+	console.log(`  -a --build ............ build before starting.`);
 	console.log(`  --docker_db ........... use docker db - it needs docker installed.`);
 	console.log(`  --db .................. set db type [mongo] - it needs docker installed.`);
 	console.log(``);
