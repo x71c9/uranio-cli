@@ -234,7 +234,7 @@ class Output {
 		if(this.params.log_level === 0){
 			return;
 		}
-		const regex = new RegExp(/\[(trace|debug|info_|warn_|error)\]/);
+		const regex = new RegExp(/\[(trace|debug|info_|warn_|error)\]\s?/);
 		const match = regex.exec(text);
 		if(!match){
 			if(!over){
