@@ -152,6 +152,7 @@ async function build(params) {
     cmd += ` --build-arg repo=${docker_params.repo}`;
     cmd += ` --build-arg project=${project_name}`;
     cmd += ` --build-arg production=${docker_params.prod}`;
+    cmd += ` --load`;
     cmd += ` .`;
     await util_instance.spawn.spin_and_native_promise(cmd, 'building', 'trace', defaults_1.defaults.prefix_docker);
     output_instance.done_log(`Docker image built ${image_name}`);
