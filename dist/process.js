@@ -285,6 +285,10 @@ function _set_args(params, args) {
         (0, common_1.check_db)(db);
         params.db = db;
     }
+    const docker_tag = args.docker_tag;
+    if (typeof docker_tag === 'string' && docker_tag !== '') {
+        params.docker_tag = docker_tag;
+    }
     const log_level = args.l || args.log_level;
     if (typeof log_level === 'string' && log_level !== '') {
         (0, common_1.check_loglevel)(log_level);

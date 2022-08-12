@@ -6,6 +6,7 @@
 import { Params, Arguments } from '../types';
 export declare function docker(params: Partial<Params>, args: Arguments): Promise<void>;
 export declare function build(params: Partial<Params>): Promise<void>;
+export declare function push(params: Partial<Params>): Promise<void>;
 export declare function create(params: Partial<Params>, entrypoint?: string): Promise<void>;
 export declare function start(params: Partial<Params>): Promise<void>;
 export declare function start_server(params: Partial<Params>): Promise<void>;

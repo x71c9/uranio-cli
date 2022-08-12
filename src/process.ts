@@ -377,6 +377,12 @@ function _set_args(params:Params, args:Arguments)
 		params.db = db as DB;
 	}
 	
+	const docker_tag = args.docker_tag;
+	
+	if(typeof docker_tag === 'string' && docker_tag !== ''){
+		params.docker_tag = docker_tag
+	}
+	
 	const log_level = args.l || args.log_level;
 	
 	if(typeof log_level === 'string' && log_level !== ''){

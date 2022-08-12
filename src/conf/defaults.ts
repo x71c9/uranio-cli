@@ -34,6 +34,7 @@ export const default_params:Params = {
 	pacman: 'yarn',
 	db: 'mongo',
 	root: '.',
+	docker_tag: 'latest',
 	log_level: 3
 };
 

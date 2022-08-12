@@ -28,7 +28,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.update_env = exports.prune = exports.network_remove = exports.network_create = exports.tmp_remove = exports.db_remove = exports.db_stop = exports.db_start = exports.db_create = exports.unbuild = exports.remove = exports.stop = exports.start_panel = exports.start_server = exports.start = exports.create = exports.build = exports.docker = void 0;
+exports.update_env = exports.prune = exports.network_remove = exports.network_create = exports.tmp_remove = exports.db_remove = exports.db_stop = exports.db_start = exports.db_create = exports.unbuild = exports.remove = exports.stop = exports.start_panel = exports.start_server = exports.start = exports.create = exports.push = exports.build = exports.docker = void 0;
 const urn_lib_1 = require("urn-lib");
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
@@ -66,6 +66,10 @@ async function docker(params, args) {
         }
         case 'unbuild': {
             await unbuild(docker_params);
+            break;
+        }
+        case 'push': {
+            await push(docker_params);
             break;
         }
         case 'db': {
@@ -151,9 +155,24 @@ async function build(params) {
     cmd += ` .`;
     await util_instance.spawn.spin_and_native_promise(cmd, 'building', 'trace', defaults_1.defaults.prefix_docker);
     output_instance.done_log(`Docker image built ${image_name}`);
-    await _copy_compiled();
+    if (docker_params.prod === false) {
+        await _copy_compiled();
+    }
 }
 exports.build = build;
+async function push(params) {
+    _init_params(params);
+    const image_name = _get_image_name();
+    let cmd_tag = '';
+    cmd_tag += `docker image tag ${image_name} ${params.docker_tag}`;
+    await util_instance.spawn.spin_and_native_promise(cmd_tag, 'tagging', 'trace', defaults_1.defaults.prefix_docker);
+    output_instance.done_log(`Docker image tagged ${params.docker_tag}`);
+    let cmd = '';
+    cmd += `docker push ${params.docker_tag}`;
+    await util_instance.spawn.spin_and_native_promise(cmd, 'pushing', 'trace', defaults_1.defaults.prefix_docker);
+    output_instance.done_log(`Docker image pushed to Docker Hub`);
+}
+exports.push = push;
 async function create(params, entrypoint) {
     _init_params(params);
     const container_name = `${_get_container_name()}`;

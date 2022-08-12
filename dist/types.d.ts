@@ -37,6 +37,7 @@ export declare type Params = {
     pacman: PacMan;
     db: DB;
     root: string;
+    docker_tag: string;
     log_level: LogLevel;
 };
 export declare type Arguments = minimist.ParsedArgs;

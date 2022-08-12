@@ -58,6 +58,10 @@ export async function docker(params:Partial<Params>, args:Arguments)
 			await unbuild(docker_params);
 			break;
 		}
+		case 'push':{
+			await push(docker_params);
+			break;
+		}
 		
 		case 'db':{
 			// const db = args._[3] as DB;
@@ -160,7 +164,28 @@ export async function build(params:Partial<Params>)
 		`Docker image built ${image_name}`
 	);
 	
-	await _copy_compiled();
+	if(docker_params.prod === false){
+		await _copy_compiled();
+	}
+	
+}
+
+export async function push(params:Partial<Params>)
+		:Promise<void>{
+	
+	_init_params(params);
+	
+	const image_name = _get_image_name();
+	
+	let cmd_tag = '';
+	cmd_tag += `docker image tag ${image_name} ${params.docker_tag}`;
+	await util_instance.spawn.spin_and_native_promise(cmd_tag, 'tagging', 'trace', defaults.prefix_docker);
+	output_instance.done_log(`Docker image tagged ${params.docker_tag}`);
+	
+	let cmd = '';
+	cmd += `docker push ${params.docker_tag}`;
+	await util_instance.spawn.spin_and_native_promise(cmd, 'pushing', 'trace', defaults.prefix_docker);
+	output_instance.done_log(`Docker image pushed to Docker Hub`);
 	
 }
 

@@ -47,6 +47,7 @@ export type Params = {
 	// deploy: Deploy
 	db: DB
 	root: string
+	docker_tag: string
 	log_level: LogLevel
 }
 

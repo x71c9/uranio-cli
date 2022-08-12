@@ -36,6 +36,7 @@ exports.default_params = {
     pacman: 'yarn',
     db: 'mongo',
     root: '.',
+    docker_tag: 'latest',
     log_level: 3
 };
 const cloud_address = 'git+ssh://git@github.com/x71c9';
