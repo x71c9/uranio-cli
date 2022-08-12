@@ -101,9 +101,7 @@ export async function start_panel(params:Partial<Params>, init=true)
 			await _init_start();
 		}
 		
-		// const urn_lib_pre = ` urn_log_prefix_type=true`;
 		const urn_lib_pre = ` --prefix_loglevel`;
-		// const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
 		const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
 		const cmd_server = `${node_env}yarn uranio-panel-${start_params.repo} start${urn_lib_pre}`;
 		util_instance.spawn.native(cmd_server, 'starting panel', 'trace', defaults.prefix_pnl);

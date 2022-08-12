@@ -153,7 +153,7 @@ export async function build(params:Partial<Params>)
 	cmd += ` -f ${docker_folder}/Dockerfile`;
 	cmd += ` --build-arg repo=${docker_params.repo}`;
 	cmd += ` --build-arg project=${project_name}`;
-	// cmd += ` --build-arg deploy=${docker_params.deploy}`;
+	cmd += ` --build-arg production=${docker_params.prod}`;
 	cmd += ` .`;
 	await util_instance.spawn.spin_and_native_promise(cmd, 'building', 'trace', defaults.prefix_docker);
 	output_instance.done_log(
@@ -190,17 +190,17 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 	let cmd = '';
 	cmd += `docker create`;
 	cmd += ` --network ${network_name}`;
-	// cmd += ` -p ${port_server}:${port_server}`;
-	// cmd += ` -p ${port_panel}:${port_panel}`;
 	cmd += ` -p ${port_server}:${port_server}`;
 	cmd += ` -p ${port_panel}:${port_panel}`;
-	cmd += ` -v $(pwd)/src/:/app/src/`;
-	cmd += ` -v $(pwd)/.env:/app/.env`;
-	cmd += ` -v ${toml_path}:/app/uranio.toml`;
-	cmd += ` -v $(pwd)/package.json:/app/package.json`;
-	cmd += ` -v $(pwd)/node_modules/:/app/node_modules/`;
-	cmd += ` -v $(pwd)/.uranio/uranio-schema:/app/.uranio/uranio-schema`;
-	cmd += ` -v $(pwd)/cert/:/app/cert/`;
+	if(docker_params.prod === false){
+		cmd += ` -v $(pwd)/src/:/app/src/`;
+		cmd += ` -v $(pwd)/.env:/app/.env`;
+		cmd += ` -v ${toml_path}:/app/uranio.toml`;
+		cmd += ` -v $(pwd)/package.json:/app/package.json`;
+		cmd += ` -v $(pwd)/node_modules/:/app/node_modules/`;
+		cmd += ` -v $(pwd)/.uranio/uranio-schema:/app/.uranio/uranio-schema`;
+		cmd += ` -v $(pwd)/cert/:/app/cert/`;
+	}
 	cmd += ` --name ${container_name}`;
 	if(typeof entrypoint === 'string'){
 		cmd += ` --entrypoint="${entrypoint}"`;
@@ -503,9 +503,12 @@ async function _download_dockerfiles(){
 	const dest = `${docker_folder}/Dockerfile`;
 	util_instance.fs.copy_file(docker_file, dest);
 	
+	// const dockerignore_file =
+	// 	`${docker_params.root}/${defaults.tmp_folder}/uranio-assets/docker/.dockerignore`;
 	const dockerignore_file =
-		`${docker_params.root}/${defaults.tmp_folder}/uranio-assets/docker/.dockerignore`;
-	const ignore_dest = `${docker_folder}/.dockerignore`;
+		`${docker_params.root}/${defaults.tmp_folder}/uranio-assets/docker/Dockerfile.dockerignore`;
+	// const ignore_dest = `${docker_folder}/.dockerignore`;
+	const ignore_dest = `${docker_folder}/Dockerfile.dockerignore`;
 	util_instance.fs.copy_file(dockerignore_file, ignore_dest);
 	
 	const docker_bash =

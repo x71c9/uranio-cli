@@ -26,7 +26,7 @@ export async function help():Promise<void> {
 	console.log(`  help .................. show help menu [this one].`);
 	console.log(``);
 	console.log(`list of options`);
-	console.log(`  -p --prod ............. set NODE_ENV=production.`);
+	console.log(`  -p --prod ............. flag for production.`);
 	console.log(`  -s --root ............. set the project root folder.`);
 	console.log(`  -r --repo ............. set uranio repo to use [core, api, trx, adm].`);
 	console.log(`  -c --config ........... set config toml file path.`);
