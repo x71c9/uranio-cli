@@ -267,24 +267,6 @@ fetch = 'axios'
 
 ---
 
-### fetch_url
-
-This option defines the base url of the Web Service. Since this can be proxied
-it cannot be inferred.
-
-| Type | Default  |
-|:-----|:---------|
-| `string` | `http://localhost:7777/uranio/api` |
-
-```toml
-# uranio.toml
-fetch_url = 'https://localhost:7774/uranio/api'
-```
-
-> Valid for Uranio repos: `trx`, `adm`.
-
----
-
 ## [default_atoms]
 
 ### superuser
@@ -463,6 +445,25 @@ This option defines the port where the Web Service is deployed.
 
 ---
 
+### url
+
+This option defines the full url where the Web Service is deployed. It must be
+explicitly defined since it can be under a proxy.
+
+| Type | Default |
+|:-----|:--------|
+| `string` | `http://localhost:7777/uranio/api` |
+
+```toml
+# uranio.toml
+[service]
+	url = "http://localhost:7777/uranio/api"
+```
+
+> Valid for Uranio repos: `trx`, `adm`.
+
+---
+
 ## [client.panel]
 
 ### protocol
@@ -521,7 +522,7 @@ This option defines the port where the Admin panel is deployed.
 
 ---
 
-## [client.fetch]
+## [client.service]
 
 ### url
 
@@ -534,7 +535,7 @@ since it can be proxied.
 
 ```toml
 # uranio.toml
-[client.fetch]
+[client.service]
 	url = 'https://localhost:7777/uranio/api'
 ```
 
