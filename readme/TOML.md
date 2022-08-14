@@ -427,6 +427,24 @@ This option defines the protocol used by the Web Service.
 
 ---
 
+### domain
+
+This option defines the domain where the Web Service is deployed.
+
+| Type | Default |
+|:-----|:--------|
+| `string` | `localhost` |
+
+```toml
+# uranio.toml
+[service]
+	domain = localhost
+```
+
+> Valid for Uranio repos: `trx`, `adm`.
+
+---
+
 ### port
 
 This option defines the port where the Web Service is deployed.
