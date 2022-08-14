@@ -186,7 +186,7 @@ export async function push(params:Partial<Params>)
 	let cmd = '';
 	cmd += `docker push ${params.docker_tag}`;
 	await util_instance.spawn.spin_and_native_promise(cmd, 'pushing', 'trace', defaults.prefix_docker);
-	output_instance.done_log(`Docker image pushed to Docker Hub`);
+	output_instance.done_log(`Docker image pushed to Docker Registry`);
 	
 }
 
