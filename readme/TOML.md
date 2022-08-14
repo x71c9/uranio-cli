@@ -433,12 +433,12 @@ This option defines the domain where the Web Service is deployed.
 
 | Type | Default |
 |:-----|:--------|
-| `string` | `localhost` |
+| `string` | `0.0.0.0` |
 
 ```toml
 # uranio.toml
 [service]
-	domain = localhost
+	domain = 0.0.0.0
 ```
 
 > Valid for Uranio repos: `trx`, `adm`.
@@ -470,12 +470,12 @@ explicitly defined since it can be under a proxy.
 
 | Type | Default |
 |:-----|:--------|
-| `string` | `http://localhost:7777/uranio/api` |
+| `string` | `http://0.0.0.0:7777/uranio/api` |
 
 ```toml
 # uranio.toml
 [service]
-	url = "http://localhost:7777/uranio/api"
+	url = "http://0.0.0.0:7777/uranio/api"
 ```
 
 > Valid for Uranio repos: `trx`, `adm`.
@@ -508,12 +508,12 @@ This option defines the domain where the Admin panel is deployed.
 
 | Type | Default |
 |:-----|:--------|
-| `string` | `localhost` |
+| `string` | `0.0.0.0` |
 
 ```toml
 # uranio.toml
 [client.panel]
-	domain = 'localhost'
+	domain = '0.0.0.0'
 ```
 
 > Valid for Uranio repos: `adm`.
@@ -549,12 +549,12 @@ since it can be proxied.
 
 | Type | Default |
 |:-----|:--------|
-| `string` | `http://localhost:7777/uranio/api` |
+| `string` | `http://0.0.0.0:7777/uranio/api` |
 
 ```toml
 # uranio.toml
 [client.service]
-	url = 'https://localhost:7777/uranio/api'
+	url = 'https://0.0.0.0:7777/uranio/api'
 ```
 
 > Valid for Uranio repos: `adm`.
