@@ -267,6 +267,27 @@ fetch = 'axios'
 
 ---
 
+### ssl_secure
+
+This option defines whether the connections should trust only CA signed
+certificate.
+
+With `ssl_secure = true` self-signed certificate won't be trusted.
+
+| Type | Default | Dev default |
+|:-----|:--------|:------------|
+| `boolean` | `true` | `false` |
+
+```toml
+# uranio.toml
+ssl_secure = true
+dev_ssl_secure = false
+```
+
+> Valid for Uranio repos: `trx`, `adm`.
+
+---
+
 ## [default_atoms]
 
 ### superuser
