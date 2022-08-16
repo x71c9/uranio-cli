@@ -25,6 +25,7 @@ export const default_params:Params = {
 	docker: false,
 	docker_db: false,
 	build: false,
+	docker_load: false,
 	filelog: true,
 	spin: true,
 	prefix: '',

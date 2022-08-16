@@ -37,6 +37,7 @@ export type Params = {
 	docker: boolean
 	docker_db: boolean
 	build: boolean
+	docker_load: boolean
 	filelog: boolean
 	spin: boolean
 	prefix: string
