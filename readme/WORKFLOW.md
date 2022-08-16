@@ -19,7 +19,7 @@ List of commands:
 in `./`;
 
 - copy `uranio-schema` to `.uranio/uranio-schema`. This is needed for text
-editors that do not check types inside `node_modules`;
+editors that do not update types inside `node_modules`;
 
 - create `./.env` if not exists;
 
@@ -35,8 +35,8 @@ editors that do not check types inside `node_modules`;
 
 - install selected repo as dependency. if repo == `adm` install `uranio-adm`
 with the alias `uranio`: `yarn add uranio@ssh://git@github.com/x71c9/uranio-adm`
-(notice the **uranio@** in front of the url) this allow to import the repo as
-`uranio` instead of `uranio-adm`.
+> notice the **uranio@** in front of the url) this allow to import the repo as
+> `uranio` instead of `uranio-adm`.
 
 - remove `./.tmp` directory.
 
@@ -123,8 +123,8 @@ List of commands:
 
 - **Start server**
 	- RUN `uranio-webservice-${repo}`. For `uranio-core` this runs the files
-	defined in `./src/server`. For all the other repo it also start a webservice
-	in Express.
+	defined in `./src/server`. For all the other repo it also start a Web Service
+	that expose the API.
 
 > **The following commands are valid only for `uranio-adm`**
 - **Start panel**
