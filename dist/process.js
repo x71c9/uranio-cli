@@ -235,6 +235,13 @@ function _set_args(params, args) {
     if (typeof args.nobuild === 'boolean' && !!args.nobuild !== !params.build) {
         params.build = !args.nobuild;
     }
+    const docker_load = args.docker_load;
+    if (docker_load == true) {
+        params.docker_load = true;
+    }
+    if (typeof args.nodocker_load === 'boolean' && !!args.nodocker_load !== !params.docker_load) {
+        params.docker_load = !args.nodocker_load;
+    }
     /* Paramteters with default value = true */
     const filelog = args.g || args.filelog;
     if (filelog == false || filelog == 'false') {

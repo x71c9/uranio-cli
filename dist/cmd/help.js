@@ -35,6 +35,8 @@ async function help() {
     console.log(`  -k --docker ........... use docker - it needs docker installed.`);
     console.log(`  -a --build ............ build before starting.`);
     console.log(`  --docker_db ........... use docker db - it needs docker installed.`);
+    console.log(`  --docker_tag .......... set docker image tag.`);
+    console.log(`  --docker_load ......... add flag --load to docker build command.`);
     console.log(`  --db .................. set db type [mongo] - it needs docker installed.`);
     console.log(``);
     console.log(`list of output options`);
