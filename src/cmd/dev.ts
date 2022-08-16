@@ -145,8 +145,9 @@ async function _dev_panel(){
 	// const args = '';
 	const args = ' --prefix_loglevel';
 	
+	const node_env = (dev_params.prod === true) ? `NODE_ENV=production ` : '';
 	const prefix = (dev_params.no_colors === true) ? defaults.prefix_pnl_blank : defaults.prefix_pnl;
-	const cmd_dev_panel = `yarn uranio-panel-${dev_params.repo} dev${args}`;
+	const cmd_dev_panel = `${node_env}yarn uranio-panel-${dev_params.repo} dev${args}`;
 	util_instance.spawn.native(cmd_dev_panel, 'developing panel', 'trace', prefix);
 	
 }
@@ -165,6 +166,9 @@ async function _dev_server(){
 	_service_child = new forever.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`,{
 		silent: true,
 		args: args,
+		env: {
+			NODE_ENV: (dev_params.prod === true) ? 'production' : 'development'
+		}
 		// watch: true,
 		// watchDirectory: `${dev_params.root}/src`
 	});
