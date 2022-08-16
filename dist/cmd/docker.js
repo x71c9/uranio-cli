@@ -184,8 +184,22 @@ async function create(params, entrypoint) {
     // const port_server = dotenv.URN_SERVICE_PORT;
     // const port_client = dotenv.URN_CLIENT_PORT;
     const toml = util_instance.cmd.read_toml();
-    const port_server = toml.service_port || 7777;
-    const port_panel = toml.client_panel_port || 5454;
+    let port_server = 7777;
+    let port_panel = 5454;
+    if (typeof toml.service_port !== 'undefined') {
+        port_server = Number(toml.service_port);
+    }
+    if (typeof toml.client_panel_port !== 'undefined') {
+        port_panel = Number(toml.client_panel_port);
+    }
+    if (docker_params.prod === false) {
+        if (typeof toml.dev_service_port !== 'undefined') {
+            port_server = Number(toml.dev_service_port);
+        }
+        if (typeof toml.client_dev_panel_port !== 'undefined') {
+            port_panel = Number(toml.client_dev_panel_port);
+        }
+    }
     // const port_server = toml.service_port || port_server;
     // const port_panel = toml.client_panel_port || port_panel;
     const network_name = _get_network_name();
