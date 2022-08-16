@@ -150,7 +150,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const prod = args.p || args.prod;
 	
-	if(prod == true){
+	if(prod == true || prod == 'true'){
 		params.prod = true;
 	}
 	if(typeof args.noprod === 'boolean' && !!args.noprod !== !params.prod){
@@ -159,7 +159,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const force = args.f || args.force;
 	
-	if(force == true){
+	if(force == true || force == 'true'){
 		params.force = true;
 	}
 	if(typeof args.noforce === 'boolean' && !!args.noforce !== !params.force){
@@ -168,7 +168,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const verbose = args.v || args.verbose;
 	
-	if(verbose == true){
+	if(verbose == true || verbose == 'true'){
 		params.verbose = true;
 	}
 	if(typeof args.noverbose === 'boolean' && !!args.noverbose !== !params.verbose){
@@ -180,7 +180,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const trace = args.u || args.trace;
 	
-	if(trace == true){
+	if(trace == true || trace == 'true'){
 		params.trace = true;
 	}
 	if(typeof args.notrace === 'boolean' && !!args.notrace !== !params.trace){
@@ -215,7 +215,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const prefix_loglevel = args.x || args.prefix_loglevel;
 	
-	if(prefix_loglevel == true){
+	if(prefix_loglevel == true || prefix_loglevel == 'true'){
 		params.prefix_loglevel = true;
 	}
 	if(typeof args.noprefix_loglevel === 'boolean' && !!args.noprefix_loglevel !== !params.prefix_loglevel){
@@ -228,7 +228,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const fullwidth = args.w || args.fullwidth;
 	
-	if(fullwidth == true){
+	if(fullwidth == true || fullwidth == 'true'){
 		params.fullwidth = true;
 	}
 	if(typeof args.nofullwidth === 'boolean' && !!args.nofullwidth !== !params.fullwidth){
@@ -246,7 +246,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const inside_ntl = args.inside_ntl;
 	
-	if(inside_ntl == true){
+	if(inside_ntl == true || inside_ntl == 'true'){
 		params.inside_ntl = true;
 	}
 	if(typeof args.noinside_ntl === 'boolean' && !!args.noinside_ntl !== !params.inside_ntl){
@@ -255,7 +255,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const time = args.t || args.time;
 	
-	if(time == true){
+	if(time == true || time == 'true'){
 		params.time = true;
 	}
 	if(typeof args.notime === 'boolean' && !!args.notime !== !params.time){
@@ -282,7 +282,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const docker = args.k || args.docker;
 	
-	if(docker == true){
+	if(docker == true || docker == 'true'){
 		params.docker = true;
 	}
 	if(typeof args.nodocker === 'boolean' && !!args.nodocker !== !params.docker){
@@ -291,7 +291,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const docker_db = args.docker_db;
 	
-	if(docker_db == true){
+	if(docker_db == true || docker_db == 'true'){
 		params.docker_db = true;
 	}
 	if(typeof args.nodocker_db === 'boolean' && !!args.nodocker_db !== !params.docker_db){
@@ -300,7 +300,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const build = args.a || args.build;
 	
-	if(build == true){
+	if(build == true || build == 'true'){
 		params.build = true;
 	}
 	if(typeof args.nobuild === 'boolean' && !!args.nobuild !== !params.build){
@@ -309,7 +309,7 @@ function _set_args(params:Params, args:Arguments)
 	
 	const docker_load = args.docker_load;
 	
-	if(docker_load == true){
+	if(docker_load == true || docker_load == 'true'){
 		params.docker_load = true;
 	}
 	if(typeof args.nodocker_load === 'boolean' && !!args.nodocker_load !== !params.docker_load){
