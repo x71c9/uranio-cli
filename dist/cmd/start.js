@@ -36,6 +36,7 @@ const common_1 = require("./common");
 const docker = __importStar(require("./docker"));
 const build_1 = require("./build");
 const types_1 = require("../types");
+const cmd_1 = require("../util/cmd");
 let output_instance;
 let util_instance;
 let start_params = defaults_1.default_params;
@@ -66,11 +67,12 @@ async function start_server(params, init = true) {
         if (init) {
             await _init_start();
         }
+        const exec = cmd_1.pacman_exec[start_params.pacman];
         // const urn_lib_pre = ` urn_log_prefix_type=true`;
         const urn_lib_pre = ` --prefix_loglevel`;
         const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
         const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
-        const cmd_server = `${node_env}yarn uranio-webservice-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
+        const cmd_server = `${node_env}${exec} uranio-webservice-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
         util_instance.spawn.native(cmd_server, 'starting server', '', defaults_1.defaults.prefix_srv);
     }
 }
@@ -87,9 +89,10 @@ async function start_panel(params, init = true) {
         if (init) {
             await _init_start();
         }
+        const exec = cmd_1.pacman_exec[start_params.pacman];
         const urn_lib_pre = ` --prefix_loglevel`;
         const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
-        const cmd_server = `${node_env}yarn uranio-panel-${start_params.repo} start${urn_lib_pre}`;
+        const cmd_server = `${node_env}${exec} uranio-panel-${start_params.repo} start${urn_lib_pre}`;
         util_instance.spawn.native(cmd_server, 'starting panel', 'trace', defaults_1.defaults.prefix_pnl);
     }
 }

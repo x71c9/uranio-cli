@@ -18,6 +18,8 @@ import {transpose} from './transpose';
 
 import {generate} from './generate';
 
+import {pacman_exec} from '../util/cmd';
+
 let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
@@ -77,9 +79,11 @@ export async function build_panel(params:Params, init=true)
 		await _build();
 	}
 	
+	const exec = pacman_exec[build_params.pacman];
+	
 	const urn_lib_pre = ` --prefix_loglevel`;
 	const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
-	const cmd_server = `${node_env}yarn uranio-panel-${build_params.repo} build ${urn_lib_pre}`;
+	const cmd_server = `${node_env}${exec} uranio-panel-${build_params.repo} build ${urn_lib_pre}`;
 	
 	await util_instance.spawn.native_promise(cmd_server, 'building panel');
 	
@@ -104,10 +108,13 @@ async function _build(){
 // }
 
 // @ts-ignore
-async function _bundle_service_ws(){
+async function _bundle_service_ws(params:Params){
+	
+	const exec = pacman_exec[params.pacman];
+	
 	output_instance.start_loading(`Bundling service ws...`);
 	let cmd_service = '';
-	cmd_service += `yarn esbuild ${build_params.root}/dist/service/ws.js`;
+	cmd_service += `${exec} esbuild ${build_params.root}/dist/service/ws.js`;
 	cmd_service += `--bundle`;
 	cmd_service += `--platform=node`;
 	cmd_service += `--minify`;
@@ -116,10 +123,13 @@ async function _bundle_service_ws(){
 }
 
 // @ts-ignore
-async function _bundle_panel_index(){
+async function _bundle_panel_index(params:Params){
+	
+	const exec = pacman_exec[params.pacman];
+	
 	output_instance.start_loading(`Bundling panel index...`);
 	let cmd_service = '';
-	cmd_service += `yarn esbuild ${build_params.root}/dist/panel/index.js`;
+	cmd_service += `${exec} esbuild ${build_params.root}/dist/panel/index.js`;
 	cmd_service += `--bundle`;
 	cmd_service += `--platform=node`;
 	cmd_service += `--minify`;

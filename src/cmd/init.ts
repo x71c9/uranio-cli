@@ -20,8 +20,8 @@ import {
 	Arguments,
 	Params,
 	Repo,
-	abstract_repos,
-	abstract_pacman,
+	// abstract_repos,
+	// abstract_pacman,
 	abstract_db,
 	valid_admin_repos,
 } from '../types';
@@ -160,7 +160,12 @@ async function _ask_for_pacman(args:Arguments){
 					type: 'list',
 					name: 'pacman',
 					message: 'Select which package manager you want to use:',
-					choices: Object.keys(abstract_pacman)
+					// choices: Object.keys(abstract_pacman)
+					choices: [
+						{name: 'npm (node default)', value: 'npm'},
+						{name: 'yarn (faster)', value: 'yarn'},
+						// {name: 'pnpm (fastest)', value: 'pnpm'},
+					]
 				}
 			]).then(async (answers) => {
 				check_pacman(answers.pacman);
@@ -257,7 +262,12 @@ async function _ask_for_repo(args:Arguments){
 					type: 'list',
 					name: 'repo',
 					message: 'Select which URANIO repo you want to use:',
-					choices: Object.keys(abstract_repos)
+					choices: [
+						{name: 'uranio-core (Serverside)', value: 'core'},
+						{name: 'uranio-api  (Serverside, Webservice)', value: 'api'},
+						{name: 'uranio-trx  (Serverside, Webservice, Clientside)', value: 'trx'},
+						{name: 'uranio-adm  (Serverside, Webservice, Clientside, Admin panel)', value: 'adm'},
+					]
 				}
 			]).then(async (answers) => {
 				check_repo(answers.repo);

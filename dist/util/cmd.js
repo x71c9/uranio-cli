@@ -31,7 +31,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.create = void 0;
+exports.create = exports.pacman_exec = void 0;
 const toml_1 = __importDefault(require("toml"));
 const urn_lib_1 = require("urn-lib");
 const defaults_1 = require("../conf/defaults");
@@ -39,6 +39,11 @@ const defaults_1 = require("../conf/defaults");
 // import * as common from '../cmd/common';
 const fs = __importStar(require("./fs"));
 const spawn = __importStar(require("./spawn"));
+exports.pacman_exec = {
+    npm: 'npx',
+    yarn: 'yarn',
+    pnpm: 'pnpm exec'
+};
 class CMD {
     constructor(params, output) {
         this.params = params;
@@ -316,6 +321,9 @@ const _pacman_commands = {
         },
         yarn(repo) {
             return `yarn add ${repo} --verbose`;
+        },
+        pnpm(repo) {
+            return `pnpm add ${repo}`;
         }
     },
     install_dev: {
@@ -324,6 +332,9 @@ const _pacman_commands = {
         },
         yarn(repo) {
             return `yarn add --dev ${repo} --verbose`;
+        },
+        pnpm(repo) {
+            return `pnpm add --D ${repo}`;
         }
     },
     uninstall: {
@@ -332,7 +343,10 @@ const _pacman_commands = {
         },
         yarn(repo) {
             return `yarn remove ${repo} --verbose`;
+        },
+        pnpm(repo) {
+            return `pnpm remove ${repo}`;
         }
-    }
+    },
 };
 //# sourceMappingURL=cmd.js.map

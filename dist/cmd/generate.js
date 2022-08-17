@@ -64,6 +64,7 @@ const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
 const types_1 = require("../types");
 const common_1 = require("./common");
+const cmd_1 = require("../util/cmd");
 let output_instance;
 let util_instance;
 let generate_params = defaults_1.default_params;
@@ -133,12 +134,13 @@ async function _generate(args) {
     if (generate_params.config[0] !== '/') {
         root_uranio = `${generate_params.root}/${generate_params.config}`;
     }
+    const exec = cmd_1.pacman_exec[generate_params.pacman];
     // const final_args = (is_docker === true) ? `${args} urn_log_prefix_type=true` : args;
     // const final_args = `${args} urn_log_prefix_type=true`;
     // const final_args = `${args}`;
     const node_env = (generate_params.prod === true) ? `NODE_ENV=production ` : '';
     const final_args = `${args} --prefix_loglevel`;
-    const generate_cmd = `${node_env}yarn uranio-generate-${generate_params.repo} -c ${root_uranio} ${final_args}`;
+    const generate_cmd = `${node_env}${exec} uranio-generate-${generate_params.repo} -c ${root_uranio} ${final_args}`;
     // await util_instance.spawn.native_promise(generate_cmd, 'generating all', chalk.red('[G]'));
     await util_instance.spawn.native_promise(generate_cmd, 'generating all', 'trace', '[G]');
     _copy_uranio_schema_repo();

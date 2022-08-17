@@ -44,6 +44,8 @@ import {Params, valid_admin_repos, valid_deploy_repos} from '../types';
 
 import {merge_params} from './common';
 
+import {pacman_exec} from '../util/cmd';
+
 let output_instance:output.OutputInstance;
 
 let util_instance:util.UtilInstance;
@@ -149,13 +151,15 @@ async function _generate(args:string){
 		root_uranio = `${generate_params.root}/${generate_params.config}`;
 	}
 	
+	const exec = pacman_exec[generate_params.pacman];
+	
 	// const final_args = (is_docker === true) ? `${args} urn_log_prefix_type=true` : args;
 	// const final_args = `${args} urn_log_prefix_type=true`;
 	// const final_args = `${args}`;
 	const node_env = (generate_params.prod === true) ? `NODE_ENV=production ` : '';
 	const final_args = `${args} --prefix_loglevel`;
 	
-	const generate_cmd = `${node_env}yarn uranio-generate-${generate_params.repo} -c ${root_uranio} ${final_args}`;
+	const generate_cmd = `${node_env}${exec} uranio-generate-${generate_params.repo} -c ${root_uranio} ${final_args}`;
 	// await util_instance.spawn.native_promise(generate_cmd, 'generating all', chalk.red('[G]'));
 	await util_instance.spawn.native_promise(generate_cmd, 'generating all', 'trace', '[G]');
 	

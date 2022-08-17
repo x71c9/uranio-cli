@@ -3,7 +3,7 @@
  *
  * @packageDocumentation
  */
-import { Params } from '../types';
+import { Params, PacManExec } from '../types';
 import * as out from '../output/index';
 import * as fs from './fs';
 import * as spawn from './spawn';
@@ -13,6 +13,7 @@ declare type DotEnv = {
 declare type Toml = {
     [k: string]: string;
 };
+export declare const pacman_exec: PacManExec;
 declare class CMD {
     params: Params;
     output: out.OutputInstance;

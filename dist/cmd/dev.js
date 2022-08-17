@@ -46,6 +46,7 @@ const transpose_1 = require("./transpose");
 const build_1 = require("./build");
 const common_1 = require("./common");
 const docker = __importStar(require("./docker"));
+const cmd_1 = require("../util/cmd");
 // const is_docker = isDocker();
 let output_instance;
 let util_instance;
@@ -117,9 +118,10 @@ async function _dev_panel() {
     // const args = ' urn_log_prefix_type=true';
     // const args = '';
     const args = ' --prefix_loglevel';
+    const exec = cmd_1.pacman_exec[dev_params.pacman];
     const node_env = (dev_params.prod === true) ? `NODE_ENV=production ` : '';
     const prefix = (dev_params.no_colors === true) ? defaults_1.defaults.prefix_pnl_blank : defaults_1.defaults.prefix_pnl;
-    const cmd_dev_panel = `${node_env}yarn uranio-panel-${dev_params.repo} dev${args}`;
+    const cmd_dev_panel = `${node_env}${exec} uranio-panel-${dev_params.repo} dev${args}`;
     util_instance.spawn.native(cmd_dev_panel, 'developing panel', 'trace', prefix);
 }
 async function _dev_server() {
@@ -165,7 +167,8 @@ async function _dev_server() {
     });
 }
 function _tsc_watch() {
-    const tsc_watch = `yarn tsc -w`;
+    const exec = cmd_1.pacman_exec[dev_params.pacman];
+    const tsc_watch = `${exec} tsc -w`;
     const prefix = (dev_params.no_colors === true) ? defaults_1.defaults.prefix_tsc_blank : defaults_1.defaults.prefix_tsc;
     util_instance.spawn.native(tsc_watch, 'watching types', 'debug', prefix);
 }

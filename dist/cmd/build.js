@@ -36,6 +36,7 @@ const types_1 = require("../types");
 const common_1 = require("./common");
 const transpose_1 = require("./transpose");
 const generate_1 = require("./generate");
+const cmd_1 = require("../util/cmd");
 let output_instance;
 let util_instance;
 let build_params = defaults_1.default_params;
@@ -72,9 +73,10 @@ async function build_panel(params, init = true) {
     if (init) {
         await _build();
     }
+    const exec = cmd_1.pacman_exec[build_params.pacman];
     const urn_lib_pre = ` --prefix_loglevel`;
     const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
-    const cmd_server = `${node_env}yarn uranio-panel-${build_params.repo} build ${urn_lib_pre}`;
+    const cmd_server = `${node_env}${exec} uranio-panel-${build_params.repo} build ${urn_lib_pre}`;
     await util_instance.spawn.native_promise(cmd_server, 'building panel');
     output_instance.done_log('Build panel completed.');
     if (init) {
@@ -91,10 +93,11 @@ async function _build() {
 // 	await _bundle_panel_index();
 // }
 // @ts-ignore
-async function _bundle_service_ws() {
+async function _bundle_service_ws(params) {
+    const exec = cmd_1.pacman_exec[params.pacman];
     output_instance.start_loading(`Bundling service ws...`);
     let cmd_service = '';
-    cmd_service += `yarn esbuild ${build_params.root}/dist/service/ws.js`;
+    cmd_service += `${exec} esbuild ${build_params.root}/dist/service/ws.js`;
     cmd_service += `--bundle`;
     cmd_service += `--platform=node`;
     cmd_service += `--minify`;
@@ -102,10 +105,11 @@ async function _bundle_service_ws() {
     await util_instance.spawn.native_promise(cmd_service, 'bundling webservice');
 }
 // @ts-ignore
-async function _bundle_panel_index() {
+async function _bundle_panel_index(params) {
+    const exec = cmd_1.pacman_exec[params.pacman];
     output_instance.start_loading(`Bundling panel index...`);
     let cmd_service = '';
-    cmd_service += `yarn esbuild ${build_params.root}/dist/panel/index.js`;
+    cmd_service += `${exec} esbuild ${build_params.root}/dist/panel/index.js`;
     cmd_service += `--bundle`;
     cmd_service += `--platform=node`;
     cmd_service += `--minify`;

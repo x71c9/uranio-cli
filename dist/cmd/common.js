@@ -153,6 +153,7 @@ exports.package_scripts = {
     'dev:panel': `uranio dev:panel`
 };
 exports.adm_package_scripts = {
-    'postinstall': `yarn patch-package --patch-dir node_modules/uranio/patches`
+    // 'postinstall': `yarn patch-package --patch-dir node_modules/uranio/patches`
+    'postinstall': `npx patch-package --patch-dir node_modules/uranio/patches`
 };
 //# sourceMappingURL=common.js.map

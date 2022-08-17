@@ -8,7 +8,7 @@ import toml from 'toml';
 
 import {urn_util} from 'urn-lib';
 
-import {Params} from '../types';
+import {Params, PacManExec} from '../types';
 
 import {defaults} from '../conf/defaults';
 
@@ -28,6 +28,12 @@ type DotEnv = {
 type Toml = {
 	[k:string]: string
 }
+
+export const pacman_exec:PacManExec = {
+	npm: 'npx',
+	yarn: 'yarn',
+	pnpm: 'pnpm exec'
+};
 
 class CMD {
 	
@@ -397,6 +403,9 @@ const _pacman_commands = {
 		},
 		yarn(repo:string){
 			return `yarn add ${repo} --verbose`;
+		},
+		pnpm(repo:string){
+			return `pnpm add ${repo}`;
 		}
 	},
 	install_dev: {
@@ -405,6 +414,9 @@ const _pacman_commands = {
 		},
 		yarn(repo:string){
 			return `yarn add --dev ${repo} --verbose`;
+		},
+		pnpm(repo:string){
+			return `pnpm add --D ${repo}`;
 		}
 	},
 	uninstall: {
@@ -413,8 +425,12 @@ const _pacman_commands = {
 		},
 		yarn(repo:string){
 			return `yarn remove ${repo} --verbose`;
+		},
+		pnpm(repo:string){
+			return `pnpm remove ${repo}`;
 		}
-	}
+	},
 };
+
 
 

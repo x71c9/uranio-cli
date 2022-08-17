@@ -31,7 +31,7 @@ export async function help():Promise<void> {
 	console.log(`  -r --repo ............. set uranio repo to use [core, api, trx, adm].`);
 	console.log(`  -c --config ........... set config toml file path.`);
 	// console.log(`  -d --deploy .......... set deploy [netlify, express].`);
-	console.log(`  -m --pacman ........... set package manager [npm, yarn].`);
+	console.log(`  -m --pacman ........... set package manager [npm, yarn, pnpm].`);
 	console.log(`  -f --force ............ run without prompts.`);
 	console.log(`  -b --branch ........... set branch to clone.`);
 	console.log(`  -k --docker ........... use docker - it needs docker installed.`);

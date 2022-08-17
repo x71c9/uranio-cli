@@ -175,5 +175,6 @@ export const package_scripts = {
 };
 
 export const adm_package_scripts = {
-	'postinstall': `yarn patch-package --patch-dir node_modules/uranio/patches`
+	// 'postinstall': `yarn patch-package --patch-dir node_modules/uranio/patches`
+	'postinstall': `npx patch-package --patch-dir node_modules/uranio/patches`
 };

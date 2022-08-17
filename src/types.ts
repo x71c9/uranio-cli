@@ -79,8 +79,9 @@ export const abstract_admin_repos = {
 } as const;
 
 export const abstract_pacman = {
-	yarn: '',
 	npm: '',
+	yarn: '',
+	pnpm: ''
 } as const;
 
 // export const abstract_deploy = {
@@ -187,5 +188,9 @@ export function valid_loglevel()
 
 export type Aliases = {
 	[key:string]: string[]
+}
+
+export type PacManExec = {
+	[k in PacMan]: string
 }
 

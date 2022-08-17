@@ -34,8 +34,9 @@ exports.abstract_admin_repos = {
     adm: ''
 };
 exports.abstract_pacman = {
-    yarn: '',
     npm: '',
+    yarn: '',
+    pnpm: ''
 };
 // export const abstract_deploy = {
 //   netlify: '',

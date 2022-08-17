@@ -139,7 +139,12 @@ async function _ask_for_pacman(args) {
                 type: 'list',
                 name: 'pacman',
                 message: 'Select which package manager you want to use:',
-                choices: Object.keys(types_1.abstract_pacman)
+                // choices: Object.keys(abstract_pacman)
+                choices: [
+                    { name: 'npm (node default)', value: 'npm' },
+                    { name: 'yarn (faster)', value: 'yarn' },
+                    // {name: 'pnpm (fastest)', value: 'pnpm'},
+                ]
             }
         ]).then(async (answers) => {
             (0, common_1.check_pacman)(answers.pacman);
@@ -237,7 +242,12 @@ async function _ask_for_repo(args) {
                 type: 'list',
                 name: 'repo',
                 message: 'Select which URANIO repo you want to use:',
-                choices: Object.keys(types_1.abstract_repos)
+                choices: [
+                    { name: 'uranio-core (Serverside)', value: 'core' },
+                    { name: 'uranio-api  (Serverside, Webservice)', value: 'api' },
+                    { name: 'uranio-trx  (Serverside, Webservice, Clientside)', value: 'trx' },
+                    { name: 'uranio-adm  (Serverside, Webservice, Clientside, Admin panel)', value: 'adm' },
+                ]
             }
         ]).then(async (answers) => {
             (0, common_1.check_repo)(answers.repo);

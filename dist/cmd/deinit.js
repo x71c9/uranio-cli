@@ -78,6 +78,7 @@ async function _delete_files() {
     util_instance.fs.remove_file(`${deinit_params.root}/.stylelintrc.json`);
     util_instance.fs.remove_file(`${deinit_params.root}/yarn.lock`);
     util_instance.fs.remove_file(`${deinit_params.root}/yarn-error.log`);
+    util_instance.fs.remove_file(`${deinit_params.root}/pnpm-lock.yaml`);
     util_instance.fs.remove_file(`${deinit_params.root}/package-lock.json`);
     util_instance.fs.remove_file(`${deinit_params.root}/netlify.toml`);
     util_instance.fs.remove_directory(`${deinit_params.root}/.netlify`);
