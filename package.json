@@ -45,7 +45,7 @@
 		"@types/is-docker": "^2.0.0",
 		"@types/minimist": "^1.2.1",
 		"@types/prettier": "^2.2.2",
-		"uranio-dev": "git+ssh://git@github.com/x71c9/uranio-dev.git#master"
+		"uranio-dev": "^0.0.1"
 	},
 	"dependencies": {
 		"@nbl7/ora": "^1.0.3",
@@ -64,7 +64,7 @@
 		"recast": "^0.20.5",
 		"toml": "^3.0.0",
 		"ts-morph": "^10.0.1",
-		"urn-lib": "git+ssh://git@github.com/x71c9/uranio-lib.git#master"
+		"uranio-lib": "^0.0.1"
 	},
 	"bin": {
 		"urn": "dist/sh.js",
