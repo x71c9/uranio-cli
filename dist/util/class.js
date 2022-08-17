@@ -34,6 +34,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = void 0;
 const chokidar_1 = __importDefault(require("chokidar"));
 const prettier_1 = __importDefault(require("prettier"));
+const is_docker_1 = __importDefault(require("is-docker"));
 const defaults_1 = require("../conf/defaults");
 // import {UtilParams} from './types';
 // import {merge_params} from '../cmd/common';
@@ -43,6 +44,9 @@ const cmd = __importStar(require("./cmd"));
 const watch_child_list = [];
 process.on('SIGINT', function () {
     process.stdout.write("\r--- Caught interrupt signal [watch] ---\n");
+    if ((0, is_docker_1.default)()) {
+        process.stdout.write("\r--- For interrupting inside Docker press Ctrl + \\ ---\n");
+    }
     for (let i = 0; i < watch_child_list.length; i++) {
         const watch_child_object = watch_child_list[i];
         watch_child_object.child.close().then(() => {

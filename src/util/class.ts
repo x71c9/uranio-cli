@@ -8,6 +8,8 @@ import chokidar from 'chokidar';
 
 import prettier from 'prettier';
 
+import isDocker from 'is-docker';
+
 import {defaults} from '../conf/defaults';
 
 import {Params} from '../types';
@@ -30,6 +32,9 @@ const watch_child_list:WatchProcessObject[] = [];
 
 process.on('SIGINT', function() {
 	process.stdout.write("\r--- Caught interrupt signal [watch] ---\n");
+	if(isDocker()){
+		process.stdout.write("\r--- For interrupting inside Docker press Ctrl + \\ ---\n");
+	}
 	for(let i = 0; i < watch_child_list.length; i++){
 		const watch_child_object = watch_child_list[i];
 		watch_child_object.child.close().then(() => {

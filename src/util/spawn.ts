@@ -8,6 +8,8 @@ import * as cp from 'child_process';
 
 import * as out from '../output/index';
 
+import isDocker from 'is-docker';
+
 type Resolve = (v?:unknown) => void;
 type Reject = (err?:Error) => void;
 
@@ -25,6 +27,9 @@ const child_outputs:CachedOutput = {};
 
 process.on('SIGINT', function() {
 	process.stdout.write("\r--- Caught interrupt signal [spawn] ---\n");
+	if(isDocker()){
+		process.stdout.write("\r--- For interrupting inside Docker press Ctrl + \\ ---\n");
+	}
 	for(let i = 0; i < child_list.length; i++){
 		const child = child_list[i];
 		if(child.pid){

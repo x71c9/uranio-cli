@@ -27,14 +27,21 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = void 0;
 const cp = __importStar(require("child_process"));
+const is_docker_1 = __importDefault(require("is-docker"));
 const child_list = [];
 // const child_list_detached:cp.ChildProcessWithoutNullStreams[] = [];
 const child_outputs = {};
 process.on('SIGINT', function () {
     process.stdout.write("\r--- Caught interrupt signal [spawn] ---\n");
+    if ((0, is_docker_1.default)()) {
+        process.stdout.write("\r--- For interrupting inside Docker press Ctrl + \\ ---\n");
+    }
     for (let i = 0; i < child_list.length; i++) {
         const child = child_list[i];
         if (child.pid) {
