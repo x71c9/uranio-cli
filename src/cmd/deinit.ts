@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import {urn_util} from 'urn-lib';
+import {urn_util} from 'uranio-lib';
 
 import {default_params, defaults} from '../conf/defaults';
 

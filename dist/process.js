@@ -34,7 +34,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.uranio_process = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const urn_lib_1 = require("urn-lib");
+const uranio_lib_1 = require("uranio-lib");
 const types_1 = require("./types");
 const output = __importStar(require("./output/index"));
 const util = __importStar(require("./util/index"));
@@ -386,7 +386,7 @@ function _folder_is_valid(folder_path) {
             const package_json_path = `${folder_path}/${file}`;
             try {
                 const content = fs_1.default.readFileSync(package_json_path, 'utf8');
-                const pack = urn_lib_1.urn_util.json.clean_parse(content);
+                const pack = uranio_lib_1.urn_util.json.clean_parse(content);
                 if (pack.name === 'uranio' || (pack.name === 'uranio-monorepo' && pack.uranio == true)) {
                     return false;
                 }
@@ -411,7 +411,7 @@ function _folder_is_uranio(folder_path) {
             const package_json_path = `${folder_path}/${file}`;
             try {
                 const content = fs_1.default.readFileSync(package_json_path, 'utf8');
-                const pack = urn_lib_1.urn_util.json.clean_parse(content);
+                const pack = uranio_lib_1.urn_util.json.clean_parse(content);
                 if (pack.name === 'uranio-monorepo') {
                     return true;
                 }
@@ -436,7 +436,7 @@ function _check_folder(folder_path) {
             const package_json_path = `${folder_path}/${file}`;
             try {
                 const content = fs_1.default.readFileSync(package_json_path, 'utf8');
-                const pack = urn_lib_1.urn_util.json.clean_parse(content);
+                const pack = uranio_lib_1.urn_util.json.clean_parse(content);
                 if (pack.name === 'urn-cli') {
                     return false;
                 }
@@ -466,7 +466,7 @@ function _return_version() {
         process.exit(1);
     }
     const data = util_instance.fs.read_file(process.mainModule.path + `/../package.json`);
-    const json_data = urn_lib_1.urn_util.json.clean_parse(data);
+    const json_data = uranio_lib_1.urn_util.json.clean_parse(data);
     const version = json_data.version;
     if (typeof version !== 'string' || version === '') {
         output_instance.error_log(`Invalid package.json version.`);

@@ -6,7 +6,7 @@
 
 import fs from 'fs';
 
-import {urn_util} from 'urn-lib';
+import {urn_util} from 'uranio-lib';
 
 import {Params} from '../types';
 

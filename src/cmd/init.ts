@@ -6,7 +6,7 @@
 
 import inquirer from 'inquirer';
 
-import {urn_util} from 'urn-lib';
+import {urn_util} from 'uranio-lib';
 
 import {defaults, default_params} from '../conf/defaults';
 

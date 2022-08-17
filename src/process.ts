@@ -8,7 +8,7 @@ import fs from 'fs';
 
 import path from 'path';
 
-import {urn_util} from 'urn-lib';
+import {urn_util} from 'uranio-lib';
 
 import {
 	Arguments,
