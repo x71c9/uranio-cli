@@ -14,7 +14,7 @@ import * as output from '../output/index';
 
 import * as util from '../util/index';
 
-import * as docker from './docker';
+// import * as docker from './docker';
 
 import {
 	Arguments,
@@ -22,7 +22,7 @@ import {
 	Repo,
 	// abstract_repos,
 	// abstract_pacman,
-	abstract_db,
+	// abstract_db,
 	valid_admin_repos,
 } from '../types';
 
@@ -69,13 +69,13 @@ export async function init(params:Partial<Params>)
 	_ignore_files();
 	_update_resolutions();
 	
-	if(init_params.docker === true){
+	// if(init_params.docker === false){
 		
-		await docker.build(init_params);
-		await docker.create(init_params);
-		await docker.network_create(init_params);
+		// await docker.build(init_params);
+		// await docker.create(init_params);
+		// await docker.network_create(init_params);
 		
-	}else{
+	// }else{
 		
 		await _init_pacman();
 		
@@ -84,16 +84,16 @@ export async function init(params:Partial<Params>)
 		
 		await _install_packages();
 		
-	}
+	// }
 	
-	if(init_params.docker_db === true){
-		if(init_params.docker === false){
-			await docker.network_create(init_params);
-		}
-		await docker.db_create(init_params);
-		await docker.db_start(init_params);
-		docker.update_env();
-	}
+	// if(init_params.docker_db === true){
+	// 	if(init_params.docker === false){
+	// 		await docker.network_create(init_params);
+	// 	}
+	// 	await docker.db_create(init_params);
+	// 	await docker.db_start(init_params);
+	// 	docker.update_env();
+	// }
 	
 	_remove_tmp();
 	
@@ -170,87 +170,89 @@ async function _ask_for_pacman(args:Arguments){
 			]).then(async (answers) => {
 				check_pacman(answers.pacman);
 				init_params.pacman = answers.pacman;
-				await _ask_for_docker(args);
-			});
-	}else{
-		await _ask_for_docker(args);
-	}
-}
-
-async function _ask_for_docker(args:Arguments){
-	const docker = args.k || args.docker;
-	if(!docker && init_params.force === false){
-		let confirm_msg = '';
-		confirm_msg += `? Do you want to compile and run inside a docker container?\n`;
-		const suffix = `? Docker need to be installed on your system.`;
-		inquirer.
-			prompt([
-				{
-					type: 'confirm',
-					name: 'docker',
-					message: confirm_msg,
-					suffix: suffix,
-					default: false
-				}
-			]).then(async (answers) => {
-				if(answers.docker === true){
-					init_params.docker = true;
-				}
-				await _ask_for_docker_db(args);
-			});
-	}else{
-		await _ask_for_docker_db(args);
-	}
-}
-
-async function _ask_for_docker_db(args:Arguments){
-	const docker_db = args.docker_db;
-	if(!docker_db && init_params.force === false){
-		let confirm_msg = '';
-		confirm_msg += `? Do you want to run the db in a docker container?\n`;
-		const suffix = `? Docker need to be installed on your system.`;
-		inquirer.
-			prompt([
-				{
-					type: 'confirm',
-					name: 'docker_db',
-					message: confirm_msg,
-					suffix: suffix,
-					default: false
-				}
-			]).then(async (answers) => {
-				if(answers.docker_db === true){
-					init_params.docker_db = true;
-					await _ask_for_db_type(args);
-				}else{
-					await _ask_for_repo(args);
-				}
-			});
-	}else{
-		await _ask_for_repo(args);
-	}
-}
-
-async function _ask_for_db_type(args:Arguments){
-	if(init_params.force === false){
-		let confirm_msg = '';
-		confirm_msg += `Select db:`;
-		inquirer.
-			prompt([
-				{
-					type: 'list',
-					name: 'db',
-					message: confirm_msg,
-					choices: Object.keys(abstract_db)
-				}
-			]).then(async (answers) => {
-				init_params.db = answers.db;
+				// await _ask_for_docker(args);
 				await _ask_for_repo(args);
 			});
 	}else{
+		// await _ask_for_docker(args);
 		await _ask_for_repo(args);
 	}
 }
+
+// async function _ask_for_docker(args:Arguments){
+// 	const docker = args.k || args.docker;
+// 	if(!docker && init_params.force === false){
+// 		let confirm_msg = '';
+// 		confirm_msg += `? Do you want to compile and run inside a docker container?\n`;
+// 		const suffix = `? Docker need to be installed on your system.`;
+// 		inquirer.
+// 			prompt([
+// 				{
+// 					type: 'confirm',
+// 					name: 'docker',
+// 					message: confirm_msg,
+// 					suffix: suffix,
+// 					default: false
+// 				}
+// 			]).then(async (answers) => {
+// 				if(answers.docker === true){
+// 					init_params.docker = true;
+// 				}
+// 				await _ask_for_docker_db(args);
+// 			});
+// 	}else{
+// 		await _ask_for_docker_db(args);
+// 	}
+// }
+
+// async function _ask_for_docker_db(args:Arguments){
+// 	const docker_db = args.docker_db;
+// 	if(!docker_db && init_params.force === false){
+// 		let confirm_msg = '';
+// 		confirm_msg += `? Do you want to run the db in a docker container?\n`;
+// 		const suffix = `? Docker need to be installed on your system.`;
+// 		inquirer.
+// 			prompt([
+// 				{
+// 					type: 'confirm',
+// 					name: 'docker_db',
+// 					message: confirm_msg,
+// 					suffix: suffix,
+// 					default: false
+// 				}
+// 			]).then(async (answers) => {
+// 				if(answers.docker_db === true){
+// 					init_params.docker_db = true;
+// 					await _ask_for_db_type(args);
+// 				}else{
+// 					await _ask_for_repo(args);
+// 				}
+// 			});
+// 	}else{
+// 		await _ask_for_repo(args);
+// 	}
+// }
+
+// async function _ask_for_db_type(args:Arguments){
+// 	if(init_params.force === false){
+// 		let confirm_msg = '';
+// 		confirm_msg += `Select db:`;
+// 		inquirer.
+// 			prompt([
+// 				{
+// 					type: 'list',
+// 					name: 'db',
+// 					message: confirm_msg,
+// 					choices: Object.keys(abstract_db)
+// 				}
+// 			]).then(async (answers) => {
+// 				init_params.db = answers.db;
+// 				await _ask_for_repo(args);
+// 			});
+// 	}else{
+// 		await _ask_for_repo(args);
+// 	}
+// }
 
 async function _ask_for_repo(args:Arguments){
 	const repo = args.r || args.repo;

@@ -18,6 +18,8 @@ import {transpose} from './transpose';
 
 import {generate} from './generate';
 
+import * as docker from './docker';
+
 import {pacman_exec} from '../util/cmd';
 
 let output_instance:output.OutputInstance;
@@ -95,6 +97,12 @@ export async function build_panel(params:Params, init=true)
 }
 
 async function _build(){
+	
+	if(build_params.docker === true){
+		
+		return await docker.build(build_params);
+		
+	}
 	
 	await transpose(build_params);
 	

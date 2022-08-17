@@ -4,6 +4,8 @@
  * @packageDocumentation
  */
 
+import * as cp from 'child_process';
+
 import {urn_util} from 'uranio-lib';
 
 import * as output from '../output/index';
@@ -39,19 +41,74 @@ export async function docker(params:Partial<Params>, args:Arguments)
 			break;
 		}
 		case 'create':{
-			await create(docker_params);
+			// await create(docker_params);
+			switch(args._[2]){
+				case 'start':{
+					await create_start(docker_params);
+					break;
+				}
+				case 'dev':{
+					await create_dev(docker_params);
+					break;
+				}
+				default:{
+					let warn_msg = ``;
+					warn_msg += `Invalid parameter. Run uranio docker create`;
+					warn_msg += ` with either \`start\` or \`dev\`.`;
+					output_instance.warn_log(warn_msg)
+					process.exit(1);
+				}
+			}
 			break;
 		}
 		case 'start':{
 			await start(docker_params);
 			break;
 		}
+		case 'dev':{
+			await dev(docker_params);
+			break;
+		}
 		case 'stop':{
-			await stop(docker_params);
+			// await stop(docker_params);
+			switch(args._[2]){
+				case 'start':{
+					await stop_start(docker_params);
+					break;
+				}
+				case 'dev':{
+					await stop_dev(docker_params);
+					break;
+				}
+				default:{
+					let warn_msg = ``;
+					warn_msg += `Invalid parameter. Run uranio docker stop`;
+					warn_msg += ` with either \`start\` or \`dev\`.`;
+					output_instance.warn_log(warn_msg)
+					process.exit(1);
+				}
+			}
 			break;
 		}
 		case 'remove':{
-			await remove(docker_params);
+			// await remove(docker_params);
+			switch(args._[2]){
+				case 'start':{
+					await remove_start(docker_params);
+					break;
+				}
+				case 'dev':{
+					await remove_dev(docker_params);
+					break;
+				}
+				default:{
+					let warn_msg = ``;
+					warn_msg += `Invalid parameter. Run uranio docker remove`;
+					warn_msg += ` with either \`start\` or \`dev\`.`;
+					output_instance.warn_log(warn_msg)
+					process.exit(1);
+				}
+			}
 			break;
 		}
 		case 'unbuild':{
@@ -62,7 +119,6 @@ export async function docker(params:Partial<Params>, args:Arguments)
 			await push(docker_params);
 			break;
 		}
-		
 		case 'db':{
 			// const db = args._[3] as DB;
 			// check_db(db);
@@ -92,7 +148,6 @@ export async function docker(params:Partial<Params>, args:Arguments)
 			}
 			break;
 		}
-		
 		case 'network':{
 			switch(args._[2]){
 				case 'create':{
@@ -112,12 +167,10 @@ export async function docker(params:Partial<Params>, args:Arguments)
 			}
 			break;
 		}
-		
 		case 'prune':{
 			await prune(docker_params);
 			break;
 		}
-		
 		case 'env':{
 			switch(args._[2]){
 				case 'update':{
@@ -133,7 +186,18 @@ export async function docker(params:Partial<Params>, args:Arguments)
 			}
 			break;
 		}
-		
+		case 'exists':{
+			if(typeof args._[2] !== 'string' || args._[2] === ''){
+				output_instance.error_log(`Invalid container name.`);
+				process.exit(1);
+			}
+			if(container_exists(args._[2])){
+				console.log(true);
+				process.exit(0);
+			}
+			console.log(false);
+			process.exit(0);
+		}
 		default:{
 			output_instance.error_log(`Invalid uranio docker command.`);
 			process.exit(1);
@@ -157,7 +221,7 @@ export async function build(params:Partial<Params>)
 	cmd += ` -f ${docker_folder}/Dockerfile`;
 	cmd += ` --build-arg repo=${docker_params.repo}`;
 	cmd += ` --build-arg project=${project_name}`;
-	cmd += ` --build-arg production=${docker_params.prod}`;
+	// cmd += ` --build-arg production=${docker_params.prod}`;
 	if(docker_params.docker_load === true){
 		cmd += ` --load`; // important for Github Action so that the image is kept locally
 	}
@@ -167,9 +231,9 @@ export async function build(params:Partial<Params>)
 		`Docker image built ${image_name}`
 	);
 	
-	if(docker_params.prod === false){
-		await _copy_compiled();
-	}
+	// if(docker_params.prod === false){
+	// await _copy_compiled();
+	// }
 	
 }
 
@@ -192,17 +256,76 @@ export async function push(params:Partial<Params>)
 	
 }
 
-export async function create(params:Partial<Params>, entrypoint?:string)
+// export async function create(params:Partial<Params>, entrypoint?:string)
+// 		:Promise<void>{
+	
+// 	_init_params(params);
+	
+// 	const container_name = `${_get_container_name_start()}`;
+// 	const image_name = _get_image_name();
+	
+// 	// const dotenv = util_instance.cmd.read_dotenv();
+// 	// const port_server = dotenv.URN_SERVICE_PORT;
+// 	// const port_client = dotenv.URN_CLIENT_PORT;
+	
+// 	const toml = util_instance.cmd.read_toml();
+// 	let port_server = 7777;
+// 	let port_panel = 5454;
+// 	if(typeof toml.service_port !== 'undefined'){
+// 		port_server = Number(toml.service_port);
+// 	}
+// 	if(typeof toml.client_panel_port !== 'undefined'){
+// 		port_panel = Number(toml.client_panel_port);
+// 	}
+// 	if(docker_params.prod === false){
+// 		if(typeof toml.dev_service_port !== 'undefined'){
+// 			port_server = Number(toml.dev_service_port);
+// 		}
+// 		if(typeof toml.client_dev_panel_port !== 'undefined'){
+// 			port_panel = Number(toml.client_dev_panel_port);
+// 		}
+// 	}
+// 	// const port_server = toml.service_port || port_server;
+// 	// const port_panel = toml.client_panel_port || port_panel;
+	
+// 	const network_name = _get_network_name();
+	
+// 	const toml_path = (docker_params.config[0] === '/') ?
+// 		docker_params.config : `$(pwd)/${docker_params.config}`;
+	
+// 	let cmd = '';
+// 	cmd += `docker create`;
+// 	cmd += ` --network ${network_name}`;
+// 	cmd += ` -p ${port_server}:${port_server}`;
+// 	cmd += ` -p ${port_panel}:${port_panel}`;
+// 	if(docker_params.prod === false){
+// 		cmd += ` -v $(pwd)/src/:/app/src/`;
+// 		cmd += ` -v $(pwd)/.env:/app/.env`;
+// 		cmd += ` -v ${toml_path}:/app/uranio.toml`;
+// 		cmd += ` -v $(pwd)/package.json:/app/package.json`;
+// 		cmd += ` -v $(pwd)/node_modules/:/app/node_modules/`;
+// 		cmd += ` -v $(pwd)/.uranio/uranio-schema:/app/.uranio/uranio-schema`;
+// 		cmd += ` -v $(pwd)/cert/:/app/cert/`;
+// 	}
+// 	cmd += ` --name ${container_name}`;
+// 	if(typeof entrypoint === 'string'){
+// 		cmd += ` --entrypoint="${entrypoint}"`;
+// 	}
+// 	cmd += ` ${image_name}`;
+// 	await util_instance.spawn.spin_and_native_promise(cmd, 'creating', 'trace', defaults.prefix_docker);
+	
+// 	output_instance.done_log(
+// 		`Docker container created ${container_name}`
+// 	);
+// }
+
+async function create_dev(params:Partial<Params>)
 		:Promise<void>{
 	
 	_init_params(params);
 	
-	const container_name = `${_get_container_name()}`;
+	const container_name = _get_container_name_dev();
 	const image_name = _get_image_name();
-	
-	// const dotenv = util_instance.cmd.read_dotenv();
-	// const port_server = dotenv.URN_SERVICE_PORT;
-	// const port_client = dotenv.URN_CLIENT_PORT;
 	
 	const toml = util_instance.cmd.read_toml();
 	let port_server = 7777;
@@ -221,33 +344,85 @@ export async function create(params:Partial<Params>, entrypoint?:string)
 			port_panel = Number(toml.client_dev_panel_port);
 		}
 	}
-	// const port_server = toml.service_port || port_server;
-	// const port_panel = toml.client_panel_port || port_panel;
 	
-	const network_name = _get_network_name();
+	// const network_name = _get_network_name();
 	
 	const toml_path = (docker_params.config[0] === '/') ?
 		docker_params.config : `$(pwd)/${docker_params.config}`;
 	
+	let uranio_cmd = `uranio dev -u --prefix_loglevel`;
+	if(docker_params.prod === true){
+		uranio_cmd += ` --prod`;
+	}
+	
 	let cmd = '';
 	cmd += `docker create`;
-	cmd += ` --network ${network_name}`;
+	// cmd += ` --network ${network_name}`;
 	cmd += ` -p ${port_server}:${port_server}`;
 	cmd += ` -p ${port_panel}:${port_panel}`;
-	if(docker_params.prod === false){
-		cmd += ` -v $(pwd)/src/:/app/src/`;
-		cmd += ` -v $(pwd)/.env:/app/.env`;
-		cmd += ` -v ${toml_path}:/app/uranio.toml`;
-		cmd += ` -v $(pwd)/package.json:/app/package.json`;
-		cmd += ` -v $(pwd)/node_modules/:/app/node_modules/`;
-		cmd += ` -v $(pwd)/.uranio/uranio-schema:/app/.uranio/uranio-schema`;
-		cmd += ` -v $(pwd)/cert/:/app/cert/`;
-	}
+	cmd += ` -v $(pwd)/src/:/app/src/`;
+	cmd += ` -v $(pwd)/.env:/app/.env`;
+	cmd += ` -v ${toml_path}:/app/uranio.toml`;
+	cmd += ` -v $(pwd)/package.json:/app/package.json`;
+	cmd += ` -v $(pwd)/node_modules/:/app/node_modules/`;
+	cmd += ` -v $(pwd)/.uranio/uranio-schema:/app/.uranio/uranio-schema`;
+	cmd += ` -v $(pwd)/cert/:/app/cert/`;
 	cmd += ` --name ${container_name}`;
-	if(typeof entrypoint === 'string'){
-		cmd += ` --entrypoint="${entrypoint}"`;
-	}
 	cmd += ` ${image_name}`;
+	cmd += ` ${uranio_cmd}`;
+	
+	await util_instance.spawn.spin_and_native_promise(cmd, 'creating', 'trace', defaults.prefix_docker);
+	
+	output_instance.done_log(
+		`Docker DEV container created ${container_name}`
+	);
+}
+
+async function create_start(params:Partial<Params>)
+		:Promise<void>{
+	
+	_init_params(params);
+	
+	const container_name = _get_container_name_start();
+	const image_name = _get_image_name();
+	
+	const toml = util_instance.cmd.read_toml();
+	let port_server = 7777;
+	let port_panel = 5454;
+	if(typeof toml.service_port !== 'undefined'){
+		port_server = Number(toml.service_port);
+	}
+	if(typeof toml.client_panel_port !== 'undefined'){
+		port_panel = Number(toml.client_panel_port);
+	}
+	if(docker_params.prod === false){
+		if(typeof toml.dev_service_port !== 'undefined'){
+			port_server = Number(toml.dev_service_port);
+		}
+		if(typeof toml.client_dev_panel_port !== 'undefined'){
+			port_panel = Number(toml.client_dev_panel_port);
+		}
+	}
+	
+	// const network_name = _get_network_name();
+	
+	// const toml_path = (docker_params.config[0] === '/') ?
+	// 	docker_params.config : `$(pwd)/${docker_params.config}`;
+	
+	let uranio_cmd = `uranio start -u --prefix_loglevel`;
+	if(docker_params.prod === true){
+		uranio_cmd += ` --prod`;
+	}
+	
+	let cmd = '';
+	cmd += `docker create`;
+	// cmd += ` --network ${network_name}`;
+	cmd += ` -p ${port_server}:${port_server}`;
+	cmd += ` -p ${port_panel}:${port_panel}`;
+	cmd += ` --name ${container_name}`;
+	cmd += ` ${image_name}`;
+	cmd += ` ${uranio_cmd}`;
+	
 	await util_instance.spawn.spin_and_native_promise(cmd, 'creating', 'trace', defaults.prefix_docker);
 	
 	output_instance.done_log(
@@ -259,12 +434,35 @@ export async function start(params:Partial<Params>):Promise<void>{
 	
 	_init_params(params);
 	
-	const container_name = _get_container_name();
+	if(_start_container_exists() === false){
+		await create_start(docker_params);
+	}
+	
+	const container_name = _get_container_name_start();
 	let cmd = '';
 	cmd += `docker start -i ${container_name}`;
-	await util_instance.spawn.spin_and_native_promise(cmd, 'starting', '', defaults.prefix_docker);
+	await util_instance.spawn.spin_and_native_promise(cmd, 'starting container', '', defaults.prefix_docker);
 	output_instance.done_log(
-		`Docker image started ${container_name}`
+		`Docker container started ${container_name}`
+	);
+}
+
+export async function dev(params:Partial<Params>):Promise<void>{
+	
+	await _copy_compiled();
+
+	if(_dev_container_exists() === false){
+		await create_dev(docker_params);
+	}
+	
+	_init_params(params);
+	
+	const container_name = _get_container_name_dev();
+	let cmd = '';
+	cmd += `docker start -i ${container_name}`;
+	await util_instance.spawn.spin_and_native_promise(cmd, 'starting dev container', '', defaults.prefix_docker);
+	output_instance.done_log(
+		`Docker DEV container started ${container_name}`
 	);
 }
 
@@ -272,7 +470,7 @@ export async function start_server(params:Partial<Params>):Promise<void>{
 	console.log(`Start server`, params);
 	// _init_params(params);
 	
-	// const container_name = _get_container_name();
+	// const container_name = _get_container_name_start();
 	// let cmd = '';
 	// cmd += `docker start -i ${container_name}`;
 	// await _execute_log(cmd, 'docker', 'starting');
@@ -285,7 +483,7 @@ export async function start_panel(params:Partial<Params>):Promise<void>{
 	console.log(`Start panel`, params);
 	// _init_params(params);
 	
-	// const container_name = _get_container_name();
+	// const container_name = _get_container_name_start();
 	// let cmd = '';
 	// cmd += `docker start -i ${container_name}`;
 	// await _execute_log(cmd, 'docker', 'starting');
@@ -294,10 +492,13 @@ export async function start_panel(params:Partial<Params>):Promise<void>{
 	// );
 }
 
-export async function stop(params:Partial<Params>, continue_on_fail=false)
+export async function stop_start(params:Partial<Params>, continue_on_fail=false)
 		:Promise<void>{
 	_init_params(params);
-	const container_name = _get_container_name();
+	if(_start_container_exists() === false){
+		return;
+	}
+	const container_name = _get_container_name_start();
 	let cmd = '';
 	cmd += `docker stop ${container_name}`;
 	if(continue_on_fail){
@@ -309,16 +510,55 @@ export async function stop(params:Partial<Params>, continue_on_fail=false)
 	);
 }
 
-export async function remove(params:Partial<Params>, continue_on_fail=false)
+export async function stop_dev(params:Partial<Params>, continue_on_fail=false)
 		:Promise<void>{
 	_init_params(params);
-	const container_name = _get_container_name();
+	if(_dev_container_exists() === false){
+		return;
+	}
+	const container_name = _get_container_name_dev();
+	let cmd = '';
+	cmd += `docker stop ${container_name}`;
+	if(continue_on_fail){
+		cmd += ` || true`;
+	}
+	await util_instance.spawn.spin_and_native_promise(cmd, 'stopping', 'trace', defaults.prefix_docker);
+	output_instance.done_log(
+		`Docker container stopped ${container_name}`
+	);
+}
+
+export async function remove_start(params:Partial<Params>, continue_on_fail=false)
+		:Promise<void>{
+	_init_params(params);
+	if(_start_container_exists() === false){
+		return;
+	}
+	const container_name = _get_container_name_start();
 	let cmd = '';
 	cmd += `docker rm ${container_name}`;
 	if(continue_on_fail){
 		cmd += ` || true`;
 	}
-	await util_instance.spawn.spin_and_native_promise(cmd, 'creating', 'trace', defaults.prefix_docker);
+	await util_instance.spawn.spin_and_native_promise(cmd, 'removing', 'trace', defaults.prefix_docker);
+	output_instance.done_log(
+		`Docker container removed ${container_name}`
+	);
+}
+
+export async function remove_dev(params:Partial<Params>, continue_on_fail=false)
+		:Promise<void>{
+	_init_params(params);
+	if(_dev_container_exists() === false){
+		return;
+	}
+	const container_name = _get_container_name_dev();
+	let cmd = '';
+	cmd += `docker rm ${container_name}`;
+	if(continue_on_fail){
+		cmd += ` || true`;
+	}
+	await util_instance.spawn.spin_and_native_promise(cmd, 'removing', 'trace', defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker container removed ${container_name}`
 	);
@@ -327,6 +567,9 @@ export async function remove(params:Partial<Params>, continue_on_fail=false)
 export async function unbuild(params:Partial<Params>, continue_on_fail=false)
 		:Promise<void>{
 	_init_params(params);
+	if(_uranio_image_exists() === false){
+		return;
+	}
 	const image_name = _get_image_name();
 	let cmd = '';
 	cmd += `docker image rm`;
@@ -344,7 +587,7 @@ export async function db_create(params:Partial<Params>)
 		:Promise<void>{
 	_init_params(params);
 	const project_name = _get_project_name();
-	const db_container_name = _get_db_container_name();
+	const db_container_name = _get_container_name_db();
 	const port = 27017;
 	const network_name = _get_network_name();
 	let cmd = '';
@@ -362,7 +605,7 @@ export async function db_create(params:Partial<Params>)
 export async function db_start(params:Partial<Params>)
 		:Promise<void>{
 	_init_params(params);
-	const db_container_name = _get_db_container_name();
+	const db_container_name = _get_container_name_db();
 	let cmd = '';
 	cmd += `docker start ${db_container_name}`;
 	await util_instance.spawn.spin_and_native_promise(cmd, `starting db ${docker_params.db}`, 'trace', defaults.prefix_docker);
@@ -374,7 +617,10 @@ export async function db_start(params:Partial<Params>)
 export async function db_stop(params:Partial<Params>, continue_on_fail=false)
 		:Promise<void>{
 	_init_params(params);
-	const db_container_name = _get_db_container_name();
+	if(_db_container_exists() === false){
+		return;
+	}
+	const db_container_name = _get_container_name_db();
 	let cmd = '';
 	cmd += `docker stop ${db_container_name}`;
 	if(continue_on_fail){
@@ -389,7 +635,10 @@ export async function db_stop(params:Partial<Params>, continue_on_fail=false)
 export async function db_remove(params:Partial<Params>, continue_on_fail=false)
 		:Promise<void>{
 	_init_params(params);
-	const db_container_name = _get_db_container_name();
+	if(_db_container_exists() === false){
+		return;
+	}
+	const db_container_name = _get_container_name_db();
 	let cmd = '';
 	cmd += `docker rm ${db_container_name}`;
 	if(continue_on_fail){
@@ -401,21 +650,21 @@ export async function db_remove(params:Partial<Params>, continue_on_fail=false)
 	);
 }
 
-export async function tmp_remove(params:Partial<Params>, continue_on_fail=false)
+export async function remove_tmp(params:Partial<Params>, continue_on_fail=false)
 		:Promise<void>{
-	
 	_init_params(params);
-	
-	const container_name = _get_container_name();
-	
+	if(_tmp_container_exists() === false){
+		return;
+	}
+	const container_name = _get_container_name_tmp();
 	let cmd_rm = '';
 	cmd_rm += `docker rm tmp_${container_name}`;
 	if(continue_on_fail){
 		cmd_rm += ` || true`;
 	}
-	await util_instance.spawn.spin_and_native_promise(cmd_rm, `removing tmp container tmp_${container_name}`, 'trace', defaults.prefix_docker);
+	await util_instance.spawn.spin_and_native_promise(cmd_rm, `removing tmp container ${container_name}`, 'trace', defaults.prefix_docker);
 	output_instance.done_log(
-		`Docker removed tmp container tmp_${container_name}`
+		`Docker removed tmp container ${container_name}`
 	);
 }
 
@@ -435,6 +684,9 @@ export async function network_create(params:Partial<Params>, continue_on_fail=fa
 
 export async function network_remove(params:Partial<Params>, continue_on_fail=false):Promise<void>{
 	_init_params(params);
+	if(_uranio_network_exists() === false){
+		return;
+	}
 	const network_name = _get_network_name();
 	let cmd_rm = '';
 	cmd_rm += `docker network remove ${network_name}`;
@@ -464,22 +716,75 @@ export async function prune(params:Partial<Params>, continue_on_fail=false)
 
 async function _copy_compiled(){
 	const image_name = _get_image_name();
-	const container_name = _get_container_name();
+	const container_name = _get_container_name_tmp();
 	let cmd_create = '';
-	cmd_create += `docker create --name tmp_${container_name} ${image_name}`;
-	await util_instance.spawn.spin_and_native_promise(cmd_create, `creating tmp container tmp_${container_name}`, 'trace', defaults.prefix_docker);
+	cmd_create += `docker create --name ${container_name} ${image_name}`;
+	await util_instance.spawn.spin_and_native_promise(cmd_create, `creating tmp container ${container_name}`, 'trace', defaults.prefix_docker);
 	let cmd_cp_node = '';
 	cmd_cp_node += `docker cp tmp_${container_name}:/app/node_modules node_modules`;
-	await util_instance.spawn.spin_and_native_promise(cmd_cp_node, `copying node_modules from tmp container tmp_${container_name}`, 'trace', defaults.prefix_docker);
+	await util_instance.spawn.spin_and_native_promise(cmd_cp_node, `copying node_modules from tmp container ${container_name}`, 'trace', defaults.prefix_docker);
 	// let cmd_cp_uranio = '';
 	// cmd_cp_uranio += `docker cp tmp_${container_name}:/app/.uranio/. .uranio/`;
 	// await util_instance.spawn.spin_and_native_promise(cmd_cp_uranio, 'docker', `copying .uranio from tmp container tmp_${container_name}`);
 	let cmd_remove = '';
-	cmd_remove += `docker rm tmp_${container_name}`;
-	await util_instance.spawn.spin_and_native_promise(cmd_remove, `removing tmp container tmp_${container_name}`, 'trace', defaults.prefix_docker);
+	cmd_remove += `docker rm ${container_name}`;
+	await util_instance.spawn.spin_and_native_promise(cmd_remove, `removing tmp container ${container_name}`, 'trace', defaults.prefix_docker);
 	output_instance.done_log(
-		`Docker copied files from tmp container tmp_${container_name}`
+		`Docker copied files from tmp container ${container_name}`
 	);
+}
+
+function _start_container_exists():boolean{
+	return container_exists(_get_container_name_start());
+}
+
+function _dev_container_exists():boolean{
+	return container_exists(_get_container_name_dev());
+}
+
+function _tmp_container_exists():boolean{
+	return container_exists(_get_container_name_tmp());
+}
+
+function _db_container_exists():boolean{
+	return container_exists(_get_container_name_db());
+}
+
+function _uranio_image_exists():boolean{
+	return image_exists(_get_image_name());
+}
+
+function _uranio_network_exists():boolean{
+	return network_exists(_get_network_name());
+}
+
+export function container_exists(container_name:string):boolean{
+	try{
+		const cmd = `docker ps -a | grep ${container_name}`;
+		output_instance.trace_log(cmd)
+		cp.execSync(cmd);
+		return true;
+	}catch(err){
+		return false;
+	}
+}
+
+export function image_exists(image_name:string):boolean{
+	try{
+		cp.execSync(`docker image ls -a | grep ${image_name}`);
+		return true;
+	}catch(err){
+		return false;
+	}
+}
+
+export function network_exists(network_name:string):boolean{
+	try{
+		cp.execSync(`docker image ls -a | grep ${network_name}`);
+		return true;
+	}catch(err){
+		return false;
+	}
 }
 
 function _get_project_name(){
@@ -493,9 +798,19 @@ function _get_image_name(){
 	const image_name = `${project_name}_uranio_img`;
 	return image_name;
 }
-function _get_container_name(){
+function _get_container_name_start(){
 	const project_name = _get_project_name();
-	const container_name = `${project_name}_uranio_con`;
+	const container_name = `${project_name}_uranio_con_start`;
+	return container_name;
+}
+function _get_container_name_dev(){
+	const project_name = _get_project_name();
+	const container_name = `${project_name}_uranio_con_dev`;
+	return container_name;
+}
+function _get_container_name_tmp(){
+	const project_name = _get_project_name();
+	const container_name = `${project_name}_uranio_con_tmp`;
 	return container_name;
 }
 function _get_network_name(){
@@ -503,7 +818,7 @@ function _get_network_name(){
 	const network_name = `${project_name}_uranio_net`;
 	return network_name;
 }
-function _get_db_container_name(){
+function _get_container_name_db(){
 	const project_name = _get_project_name();
 	const db_container_name = `${project_name}_uranio_db`;
 	return db_container_name;
@@ -627,11 +942,11 @@ export function update_env(params?:Partial<Params>):void{
 	
 	const new_dot_env:DotEnv = {};
 	new_dot_env['URN_MONGO_MAIN_CONNECTION'] =
-		`mongodb://${_get_db_container_name()}.${_get_network_name()}:27017`;
+		`mongodb://${_get_container_name_db()}.${_get_network_name()}:27017`;
 	new_dot_env['URN_MONGO_TRASH_CONNECTION'] =
-		`mongodb://${_get_db_container_name()}.${_get_network_name()}:27017`;
+		`mongodb://${_get_container_name_db()}.${_get_network_name()}:27017`;
 	new_dot_env['URN_MONGO_LOG_CONNECTION'] =
-		`mongodb://${_get_db_container_name()}.${_get_network_name()}:27017`;
+		`mongodb://${_get_container_name_db()}.${_get_network_name()}:27017`;
 	
 	const content = util_instance.fs.read_file(dotenv_path);
 	const lines = content.split('\n');

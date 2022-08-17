@@ -42,7 +42,7 @@ export async function deinit(params:Partial<Params>)
 	if(!util_instance.is_initialized()){
 		return;
 	}
-	
+
 	await _reset_package_json();
 	await _remove_dockers();
 	_delete_files();
@@ -57,12 +57,15 @@ async function _remove_dockers()
 		output_instance.warn_log(`Some build artifacts might be still present.`);
 		return;
 	}
-	await docker.tmp_remove(deinit_params, true);
+	
+	await docker.remove_tmp(deinit_params, true);
 	await docker.db_stop(deinit_params, true);
 	await docker.db_remove(deinit_params, true);
 	await docker.network_remove(deinit_params, true);
-	await docker.stop(deinit_params, true);
-	await docker.remove(deinit_params, true);
+	await docker.stop_start(deinit_params, true);
+	await docker.stop_dev(deinit_params, true);
+	await docker.remove_start(deinit_params, true);
+	await docker.remove_dev(deinit_params, true);
 	await docker.unbuild(deinit_params, true);
 	await docker.prune(deinit_params, true);
 }

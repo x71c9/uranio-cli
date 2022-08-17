@@ -33,7 +33,7 @@ const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
 const defaults_1 = require("../conf/defaults");
 const common_1 = require("./common");
-const docker = __importStar(require("./docker"));
+// import * as docker from './docker';
 const build_1 = require("./build");
 const types_1 = require("../types");
 const cmd_1 = require("../util/cmd");
@@ -43,16 +43,15 @@ let start_params = defaults_1.default_params;
 async function start(params) {
     _init_params(params);
     output_instance.start_loading(`Starting...`);
-    if (params.docker === true) {
-        await docker.start(start_params);
+    // if(params.docker === true){
+    // 	await docker.start(start_params);
+    // }else{
+    await _init_start();
+    start_server(start_params, false);
+    if ((0, types_1.valid_admin_repos)().includes(start_params.repo)) {
+        start_panel(start_params, false);
     }
-    else {
-        await _init_start();
-        start_server(start_params, false);
-        if ((0, types_1.valid_admin_repos)().includes(start_params.repo)) {
-            start_panel(start_params, false);
-        }
-    }
+    // }
 }
 exports.start = start;
 async function start_server(params, init = true) {
@@ -60,21 +59,20 @@ async function start_server(params, init = true) {
         _init_params(params);
     }
     output_instance.start_loading(`Starting server...`);
-    if (params.docker === true) {
-        await docker.start_server(start_params);
+    // if(params.docker === true){
+    // 	await docker.start_server(start_params);
+    // }else{
+    if (init) {
+        await _init_start();
     }
-    else {
-        if (init) {
-            await _init_start();
-        }
-        const exec = cmd_1.pacman_exec[start_params.pacman];
-        // const urn_lib_pre = ` urn_log_prefix_type=true`;
-        const urn_lib_pre = ` --prefix_loglevel`;
-        const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
-        const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
-        const cmd_server = `${node_env}${exec} uranio-webservice-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
-        util_instance.spawn.native(cmd_server, 'starting server', '', defaults_1.defaults.prefix_srv);
-    }
+    const exec = cmd_1.pacman_exec[start_params.pacman];
+    // const urn_lib_pre = ` urn_log_prefix_type=true`;
+    const urn_lib_pre = ` --prefix_loglevel`;
+    const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
+    const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
+    const cmd_server = `${node_env}${exec} uranio-webservice-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
+    util_instance.spawn.native(cmd_server, 'starting server', '', defaults_1.defaults.prefix_srv);
+    // }
 }
 exports.start_server = start_server;
 async function start_panel(params, init = true) {
@@ -82,25 +80,24 @@ async function start_panel(params, init = true) {
         _init_params(params);
     }
     output_instance.start_loading(`Starting panel...`);
-    if (params.docker === true) {
-        await docker.start_panel(start_params);
+    // if(params.docker === true){
+    // 	await docker.start_panel(start_params);
+    // }else{
+    if (init) {
+        await _init_start();
     }
-    else {
-        if (init) {
-            await _init_start();
-        }
-        const exec = cmd_1.pacman_exec[start_params.pacman];
-        const urn_lib_pre = ` --prefix_loglevel`;
-        const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
-        const cmd_server = `${node_env}${exec} uranio-panel-${start_params.repo} start${urn_lib_pre}`;
-        util_instance.spawn.native(cmd_server, 'starting panel', 'trace', defaults_1.defaults.prefix_pnl);
-    }
+    const exec = cmd_1.pacman_exec[start_params.pacman];
+    const urn_lib_pre = ` --prefix_loglevel`;
+    const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
+    const cmd_server = `${node_env}${exec} uranio-panel-${start_params.repo} start${urn_lib_pre}`;
+    util_instance.spawn.native(cmd_server, 'starting panel', 'trace', defaults_1.defaults.prefix_pnl);
+    // }
 }
 exports.start_panel = start_panel;
 async function _init_start() {
-    if (start_params.build === true) {
-        await (0, build_1.build_server)(start_params, true, false);
-    }
+    // if(start_params.build === true){
+    await (0, build_1.build_server)(start_params, true, false);
+    // }
 }
 function _init_params(params) {
     params.spin = false;

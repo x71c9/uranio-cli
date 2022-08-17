@@ -36,6 +36,7 @@ const types_1 = require("../types");
 const common_1 = require("./common");
 const transpose_1 = require("./transpose");
 const generate_1 = require("./generate");
+const docker = __importStar(require("./docker"));
 const cmd_1 = require("../util/cmd");
 let output_instance;
 let util_instance;
@@ -85,6 +86,9 @@ async function build_panel(params, init = true) {
 }
 exports.build_panel = build_panel;
 async function _build() {
+    if (build_params.docker === true) {
+        return await docker.build(build_params);
+    }
     await (0, transpose_1.transpose)(build_params);
     await (0, generate_1.generate)(build_params);
 }

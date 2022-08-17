@@ -228,7 +228,7 @@ function _set_args(params, args) {
     if (typeof args.nodocker_db === 'boolean' && !!args.nodocker_db !== !params.docker_db) {
         params.docker_db = !args.nodocker_db;
     }
-    const build = args.a || args.build;
+    const build = args.b || args.build;
     if (build == true || build == 'true') {
         params.build = true;
     }
@@ -269,7 +269,7 @@ function _set_args(params, args) {
     if (typeof prefix === 'string' && prefix !== '') {
         params.prefix = prefix;
     }
-    const branch = args.b || args.branch;
+    const branch = args.a || args.branch;
     if (typeof branch === 'string' && branch !== '') {
         params.branch = branch;
     }

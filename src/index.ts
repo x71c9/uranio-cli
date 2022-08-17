@@ -4,6 +4,7 @@ import {
 	start,
 	generate,
 	transpose,
+	docker
 } from './cmd/index';
 
 export default {
@@ -12,4 +13,6 @@ export default {
 	start,
 	generate,
 	transpose,
+	docker,
 };
+

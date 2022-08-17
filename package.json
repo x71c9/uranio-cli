@@ -9,7 +9,7 @@
 		"build": "yarn tsc -b",
 		"plain:sh": "node -r source-map-support/register ./dist/sh.js ",
 		"dev:init": "yarn tsc-watch --onSuccess \"yarn plain:sh init -ftuw -r api -x [CL] --branch master --nospinner\"",
-		"dev:docker:build:nospin": "yarn tsc-watch --onSuccess \"yarn plain:sh docker build -ftuw -r api -e [D] --branch master --nospin\"",
+		"dev:docker": "yarn tsc-watch --onSuccess \"yarn plain:sh docker build -ftuw -r api -e [D] --branch master --nospin\"",
 		"dev:docker:build": "yarn tsc-watch --onSuccess \"yarn plain:sh docker build -ftuw -r api -e [D] --branch master\"",
 		"dev:build": "yarn tsc-watch --onSuccess \"yarn plain:sh build -ut -r api -e [CL] --branch master\"",
 		"dev:build:w": "yarn tsc-watch --onSuccess \"yarn plain:sh build -uwt -r api --branch master\"",

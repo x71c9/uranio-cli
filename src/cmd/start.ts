@@ -14,7 +14,7 @@ import {Params} from '../types';
 
 import {merge_params} from './common';
 
-import * as docker from './docker';
+// import * as docker from './docker';
 
 import {build_server} from './build';
 
@@ -35,21 +35,21 @@ export async function start(params:Partial<Params>)
 	
 	output_instance.start_loading(`Starting...`);
 	
-	if(params.docker === true){
+	// if(params.docker === true){
 		
-		await docker.start(start_params);
+	// 	await docker.start(start_params);
 		
-	}else{
+	// }else{
 		
-		await _init_start();
-		
-		start_server(start_params, false);
-		
-		if(valid_admin_repos().includes(start_params.repo)){
-			start_panel(start_params, false);
-		}
-		
+	await _init_start();
+	
+	start_server(start_params, false);
+	
+	if(valid_admin_repos().includes(start_params.repo)){
+		start_panel(start_params, false);
 	}
+		
+	// }
 	
 }
 
@@ -62,26 +62,26 @@ export async function start_server(params:Partial<Params>, init=true)
 	
 	output_instance.start_loading(`Starting server...`);
 	
-	if(params.docker === true){
+	// if(params.docker === true){
 		
-		await docker.start_server(start_params);
+	// 	await docker.start_server(start_params);
 		
-	}else{
+	// }else{
 		
-		if(init){
-			await _init_start();
-		}
-		
-		const exec = pacman_exec[start_params.pacman];
-		
-		// const urn_lib_pre = ` urn_log_prefix_type=true`;
-		const urn_lib_pre = ` --prefix_loglevel`;
-		const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
-		const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
-		const cmd_server = `${node_env}${exec} uranio-webservice-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
-		util_instance.spawn.native(cmd_server, 'starting server', '', defaults.prefix_srv);
-		
+	if(init){
+		await _init_start();
 	}
+	
+	const exec = pacman_exec[start_params.pacman];
+	
+	// const urn_lib_pre = ` urn_log_prefix_type=true`;
+	const urn_lib_pre = ` --prefix_loglevel`;
+	const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
+	const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
+	const cmd_server = `${node_env}${exec} uranio-webservice-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
+	util_instance.spawn.native(cmd_server, 'starting server', '', defaults.prefix_srv);
+		
+	// }
 	
 }
 
@@ -94,32 +94,32 @@ export async function start_panel(params:Partial<Params>, init=true)
 	
 	output_instance.start_loading(`Starting panel...`);
 	
-	if(params.docker === true){
+	// if(params.docker === true){
 		
-		await docker.start_panel(start_params);
+	// 	await docker.start_panel(start_params);
 		
-	}else{
+	// }else{
 		
-		if(init){
-			await _init_start();
-		}
-		
-		const exec = pacman_exec[start_params.pacman];
-		
-		const urn_lib_pre = ` --prefix_loglevel`;
-		const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
-		const cmd_server = `${node_env}${exec} uranio-panel-${start_params.repo} start${urn_lib_pre}`;
-		util_instance.spawn.native(cmd_server, 'starting panel', 'trace', defaults.prefix_pnl);
-		
+	if(init){
+		await _init_start();
 	}
+	
+	const exec = pacman_exec[start_params.pacman];
+	
+	const urn_lib_pre = ` --prefix_loglevel`;
+	const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
+	const cmd_server = `${node_env}${exec} uranio-panel-${start_params.repo} start${urn_lib_pre}`;
+	util_instance.spawn.native(cmd_server, 'starting panel', 'trace', defaults.prefix_pnl);
+	
+	// }
 	
 }
 
 async function _init_start(){
 	
-	if(start_params.build === true){
-		await build_server(start_params, true, false);
-	}
+	// if(start_params.build === true){
+	await build_server(start_params, true, false);
+	// }
 	
 }
 
