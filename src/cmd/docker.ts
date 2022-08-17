@@ -434,7 +434,13 @@ export async function start(params:Partial<Params>):Promise<void>{
 	
 	_init_params(params);
 	
+	if(_uranio_image_exists() === false){
+		output_instance.info_log(`First time running. Building uranio image...`);
+		await build(docker_params);
+	}
+	
 	if(_start_container_exists() === false){
+		output_instance.info_log(`First time running. Building uranio container...`);
 		await create_start(docker_params);
 	}
 	
