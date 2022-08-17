@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import {urn_util} from 'urn-lib';
+import {urn_util} from 'uranio-lib';
 
 import * as output from '../output/index';
 

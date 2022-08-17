@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.adm_package_scripts = exports.package_scripts = exports.check_if_is_dot = exports.check_loglevel = exports.check_db = exports.check_deploy = exports.check_pacman = exports.check_repo = exports.merge_init_params = exports.merge_params = exports.read_init_file = void 0;
 const fs_1 = __importDefault(require("fs"));
-const urn_lib_1 = require("urn-lib");
+const uranio_lib_1 = require("uranio-lib");
 const defaults_1 = require("../conf/defaults");
 const types_1 = require("../types");
 function read_init_file(params) {
@@ -21,7 +21,7 @@ function read_init_file(params) {
     try {
         const cloned_params = { ...params };
         const rc_content = fs_1.default.readFileSync(rcfile_path, 'utf8');
-        const rc_obj = urn_lib_1.urn_util.json.clean_parse(rc_content);
+        const rc_obj = uranio_lib_1.urn_util.json.clean_parse(rc_content);
         cloned_params.repo = rc_obj.repo;
         cloned_params.pacman = rc_obj.pacman;
         // cloned_params.deploy = rc_obj.deploy;
@@ -51,19 +51,19 @@ function _merge_params(params, is_init = false) {
         merged_params = read_init_file(params);
     }
     for (const k in defaults_1.default_params) {
-        if (urn_lib_1.urn_util.object.has_key(params, k)) {
+        if (uranio_lib_1.urn_util.object.has_key(params, k)) {
             merged_params[k] = params[k];
         }
     }
     for (const l in params) {
-        if (!urn_lib_1.urn_util.object.has_key(merge_params, l)) {
+        if (!uranio_lib_1.urn_util.object.has_key(merge_params, l)) {
             merged_params[l] = params[l];
         }
     }
     return merged_params;
 }
 function check_repo(repo) {
-    if (!urn_lib_1.urn_util.object.has_key(types_1.abstract_repos, repo)) {
+    if (!uranio_lib_1.urn_util.object.has_key(types_1.abstract_repos, repo)) {
         const valid_repos_str = (0, types_1.valid_repos)().join(', ');
         let end_log = '';
         end_log += `Wrong repo. `;
@@ -74,7 +74,7 @@ function check_repo(repo) {
 }
 exports.check_repo = check_repo;
 function check_pacman(pacman) {
-    if (!urn_lib_1.urn_util.object.has_key(types_1.abstract_pacman, pacman)) {
+    if (!uranio_lib_1.urn_util.object.has_key(types_1.abstract_pacman, pacman)) {
         const valid_pacman_str = (0, types_1.valid_pacman)().join(', ');
         let end_log = '';
         end_log += `Wrong package manager. `;
@@ -97,7 +97,7 @@ function check_deploy(deploy) {
 }
 exports.check_deploy = check_deploy;
 function check_db(db) {
-    if (!urn_lib_1.urn_util.object.has_key(types_1.abstract_db, db)) {
+    if (!uranio_lib_1.urn_util.object.has_key(types_1.abstract_db, db)) {
         const valid_db_str = (0, types_1.valid_db)().join(', ');
         let end_log = '';
         end_log += `Wrong db value. `;
@@ -108,7 +108,7 @@ function check_db(db) {
 }
 exports.check_db = check_db;
 function check_loglevel(level) {
-    if (!urn_lib_1.urn_util.object.has_key(types_1.abstract_loglevel, level)) {
+    if (!uranio_lib_1.urn_util.object.has_key(types_1.abstract_loglevel, level)) {
         const valid_ll_str = (0, types_1.valid_loglevel)().join(', ');
         let end_log = '';
         end_log += `Wrong log_level value. `;
@@ -128,7 +128,7 @@ function check_if_is_dot(path) {
             const package_json_path = `${path}/${file}`;
             try {
                 const content = fs_1.default.readFileSync(package_json_path, 'utf8');
-                const pack = urn_lib_1.urn_util.json.clean_parse(content);
+                const pack = uranio_lib_1.urn_util.json.clean_parse(content);
                 if (pack.name === 'urn-dot' || pack.name === 'uranio-dot') {
                     return true;
                 }

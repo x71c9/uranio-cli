@@ -29,7 +29,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.update_env = exports.prune = exports.network_remove = exports.network_create = exports.tmp_remove = exports.db_remove = exports.db_stop = exports.db_start = exports.db_create = exports.unbuild = exports.remove = exports.stop = exports.start_panel = exports.start_server = exports.start = exports.create = exports.push = exports.build = exports.docker = void 0;
-const urn_lib_1 = require("urn-lib");
+const uranio_lib_1 = require("uranio-lib");
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
 const defaults_1 = require("../conf/defaults");
@@ -415,7 +415,7 @@ async function _copy_compiled() {
 function _get_project_name() {
     const package_json_path = `${docker_params.root}/package.json`;
     const data = util_instance.fs.read_file(package_json_path, 'utf8');
-    const package_data = urn_lib_1.urn_util.json.clean_parse(data);
+    const package_data = uranio_lib_1.urn_util.json.clean_parse(data);
     return package_data['name'] || 'uranio-project';
 }
 function _get_image_name() {

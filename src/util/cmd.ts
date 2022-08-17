@@ -6,7 +6,7 @@
 
 import toml from 'toml';
 
-import {urn_util} from 'urn-lib';
+import {urn_util} from 'uranio-lib';
 
 import {Params, PacManExec} from '../types';
 

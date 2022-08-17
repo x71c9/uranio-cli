@@ -33,7 +33,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.prompt_init = exports.init = void 0;
 const inquirer_1 = __importDefault(require("inquirer"));
-const urn_lib_1 = require("urn-lib");
+const uranio_lib_1 = require("uranio-lib");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
@@ -547,7 +547,7 @@ function _update_package_scripts() {
     const package_json_path = `${init_params.root}/package.json`;
     const data = util_instance.fs.read_file(package_json_path, 'utf8');
     try {
-        const package_data = urn_lib_1.urn_util.json.clean_parse(data);
+        const package_data = uranio_lib_1.urn_util.json.clean_parse(data);
         const old_scripts = package_data['scripts'] || {};
         package_data['scripts'] = {
             ...old_scripts,

@@ -29,7 +29,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deinit = void 0;
-const urn_lib_1 = require("urn-lib");
+const uranio_lib_1 = require("uranio-lib");
 const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
@@ -146,14 +146,14 @@ function _remove_package_scripts() {
     const package_json_path = `${deinit_params.root}/package.json`;
     const data = util_instance.fs.read_file(package_json_path, 'utf8');
     try {
-        const package_data = urn_lib_1.urn_util.json.clean_parse(data);
+        const package_data = uranio_lib_1.urn_util.json.clean_parse(data);
         const old_scripts = package_data['scripts'] || {};
         for (const [key, value] of Object.entries(old_scripts)) {
-            if (urn_lib_1.urn_util.object.has_key(common_1.package_scripts, key)
+            if (uranio_lib_1.urn_util.object.has_key(common_1.package_scripts, key)
                 && common_1.package_scripts[key] === value) {
                 delete old_scripts[key];
             }
-            if (urn_lib_1.urn_util.object.has_key(common_1.adm_package_scripts, key)
+            if (uranio_lib_1.urn_util.object.has_key(common_1.adm_package_scripts, key)
                 && common_1.adm_package_scripts[key] === value) {
                 delete old_scripts[key];
             }

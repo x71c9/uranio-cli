@@ -33,7 +33,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = exports.pacman_exec = void 0;
 const toml_1 = __importDefault(require("toml"));
-const urn_lib_1 = require("urn-lib");
+const uranio_lib_1 = require("uranio-lib");
 const defaults_1 = require("../conf/defaults");
 // DO NO CANCEL IT
 // import * as common from '../cmd/common';
@@ -94,7 +94,7 @@ class CMD {
     get_package_data(package_json_path) {
         try {
             const data = this.fs.read_file(package_json_path, 'utf8');
-            const pack_data = urn_lib_1.urn_util.json.clean_parse(data);
+            const pack_data = uranio_lib_1.urn_util.json.clean_parse(data);
             return pack_data;
         }
         catch (ex) {
