@@ -28,7 +28,7 @@ exports.default_params = {
     docker_db: false,
     build: false,
     docker_load: false,
-    filelog: true,
+    filelog: false,
     spin: true,
     prefix: '',
     branch: 'master',

@@ -26,7 +26,7 @@ export const default_params:Params = {
 	docker_db: false,
 	build: false,
 	docker_load: false,
-	filelog: true,
+	filelog: false,
 	spin: true,
 	prefix: '',
 	branch: 'master',

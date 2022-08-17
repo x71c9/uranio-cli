@@ -96,7 +96,7 @@ function _set_root(args) {
 }
 function _init_log() {
     const log_file_path = `${process_params.root}/${defaults_1.defaults.log_filepath}`;
-    if (!util_instance.fs.exists(log_file_path)) {
+    if (!util_instance.fs.exists(log_file_path) && process_params.filelog === true) {
         util_instance.fs.create_file(log_file_path);
     }
     _log_arguments(process_params);
@@ -242,17 +242,17 @@ function _set_args(params, args) {
     if (typeof args.nodocker_load === 'boolean' && !!args.nodocker_load !== !params.docker_load) {
         params.docker_load = !args.nodocker_load;
     }
-    /* Paramteters with default value = true */
     const filelog = args.g || args.filelog;
-    if (filelog == false || filelog == 'false') {
-        params.filelog = false;
+    if (filelog == true || filelog == 'true') {
+        params.filelog = true;
     }
     if (typeof args.nofilelog === 'boolean' && !!args.nofilelog !== !params.filelog) {
         params.filelog = !args.nofilelog;
     }
+    /* Paramteters with default value = true */
     const spin = args.i || args.spin;
     if (spin == false || spin == 'false') {
-        params.filelog = false;
+        params.spin = false;
     }
     if (typeof args.nospin === 'boolean' && !!args.nospin !== !params.spin) {
         params.spin = !args.nospin;
