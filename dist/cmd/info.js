@@ -38,6 +38,7 @@ const defaults_1 = require("../conf/defaults");
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
 const common_1 = require("./common");
+// import {defaults} from 'uranio-lib/dist/log';
 let output_instance;
 let util_instance;
 let info_params = defaults_1.default_params;
@@ -46,14 +47,7 @@ async function info(params) {
     _check_if_is_initialized();
     console.log(`root:   ${_bold(info_params.root)}`);
     console.log(`repo:   ${_bold(info_params.repo)}`);
-    // if(valid_deploy_repos().includes(info_params.repo)){
-    //   console.log(`deploy: ${_bold(info_params.deploy)}`);
-    // }
     console.log(`pacman: ${_bold(info_params.pacman)}`);
-    // console.log(`docker: ${_bold(String(info_params.docker))}`);
-    // if(info_params.docker_db){
-    // 	console.log(`docker_db: ${_bold(info_params.db)}`);
-    // }
     process.exit(0);
 }
 exports.info = info;
@@ -70,7 +64,7 @@ function _check_if_is_initialized() {
     // if(!util_instance.fs.exists(`${info_params.root}/${defaults.folder}`)){
     //   _repo_not_initialized();
     // }
-    if (!util_instance.fs.exists(`${info_params.root}/uranio.json`)) {
+    if (!util_instance.fs.exists(`${info_params.root}/${defaults_1.defaults.folder}/${defaults_1.defaults.init_filepath}`)) {
         _repo_not_initialized();
     }
 }

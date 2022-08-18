@@ -8,7 +8,7 @@
 
 import chalk from 'chalk';
 
-import {default_params} from '../conf/defaults';
+import {default_params, defaults} from '../conf/defaults';
 
 import * as output from '../output/index';
 
@@ -18,6 +18,8 @@ import * as util from '../util/index';
 import { Params } from '../types';
 
 import {merge_params} from './common';
+
+// import {defaults} from 'uranio-lib/dist/log';
 
 let output_instance:output.OutputInstance;
 
@@ -33,14 +35,7 @@ export async function info(params:Params):Promise<void> {
 	
 	console.log(`root:   ${_bold(info_params.root)}`);
 	console.log(`repo:   ${_bold(info_params.repo)}`);
-	// if(valid_deploy_repos().includes(info_params.repo)){
-	//   console.log(`deploy: ${_bold(info_params.deploy)}`);
-	// }
 	console.log(`pacman: ${_bold(info_params.pacman)}`);
-	// console.log(`docker: ${_bold(String(info_params.docker))}`);
-	// if(info_params.docker_db){
-	// 	console.log(`docker_db: ${_bold(info_params.db)}`);
-	// }
 	process.exit(0);
 	
 }
@@ -66,7 +61,7 @@ function _check_if_is_initialized(){
 	// if(!util_instance.fs.exists(`${info_params.root}/${defaults.folder}`)){
 	//   _repo_not_initialized();
 	// }
-	if(!util_instance.fs.exists(`${info_params.root}/uranio.json`)){
+	if(!util_instance.fs.exists(`${info_params.root}/${defaults.folder}/${defaults.init_filepath}`)){
 		_repo_not_initialized();
 	}
 }

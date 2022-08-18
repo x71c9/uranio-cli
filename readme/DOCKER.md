@@ -71,7 +71,7 @@ changed.
 
 | Flag | Description |
 |:-----|:---------|
-| `--load` | Shorthand for `--output=type=docker` |
+| `--docker_load` | Same as `--output=type=docker` in Docker |
 
 This is the command that builds the Uranio image. The Docker commands is:
 
