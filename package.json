@@ -1,7 +1,7 @@
 {
 	"name": "uranio",
 	"license": "UNLICENSED",
-	"version": "0.0.94",
+	"version": "0.0.95",
 	"description": "Uranio command line interface",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
