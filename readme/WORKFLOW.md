@@ -7,7 +7,7 @@ List of commands:
 - create `./.uranio` directory;
 
 - create `./.uranio/.uranio.json` init file with the important parameters
-`repo`, `docker`, `pacman` and their values;
+`repo` and `pacman` and their values;
 
 - create `./src` directory and its subdirectories if do not exist;
 

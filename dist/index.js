@@ -5,8 +5,6 @@ exports.default = {
     init: index_1.init,
     build: index_1.build,
     start: index_1.start,
-    generate: index_1.generate,
-    transpose: index_1.transpose,
     docker: index_1.docker,
 };
 //# sourceMappingURL=index.js.map
