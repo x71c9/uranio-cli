@@ -29,7 +29,7 @@ import {build_server} from './build';
 
 import {merge_params} from './common';
 
-// import * as docker from './docker';
+import * as docker from './docker';
 
 import {pacman_exec} from '../util/cmd';
 
@@ -62,6 +62,8 @@ export async function dev(params:Partial<Params>)
 		:Promise<void>{
 	
 	_init_params(params);
+	
+	docker.fail_if_compiled(dev_params);
 	
 	// if(params.docker === true){
 		

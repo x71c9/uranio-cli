@@ -45,7 +45,7 @@ const generate_1 = require("./generate");
 const transpose_1 = require("./transpose");
 const build_1 = require("./build");
 const common_1 = require("./common");
-// import * as docker from './docker';
+const docker = __importStar(require("./docker"));
 const cmd_1 = require("../util/cmd");
 // const is_docker = isDocker();
 let output_instance;
@@ -66,6 +66,7 @@ let _is_dev_server = false;
 const _valid_reload_extensions = ['.ts', '.js'];
 async function dev(params) {
     _init_params(params);
+    docker.fail_if_compiled(dev_params);
     // if(params.docker === true){
     // 	await docker.start(dev_params);
     // }else{

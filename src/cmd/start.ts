@@ -14,7 +14,7 @@ import {Params} from '../types';
 
 import {merge_params} from './common';
 
-// import * as docker from './docker';
+import * as docker from './docker';
 
 import {build_server} from './build';
 
@@ -32,6 +32,8 @@ export async function start(params:Partial<Params>)
 		:Promise<void>{
 	
 	_init_params(params);
+	
+	docker.fail_if_compiled(start_params);
 	
 	output_instance.start_loading(`Starting...`);
 	

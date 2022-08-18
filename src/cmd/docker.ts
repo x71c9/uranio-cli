@@ -1,6 +1,37 @@
 /**
  * Docker command module
  *
+ * There might be some confusion since both Uranio and Docker have the
+ * same method names.
+ *
+ * Uranio commands are:
+ * - uranio docker start
+ * - uranio docker dev
+ *
+ * These commands can be run with or without the flag --prod
+ *
+ * Uranio build only one docker image, but creates different containers
+ * according with the command and the --prod flag.
+ *
+ * When running both `uranio docker start` and `uranio docker dev` the
+ * following happens:
+ *
+ * - if the Uranio image does not exist it builds it;
+ * - if the Uranio container does not exist it creates it;
+ * - it start the container.
+ *
+ * There are 4 possible containers Uranio creates.
+ *
+ * For the command `uranio docker start` the container name ends with:
+ * - _uranio_con_start_dev
+ * - _uranio_con_start_prod
+ *
+ * For the command `uranio docker dev` the container name ends with:
+ * - _uranio_con_dev_dev
+ * - _uranio_con_dev_prod
+ *
+ * 
+ *
  * @packageDocumentation
  */
 
@@ -38,10 +69,10 @@ export async function docker(params:Partial<Params>, args:Arguments)
 	docker_folder = `${dot_folder}/${defaults.docker_folder}`;
 	
 	switch(args._[1]){
-		// case 'build':{
-		// 	await build(docker_params);
-		// 	break;
-		// }
+		case 'build':{
+			await build(docker_params);
+			break;
+		}
 		case 'start':{
 			await start(docker_params);
 			break;
@@ -65,11 +96,11 @@ export async function docker(params:Partial<Params>, args:Arguments)
 		// case 'create':{
 		// 	switch(args._[2]){
 		// 		case 'start':{
-		// 			await create_start(docker_params);
+		// 			await _create_start(docker_params);
 		// 			break;
 		// 		}
 		// 		case 'dev':{
-		// 			await create_dev(docker_params);
+		// 			await _create_dev(docker_params);
 		// 			break;
 		// 		}
 		// 		default:{
@@ -85,11 +116,11 @@ export async function docker(params:Partial<Params>, args:Arguments)
 		// case 'stop':{
 		// 	switch(args._[2]){
 		// 		case 'start':{
-		// 			await stop_start(docker_params);
+		// 			await _stop_start(docker_params);
 		// 			break;
 		// 		}
 		// 		case 'dev':{
-		// 			await stop_dev(docker_params);
+		// 			await _stop_dev(docker_params);
 		// 			break;
 		// 		}
 		// 		default:{
@@ -174,7 +205,7 @@ export async function docker(params:Partial<Params>, args:Arguments)
 		// case 'env':{
 		// 	switch(args._[2]){
 		// 		case 'update':{
-		// 			update_env(docker_params);
+		// 			_update_env(docker_params);
 		// 			break;
 		// 		}
 		// 		default:{
@@ -270,7 +301,7 @@ export async function start(params:Partial<Params>):Promise<void>{
 async function _start_dev(){
 	if(_container_exists(_get_container_name_start_dev()) === false){
 		output_instance.info_log(`First time running. Building container [uranio start DEV]...`, `[START]`);
-		await _create_start_dev(docker_params);
+		await _create_start_dev();
 	}
 	const container_name = _get_container_name_start_dev();
 	await _start_container(container_name);
@@ -279,35 +310,32 @@ async function _start_dev(){
 async function _start_prod(){
 	if(_container_exists(_get_container_name_start_prod()) === false){
 		output_instance.info_log(`First time running. Building container [uranio start PROD]...`, `[START]`);
-		await _create_start_prod(docker_params);
+		await _create_start_prod();
 	}
 	const container_name = _get_container_name_start_prod();
 	await _start_container(container_name);
 }
 
 export async function dev(params:Partial<Params>):Promise<void>{
-	
 	_init_params(params);
-	
 	if(_uranio_image_exists() === false){
 		output_instance.info_log(`First time running. Building uranio image...`, `[DEV]`);
 		await build(docker_params);
 	}
-	
-	await _copy_compiled();
-	
+	if(_compile_file_exists() === false){
+		await _copy_compiled();
+	}
 	if(docker_params.prod === true){
 		await _dev_prod();
 	}else{
 		await _dev_dev();
 	}
-	
 }
 
 async function _dev_dev(){
 	if(_container_exists(_get_container_name_dev_dev()) === false){
 		output_instance.info_log(`First time running. Building container [uranio dev DEV]...`, `[START]`);
-		await _create_dev_dev(docker_params);
+		await _create_dev_dev();
 	}
 	const container_name = _get_container_name_dev_dev();
 	await _start_container(container_name);
@@ -316,7 +344,7 @@ async function _dev_dev(){
 async function _dev_prod(){
 	if(_container_exists(_get_container_name_dev_prod()) === false){
 		output_instance.info_log(`First time running. Building container [uranio dev PROD]...`, `[START]`);
-		await _create_dev_prod(docker_params);
+		await _create_dev_prod();
 	}
 	const container_name = _get_container_name_dev_prod();
 	await _start_container(container_name);
@@ -331,28 +359,24 @@ async function _start_container(container_name:string){
 	);
 }
 
-export async function create_start(params:Partial<Params>):Promise<void>{
-	_init_params(params);
-	if(docker_params.prod === true){
-		await _create_start_prod(params);
-	}else{
-		await _create_start_dev(params);
-	}
-}
+// async function _create_start(params:Partial<Params>):Promise<void>{
+// 	if(docker_params.prod === true){
+// 		await _create_start_prod(params);
+// 	}else{
+// 		await _create_start_dev(params);
+// 	}
+// }
 
-export async function create_dev(params:Partial<Params>):Promise<void>{
-	_init_params(params);
-	
-	if(docker_params.prod === true){
-		await _create_dev_prod(params);
-	}else{
-		await _create_dev_dev(params);
-	}
-}
+// async function _create_dev(params:Partial<Params>):Promise<void>{
+// 	if(docker_params.prod === true){
+// 		await _create_dev_prod(params);
+// 	}else{
+// 		await _create_dev_dev(params);
+// 	}
+// }
 
-async function _create_container(params:Partial<Params>, container_name:string, production:boolean, command:Command)
+async function _create_container(container_name:string, production:boolean, command:Command)
 		:Promise<void>{
-	_init_params(params);
 	
 	const image_name = _get_image_name();
 	
@@ -414,48 +438,48 @@ async function _create_container(params:Partial<Params>, container_name:string, 
 	);
 }
 
-async function _create_dev_dev(params:Partial<Params>)
+async function _create_dev_dev()
 		:Promise<void>{
 	output_instance.debug_log(`Creating Docker container [uranio dev DEV]`, `[DEV] `);
 	
 	const container_name = _get_container_name_dev_dev();
-	await _create_container(params, container_name, false, 'dev');
+	await _create_container(container_name, false, 'dev');
 	
 	output_instance.done_log(
 		`Docker container [uranio dev DEV] created ${container_name}`
 	);
 }
 
-async function _create_dev_prod(params:Partial<Params>)
+async function _create_dev_prod()
 		:Promise<void>{
 	output_instance.debug_log(`Creating Docker container [uranio dev PROD]`, `[DEV] `);
 	
 	const container_name = _get_container_name_dev_prod();
-	await _create_container(params, container_name, true, 'dev');
+	await _create_container(container_name, true, 'dev');
 	
 	output_instance.done_log(
 		`Docker container [uranio dev PROD] created ${container_name}`
 	);
 }
 
-async function _create_start_dev(params:Partial<Params>)
+async function _create_start_dev()
 		:Promise<void>{
 	output_instance.debug_log(`Creating Docker container [uranio start DEV]`, `[START] `);
 	
 	const container_name = _get_container_name_start_dev();
-	await _create_container(params, container_name, false, 'start');
+	await _create_container(container_name, false, 'start');
 	
 	output_instance.done_log(
 		`Docker container [uranio start DEV] created ${container_name}`
 	);
 }
 
-async function _create_start_prod(params:Partial<Params>)
+async function _create_start_prod()
 		:Promise<void>{
 	output_instance.debug_log(`Creating Docker container [uranio start PROD]`, `[START] `);
 	
 	const container_name = _get_container_name_start_prod();
-	await _create_container(params, container_name, true, 'start');
+	await _create_container(container_name, true, 'start');
 	
 	output_instance.done_log(
 		`Docker container [uranio start PROD] created ${container_name}`
@@ -463,42 +487,41 @@ async function _create_start_prod(params:Partial<Params>)
 }
 
 
-export async function stop_start(params:Partial<Params>, continue_on_fail=false)
+async function _stop_start(continue_on_fail=false)
 		:Promise<void>{
-	await _stop_start_dev(params, continue_on_fail);
-	await _stop_start_prod(params, continue_on_fail);
+	await _stop_start_dev(continue_on_fail);
+	await _stop_start_prod(continue_on_fail);
 }
 
-async function _stop_start_dev(params:Partial<Params>, continue_on_fail=false){
+async function _stop_start_dev(continue_on_fail=false){
 	const container_name = _get_container_name_start_dev();
-	await _stop_container(params, container_name, continue_on_fail);
+	await _stop_container(container_name, continue_on_fail);
 }
 
-async function _stop_start_prod(params:Partial<Params>, continue_on_fail=false){
+async function _stop_start_prod(continue_on_fail=false){
 	const container_name = _get_container_name_start_prod();
-	await _stop_container(params, container_name, continue_on_fail);
+	await _stop_container(container_name, continue_on_fail);
 }
 
-export async function stop_dev(params:Partial<Params>, continue_on_fail=false)
+async function _stop_dev(continue_on_fail=false)
 		:Promise<void>{
-	await _stop_dev_dev(params, continue_on_fail);
-	await _stop_dev_prod(params, continue_on_fail);
+	await _stop_dev_dev(continue_on_fail);
+	await _stop_dev_prod(continue_on_fail);
 }
 
-export async function _stop_dev_dev(params:Partial<Params>, continue_on_fail=false)
+async function _stop_dev_dev(continue_on_fail=false)
 		:Promise<void>{
 	const container_name = _get_container_name_dev_dev();
-	await _stop_container(params, container_name, continue_on_fail);
+	await _stop_container(container_name, continue_on_fail);
 }
 
-export async function _stop_dev_prod(params:Partial<Params>, continue_on_fail=false)
+async function _stop_dev_prod(continue_on_fail=false)
 		:Promise<void>{
 	const container_name = _get_container_name_dev_prod();
-	await _stop_container(params, container_name, continue_on_fail);
+	await _stop_container(container_name, continue_on_fail);
 }
 
-async function _stop_container(params:Partial<Params>, container_name:string, continue_on_fail=false){
-	_init_params(params);
+async function _stop_container(container_name:string, continue_on_fail=false){
 	if(_container_exists(container_name) === false){
 		return;
 	}
@@ -633,12 +656,15 @@ export async function db_create(params:Partial<Params>)
 export async function db_start(params:Partial<Params>)
 		:Promise<void>{
 	
+	_init_params(params);
+	
 	if(_container_exists(_get_container_name_db()) === false){
 		output_instance.info_log(`First time running. Building container DB...`, `[DB]`);
 		await db_create(docker_params);
 	}
 	
-	_init_params(params);
+	_update_env();
+	
 	const db_container_name = _get_container_name_db();
 	let cmd = '';
 	cmd += `docker start ${db_container_name}`;
@@ -684,15 +710,14 @@ export async function db_remove(params:Partial<Params>, continue_on_fail=false)
 	);
 }
 
-export async function remove_tmp(params:Partial<Params>, continue_on_fail=false)
+async function _remove_tmp(continue_on_fail=false)
 		:Promise<void>{
-	_init_params(params);
 	if(_tmp_container_exists() === false){
 		return;
 	}
 	const container_name = _get_container_name_tmp();
 	let cmd_rm = '';
-	cmd_rm += `docker rm tmp_${container_name}`;
+	cmd_rm += `docker rm ${container_name}`;
 	if(continue_on_fail){
 		cmd_rm += ` || true`;
 	}
@@ -738,12 +763,12 @@ export async function prune(params:Partial<Params>, continue_on_fail=false)
 	
 	_init_params(params);
 	
-	await remove_tmp(docker_params, true);
+	await _remove_tmp(true);
 	await db_stop(docker_params, true);
 	await db_remove(docker_params, true);
 	await network_remove(docker_params, true);
-	await stop_start(docker_params, true);
-	await stop_dev(docker_params, true);
+	await _stop_start(true);
+	await _stop_dev(true);
 	await remove_start(docker_params, true);
 	await remove_dev(docker_params, true);
 	await unbuild(docker_params, true);
@@ -770,14 +795,39 @@ async function _copy_compiled(){
 	cmd_cp_node += `docker cp ${container_name}:/app/node_modules node_modules`;
 	await util_instance.spawn.spin_and_native_promise(cmd_cp_node, `copying node_modules from tmp container ${container_name}`, 'trace', defaults.prefix_docker);
 	// let cmd_cp_uranio = '';
-	// cmd_cp_uranio += `docker cp tmp_${container_name}:/app/.uranio/. .uranio/`;
-	// await util_instance.spawn.spin_and_native_promise(cmd_cp_uranio, 'docker', `copying .uranio from tmp container tmp_${container_name}`);
+	// cmd_cp_uranio += `docker cp ${container_name}:/app/.uranio/. .uranio/`;
+	// await util_instance.spawn.spin_and_native_promise(cmd_cp_uranio, 'docker', `copying .uranio from tmp container ${container_name}`);
 	let cmd_remove = '';
 	cmd_remove += `docker rm ${container_name}`;
 	await util_instance.spawn.spin_and_native_promise(cmd_remove, `removing tmp container ${container_name}`, 'trace', defaults.prefix_docker);
 	output_instance.done_log(
 		`Docker copied files from tmp container ${container_name}`
 	);
+	_add_copy_compiled_file();
+}
+
+function _add_copy_compiled_file(){
+	const compiled_file_path = `${docker_folder}/compiled`;
+	util_instance.fs.create_file(compiled_file_path);
+}
+
+function _compile_file_exists(){
+	const compiled_file_path = `${docker_folder}/compiled`;
+	return util_instance.fs.exists(compiled_file_path);
+}
+
+export function fail_if_compiled(params:Partial<Params>){
+	_init_params(params);
+	if(_compile_file_exists() === true){
+		let err_msg = '[FATAL]';
+		err_msg += `Uranio was compiled inside a Docker container.`;
+		err_msg += ` In order to work outside the container it must be recompiled.`;
+		err_msg += ` Run \`uranio reinit\` to recompiled.`;
+		err_msg += ` Otherwise to run inside the docker container run`;
+		err_msg += ` \`uranio docker dev\` or \`uranio docker start\``;
+		output_instance.error_log(err_msg);
+		throw new Error(err_msg);
+	}
 }
 
 // function _start_container_exists():boolean{
@@ -934,10 +984,10 @@ async function _download_dockerfiles(){
 	const bash_dest = `${docker_folder}/.bash_docker`;
 	util_instance.fs.copy_file(docker_bash, bash_dest);
 	
-	_remove_tmp();
+	_remove_tmp_dir();
 }
 
-function _remove_tmp(){
+function _remove_tmp_dir(){
 	output_instance.start_loading(
 		`Removing tmp folder [${defaults.tmp_folder}]...`
 	);
@@ -988,7 +1038,7 @@ type DotEnv = {
 	[k:string]: string
 }
 
-export function update_env(params?:Partial<Params>):void{
+function _update_env(params?:Partial<Params>):void{
 	
 	if(params){
 		_init_params(params);

@@ -33,7 +33,7 @@ const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
 const defaults_1 = require("../conf/defaults");
 const common_1 = require("./common");
-// import * as docker from './docker';
+const docker = __importStar(require("./docker"));
 const build_1 = require("./build");
 const types_1 = require("../types");
 const cmd_1 = require("../util/cmd");
@@ -42,6 +42,7 @@ let util_instance;
 let start_params = defaults_1.default_params;
 async function start(params) {
     _init_params(params);
+    docker.fail_if_compiled(start_params);
     output_instance.start_loading(`Starting...`);
     // if(params.docker === true){
     // 	await docker.start(start_params);

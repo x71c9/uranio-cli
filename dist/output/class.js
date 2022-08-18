@@ -170,6 +170,8 @@ class Output {
         let noroot_text = text;
         const regex = new RegExp(`${this.params.root}`, 'g');
         noroot_text = text.replace(regex, '__root');
+        const regex_new_line = new RegExp(`\n`, 'g');
+        noroot_text = text.replace(regex_new_line, ' ');
         const chopped_current = (spinner_current.length > process.stdout.columns / 2) ?
             spinner_current.substring(0, Math.floor(process.stdout.columns / 2)) + '...' :
             spinner_current;
