@@ -25,9 +25,6 @@ export declare type Params = {
     fullwidth: boolean;
     inside_ntl: boolean;
     time: boolean;
-    docker: boolean;
-    docker_db: boolean;
-    build: boolean;
     docker_load: boolean;
     filelog: boolean;
     spin: boolean;

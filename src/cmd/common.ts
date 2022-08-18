@@ -39,8 +39,8 @@ export function read_init_file(params:Partial<Params>):Partial<Params>{
 		cloned_params.repo = rc_obj.repo;
 		cloned_params.pacman = rc_obj.pacman;
 		// cloned_params.deploy = rc_obj.deploy;
-		cloned_params.docker = Boolean(rc_obj.docker);
-		cloned_params.docker_db = Boolean(rc_obj.docker_db);
+		// cloned_params.docker = Boolean(rc_obj.docker);
+		// cloned_params.docker_db = Boolean(rc_obj.docker_db);
 		cloned_params.db = rc_obj.db;
 		return cloned_params;
 	}catch(ex){

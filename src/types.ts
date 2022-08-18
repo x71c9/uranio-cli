@@ -34,9 +34,9 @@ export type Params = {
 	time: boolean
 	// context: boolean
 	// prefix_color: boolean
-	docker: boolean
-	docker_db: boolean
-	build: boolean
+	// docker: boolean
+	// docker_db: boolean
+	// build: boolean
 	docker_load: boolean
 	filelog: boolean
 	spin: boolean

@@ -50,10 +50,10 @@ async function info(params) {
     //   console.log(`deploy: ${_bold(info_params.deploy)}`);
     // }
     console.log(`pacman: ${_bold(info_params.pacman)}`);
-    console.log(`docker: ${_bold(String(info_params.docker))}`);
-    if (info_params.docker_db) {
-        console.log(`docker_db: ${_bold(info_params.db)}`);
-    }
+    // console.log(`docker: ${_bold(String(info_params.docker))}`);
+    // if(info_params.docker_db){
+    // 	console.log(`docker_db: ${_bold(info_params.db)}`);
+    // }
     process.exit(0);
 }
 exports.info = info;

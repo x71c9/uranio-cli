@@ -214,27 +214,27 @@ function _set_args(params, args) {
     // if(typeof args.noprefix_color === 'boolean' && !!args.noprefix_color !== !params.prefix_color){
     // 	params.prefix_color = !args.noprefix_color;
     // }
-    const docker = args.k || args.docker;
-    if (docker == true || docker == 'true') {
-        params.docker = true;
-    }
-    if (typeof args.nodocker === 'boolean' && !!args.nodocker !== !params.docker) {
-        params.docker = !args.nodocker;
-    }
-    const docker_db = args.docker_db;
-    if (docker_db == true || docker_db == 'true') {
-        params.docker_db = true;
-    }
-    if (typeof args.nodocker_db === 'boolean' && !!args.nodocker_db !== !params.docker_db) {
-        params.docker_db = !args.nodocker_db;
-    }
-    const build = args.b || args.build;
-    if (build == true || build == 'true') {
-        params.build = true;
-    }
-    if (typeof args.nobuild === 'boolean' && !!args.nobuild !== !params.build) {
-        params.build = !args.nobuild;
-    }
+    // const docker = args.k || args.docker;
+    // if(docker == true || docker == 'true'){
+    // 	params.docker = true;
+    // }
+    // if(typeof args.nodocker === 'boolean' && !!args.nodocker !== !params.docker){
+    // 	params.docker = !args.nodocker;
+    // }
+    // const docker_db = args.docker_db;
+    // if(docker_db == true || docker_db == 'true'){
+    // 	params.docker_db = true;
+    // }
+    // if(typeof args.nodocker_db === 'boolean' && !!args.nodocker_db !== !params.docker_db){
+    // 	params.docker_db = !args.nodocker_db;
+    // }
+    // const build = args.b || args.build;
+    // if(build == true || build == 'true'){
+    // 	params.build = true;
+    // }
+    // if(typeof args.nobuild === 'boolean' && !!args.nobuild !== !params.build){
+    // 	params.build = !args.nobuild;
+    // }
     const docker_load = args.docker_load;
     if (docker_load == true || docker_load == 'true') {
         params.docker_load = true;

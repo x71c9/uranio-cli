@@ -520,13 +520,13 @@ function _create_init_file(){
 	// if(valid_deploy_repos().includes(init_params.repo)){
 	//   content += `\t"deploy": "${init_params.deploy}",\n`;
 	// }
-	if(init_params.docker === true){
-		content += `\t"docker": ${init_params.docker},\n`;
-	}
-	if(init_params.docker_db === true){
-		content += `\t"docker_db": ${init_params.docker_db},\n`;
-		content += `\t"db": "${init_params.db}",\n`;
-	}
+	// if(init_params.docker === true){
+	// 	content += `\t"docker": ${init_params.docker},\n`;
+	// }
+	// if(init_params.docker_db === true){
+	// 	content += `\t"docker_db": ${init_params.docker_db},\n`;
+	// 	content += `\t"db": "${init_params.db}",\n`;
+	// }
 	content += `}`;
 	
 	util_instance.fs.write_file(init_filepath, content);

@@ -29,7 +29,7 @@ import {build_server} from './build';
 
 import {merge_params} from './common';
 
-import * as docker from './docker';
+// import * as docker from './docker';
 
 import {pacman_exec} from '../util/cmd';
 
@@ -63,20 +63,20 @@ export async function dev(params:Partial<Params>)
 	
 	_init_params(params);
 	
-	if(params.docker === true){
+	// if(params.docker === true){
 		
-		await docker.start(dev_params);
+	// 	await docker.start(dev_params);
 		
-	}else{
+	// }else{
 		
-		await _init_dev();
-		_dev_server();
-		
-		if(valid_admin_repos().includes(dev_params.repo)){
-			_dev_panel();
-		}
-		
+	await _init_dev();
+	_dev_server();
+	
+	if(valid_admin_repos().includes(dev_params.repo)){
+		_dev_panel();
 	}
+		
+	// }
 }
 
 export async function dev_server(params:Partial<Params>)
@@ -84,16 +84,16 @@ export async function dev_server(params:Partial<Params>)
 	
 	_init_params(params);
 	
-	if(params.docker === true){
+	// if(params.docker === true){
 		
-		await docker.start_server(dev_params);
+	// 	await docker.start_server(dev_params);
 		
-	}else{
+	// }else{
 		
-		await _init_dev();
-		_dev_server();
+	await _init_dev();
+	_dev_server();
 		
-	}
+	// }
 	
 }
 
@@ -102,16 +102,16 @@ export async function dev_panel(params:Partial<Params>)
 	
 	_init_params(params);
 	
-	if(params.docker === true){
+	// if(params.docker === true){
 		
-		await docker.start_panel(dev_params);
+	// 	await docker.start_panel(dev_params);
 		
-	}else{
+	// }else{
 		
-		await _init_dev();
-		_dev_panel();
+	await _init_dev();
+	_dev_panel();
 		
-	}
+	// }
 	
 }
 
