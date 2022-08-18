@@ -421,14 +421,14 @@ async function _create_container(container_name:string, production:boolean, comm
 	cmd += ` --network ${network_name}`;
 	cmd += ` -p ${port_server}:${port_server}`;
 	cmd += ` -p ${port_panel}:${port_panel}`;
+	cmd += ` -v $(pwd)/.env:/app/.env`;
+	cmd += ` -v $(pwd)/cert/:/app/cert/`;
 	if(command === 'dev'){
 		cmd += ` -v $(pwd)/src/:/app/src/`;
-		cmd += ` -v $(pwd)/.env:/app/.env`;
 		cmd += ` -v ${toml_path}:/app/uranio.toml`;
 		cmd += ` -v $(pwd)/package.json:/app/package.json`;
 		cmd += ` -v $(pwd)/node_modules/:/app/node_modules/`;
 		cmd += ` -v $(pwd)/.uranio/uranio-schema:/app/.uranio/uranio-schema`;
-		cmd += ` -v $(pwd)/cert/:/app/cert/`;
 	}
 	cmd += ` --name ${container_name}`;
 	cmd += ` ${image_name}`;
