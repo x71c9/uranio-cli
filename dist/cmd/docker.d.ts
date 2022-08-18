@@ -23,11 +23,11 @@
  * There are 4 possible containers Uranio creates.
  *
  * For the command `uranio docker start` the container name ends with:
- * - _uranio_con_start_dev
+ * - _uranio_con_start
  * - _uranio_con_start_prod
  *
  * For the command `uranio docker dev` the container name ends with:
- * - _uranio_con_dev_dev
+ * - _uranio_con_dev
  * - _uranio_con_dev_prod
  *
  *
