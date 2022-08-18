@@ -51,4 +51,5 @@ export declare function db_remove(params: Partial<Params>, continue_on_fail?: bo
 export declare function network_create(params: Partial<Params>, continue_on_fail?: boolean): Promise<void>;
 export declare function network_remove(params: Partial<Params>, continue_on_fail?: boolean): Promise<void>;
 export declare function prune(params: Partial<Params>, continue_on_fail?: boolean): Promise<void>;
+export declare function is_docker_compiled(params: Partial<Params>): boolean;
 export declare function fail_if_compiled(params: Partial<Params>): void;

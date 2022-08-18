@@ -59,7 +59,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fail_if_compiled = exports.prune = exports.network_remove = exports.network_create = exports.db_remove = exports.db_stop = exports.db_start = exports.db_create = exports.unbuild = exports.remove_dev = exports.remove_start = exports.stop = exports.dev = exports.start = exports.push = exports.build = exports.docker = void 0;
+exports.fail_if_compiled = exports.is_docker_compiled = exports.prune = exports.network_remove = exports.network_create = exports.db_remove = exports.db_stop = exports.db_start = exports.db_create = exports.unbuild = exports.remove_dev = exports.remove_start = exports.stop = exports.dev = exports.start = exports.push = exports.build = exports.docker = void 0;
 const cp = __importStar(require("child_process"));
 const uranio_lib_1 = require("uranio-lib");
 const output = __importStar(require("../output/index"));
@@ -712,6 +712,11 @@ function _remove_compiled_file() {
     const compiled_file_path = `${docker_folder}/compiled`;
     util_instance.fs.remove_file(compiled_file_path);
 }
+function is_docker_compiled(params) {
+    _init_params(params);
+    return _compile_file_exists();
+}
+exports.is_docker_compiled = is_docker_compiled;
 function fail_if_compiled(params) {
     _init_params(params);
     if (_compile_file_exists() === true) {

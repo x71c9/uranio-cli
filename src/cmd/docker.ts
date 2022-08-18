@@ -836,6 +836,11 @@ function _remove_compiled_file(){
 	util_instance.fs.remove_file(compiled_file_path);
 }
 
+export function is_docker_compiled(params:Partial<Params>){
+	_init_params(params);
+	return _compile_file_exists();
+}
+
 export function fail_if_compiled(params:Partial<Params>){
 	_init_params(params);
 	if(_compile_file_exists() === true){
