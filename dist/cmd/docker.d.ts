@@ -40,6 +40,7 @@ export declare function build(params: Partial<Params>): Promise<void>;
 export declare function push(params: Partial<Params>): Promise<void>;
 export declare function start(params: Partial<Params>): Promise<void>;
 export declare function dev(params: Partial<Params>): Promise<void>;
+export declare function stop(params: Partial<Params>): Promise<void>;
 export declare function remove_start(params: Partial<Params>, continue_on_fail?: boolean): Promise<void>;
 export declare function remove_dev(params: Partial<Params>, continue_on_fail?: boolean): Promise<void>;
 export declare function unbuild(params: Partial<Params>, continue_on_fail?: boolean): Promise<void>;

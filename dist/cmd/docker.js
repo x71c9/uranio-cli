@@ -59,7 +59,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fail_if_compiled = exports.prune = exports.network_remove = exports.network_create = exports.db_remove = exports.db_stop = exports.db_start = exports.db_create = exports.unbuild = exports.remove_dev = exports.remove_start = exports.dev = exports.start = exports.push = exports.build = exports.docker = void 0;
+exports.fail_if_compiled = exports.prune = exports.network_remove = exports.network_create = exports.db_remove = exports.db_stop = exports.db_start = exports.db_create = exports.unbuild = exports.remove_dev = exports.remove_start = exports.stop = exports.dev = exports.start = exports.push = exports.build = exports.docker = void 0;
 const cp = __importStar(require("child_process"));
 const uranio_lib_1 = require("uranio-lib");
 const output = __importStar(require("../output/index"));
@@ -98,6 +98,10 @@ async function docker(params, args) {
         }
         case 'unbuild': {
             await unbuild(docker_params);
+            break;
+        }
+        case 'stop': {
+            await stop(docker_params);
             break;
         }
         // case 'create':{
@@ -433,6 +437,12 @@ async function _create_start_prod() {
     await _create_container(container_name, true, 'start');
     output_instance.done_log(`Docker container [uranio start PROD] created ${container_name}`);
 }
+async function stop(params) {
+    _init_params(params);
+    await _stop_start(true);
+    await _stop_dev(true);
+}
+exports.stop = stop;
 async function _stop_start(continue_on_fail = false) {
     await _stop_start_dev(continue_on_fail);
     await _stop_start_prod(continue_on_fail);
@@ -660,7 +670,7 @@ async function prune(params, continue_on_fail = false) {
     await remove_start(docker_params, true);
     await remove_dev(docker_params, true);
     await unbuild(docker_params, true);
-    await _remove_compiled_file();
+    _remove_compiled_file();
     const project_name = _get_project_name();
     let cmd_prune = '';
     cmd_prune += `docker builder prune -af --filter "label=project=${project_name}"`;

@@ -93,6 +93,10 @@ export async function docker(params:Partial<Params>, args:Arguments)
 			await unbuild(docker_params);
 			break;
 		}
+		case 'stop':{
+			await stop(docker_params);
+			break;
+		}
 		// case 'create':{
 		// 	switch(args._[2]){
 		// 		case 'start':{
@@ -486,6 +490,11 @@ async function _create_start_prod()
 	);
 }
 
+export async function stop(params:Partial<Params>):Promise<void>{
+	_init_params(params);
+	await _stop_start(true);
+	await _stop_dev(true);
+}
 
 async function _stop_start(continue_on_fail=false)
 		:Promise<void>{
@@ -772,7 +781,7 @@ export async function prune(params:Partial<Params>, continue_on_fail=false)
 	await remove_start(docker_params, true);
 	await remove_dev(docker_params, true);
 	await unbuild(docker_params, true);
-	await _remove_compiled_file();
+	_remove_compiled_file();
 	
 	const project_name = _get_project_name();
 	let cmd_prune = '';
