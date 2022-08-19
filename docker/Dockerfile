@@ -6,8 +6,7 @@ WORKDIR /app
 RUN chown -R node.node /app
 
 COPY .bash_docker /app
-RUN cat .bash_docker >> /root/.bashrc
-RUN cat .bash_docker >> /home/node/.bashrc
+RUN cat .bash_docker >> /root/.bashrc && cat .bash_docker >> /home/node/.bashrc
 
 RUN mkdir ~/.ssh/ && ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
