@@ -19,10 +19,24 @@ Uranio command line interface.
 
 **`uranio`** is the only package you need in order to work with Uranio.
 
-Uranio is a Typescript framework that builds CRUD APIs.
+Uranio is a Typescript framework for developing CRUD API. It generates the CRUD
+[Create, Read, Update, Delete] methods for querying a database.
+
+A database relation in Uranio is called **Atom**.
+
+Uranio two main features are:
+
+1. Uranio makes possible to define new Atoms and to use them in the current
+project, so that each projects have its own Atoms.
+
+2. Uranio makes also possible to have code completition and intelisense with the
+new defined Atoms.
 
 Uranio can be installed as one of the following repo:
-`core`, `api`, `trx`, `adm`.
+- `uranio-core` (Serverside)
+- `uranio-api`  (Serverside, Webservice)
+- `uranio-trx`  (Serverside, Webservice, Clientside)
+- `uranio-adm`  (Serverside, Webservice, Clientside, Admin panel)
 
 Each repo includes the previous one.
 
@@ -73,13 +87,21 @@ in your terminal:
 #### Global installation (recommended)
 
 ```bash
-yarn global add uranio
+npm install --global uranio
 ```
 <details>
-  <summary>or if you are using npm</summary>
+  <summary>or if you are using yarn</summary>
 
 ```bash
-npm install -g uranio
+yarn global add uranio
+```
+</details>
+
+<details>
+  <summary>or if you are using pnpm</summary>
+
+```bash
+pnpm global add uranio
 ```
 </details>
 
@@ -91,13 +113,21 @@ npm install -g uranio
 > be conflicts with package names.
 
 ```bash
-yarn add uranio-cli@npm:uranio
+npm install uranio-cli@npm:uranio
 ```
 <details>
-  <summary>or if you are using npm</summary>
+  <summary>or if you are using yarn</summary>
 
 ```bash
-npm install uranio-cli@npm:uranio
+yarn add uranio-cli@npm:uranio
+```
+</details>
+
+<details>
+  <summary>or if you are using pnpm</summary>
+
+```bash
+pnpm add uranio-cli@npm:uranio
 ```
 </details>
 
@@ -141,42 +171,9 @@ dependencies and copy all the files needed in order to start developing.
 
 - `-s --root` (*string*) - Set project root.
 If empty Uranio will auto detect the closest repo.
-- `-r --repo` (*string*) - Set Uranio repo [core, api, trx, adm]
+- `-r --repo` (*string*) - Set Uranio repo [core, api, trx, adm].
 - `-f --force` (*boolean*) - Run without prompts.
-- `-p --pacman` (*string*) - Set package manager [npm, yarn]
-- `-k --docker` (*boolean*) - Compile and run inside a Docker container -
-Docker must be installed on the machine.
-- `--docker_db` (*boolean*) - Run a DB in a Docker container -
-Docker must be installed on the machine.
-- `--db` (*string*) - Set docker DB [mongo] -
-Docker must be installed on the machine.
-
-
-#### dev
-
-```
-uranio dev
-```
-This command starts a local development server.
-
-| Subcommand | description  |
-|:------------ |:-----|
-| `dev:server` | Run development only for server  |
-| `dev:panel` | Run development only for the admin panel  |
-
-
-#### build
-
-```
-uranio build
-```
-This command build and compiled the code that will be needed in production.
-
-| Subcommand | description  |
-|:------------ |:-----|
-| `build:server` | Build the server |
-| `build:panel` | Build the admin panel  |
-
+- `-m --pacman` (*string*) - Set package manager [npm, yarn, pnpm].
 
 #### start
 
@@ -185,10 +182,30 @@ uranio start
 ```
 This command starts the server and the admin panel for production.
 
-| Subcommand | description  |
-|:------------ |:-----|
-| `start:server` | Start the server in production mode |
-| `start:panel` | Start the admin panel in production mode  |
+<!-- | Subcommand | description  | -->
+<!-- |:------------ |:-----| -->
+<!-- | `start:server` | Start the server in production mode | -->
+<!-- | `start:panel` | Start the admin panel in production mode  | -->
+
+##### Flags
+
+- `-p --prod` (*boolean*) - Run in production mode.
+
+#### dev
+
+```
+uranio dev
+```
+This command starts a local development server.
+
+<!-- | Subcommand | description  | -->
+<!-- |:------------ |:-----| -->
+<!-- | `dev:server` | Run development only for server  | -->
+<!-- | `dev:panel` | Run development only for the admin panel  | -->
+
+##### Flags
+
+- `-p --prod` (*boolean*) - Run in production mode.
 
 
 #### deinit
@@ -205,7 +222,7 @@ initial state.
 ```
 uranio info
 ```
-This command prints the information uranio was initialized with.
+This command prints the main uranio information for the current repo.
 
 
 #### help
@@ -231,26 +248,22 @@ This command prints `uranio` version.
 
 ### Output options
 
-- `-v --verbose` (*boolean*) - log in verbose mode.
-- `-u --debug` (*boolean*) - log in debug mode.
-- `-n --hide` (*boolean*) - do not output log.
-- `-b --blank` (*boolean*) - log with no colors.
+- `-v --verbose` (*boolean*) - log in verbose mode [same as --log_level=debug].
+- `-u --trace` (*boolean*) - log in trace mode [same as --log_level=trace].
+- `-n --no_colors` (*boolean*) - log with no colors.
 - `-w --fullwidth` (*boolean*) - log in full width.
-- `-x --prefix` (*string*) - set a log prefix.
 - `-t --time` (*boolean*) - log with timestamp.
-- `-a --context` (*boolean*) - log with context.
-- `-l --filelog` (*boolean*) - save log on file.
+- `-g --filelog` (*boolean*) - save log on file.
 - `-i --spin` (*boolean*) - log with spinner.
-- `-e --native` (*boolean*) - log in native mode.
-- `-c --color_log` (*string*) - log color.
-- `-o --color_verbose` (*string*) - verbose log color.
-- `-q --color_debug` (*string*) - debug log color.
+- `-e --prefix` (*string*) - set a log prefix.
+- `-l --log_level` (*string*) - set log level [none, error, warn, info, debug, trace]
+- `-x --prefix_loglevel` (*boolean*) - prefix log type.
 
 ---
 
 ### Getting started
 
-Change directory to your npm repo:
+Change directory to your node repo:
 
 ```bash
 cd /path/to/my/repo
@@ -258,10 +271,24 @@ cd /path/to/my/repo
 
 If not already, run:
 ```bash
-yarn init
-#or
 npm init
 ```
+<details>
+  <summary>or if you are using yarn</summary>
+
+```bash
+yarn init
+```
+</details>
+
+<details>
+  <summary>or if you are using pnpm</summary>
+
+```bash
+pnpm init
+```
+</details>
+
 
 Then initialize Uranio with:
 
@@ -272,17 +299,18 @@ uranio init
 The command will prompt with questions regarding the repository you
 want to initialize.
 
-- Choose the package manager [yarn, npm]
-- Choose if you want to run and compile inside a Docker container.
-- Choose if you want Uranio to create a Docker container with a database.
-- If the previous answer was affirmative, choose the database type.
+- Choose the package manager [yarn, npm, pnpm]
+<!-- - Choose if you want to run and compile inside a Docker container. -->
+<!-- - Choose if you want Uranio to create a Docker container with a database. -->
+<!-- - If the previous answer was affirmative, choose the database type. -->
 - Choose the uranio module you want to use: [core, api, trx, adm]
 
 This might take a while, depending on your internet connection.
 
 After it is done, your repo is ready for development.
 
-In order to start developing you will need to create and run a development server. Run:
+In order to start developing you will need to create and run a development
+server. Run:
 
 ```bash
 uranio dev

@@ -17,7 +17,7 @@ exports.default_params = {
     trace: false,
     // hide: false,
     no_colors: false,
-    prefix_loglevel: false,
+    prefix_logtype: false,
     fullwidth: false,
     // native: false,
     inside_ntl: false,

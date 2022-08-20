@@ -333,7 +333,7 @@ class Output {
 		if(this.params.prefix){
 			final_text = `${this.params.prefix.toString()} ${final_text}`;
 		}
-		if(this.params.prefix_loglevel === true && prefix_type_by_type[type]){
+		if(this.params.prefix_logtype === true && prefix_type_by_type[type]){
 			final_text = `${prefix_type_by_type[type]} ${final_text}`;
 		}
 		return final_text;
@@ -673,7 +673,7 @@ class Output {
 	// }
 	
 	private _color_type(text:string, level:LogLevel){
-		if(this.params.prefix_loglevel === true){
+		if(this.params.prefix_logtype === true){
 			return text;
 		}
 		// const regex = new RegExp(/\[(trace|debug___|warn____|error___|ERROR)\]/);

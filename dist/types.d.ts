@@ -21,7 +21,7 @@ export declare type Params = {
     verbose: boolean;
     trace: boolean;
     no_colors: boolean;
-    prefix_loglevel: boolean;
+    prefix_logtype: boolean;
     fullwidth: boolean;
     inside_ntl: boolean;
     time: boolean;

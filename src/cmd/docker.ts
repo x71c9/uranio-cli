@@ -411,7 +411,7 @@ async function _create_container(container_name:string, production:boolean, comm
 	const toml_path = (docker_params.config[0] === '/') ?
 		docker_params.config : `$(pwd)/${docker_params.config}`;
 	
-	let uranio_cmd = `uranio ${command} -u --prefix_loglevel`;
+	let uranio_cmd = `uranio ${command} -u --prefix_logtype`;
 	if(production === true){
 		uranio_cmd += ` --prod`;
 	}

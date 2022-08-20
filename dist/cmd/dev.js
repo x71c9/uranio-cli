@@ -115,7 +115,7 @@ async function _dev_panel() {
     // const args = (is_docker === true) ? ' urn_log_prefix_type=true' : '';
     // const args = ' urn_log_prefix_type=true';
     // const args = '';
-    const args = ' --prefix_loglevel';
+    const args = ' --prefix_logtype';
     const exec = cmd_1.pacman_exec[dev_params.pacman];
     const node_env = (dev_params.prod === true) ? `NODE_ENV=production ` : '';
     const prefix = (dev_params.no_colors === true) ? defaults_1.defaults.prefix_pnl_blank : defaults_1.defaults.prefix_pnl;
@@ -128,7 +128,7 @@ async function _dev_server() {
     // const args = (is_docker === true) ? ['urn_log_prefix_type=true'] : [];
     // const args = ['urn_log_prefix_type=true'];
     // const args:string[] = [];
-    const args = ['--prefix_loglevel'];
+    const args = ['--prefix_logtype'];
     // Forever module needs for ensuring that a given script runs continuously
     _service_child = new forever_monitor_1.default.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`, {
         silent: true,

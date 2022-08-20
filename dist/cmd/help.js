@@ -44,12 +44,12 @@ async function help() {
     console.log(`  -u --trace ............ log in trace mode [same as --log_level=trace].`);
     console.log(`  -n --no_colors ........ log with no colors.`);
     console.log(`  -w --fullwidth ........ log in full width.`);
-    console.log(`  -e --prefix ........... set a log prefix.`);
     console.log(`  -t --time ............. log with timestamp.`);
     console.log(`  -g --filelog .......... save log on file.`);
     console.log(`  -i --spin ............. log with spinner.`);
+    console.log(`  -e --prefix ........... set a log prefix.`);
     console.log(`  -l --log_level ........ log level [none, error, warn, log, debug, trace].`);
-    console.log(`  -x --prefix_loglevel .. prefix log type.`);
+    console.log(`  -x --prefix_logtype ... prefix log type.`);
     console.log(``);
     console.log(``);
     process.exit(0);

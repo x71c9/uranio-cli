@@ -83,7 +83,7 @@ export async function build_panel(params:Params, init=true)
 	
 	const exec = pacman_exec[build_params.pacman];
 	
-	const urn_lib_pre = ` --prefix_loglevel`;
+	const urn_lib_pre = ` --prefix_logtype`;
 	const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
 	const cmd_server = `${node_env}${exec} uranio-panel-${build_params.repo} build ${urn_lib_pre}`;
 	

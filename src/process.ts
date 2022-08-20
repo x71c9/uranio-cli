@@ -213,16 +213,16 @@ function _set_args(params:Params, args:Arguments)
 		params.no_colors = !args.nono_colors;
 	}
 	
-	const prefix_loglevel = args.x || args.prefix_loglevel;
+	const prefix_logtype = args.x || args.prefix_logtype;
 	
-	if(prefix_loglevel == true || prefix_loglevel == 'true'){
-		params.prefix_loglevel = true;
+	if(prefix_logtype == true || prefix_logtype == 'true'){
+		params.prefix_logtype = true;
 	}
-	if(typeof args.noprefix_loglevel === 'boolean' && !!args.noprefix_loglevel !== !params.prefix_loglevel){
-		params.prefix_loglevel = !args.noprefix_loglevel;
+	if(typeof args.noprefix_logtype === 'boolean' && !!args.noprefix_logtype !== !params.prefix_logtype){
+		params.prefix_logtype = !args.noprefix_logtype;
 	}
 	
-	if(params.prefix_loglevel === true){
+	if(params.prefix_logtype === true){
 		params.no_colors = true;
 	}
 	

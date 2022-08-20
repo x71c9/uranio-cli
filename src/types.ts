@@ -27,7 +27,7 @@ export type Params = {
 	trace: boolean
 	// hide: boolean
 	no_colors: boolean
-	prefix_loglevel: boolean
+	prefix_logtype: boolean
 	fullwidth: boolean
 	// native: boolean
 	inside_ntl: boolean

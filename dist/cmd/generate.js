@@ -139,7 +139,7 @@ async function _generate(args) {
     // const final_args = `${args} urn_log_prefix_type=true`;
     // const final_args = `${args}`;
     const node_env = (generate_params.prod === true) ? `NODE_ENV=production ` : '';
-    const final_args = `${args} --prefix_loglevel`;
+    const final_args = `${args} --prefix_logtype`;
     const generate_cmd = `${node_env}${exec} uranio-generate-${generate_params.repo} -c ${root_uranio} ${final_args}`;
     // await util_instance.spawn.native_promise(generate_cmd, 'generating all', chalk.red('[G]'));
     await util_instance.spawn.native_promise(generate_cmd, 'generating all', 'trace', '[G]');
