@@ -116,25 +116,28 @@ URN_DB_LOG_NAME=uranio_log_dev
 
 ---
 
-### URN_SUPERUSER_CREATE_ON_INIT
+<!-- ### URN_SUPERUSER_CREATE_ON_INIT -->
 
-This key defines if Uranio should create a `_superuser` when initializing.
-Useful for generating the first account with credentials.
+<!-- This key defines if Uranio should create a `_superuser` when initializing. -->
+<!-- Useful for generating the first account with credentials. -->
 
-Type: `boolean`
+<!-- Type: `boolean` -->
 
-```toml
-# .env
-URN_SUPERUSER_CREATE_ON_INIT=true
-```
+<!-- ```toml -->
+<!-- # .env -->
+<!-- URN_SUPERUSER_CREATE_ON_INIT=true -->
+<!-- ``` -->
 
-> Valid for Uranio repos: `core`, `api`, `trx`, `adm`.
+<!-- > Valid for Uranio repos: `core`, `api`, `trx`, `adm`. -->
 
 ---
 
 ### URN_SUPERUSER_EMAIL
 
-This key defines `_superuser` email. (See `URN_SUPERUSER_CREATE_ON_INIT`).
+<!-- This key defines `_superuser` email. (See `URN_SUPERUSER_CREATE_ON_INIT`). -->
+This key defines `_superuser` email.
+
+> Valid if `superuser_create_on_init` is set on `uranio.toml`.
 
 Type: `string`
 
@@ -149,7 +152,10 @@ URN_SUPERUSER_EMAIL=email@email.com
 
 ### URN_SUPERUSER_PASSWORD
 
-This key defines `_superuser` password. (See `URN_SUPERUSER_CREATE_ON_INIT`).
+<!-- This key defines `_superuser` password. (See `URN_SUPERUSER_CREATE_ON_INIT`). -->
+This key defines `_superuser` password.
+
+> Valid if `superuser_create_on_init` is set on `uranio.toml`.
 
 Type: `string`
 
