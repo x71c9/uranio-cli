@@ -273,7 +273,7 @@ class CMD {
         this.output.trace_log(`Started ${action}`);
         const branch_str = (branch !== 'master' && typeof branch === 'string') ?
             `-b ${branch} ` : '';
-        let cmd = `git clone -–depth 1 ${branch_str}${address} ${dest_folder} --progress`;
+        let cmd = `git clone ${branch_str}${address} ${dest_folder} --depth 1 --progress`;
         cmd += (recursive === true) ? ` --recurse-submodules` : '';
         // return await this.spawn.spin_and_trace_log_promise(cmd, action, '');
         return await this.spawn.spin_promise(cmd, action, '');
