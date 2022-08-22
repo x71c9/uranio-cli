@@ -484,22 +484,38 @@ This option defines the port where the Web Service is deployed.
 
 ---
 
-### url
+### proxy
 
-This option defines the full url where the Web Service is deployed. It must be
-explicitly defined since it can be under a proxy.
+This option can be set if the Web Service is proxied on another URI.
 
 | Type | Default |
 |:-----|:--------|
-| `string` | `http://0.0.0.0:7777/uranio/api` |
+| `string` | '' |
 
 ```toml
 # uranio.toml
 [service]
-	url = "http://0.0.0.0:7777/uranio/api"
+	proxy = "https://proxyserver.com:7777/uranio/api"
 ```
 
 > Valid for Uranio repos: `trx`, `adm`.
+
+> IMPORTANT
+>
+> If this option `service_proxy` is needed only for production, a developmenet
+> `dev_service_proxy` must be set with the default URL.
+>
+> For example:
+```toml
+# uranio.toml
+[service]
+	proxy = "https://proxyserver.com:7777/uranio/api"
+[dev.service]
+	protocol = 'http'
+	domain = '0.0.0.0'
+	port = 3000
+	proxy = "http://0.0.0.0:3000/uranio/api"
+```
 
 ---
 
@@ -558,6 +574,38 @@ This option defines the port where the Admin panel is deployed.
 ```
 
 > Valid for Uranio repos: `adm`.
+
+---
+
+### api_proxy
+
+This option can be set if the Service API for the Admin Panel is proxied.
+
+| Type | Default |
+|:-----|:--------|
+| `string` | '' |
+
+```toml
+# uranio.toml
+[client.panel]
+	api_proxy = "https://proxyserver.com:7777/uranio/api"
+```
+
+> Valid for Uranio repos: `adm`.
+
+> IMPORTANT
+>
+> If this option `client_panel_api_proxy` is needed only for production, a developmenet
+> `client_dev_panel_api_proxy` must be set with the default URL.
+>
+> For example:
+```toml
+# uranio.toml
+[client.panel]
+	api_proxy = "https://proxyserver.com:7777/uranio/api"
+[client.dev.panel]
+	api_proxy = "http://0.0.0.0:3000/uranio/api"
+```
 
 ---
 
