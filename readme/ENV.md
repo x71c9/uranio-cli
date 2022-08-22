@@ -166,6 +166,11 @@ URN_SUPERUSER_PASSWORD=averylongandsecurepassword
 
 > Valid for Uranio repos: `core`, `api`, `trx`, `adm`.
 
+> IMPORTANT
+>
+> If the password chaneg and `superuser_create_on_init` is set to `true` in
+> `uranio.toml`. The old user is deleted and a new one is created.
+
 ---
 
 ### URN_JWT_PRIVATE_KEY
