@@ -89,12 +89,20 @@ async function _build() {
     // if(build_params.docker === true){
     // 	return await docker.build(build_params);
     // }
+    // await _transpile(); // NO NEED since all delta will be transpiled by uranio
     await (0, transpose_1.transpose)(build_params);
     await (0, generate_1.generate)(build_params);
 }
 // async function _create_bundles(){
 // 	await _bundle_service_ws();
 // 	await _bundle_panel_index();
+// }
+// @ts-ignore
+// async function _transpile(){
+// 	const exec = pacman_exec[build_params.pacman];
+// 	let cmd_ts = '';
+// 	cmd_ts += `${exec} tsc -b`;
+// 	await util_instance.spawn.native_promise(cmd_ts, 'transpiling typescript');
 // }
 // @ts-ignore
 async function _bundle_service_ws(params) {

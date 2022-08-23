@@ -104,6 +104,8 @@ async function _build(){
 		
 	// }
 	
+	// await _transpile(); // NO NEED since all delta will be transpiled by uranio
+	
 	await transpose(build_params);
 	
 	await generate(build_params);
@@ -113,6 +115,16 @@ async function _build(){
 // async function _create_bundles(){
 // 	await _bundle_service_ws();
 // 	await _bundle_panel_index();
+// }
+
+// @ts-ignore
+// async function _transpile(){
+	
+// 	const exec = pacman_exec[build_params.pacman];
+	
+// 	let cmd_ts = '';
+// 	cmd_ts += `${exec} tsc -b`;
+// 	await util_instance.spawn.native_promise(cmd_ts, 'transpiling typescript');
 // }
 
 // @ts-ignore

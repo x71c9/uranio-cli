@@ -495,7 +495,7 @@ This option can be set if the Web Service is proxied on another URI.
 ```toml
 # uranio.toml
 [service]
-	proxy = "https://proxyserver.com:7777/uranio/api"
+	proxy = "https://proxyserver.com:7777"
 ```
 
 > Valid for Uranio repos: `trx`, `adm`.
@@ -509,7 +509,7 @@ This option can be set if the Web Service is proxied on another URI.
 ```toml
 # uranio.toml
 [service]
-	proxy = "https://proxyserver.com:7777/uranio/api"
+	proxy = "https://proxyserver.com:7777"
 [dev.service]
 	protocol = 'http'
 	domain = '0.0.0.0'
@@ -588,7 +588,7 @@ This option can be set if the Service API for the Admin Panel is proxied.
 ```toml
 # uranio.toml
 [client.panel]
-	api_proxy = "https://proxyserver.com:7777/uranio/api"
+	api_proxy = "https://proxyserver.com:7777"
 ```
 
 > Valid for Uranio repos: `adm`.
@@ -602,7 +602,7 @@ This option can be set if the Service API for the Admin Panel is proxied.
 ```toml
 # uranio.toml
 [client.panel]
-	api_proxy = "https://proxyserver.com:7777/uranio/api"
+	api_proxy = "https://proxyserver.com:7777"
 [client.dev.panel]
 	api_proxy = "http://0.0.0.0:3000/uranio/api"
 ```
