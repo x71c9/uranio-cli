@@ -145,12 +145,12 @@ function check_if_is_dot(path) {
 }
 exports.check_if_is_dot = check_if_is_dot;
 exports.package_scripts = {
-    'build': `uranio build`,
-    'build:server': `uranio build:client`,
-    'build:panel': `uranio build:panel`,
+    // 'build': `uranio build`,
+    // 'build:server': `uranio build:client`,
+    // 'build:panel': `uranio build:panel`,
     'dev': `uranio dev`,
-    'dev:server': `uranio dev:server`,
-    'dev:panel': `uranio dev:panel`
+    // 'dev:server': `uranio dev:server`,
+    // 'dev:panel': `uranio dev:panel`
 };
 exports.adm_package_scripts = {
     // 'postinstall': `yarn patch-package --patch-dir node_modules/uranio/patches`

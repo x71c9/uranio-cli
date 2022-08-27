@@ -15,12 +15,7 @@ export declare function check_db(db: string): void;
 export declare function check_loglevel(level: string): void;
 export declare function check_if_is_dot(path: string): boolean;
 export declare const package_scripts: {
-    build: string;
-    'build:server': string;
-    'build:panel': string;
     dev: string;
-    'dev:server': string;
-    'dev:panel': string;
 };
 export declare const adm_package_scripts: {
     postinstall: string;

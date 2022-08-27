@@ -15,7 +15,7 @@
  *
  * 2) SRC Server Folder
  * It copies and compile all file from src/server to:
- * -- node_modules/uranio/src/aroms/server
+ * -- node_modules/uranio/src/atoms/server
  *
  * 2) SRC Admin Folder
  * TODO
@@ -395,10 +395,10 @@ function _is_atom_register_definition(file_path) {
     return (relative_splitted.length === 2 && path_1.default.basename(file_path) === 'index.ts');
 }
 function _replace_import_server(text, file_path) {
-    return _replace_import(text, file_path, 'server');
+    return _replace_import(text, file_path, 'srv');
 }
 function _replace_import_client(text, file_path) {
-    return _replace_import(text, file_path, 'client');
+    return _replace_import(text, file_path, 'cln');
 }
 function _replace_import(text, file_path, parent_folder) {
     const atoms_dir_path = `${transpose_params.root}/src/atoms/`;
@@ -430,7 +430,7 @@ function _transpose_server_dir_file(file_path) {
     output_instance.trace_log(`Transpose server dir file [${file_path}].`);
     const server_dir = `${transpose_params.root}/src/server/`;
     const relative_path = file_path.replace(server_dir, '');
-    const node_delta_server = `${transpose_params.root}/node_modules/uranio/src/server/delta`;
+    const node_delta_server = `${transpose_params.root}/node_modules/uranio/src/srv/delta`;
     const node_dest_path = `${node_delta_server}/${relative_path}`;
     util_instance.fs.copy_file(file_path, node_dest_path);
     const node_dist_path = _dest_dist_path(node_dest_path);

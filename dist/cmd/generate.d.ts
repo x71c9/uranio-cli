@@ -12,7 +12,7 @@
  * - uranio-generate-api
  * - uranio-generate-core
  *
- * This scripts are always defined in `src/server/generate.ts` for each uranio
+ * This scripts are always defined in `src/srv/generate.ts` for each uranio
  * repo.
  *
  * In general what they do is:

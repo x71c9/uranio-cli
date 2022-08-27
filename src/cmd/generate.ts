@@ -12,7 +12,7 @@
  * - uranio-generate-api
  * - uranio-generate-core
  *
- * This scripts are always defined in `src/server/generate.ts` for each uranio
+ * This scripts are always defined in `src/srv/generate.ts` for each uranio
  * repo.
  *
  * In general what they do is:
@@ -54,10 +54,10 @@ let generate_params = default_params as Params;
 
 const _valid_generate_extensions = ['.ts', '.js'];
 
-let register_path_server = `node_modules/uranio/src/server/register.ts`;
-let register_path_client = `node_modules/uranio/src/client/register.ts`;
-let compiled_register_path_server = `node_modules/uranio/dist/server/register.js`;
-let compiled_register_path_client = `node_modules/uranio/dist/client/register.js`;
+let register_path_server = `node_modules/uranio/src/srv/register.ts`;
+let register_path_client = `node_modules/uranio/src/cln/register.ts`;
+let compiled_register_path_server = `node_modules/uranio/dist/srv/register.js`;
+let compiled_register_path_client = `node_modules/uranio/dist/cln/register.js`;
 
 export async function generate(params:Params, _path?:string, _event?:string)
 		:Promise<void>{
@@ -191,18 +191,18 @@ function _copy_uranio_schema_repo(){
  * Then it will compile both of them.
  *
  * The location of the compiled files is:
- * `./node_modules/uranio/src/[server|client]/register.js`
+ * `./node_modules/uranio/src/[srv|cln]/register.js`
  */
 async function _generate_register()
 		:Promise<void>{
 	
 	const node_register_uranio_src = `node_modules/uranio/src`;
-	const node_register_src_server = `${node_register_uranio_src}/server/register.ts`;
-	const node_register_src_client = `${node_register_uranio_src}/client/register.ts`;
+	const node_register_src_server = `${node_register_uranio_src}/srv/register.ts`;
+	const node_register_src_client = `${node_register_uranio_src}/cln/register.ts`;
 	
 	const node_register_uranio_dist = `node_modules/uranio/dist`;
-	const node_register_dist_server = `${node_register_uranio_dist}/server/register.js`;
-	const node_register_dist_client = `${node_register_uranio_dist}/client/register.js`;
+	const node_register_dist_server = `${node_register_uranio_dist}/srv/register.js`;
+	const node_register_dist_client = `${node_register_uranio_dist}/cln/register.js`;
 	
 	register_path_server = `${generate_params.root}/${node_register_src_server}`;
 	register_path_client = `${generate_params.root}/${node_register_src_client}`;
@@ -229,6 +229,7 @@ function _compile(src:string, dest:string){
 		// sourcemap: true,
 		// minify: true
 	});
+	output_instance.trace_log(`Compiled [${src}] to [${dest}]`);
 }
 
 function _compile_register_server(){

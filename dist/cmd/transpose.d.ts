@@ -14,7 +14,7 @@
  *
  * 2) SRC Server Folder
  * It copies and compile all file from src/server to:
- * -- node_modules/uranio/src/aroms/server
+ * -- node_modules/uranio/src/atoms/server
  *
  * 2) SRC Admin Folder
  * TODO

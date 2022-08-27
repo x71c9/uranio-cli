@@ -166,12 +166,12 @@ export function check_if_is_dot(path:string):boolean{
 }
 
 export const package_scripts = {
-	'build': `uranio build`,
-	'build:server': `uranio build:client`,
-	'build:panel': `uranio build:panel`,
+	// 'build': `uranio build`,
+	// 'build:server': `uranio build:client`,
+	// 'build:panel': `uranio build:panel`,
 	'dev': `uranio dev`,
-	'dev:server': `uranio dev:server`,
-	'dev:panel': `uranio dev:panel`
+	// 'dev:server': `uranio dev:server`,
+	// 'dev:panel': `uranio dev:panel`
 };
 
 export const adm_package_scripts = {
