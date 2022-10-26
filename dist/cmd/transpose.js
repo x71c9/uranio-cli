@@ -273,6 +273,9 @@ function _dest_dist_path(filepath) {
     return `${dir_name}/${file_name}.js`;
 }
 function _compile(src_path, dest_path) {
+    if (path_1.default.extname(src_path) !== '.js' && path_1.default.extname(src_path) !== '.ts') {
+        return;
+    }
     if (path_1.default.extname(src_path) === '.json') {
         const dest_dirname = path_1.default.dirname(dest_path);
         const dest_basename = path_1.default.basename(dest_path, '.js');

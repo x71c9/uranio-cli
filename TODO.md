@@ -1,5 +1,8 @@
 #### TODO
 
+- Ask to override `tsconfig.json`
+- Add `.env` fields if already in repo.
+
 ##### Module functions
 
 - uranio init
