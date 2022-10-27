@@ -33,13 +33,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports._watch = exports.dev_panel = exports.dev_server = exports.dev = void 0;
 const path_1 = __importDefault(require("path"));
-const forever_monitor_1 = __importDefault(require("forever-monitor"));
-// import isDocker from 'is-docker';
-// import chalk from 'chalk';
+// import forever from 'forever-monitor';
 const output = __importStar(require("../output/index"));
 const util = __importStar(require("../util/index"));
 const defaults_1 = require("../conf/defaults");
-// import {Params} from '../types';
 const types_1 = require("../types");
 const generate_1 = require("./generate");
 const transpose_1 = require("./transpose");
@@ -47,55 +44,35 @@ const build_1 = require("./build");
 const common_1 = require("./common");
 const docker = __importStar(require("./docker"));
 const cmd_1 = require("../util/cmd");
-// const is_docker = isDocker();
 let output_instance;
 let util_instance;
 let dev_params = defaults_1.default_params;
-// let watch_lib_scanned = false;
 let watch_src_scanned = false;
 let watch_toml_scanned = false;
-// const nuxt_color = '#677cc7';
-// const tscw_color = '#734de3';
-// const watc_color = '#687a6a';
-// const pane_color = '#4f9ee3';
-// const pane_color = '#7464C3';
-// const pane_color = '#00AA7E';
+// let _service_child:forever.Monitor;
 let _service_child;
-// let _service_time:ReturnType<typeof setTimeout>;
 let _is_dev_server = false;
 const _valid_reload_extensions = ['.ts', '.js'];
 async function dev(params) {
     _init_params(params);
     docker.fail_if_compiled(dev_params);
-    // if(params.docker === true){
-    // 	await docker.start(dev_params);
-    // }else{
     await _init_dev();
     _dev_server();
     if ((0, types_1.valid_admin_repos)().includes(dev_params.repo)) {
         _dev_panel();
     }
-    // }
 }
 exports.dev = dev;
 async function dev_server(params) {
     _init_params(params);
-    // if(params.docker === true){
-    // 	await docker.start_server(dev_params);
-    // }else{
     await _init_dev();
     _dev_server();
-    // }
 }
 exports.dev_server = dev_server;
 async function dev_panel(params) {
     _init_params(params);
-    // if(params.docker === true){
-    // 	await docker.start_panel(dev_params);
-    // }else{
     await _init_dev();
     _dev_panel();
-    // }
 }
 exports.dev_panel = dev_panel;
 function _init_params(params) {
@@ -112,9 +89,6 @@ async function _init_dev() {
 async function _dev_panel() {
     // uranio-panel-adm dev doesn't need Forever to reaload (like the server)
     // because it reloads itself by launching Nuxt dev service.
-    // const args = (is_docker === true) ? ' urn_log_prefix_type=true' : '';
-    // const args = ' urn_log_prefix_type=true';
-    // const args = '';
     const args = ' --prefix_logtype';
     const exec = cmd_1.pacman_exec[dev_params.pacman];
     const node_env = (dev_params.prod === true) ? `NODE_ENV=production ` : '';
@@ -124,46 +98,57 @@ async function _dev_panel() {
 }
 async function _dev_server() {
     _is_dev_server = true;
-    // _fix_mongodb_saslprep_requirement();
-    // const args = (is_docker === true) ? ['urn_log_prefix_type=true'] : [];
-    // const args = ['urn_log_prefix_type=true'];
-    // const args:string[] = [];
-    const args = ['--prefix_logtype'];
-    // Forever module needs for ensuring that a given script runs continuously
-    _service_child = new forever_monitor_1.default.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`, {
-        silent: true,
-        args: args,
-        env: {
-            NODE_ENV: (dev_params.prod === true) ? 'production' : 'development'
-        }
-        // watch: true,
-        // watchDirectory: `${dev_params.root}/src`
-    });
-    _service_child.start();
-    _service_child.on('watch:restart', function (info) {
-        output_instance.info_log('Restarting [dev server] because ' + info.file + ' changed');
-    });
-    _service_child.on('restart', function (_info) {
-        output_instance.info_log('Forever restarting [dev server].');
-    });
-    _service_child.on('exit:code', function (code) {
-        output_instance.done_log('Forever detected [dev server] exited with code ' + code);
-    });
-    _service_child.on('stdout', function (chunk) {
-        // process.stdout.write(`${prefix} ${data.toString()}`);
-        // process.stdout.write(chunk.toString());
-        const splitted_chunk = chunk.toString().split('\n');
-        for (const split of splitted_chunk) {
-            let plain_text = output_instance.clean_chunk(split);
-            if (plain_text === '') {
-                continue;
-            }
-            const prefix = (dev_params.no_colors === true) ? defaults_1.defaults.prefix_srv_blank : defaults_1.defaults.prefix_srv;
-            plain_text = `${prefix} ${plain_text}`;
-            output_instance.translate_loglevel(plain_text);
-        }
-    });
+    const prefix = (dev_params.no_colors === true) ? defaults_1.defaults.prefix_srv_blank : defaults_1.defaults.prefix_srv;
+    const cmd_dev_service = `${dev_params.root}/node_modules/uranio/dist/service/ws.js`;
+    _service_child = util_instance.spawn.native(cmd_dev_service, 'developing service', undefined, prefix);
 }
+async function _restart_service() {
+    output_instance.debug_log(`Restarting server...`);
+    _service_child.stdin.end();
+    _service_child.stdout.destroy();
+    _service_child.stderr.destroy();
+    _service_child.kill('SIGINT');
+    _dev_server();
+}
+// async function _dev_server(){
+// 	_is_dev_server = true;
+// 	// _fix_mongodb_saslprep_requirement();
+// 	const args:string[] = ['--prefix_logtype'];
+// 	// Forever module needs for ensuring that a given script runs continuously
+// 	_service_child = new forever.Monitor(`${dev_params.root}/node_modules/uranio/dist/service/ws.js`,{
+// 		silent: true,
+// 		args: args,
+// 		env: {
+// 			NODE_ENV: (dev_params.prod === true) ? 'production' : 'development'
+// 		}
+// 		// watch: true,
+// 		// watchDirectory: `${dev_params.root}/src`
+// 	});
+// 	_service_child.start();
+// 	_service_child.on('watch:restart', function(info) {
+// 		output_instance.info_log('Restarting [dev server] because ' + info.file + ' changed');
+// 	});
+// 	_service_child.on('restart', function(_info) {
+// 		output_instance.info_log('Forever restarting [dev server].');
+// 	});
+// 	_service_child.on('exit:code', function(code) {
+// 		output_instance.done_log('Forever detected [dev server] exited with code ' + code);
+// 	});
+// 	_service_child.on('stdout', function(chunk){
+// 		// process.stdout.write(`${prefix} ${data.toString()}`);
+// 		// process.stdout.write(chunk.toString());
+// 		const splitted_chunk = chunk.toString().split('\n');
+// 		for(const split of splitted_chunk){
+// 			let plain_text = output_instance.clean_chunk(split);
+// 			if(plain_text === ''){
+// 				continue;
+// 			}
+// 			const prefix = (dev_params.no_colors === true) ? defaults.prefix_srv_blank : defaults.prefix_srv;
+// 			plain_text = `${prefix} ${plain_text}`;
+// 			output_instance.translate_loglevel(plain_text);
+// 		}
+// 	});
+// }
 function _tsc_watch() {
     const exec = cmd_1.pacman_exec[dev_params.pacman];
     const tsc_watch = `${exec} tsc -w`;
@@ -193,10 +178,8 @@ function _watch() {
         await (0, transpose_1.transpose)(dev_params, _path, _event);
         await (0, generate_1.generate)(dev_params, _path, _event);
         if (_is_dev_server && _valid_reload_extensions.includes(extension)) {
-            // clearTimeout(_service_time);
-            // _service_time = setTimeout(() => {
-            _service_child.restart();
-            // }, 500);
+            // _service_child.restart();
+            _restart_service();
         }
         output_instance.done_log(`[src watch] Built [${_event}] [${_path}].`);
     });
@@ -217,10 +200,8 @@ function _watch() {
         output_instance.info_log(`${_event} ${_path}`);
         await (0, generate_1.generate)(dev_params, _path, _event);
         if (_is_dev_server) {
-            // clearTimeout(_service_time);
-            // _service_time = setTimeout(() => {
-            _service_child.restart();
-            // }, 500);
+            // _service_child.restart();
+            _restart_service();
         }
         output_instance.done_log(`[toml watch] Generated [${_event}] [${_path}].`);
     });

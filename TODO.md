@@ -1,6 +1,7 @@
 #### TODO
 
 - Ask to override `tsconfig.json`
+- Do not remove on deinit? `tsconfig.json`
 - Add `.env` fields if already in repo.
 
 ##### Module functions

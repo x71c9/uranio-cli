@@ -218,6 +218,10 @@ class Spawn {
 					this.output.done_debug_log(`Done ${action}`);
 					return (resolve) ? resolve(true) : true;
 				}
+				// case 6:{
+				// 	this.output.warn_log(`Restarting...`);
+				// 	return (resolve) ? resolve(true) : true;
+				// }
 				default:{
 					if(code !== null){
 						_print_cached_output(child_outputs[child.pid || 'pid0'], this.output);
