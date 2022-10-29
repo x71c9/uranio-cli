@@ -13,12 +13,12 @@ declare class Spawn {
     output: out.OutputInstance;
     constructor(output: out.OutputInstance);
     exec_sync(command: string): void;
-    native(command: string, action: string, over?: Over, prefix?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
+    native(command: string, action: string, over?: Over, prefix?: string, resolve?: Resolve, reject?: Reject, detached?: boolean, no_log_on_error?: boolean): cp.ChildProcessWithoutNullStreams;
     spin(command: string, action: string, prefix?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
     info_log(command: string, action: string, prefix?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
     debug_log(command: string, action: string, prefix?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
     trace_log(command: string, action: string, prefix?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
-    spin_and_native(command: string, action: string, over?: Over, prefix?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
+    spin_and_native(command: string, action: string, over?: Over, prefix?: string, resolve?: Resolve, reject?: Reject, detached?: boolean, no_log_on_error?: boolean): cp.ChildProcessWithoutNullStreams;
     spin_and_log(command: string, action: string, prefix?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
     spin_and_verbose_log(command: string, action: string, prefix?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;
     spint_and_trace_log(command: string, action: string, prefix?: string, resolve?: Resolve, reject?: Reject, detached?: boolean): cp.ChildProcessWithoutNullStreams;

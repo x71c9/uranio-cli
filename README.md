@@ -1,6 +1,6 @@
 ## Uranio
 
-![uranio logo](./img/URN_TEXT_1440_BANNER_00.png)
+![uranio logo](./img/URN_TEXT_1440_BANNER_01.png)
 
 Uranio command line interface.
 

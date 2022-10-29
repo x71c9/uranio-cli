@@ -82,17 +82,23 @@ async function _dev_panel(){
 }
 async function _dev_server(){
 	_is_dev_server = true;
+	const args = ' --prefix_logtype';
 	const prefix = (dev_params.no_colors === true) ? defaults.prefix_srv_blank : defaults.prefix_srv;
-	const cmd_dev_service = `${dev_params.root}/node_modules/uranio/dist/service/ws.js`;
-	_service_child = util_instance.spawn.native(cmd_dev_service, 'developing service', undefined, prefix);
+	const exec = pacman_exec[dev_params.pacman];
+	const node_env = (dev_params.prod === true) ? `NODE_ENV=production ` : '';
+	// const cmd_dev_service = `${node_env}${exec} uranio-webservice-${dev_params.repo} ${args}`;
+	let cmd_dev_service = '';
+	cmd_dev_service += `${node_env}${exec}`;
+	cmd_dev_service += ` node ${dev_params.root}/node_modules/uranio/dist/service/ws.js ${args}`;
+	_service_child = util_instance.spawn.native(cmd_dev_service, 'developing service', undefined, prefix, undefined, undefined, false, true);
 }
 
 async function _restart_service(){
 	output_instance.debug_log(`Restarting server...`);
-	_service_child.stdin.end();
-	_service_child.stdout.destroy();
-	_service_child.stderr.destroy();
-	_service_child.kill('SIGINT');
+	// _service_child.stdin.end();
+	// _service_child.stdout.destroy();
+	// _service_child.stderr.destroy();
+	_service_child.kill();
 	_dev_server();
 }
 
