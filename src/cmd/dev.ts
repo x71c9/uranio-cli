@@ -95,9 +95,9 @@ async function _dev_server(){
 
 async function _restart_service(){
 	output_instance.debug_log(`Restarting server...`);
-	// _service_child.stdin.end();
-	// _service_child.stdout.destroy();
-	// _service_child.stderr.destroy();
+	_service_child.stdin.end();
+	_service_child.stdout.destroy();
+	_service_child.stderr.destroy();
 	_service_child.kill();
 	_dev_server();
 }
@@ -162,7 +162,7 @@ export function _watch(){
 		async (_event, _path) => {
 			const basename = path.basename(_path);
 			const extension = path.extname(basename);
-			const not_valid_extensions = ['.swp', '.swo'];
+			const not_valid_extensions = ['.swp', '.swo', '.DS_Store'];
 			if(not_valid_extensions.includes(extension) || not_valid_extensions.includes(basename)){
 				return false;
 			}
