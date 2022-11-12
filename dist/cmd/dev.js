@@ -51,6 +51,7 @@ let watch_src_scanned = false;
 let watch_toml_scanned = false;
 // let _service_child:forever.Monitor;
 let _service_child;
+// let _child_controller:AbortController;
 let _is_dev_server = false;
 const _valid_reload_extensions = ['.ts', '.js'];
 async function dev(params) {
@@ -91,22 +92,40 @@ async function _dev_panel() {
     // because it reloads itself by launching Nuxt dev service.
     const args = ' --prefix_logtype';
     const exec = cmd_1.pacman_exec[dev_params.pacman];
-    const node_env = (dev_params.prod === true) ? `NODE_ENV=production ` : '';
-    const prefix = (dev_params.no_colors === true) ? defaults_1.defaults.prefix_pnl_blank : defaults_1.defaults.prefix_pnl;
+    const node_env = (dev_params.prod === true) ?
+        `NODE_ENV=production ` : '';
+    const prefix = (dev_params.no_colors === true) ?
+        defaults_1.defaults.prefix_pnl_blank : defaults_1.defaults.prefix_pnl;
     const cmd_dev_panel = `${node_env}${exec} uranio-panel-${dev_params.repo} dev${args}`;
-    util_instance.spawn.native(cmd_dev_panel, 'developing panel', 'trace', prefix);
+    util_instance.spawn.native({
+        command: cmd_dev_panel,
+        action: 'developing panel',
+        over: 'trace',
+        prefix
+    });
 }
 async function _dev_server() {
     _is_dev_server = true;
     const args = ' --prefix_logtype';
-    const prefix = (dev_params.no_colors === true) ? defaults_1.defaults.prefix_srv_blank : defaults_1.defaults.prefix_srv;
-    const exec = cmd_1.pacman_exec[dev_params.pacman];
-    const node_env = (dev_params.prod === true) ? `NODE_ENV=production ` : '';
-    // const cmd_dev_service = `${node_env}${exec} uranio-webservice-${dev_params.repo} ${args}`;
+    const prefix = (dev_params.no_colors === true) ?
+        defaults_1.defaults.prefix_srv_blank : defaults_1.defaults.prefix_srv;
+    // const exec = pacman_exec[dev_params.pacman];
+    const node_env = (dev_params.prod === true) ?
+        `NODE_ENV=production ` : '';
+    // const cmd_dev_service =
+    // `${node_env}${exec} uranio-webservice-${dev_params.repo} ${args}`;
     let cmd_dev_service = '';
-    cmd_dev_service += `${node_env}${exec}`;
-    cmd_dev_service += ` node ${dev_params.root}/node_modules/uranio/dist/service/ws.js ${args}`;
-    _service_child = util_instance.spawn.native(cmd_dev_service, 'developing service', undefined, prefix, undefined, undefined, false, true);
+    // cmd_dev_service += `${node_env}${exec}`;
+    cmd_dev_service += `${node_env}`;
+    cmd_dev_service +=
+        ` node ${dev_params.root}/node_modules/uranio/dist/service/ws.js ${args}`;
+    // _child_controller = util_instance.spawn.native({
+    _service_child = util_instance.spawn.native({
+        command: cmd_dev_service,
+        action: 'developing service',
+        prefix: prefix,
+        no_log_on_error: true
+    });
 }
 async function _restart_service() {
     output_instance.debug_log(`Restarting server...`);
@@ -159,7 +178,12 @@ function _tsc_watch() {
     const exec = cmd_1.pacman_exec[dev_params.pacman];
     const tsc_watch = `${exec} tsc -w`;
     const prefix = (dev_params.no_colors === true) ? defaults_1.defaults.prefix_tsc_blank : defaults_1.defaults.prefix_tsc;
-    util_instance.spawn.native(tsc_watch, 'watching types', 'debug', prefix);
+    util_instance.spawn.native({
+        command: tsc_watch,
+        action: 'watching types',
+        over: 'debug',
+        prefix
+    });
 }
 function _watch() {
     const src_path = `${dev_params.root}/src/`;

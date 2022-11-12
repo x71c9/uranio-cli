@@ -54,7 +54,25 @@ class Spawn {
 		cp.execSync(command);
 	}
 	
-	public native(command:string, action:string, over:Over='', prefix='', resolve?:Resolve, reject?:Reject, detached=false, no_log_on_error=false){
+	public native({
+		command,
+		action,
+		over='',
+		prefix='',
+		resolve,
+		reject,
+		detached=false,
+		no_log_on_error=false
+	}:{
+		command: string,
+		action: string,
+		over?: Over,
+		prefix?: string,
+		resolve?: Resolve,
+		reject?: Reject,
+		detached?: boolean,
+		no_log_on_error?: boolean
+	}){
 		return this._native_spawn({
 			command,
 			action,
@@ -188,7 +206,9 @@ class Spawn {
 	
 	public async native_promise(command:string, action:string, over:Over='', prefix='', detached=false){
 		return await new Promise((resolve, reject) => {
-			return this.native(command, action, over, prefix, resolve, reject, detached);
+			return this.native({
+				command, action, over, prefix, resolve, reject, detached
+			});
 		});
 	}
 	
@@ -260,6 +280,10 @@ class Spawn {
 			this.output.start_loading(command);
 		}
 		this.output.trace_log(`$ ${command}`);
+		
+		// const controller = new AbortController();
+		// const { signal } = controller;
+		// const child = cp.spawn(command, {shell: true, detached: detached, signal});
 		
 		const child = cp.spawn(command, {shell: true, detached: detached});
 		
@@ -346,7 +370,8 @@ class Spawn {
 		child_outputs[child.pid || 'pid0'] = [];
 		
 		return child;
-	
+		// return controller;
+		
 	}
 	
 	private _spawn({

@@ -64,7 +64,7 @@ class Spawn {
         this.output.trace_log(command);
         cp.execSync(command);
     }
-    native(command, action, over = '', prefix = '', resolve, reject, detached = false, no_log_on_error = false) {
+    native({ command, action, over = '', prefix = '', resolve, reject, detached = false, no_log_on_error = false }) {
         return this._native_spawn({
             command,
             action,
@@ -188,7 +188,9 @@ class Spawn {
     }
     async native_promise(command, action, over = '', prefix = '', detached = false) {
         return await new Promise((resolve, reject) => {
-            return this.native(command, action, over, prefix, resolve, reject, detached);
+            return this.native({
+                command, action, over, prefix, resolve, reject, detached
+            });
         });
     }
     async info_log_promise(command, action, prefix = '', detached = false) {
@@ -231,6 +233,9 @@ class Spawn {
             this.output.start_loading(command);
         }
         this.output.trace_log(`$ ${command}`);
+        // const controller = new AbortController();
+        // const { signal } = controller;
+        // const child = cp.spawn(command, {shell: true, detached: detached, signal});
         const child = cp.spawn(command, { shell: true, detached: detached });
         if (child.stdout) {
             child.stdout.setEncoding('utf8');
@@ -309,6 +314,7 @@ class Spawn {
         // }
         child_outputs[child.pid || 'pid0'] = [];
         return child;
+        // return controller;
     }
     _spawn({ command, action, spin, verbose, debug, prefix, resolve, reject, detached = false, no_log_on_error = false }) {
         if (spin) {

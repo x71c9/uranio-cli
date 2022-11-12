@@ -5,6 +5,10 @@
 	"description": "Uranio command line interface",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
+	"bin": {
+		"urn": "dist/sh.js",
+		"uranio": "dist/sh.js"
+	},
 	"scripts": {
 		"build": "yarn tsc -b",
 		"plain:sh": "node -r source-map-support/register ./dist/sh.js ",
@@ -65,9 +69,5 @@
 		"toml": "^3.0.0",
 		"ts-morph": "^10.0.1",
 		"uranio-lib": "^0.0.2"
-	},
-	"bin": {
-		"urn": "dist/sh.js",
-		"uranio": "dist/sh.js"
 	}
 }

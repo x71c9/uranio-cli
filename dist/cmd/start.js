@@ -63,8 +63,14 @@ async function start_server(params, init = true) {
     const urn_lib_pre = ` --prefix_logtype`;
     const urn_config_path = ` -c ${start_params.root}/uranio.toml`;
     const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
-    const cmd_server = `${node_env}${exec} uranio-webservice-${start_params.repo}${urn_lib_pre}${urn_config_path}`;
-    util_instance.spawn.native(cmd_server, 'starting server', '', defaults_1.defaults.prefix_srv);
+    let cmd_server = `${node_env}${exec}`;
+    cmd_server += ` uranio-webservice-${start_params.repo}`;
+    cmd_server += `${urn_lib_pre}${urn_config_path}`;
+    util_instance.spawn.native({
+        command: cmd_server,
+        action: 'starting server',
+        prefix: defaults_1.defaults.prefix_srv
+    });
 }
 exports.start_server = start_server;
 async function start_panel(params, init = true) {
@@ -79,7 +85,12 @@ async function start_panel(params, init = true) {
     const urn_lib_pre = ` --prefix_logtype`;
     const node_env = (params.prod === true) ? `NODE_ENV=production ` : '';
     const cmd_server = `${node_env}${exec} uranio-panel-${start_params.repo} start${urn_lib_pre}`;
-    util_instance.spawn.native(cmd_server, 'starting panel', 'trace', defaults_1.defaults.prefix_pnl);
+    util_instance.spawn.native({
+        command: cmd_server,
+        action: 'starting panel',
+        over: 'trace',
+        prefix: defaults_1.defaults.prefix_pnl
+    });
 }
 exports.start_panel = start_panel;
 async function _init_start() {
