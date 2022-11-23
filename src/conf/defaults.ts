@@ -39,7 +39,7 @@ export const default_params:Params = {
 	log_level: 3
 };
 
-const cloud_address = 'git+ssh://git@github.com/x71c9';
+const cloud_address = 'https://github.com/x71c9';
 
 export const defaults = {
 	folder: '.uranio',
