@@ -57,7 +57,10 @@ async function _remove_dockers() {
         output_instance.warn_log(`Some build artifacts might be still present.`);
         return;
     }
-    await docker.prune(deinit_params, true);
+    const is_docker_running = await util_instance.cmd.is_docker_running();
+    if (is_docker_running) {
+        await docker.prune(deinit_params, true);
+    }
 }
 async function _delete_files() {
     util_instance.fs.remove_directory(`${deinit_params.root}/.tmp`);

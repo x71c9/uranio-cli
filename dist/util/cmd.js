@@ -35,6 +35,9 @@ exports.create = exports.pacman_exec = void 0;
 const toml_1 = __importDefault(require("toml"));
 const uranio_lib_1 = require("uranio-lib");
 const defaults_1 = require("../conf/defaults");
+const util_1 = require("util");
+const child_process_1 = __importDefault(require("child_process"));
+const exe = (0, util_1.promisify)(child_process_1.default.exec);
 // DO NO CANCEL IT
 // import * as common from '../cmd/common';
 const fs = __importStar(require("./fs"));
@@ -231,6 +234,19 @@ class CMD {
     async uninstall_adm(pack_data) {
         await this._uninstall_uranio_pack(defaults_1.defaults.adm_repo, pack_data);
         return true;
+    }
+    async is_docker_running() {
+        try {
+            const response = await exe(`docker ps`);
+            const resp_str = response.stdout.trim();
+            if (resp_str.indexOf('Cannot connect to the Docker daemon') === -1) {
+                return true;
+            }
+            return false;
+        }
+        catch (err) {
+            return false;
+        }
     }
     async _uninstall_uranio_dep(repo, pack_data) {
         let short_repo = (repo.substring(0, 3) === 'ssh' || repo.substring(0, 7) === 'git+ssh') ?

@@ -473,6 +473,7 @@ async function _install_dev_dep() {
     //   await _install_real_dev_package(`patch-package`);
     //   await _install_real_dev_package(`postinstall-postinstall`);
     // }
+    await _install_dev_package(defaults_1.defaults.core_dep_dev_repo);
 }
 async function _install_packages() {
     output_instance.start_loading(`Intalling [${init_params.repo}]...`);

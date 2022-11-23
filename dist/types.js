@@ -22,6 +22,7 @@ exports.abstract_repos = {
     adm: ''
 };
 exports.abstract_deploy_repos = {
+    core: '',
     api: '',
     trx: '',
     adm: ''

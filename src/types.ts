@@ -64,6 +64,7 @@ export const abstract_repos = {
 } as const;
 
 export const abstract_deploy_repos = {
+	core: '',
 	api: '',
 	trx: '',
 	adm: ''

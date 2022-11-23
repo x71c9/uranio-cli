@@ -47,6 +47,7 @@ export declare const abstract_repos: {
     readonly adm: "";
 };
 export declare const abstract_deploy_repos: {
+    readonly core: "";
     readonly api: "";
     readonly trx: "";
     readonly adm: "";

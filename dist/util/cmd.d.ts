@@ -47,6 +47,7 @@ declare class CMD {
     uninstall_api(pack_data?: any): Promise<boolean>;
     uninstall_trx(pack_data?: any): Promise<boolean>;
     uninstall_adm(pack_data?: any): Promise<boolean>;
+    is_docker_running(): Promise<boolean>;
     private _uninstall_uranio_dep;
     private _uninstall_uranio_pack;
     private _uninstall_package;

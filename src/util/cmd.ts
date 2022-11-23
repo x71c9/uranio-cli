@@ -5,14 +5,13 @@
  */
 
 import toml from 'toml';
-
 import {urn_util} from 'uranio-lib';
-
 import {Params, PacManExec} from '../types';
-
 import {defaults} from '../conf/defaults';
-
 import * as out from '../output/index';
+import { promisify } from 'util';
+import cp from 'child_process';
+const exe = promisify(cp.exec);
 
 // DO NO CANCEL IT
 // import * as common from '../cmd/common';
@@ -270,6 +269,19 @@ class CMD {
 	public async uninstall_adm(pack_data?:any){
 		await this._uninstall_uranio_pack(defaults.adm_repo, pack_data);
 		return true;
+	}
+	
+	public async is_docker_running():Promise<boolean>{
+		try{
+			const response = await exe(`docker ps`);
+			const resp_str = response.stdout.trim();
+			if(resp_str.indexOf('Cannot connect to the Docker daemon') === -1){
+				return true;
+			}
+			return false;
+		}catch(err){
+			return false;
+		}
 	}
 	
 	private async _uninstall_uranio_dep(repo:string, pack_data?:any){
