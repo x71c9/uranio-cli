@@ -40,7 +40,7 @@ exports.default_params = {
     docker_tag: 'latest',
     log_level: 3
 };
-const cloud_address = 'git+ssh://git@github.com/x71c9';
+const cloud_address = 'https://github.com/x71c9';
 exports.defaults = {
     folder: '.uranio',
     docker_folder: '.docker',
