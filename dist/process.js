@@ -56,7 +56,7 @@ async function uranio_process(args) {
     util_instance = util.create(process_params, output_instance);
     _init_log();
     await _switch_command(args);
-    process.exit(0);
+    // process.exit(0);
 }
 exports.uranio_process = uranio_process;
 function _cmd_that_do_not_need_root(args) {

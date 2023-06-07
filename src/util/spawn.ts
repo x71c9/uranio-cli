@@ -336,6 +336,12 @@ class Spawn {
 			return (reject) ? reject() : process.exit(1);
 		});
 		
+		child.on('exit', (code, _signal) => {
+			if(code !== 0){
+				process.exit(code || 1);
+			}
+		});
+		
 		child.on('close', (code) => {
 			this.output.stop_loading();
 			switch(code){
@@ -356,7 +362,7 @@ class Spawn {
 					}
 					this.output.error_log(`Error on: ${command}`);
 					this.output.error_log(`Child process exited with code ${code}`);
-					// return (reject) ? reject() : false;
+					return (reject) ? reject() : process.exit(1);
 				}
 			}
 		});
