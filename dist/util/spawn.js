@@ -281,7 +281,7 @@ class Spawn {
         }
         child.on('error', (err) => {
             this.output.error_log(`${err}`);
-            return (reject) ? reject() : false;
+            return (reject) ? reject() : process.exit(1);
         });
         child.on('close', (code) => {
             this.output.stop_loading();

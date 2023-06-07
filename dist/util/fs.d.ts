@@ -29,6 +29,6 @@ declare class FS {
     remove_directory_async(dir_path: string): void;
     remove_directory(dir_path: string): void;
 }
-export declare type FSInstance = InstanceType<typeof FS>;
+export type FSInstance = InstanceType<typeof FS>;
 export declare function create(output: out.OutputInstance): FSInstance;
 export {};

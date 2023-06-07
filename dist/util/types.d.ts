@@ -4,11 +4,11 @@
  * @packageDocumentation
  */
 import chokidar from 'chokidar';
-export declare type OnReadyCallback = () => void;
-export declare type OnAllCallback = (event: WatchEvent, path: string) => void;
-export declare type WatchProcessObject = {
+export type OnReadyCallback = () => void;
+export type OnAllCallback = (event: WatchEvent, path: string) => void;
+export type WatchProcessObject = {
     child: chokidar.FSWatcher;
     text: string;
     context: string;
 };
-export declare type WatchEvent = 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir';
+export type WatchEvent = 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir';

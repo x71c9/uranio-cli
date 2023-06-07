@@ -7,10 +7,10 @@ import { Params, PacManExec } from '../types';
 import * as out from '../output/index';
 import * as fs from './fs';
 import * as spawn from './spawn';
-declare type DotEnv = {
+type DotEnv = {
     [k: string]: string;
 };
-declare type Toml = {
+type Toml = {
     [k: string]: string;
 };
 export declare const pacman_exec: PacManExec;
@@ -53,6 +53,6 @@ declare class CMD {
     private _uninstall_package;
     private _clone_repo;
 }
-export declare type CMDInstance = InstanceType<typeof CMD>;
+export type CMDInstance = InstanceType<typeof CMD>;
 export declare function create(params: Params, output: out.OutputInstance): CMDInstance;
 export {};

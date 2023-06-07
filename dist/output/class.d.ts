@@ -40,6 +40,6 @@ declare class Output {
     private _spinner_text_color;
     private _go_previous;
 }
-export declare type OutputInstance = InstanceType<typeof Output>;
+export type OutputInstance = InstanceType<typeof Output>;
 export declare function create(params: Params): OutputInstance;
 export {};

@@ -81,6 +81,7 @@ export async function uranio_process(args:Arguments)
 	
 	await _switch_command(args);
 	
+	process.exit(0);
 }
 
 function _cmd_that_do_not_need_root(args:Arguments){

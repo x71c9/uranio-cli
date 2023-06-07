@@ -4,9 +4,9 @@
  * @packageDocumentation
  */
 import minimist from 'minimist';
-export declare type Repo = keyof typeof abstract_repos;
-export declare type PacMan = keyof typeof abstract_pacman;
-export declare type DB = keyof typeof abstract_db;
+export type Repo = keyof typeof abstract_repos;
+export type PacMan = keyof typeof abstract_pacman;
+export type DB = keyof typeof abstract_db;
 export declare enum LogLevel {
     NONE = 0,
     ERROR = 1,
@@ -15,7 +15,7 @@ export declare enum LogLevel {
     DEBUG = 4,
     TRACE = 5
 }
-export declare type Params = {
+export type Params = {
     prod: boolean;
     force: boolean;
     verbose: boolean;
@@ -38,8 +38,8 @@ export declare type Params = {
     docker_tag: string;
     log_level: LogLevel;
 };
-export declare type Arguments = minimist.ParsedArgs;
-export declare type ParseOptions = minimist.Opts;
+export type Arguments = minimist.ParsedArgs;
+export type ParseOptions = minimist.Opts;
 export declare const abstract_repos: {
     readonly core: "";
     readonly api: "";
@@ -83,9 +83,9 @@ export declare function valid_admin_repos(): string[];
 export declare function valid_pacman(): string[];
 export declare function valid_db(): string[];
 export declare function valid_loglevel(): string[];
-export declare type Aliases = {
+export type Aliases = {
     [key: string]: string[];
 };
-export declare type PacManExec = {
+export type PacManExec = {
     [k in PacMan]: string;
 };

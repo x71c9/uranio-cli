@@ -6,9 +6,9 @@
 /// <reference types="node" />
 import * as cp from 'child_process';
 import * as out from '../output/index';
-declare type Resolve = (v?: unknown) => void;
-declare type Reject = (err?: Error) => void;
-declare type Over = 'trace' | 'debug' | 'info' | 'warn' | 'error' | '';
+type Resolve = (v?: unknown) => void;
+type Reject = (err?: Error) => void;
+type Over = 'trace' | 'debug' | 'info' | 'warn' | 'error' | '';
 declare class Spawn {
     output: out.OutputInstance;
     constructor(output: out.OutputInstance);
@@ -43,6 +43,6 @@ declare class Spawn {
     private _native_spawn;
     private _spawn;
 }
-export declare type SpawnInstance = InstanceType<typeof Spawn>;
+export type SpawnInstance = InstanceType<typeof Spawn>;
 export declare function create(output: out.OutputInstance): SpawnInstance;
 export {};

@@ -21,6 +21,6 @@ declare class Util {
     must_be_initialized(): void;
     pretty(filepath: string, parser?: string): void;
 }
-export declare type UtilInstance = InstanceType<typeof Util>;
+export type UtilInstance = InstanceType<typeof Util>;
 export declare function create(params: Params, output: out.OutputInstance): UtilInstance;
 export {};
