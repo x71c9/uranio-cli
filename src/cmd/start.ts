@@ -45,6 +45,7 @@ export async function start_server(params:Partial<Params>, init=true)
 	let cmd_server = `${node_env}${exec}`;
 	cmd_server += ` uranio-webservice-${start_params.repo}`;
 	cmd_server += `${urn_lib_pre}${urn_config_path}`;
+	cmd_server += `-- ${process.argv.join(' ')}`;
 	util_instance.spawn.native({
 		command: cmd_server,
 		action: 'starting server',
