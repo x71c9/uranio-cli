@@ -1,3 +1,10 @@
+# Deprecated
+
+**This repository is deprecated and no longer maintained.**
+
+Please use the new repository for the latest code and updates:  
+[https://github.com/x71c9/uranio](https://github.com/x71c9/uranio)
+
 ## Uranio
 
 ![uranio logo](./img/URN_TEXT_1440_BANNER_01.png)
